@@ -1,0 +1,72 @@
+{% extends "profiles/global-base-ui/global_base_ui.html" %}  
+
+{% block sidebar%}
+    <div class="ui bottom attached segment pushable">
+        <div class="ui inverted labeled icon left inline vertical sidebar menu" style="">
+            <a class="item" ><i class="chart line icon"></i>Dashboard</a>
+            <div class="item"><i class="clipboard list icon"></i>Planning and Acquiring
+                <div class="menu">
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                </div>
+            </div>
+            <div class="item"><i class="bell icon"></i>Training
+                <div class="menu">
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                </div>
+            </div>
+            <div class="item"><i class="shipping fast icon"></i>Deployment
+                <div class="menu">
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                </div>
+            </div>
+            <div class="item"><i class="boxes icon"></i>Inventory
+                <div class="menu">
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                </div>
+            </div>
+            <div class="item"><i class="folder open icon"></i>Unit Management
+                <div class="menu">
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                        <a class="item">Subsection 1</a>
+                </div>
+            </div>
+        </div>
+       
+         <!--html pages-->
+        {% block content %}
+        {% endblock%}
+    </div>
+{% endblock%}
+
+{% block script%}
+    <script>
+        $(document).ready(function(){
+           $('.ui.sidebar')
+            .sidebar({
+                context: $('.bottom.segment')
+            })
+            .sidebar('attach events', '.menu .item');
+            
+            $('.ui.menu .ui.dropdown').dropdown({
+                on: 'hover'
+            });
+            
+            $('.ui.menu .item').on('click', function() {   
+                $(this)
+                .addClass('active')
+                .siblings()
+                .removeClass('active'); 
+            })
+        });
+     </script>
+
+{% endblock%}

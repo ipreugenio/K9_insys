@@ -1,0 +1,60 @@
+{% extends "profiles/global-base-ui/sidebar_menu.html" %}  
+
+{% block sidebar_module %}
+    <div class="pusher">
+        <div class="ui basic segment">
+
+              <div class="ui fluid container">
+                    <div class="ui grid">
+                        <div class="three wide column">
+                                <div class="ui pointing vertical menu">
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="#">Inventory</a>
+                                            <i class="bell icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="#">Subsection 1</a>
+                                            <i class="bell icon"></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="#">Subsection 2</a>
+                                            <i class="bell icon"></i>
+                                    </div>
+                                   
+                                </div>
+                        </div>
+                        <!>
+                        <div class="thirteen wide column">
+                            {% block content %}
+                            {% endblock %}
+                        </div>
+                    </div>
+              </div>
+        </div>
+      </div>
+
+      <style>
+          .submenu{
+                color: #666666;
+                display: block;
+                font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                display: list-item;
+                table-layout: fixed;
+                background-color: transparent;
+                list-style-type: none;
+                list-style-position: outside;
+                line-height: 1.14285714em;
+              
+            }
+            .submenu:hover{
+                color: black;
+            }
+            .subdiv{
+                display: flex; 
+                padding: 8px;  
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+          
+      </style>
+{% endblock%}

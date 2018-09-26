@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>K9 Coast Guard</title>
+
+    <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
+    <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}">
+</head>
+<body>
+    <!--START OF TOP MENU-->
+    <div class="ui inverted top attached menu">
+        <a class="item" style="width: 175px;"><i class="sidebar icon"></i>Menu</a>
+    </div>
+     <!--END OF TOP MENU-->
+
+    <!--sidebar_menu.html-->
+    {% block sidebar %}
+    {% endblock%}
+
+</body>
+    
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'semantic/semantic.min.js' %}"></script>
+    <script src="{% static 'custome/custom_jquery.js' %}"></script>
+
+      
+    {% block script%}
+    {% endblock%}
+
+</html>
