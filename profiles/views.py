@@ -6,5 +6,14 @@ from django.db.models import aggregates
 from django.contrib import messages
 # Create your views here.
 
-def index(request):
-    return render (request, 'profiles/index.html')
+def dashboard(request):
+    return render (request, 'profiles/dashboard.html')
+
+def profile(request):
+    return render (request, 'profiles/profile.html')
+
+def register(request):
+    return render (request, 'profiles/register.html')
+
+def login(request):
+    return render (request, 'profiles/login.html')
