@@ -1,0 +1,57 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+
+
+<h1 class="ui header">
+  Add K9 Form
+  <div class="sub header">Input K9 data here</div>
+</h1>
+<div class="ui inverted segment">
+<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_form' %}" method="post">
+
+    {% csrf_token %}
+
+
+    <div class="fields">
+    <div class="six wide field">
+    <label>Serial Number</label>
+        {{form.serial_number}}
+    </div>
+    <div class="twelve wide field">
+    <label>Name</label>
+        {{form.name}}
+    </div>
+    </div>
+
+
+    <div class="fields">
+    <div class="eight wide field">
+    <label>Breed</label>
+        {{form.breed}}
+    </div>
+    <div class="four wide field">
+    <label>Sex</label>
+        {{form.sex}}
+     </div>
+    <div class="four wide field">
+    <label>Color</label>
+        {{form.color}}
+    </div>
+    </div>
+
+    <div class="four wide field">
+    <label>Birthdate</label>
+        {{form.birth_date}}
+  </div>
+
+    <div class="four wide field">
+    <label>Microchip</label>
+        {{form.microchip}}
+  </div>
+
+
+
+    <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+</form>
+</div>
+
+{% endblock %}

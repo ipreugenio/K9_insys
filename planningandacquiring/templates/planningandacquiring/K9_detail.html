@@ -1,0 +1,51 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+<h1 class="ui header">
+    {{k9}}
+    <div class="sub header">K9 details for {{k9}}</div>
+</h1>
+		<table class="ui celled table">
+        	<thead>
+          	<tr>
+                <th>Name</th>
+                <td>{{k9.name}}</td>
+                </tr>
+            <tr>
+              <th>Serial Number</th>
+                <td>{{k9.serial_number}}</td>
+                </tr>
+            <tr>
+              <th>Breed</th>
+                <td>{{k9.breed}}</td>
+                </tr>
+            <tr>
+              <th>Sex</th>
+                <td>{{k9.sex}}</td>
+                </tr>
+            <tr>
+			  <th>Color</th>
+                <td>{{k9.color}}</td>
+                </tr>
+            <tr>
+              <th>Birthdate</th>
+                <td>{{k9.birth_date}}</td>
+                </tr>
+            <tr>
+              <th>Age</th>
+                <td>{{k9.age}}</td>
+                </tr>
+            <tr>
+              <th>Year Retired</th>
+                <td>{{k9.year_retired}}</td>
+                </tr>
+            <tr>
+              <th>Assignment</th>
+                <td>{{k9.assignment}}</td>
+                </tr>
+            <tr>
+              <th>Microchip</th>
+                <td>{{k9.microchip}}</td>
+            </tr>
+
+    		</thead>
+        </table>
+{% endblock %}

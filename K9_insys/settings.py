@@ -31,12 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-	'profiles.apps.ProfilesConfig',
-	'planningandacquiring.apps.PlanningandacquiringConfig',
+    'profiles.apps.ProfilesConfig',
+    'planningandacquiring.apps.PlanningandacquiringConfig',
     'deployment.apps.DeploymentConfig',
     'training.apps.TrainingConfig',
-	'unitmanagement.apps.UnitmanagementConfig',
-	'inventory.apps.InventoryConfig',
+    'unitmanagement.apps.UnitmanagementConfig',
+    'inventory.apps.InventoryConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,7 +86,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '8888',
     }
 }
 
