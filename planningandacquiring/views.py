@@ -22,6 +22,7 @@ def add_K9(request):
             form.save()
 
     context = {
+        'Title' : "Add K9",
         'form' : add_K9_form
             }
 

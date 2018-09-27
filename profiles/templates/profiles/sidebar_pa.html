@@ -8,19 +8,16 @@
                     <div class="ui grid">
                         <div class="three wide column">
                                 <div class="ui pointing vertical menu">
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Planning and Acquiring</a>
-                                            <i class="bell icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 1</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 2</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                   
+
+
+                                    <div class="item">
+                                        <b>K9 Menu</b>
+    <div class="menu">
+      <a class="item" href="{% url 'planningandacquiring:add_K9_form'%}">Add K9 Form</a>
+      <a class="item" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
+    </div>
+  </div>
+
                                 </div>
                         </div>
                         <!>

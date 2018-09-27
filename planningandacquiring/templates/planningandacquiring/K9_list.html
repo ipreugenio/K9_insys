@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{Title}}</title>
-</head>
-<body>
-<h3>{{Title}}</h3>
-
-		<table>
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+<h1 class="ui header">
+    {{Title}}
+    <div class="sub header">List of all K9s on record</div>
+</h1>
+		<table class="ui celled table">
         	<thead>
           	<tr>
               <th>Name</th>
@@ -49,5 +45,5 @@
         </tbody>
     </table>
 
-</body>
-</html>
+
+{% endblock %}
