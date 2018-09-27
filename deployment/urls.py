@@ -4,6 +4,6 @@ from .import views
 
 app_name='deployment'
 urlpatterns = [
-    #path('/', views., name=''),
+    path('', views.index, name='index'),
     #path('/<int:id>/', views., name=''),
 ];

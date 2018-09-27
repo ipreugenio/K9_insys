@@ -4,7 +4,7 @@ from .import views
 
 app_name='planningandacquiring'
 urlpatterns = [
-    #path('/', views., name=''),
+    path('', views.index, name='index'),
     #path('/<int:id>/', views., name=''),
     path('add_K9_form/', views.add_K9, name='add_K9_form'),
 ];
