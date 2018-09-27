@@ -1,4 +1,7 @@
 from django.db import models
+from datetime import datetime as dt
+from datetime import timedelta as td
+from datetime import date as d
 
 # Create your models here.
 
@@ -13,6 +16,7 @@ class K9(models.Model):
         ('Black', 'Black'),
         ('Gray', 'Gray'),
         ('White', 'White'),
+        ('Yellow', 'Yellow'),
         ('Mixed', 'Mixed')
     )
 
@@ -24,9 +28,21 @@ class K9(models.Model):
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', blank=True)
     age = models.IntegerField('age', default = 0)
-    year_retired = models.DateField('year_retired', blank=True)
+    year_retired = models.DateField('year_retired', blank=True, null=True)
     assignment = models.CharField('assignment', max_length=200)
     microchip = models.CharField('microchip', max_length=200)
+
+    def calculate_age(self):
+        #delta = dt.now().date() - self.birth_date
+        #return delta.days
+        today = d.today()
+        birthdate = self.birth_date
+        return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+
+    def save(self, *args, **kwargs):
+        self.age = self.calculate_age()
+
+        super(K9, self).save(*args, **kwargs)
 
 class Medicine(models.Model):
     name = models.CharField('name', max_length=200)

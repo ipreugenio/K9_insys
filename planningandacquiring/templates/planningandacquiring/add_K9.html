@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add K9 Form</title>
+</head>
+<body>
+
+<form action="{% url 'planningandacquiring:add_K9_form' %}" method="post">
+
+    {% csrf_token %}
+
+<table>
+<thead>
+            <tr>
+                <th>Serial Number</th>
+                <th>Name</th>
+                <th>Breed</th>
+                <th>Sex</th>
+                <th>Color</th>
+                <th>Birthdate</th>
+                <th>Microchip</th>
+            </tr>
+            </thead>
+      <tbody>
+            <tr>
+              <td> {{form.serial_number}}</td>
+                <td>{{form.name}}</td>
+               <td> {{form.breed}}</td>
+               <td> {{form.sex}}</td>
+                <td>{{form.color}}</td>
+                <td>{{form.birth_date}}</td>
+                <td>{{form.microchip}}</td>
+            </tr>
+         </tbody>
+</table>
+    <button type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+</form>
+</body>
+
+</html>
