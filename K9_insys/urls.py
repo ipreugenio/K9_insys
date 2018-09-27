@@ -25,5 +25,4 @@ urlpatterns = [
     path('planningandacquiring/', include ('planningandacquiring.urls', namespace='planningandacquiring')),
     path('training/', include ('training.urls', namespace='training')),
     path('unitmanagement/', include ('unitmanagement.urls', namespace='unitmanagement')),
-
 ]

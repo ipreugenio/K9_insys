@@ -8,10 +8,16 @@ class Medicine(models.Model):
         ('mg', 'mg'),
         ('mL', 'mL'),
     )
-
     medicine = models.CharField(max_length=100)
     dose = models.IntegerField('dose', default=0)
     mass = models.CharField('mass', choices=MASS, max_length=10, default='mg')
+    description = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.medicine
+    
+    def dosage(self):
+        return str(self.dose) +' ' + str(self.mass)
 
 class Medicine_Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
