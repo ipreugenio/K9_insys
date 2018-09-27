@@ -9,9 +9,9 @@ class Medicine(models.Model):
         ('mL', 'mL'),
     )
     medicine = models.CharField(max_length=100)
-    dose = models.IntegerField('dose', default=0)
+    dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
     mass = models.CharField('mass', choices=MASS, max_length=10, default='mg')
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.medicine
@@ -33,13 +33,18 @@ class Food(models.Model):
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
+        ('Both', 'Both'),
     )
 
     food = models.CharField(max_length=100)
-    foodtype = models.CharField('foodtype', choices=FOODTYPE, max_length=50, default='Adult Dog Food')
+    foodtype = models.CharField('foodtype', choices=FOODTYPE, max_length=50)
+    description = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.food
 
 class Food_Inventory(models.Model):
-    medicine = models.ForeignKey(Food, on_delete=models.CASCADE)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
 
 class Food_Inventory_Count(models.Model):
@@ -49,9 +54,11 @@ class Food_Inventory_Count(models.Model):
 
 #Equipment
 class Equipment(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
-    quantity = models.IntegerField('quantity', default=0)
+    equipment = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.equipment
 
 class Equipment_Inventory(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)

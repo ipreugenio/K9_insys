@@ -16,26 +16,22 @@
                                     <div class="{{ style }} row"> {{ message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <form class = "ui inverted form" action="{% url 'inventory:medicine_add' %}" method="POST">
+                            <form class = "ui inverted form" action="{% url 'inventory:food_add' %}" method="POST">
                                 {% csrf_token %}
-                                <div class="field">
-                                    <label>Medicine</label>
-                                    {{form.medicine}}
-                                </div>
-
                                 <div class="two fields">
-                                    <div class="field">
-                                        <label>Dose</label>
-                                        {{form.dose}}
+                                    <div class="ten wide field">
+                                        <label>Food</label>
+                                        {{form.food}}
                                     </div>
-                                    <div class="field">
-                                        <label>Mass</label>
-                                        {{form.mass}}
+                                        
+                                    <div class="six wide field">
+                                        <label>Type</label>
+                                        {{form.foodtype}}
                                     </div>
                                 </div>
-
+                               
                                 <div class="field">
-                                    <label>Description</label>
+                                        <label>Description</label>
                                         {{form.description}}
                                 </div>
 
@@ -49,6 +45,4 @@
         </div>
     </div>                    
 </div>
-
-
 {% endblock%}

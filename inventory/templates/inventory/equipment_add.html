@@ -16,27 +16,17 @@
                                     <div class="{{ style }} row"> {{ message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <form class = "ui inverted form" action="{% url 'inventory:medicine_add' %}" method="POST">
+                            <form class = "ui inverted form" action="{% url 'inventory:equipment_add' %}" method="POST">
                                 {% csrf_token %}
+                             
                                 <div class="field">
-                                    <label>Medicine</label>
-                                    {{form.medicine}}
-                                </div>
-
-                                <div class="two fields">
-                                    <div class="field">
-                                        <label>Dose</label>
-                                        {{form.dose}}
-                                    </div>
-                                    <div class="field">
-                                        <label>Mass</label>
-                                        {{form.mass}}
-                                    </div>
+                                    <label>Equipment</label>
+                                    {{form.equipment}}
                                 </div>
 
                                 <div class="field">
                                     <label>Description</label>
-                                        {{form.description}}
+                                    {{form.description}}
                                 </div>
 
                                 <div class="ui inverted right aligned segment" style="padding: 0px;">
@@ -49,6 +39,4 @@
         </div>
     </div>                    
 </div>
-
-
 {% endblock%}

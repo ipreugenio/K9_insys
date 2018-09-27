@@ -7,7 +7,11 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu">
+                                <div class="ui pointing vertical menu" style="width:200px;">
+                                        <div class = "subdiv">
+                                                <p class = "submenu" href="{% url 'inventory:medicine_add'%}" style="font-weight:bold;color:black;font-size:15px;">Inventory Menu</p>
+                                                
+                                        </div>
                                     <div class = "subdiv">
                                             <a class = "submenu" href="{% url 'inventory:medicine_add'%}">Add Medicine</a>
                                             <i class="plus circle icon "></i>
@@ -21,15 +25,15 @@
                                             <i class="plus circle icon "></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:medicine_list'%}">Medicine List</a>
+                                            <a class = "submenu" href="{% url 'inventory:medicine_list'%}">Medicine List View</a>
                                             <i class="list alternate icon "></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:food_list'%}">Dog Food List</a>
+                                            <a class = "submenu" href="{% url 'inventory:food_list'%}">Dog Food List View</a>
                                             <i class="list alternate icon "></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:equipment_list'%}">Equipment List</a>
+                                            <a class = "submenu" href="{% url 'inventory:equipment_list'%}">Equipment List View</a>
                                             <i class="list alternate icon "></i>
                                     </div>
                                    

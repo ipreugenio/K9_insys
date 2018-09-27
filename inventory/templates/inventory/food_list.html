@@ -13,8 +13,8 @@
 <table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>Medicine</th>
-            <th>Dose</th>
+            <th>Dog Food</th>
+            <th>Type</th>
             <th>Description</th>
             <th></th>
         </tr>
@@ -22,14 +22,14 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:300px;" >{{ data.medicine }}</td>
-                <td style="width:100px;">{{ data.dosage }}</td>
+                <td style="width:300px;" >{{ data.food }}</td>
+                <td style="width:100px;">{{ data.foodtype }}</td>
                 <td>{{ data.description }}</td>
                 <td class="center aligned" style="width:100px;">
                     <a href="#" style="margin-right:10px;">
                         <i class="blue edit icon"></i>
                     </a>
-                    <a onclick="return confirm('Are you sure?')" class = "button"   href="{% url 'inventory:medicine_delete' data.id %}">
+                    <a onclick="return confirm('Are you sure?')" class = "button"   href="{% url 'inventory:food_delete' data.id %}">
                         <i class="red trash alternate icon"></i>
                     </a>
                            
@@ -42,11 +42,13 @@
                
         $(document).ready(function() {
 	        $('#tabledata').DataTable();
+               
             //  $(function() {
             //     $( ".message" ).slideUp( 4000, function() {
             //         // Animation complete.
             //     });
             // });
         } );
+        
     </script>
  {% endblock %}
