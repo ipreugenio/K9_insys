@@ -29,8 +29,11 @@ class K9(models.Model):
     birth_date = models.DateField('birth_date', blank=True)
     age = models.IntegerField('age', default = 0)
     year_retired = models.DateField('year_retired', blank=True, null=True)
-    assignment = models.CharField('assignment', max_length=200)
+    assignment = models.CharField('assignment', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200)
+
+    def __str__(self):
+        return str(self.name)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -41,7 +44,6 @@ class K9(models.Model):
 
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
-
         super(K9, self).save(*args, **kwargs)
 
 class Medicine(models.Model):

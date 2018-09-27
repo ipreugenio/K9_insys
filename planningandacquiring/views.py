@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .forms import add_K9_form
+from .models import K9
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
@@ -25,3 +26,23 @@ def add_K9(request):
             }
 
     return render(request, 'planningandacquiring/add_K9.html', context)
+
+#Listview format
+def K9_listview(request):
+    k9 = K9.objects.all()
+    context = {
+        'Title' : 'K9 List',
+        'k9' : k9
+    }
+
+    return render(request, 'planningandacquiring/K9_list.html', context)
+
+#Detailview format
+def K9_detailview(request, id):
+    k9 = K9.objects.get(id = id)
+    context = {
+        'Title': 'K9 Details',
+        'k9' : k9
+    }
+
+    return render(request, 'planningandacquiring/K9_detail.html', context)
