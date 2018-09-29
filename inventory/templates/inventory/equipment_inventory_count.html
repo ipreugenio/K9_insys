@@ -13,25 +13,18 @@
 <table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>Equipment</th>
-            <th>Description</th>
-            <th></th>
+            <th>Inventory</th>
+            <th>Qauntity</th>
+            <th>Date Counted</th>
+           
         </tr>
     </thead>
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:300px;" >{{ data.equipment }}</td>
-                <td>{{ data.description }}</td>
-                <td class="center aligned" style="width:100px;">
-                    <a href="{% url 'inventory:equipment_edit' data.id %}" style="margin-right:10px;">
-                        <i class="blue edit icon"></i>
-                    </a>
-                    <a onclick="return confirm('Are you sure?')" class = "button"   href="{% url 'inventory:equipment_delete' data.id %}">
-                        <i class="red trash alternate icon"></i>
-                    </a>
-                           
-                </td>       
+                <td>{{ data.inventory }}</td>
+                <td>{{ data.quantity }}</td>
+                <td>{{ data.date_counted }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -19,6 +19,9 @@ class Medicine(models.Model):
     def dosage(self):
         return str(self.dose) +' ' + str(self.mass)
 
+    def medicine_fullname(self):
+        return str(self.medicine) +' ' + str(self.dosage)
+
 class Medicine_Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
@@ -27,6 +30,7 @@ class Medicine_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
 
 #Food
 class Food(models.Model):
@@ -51,6 +55,7 @@ class Food_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
 
 #Equipment
 class Equipment(models.Model):
@@ -68,3 +73,4 @@ class Equipment_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Equipment_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)

@@ -16,7 +16,7 @@
                                     <div class="{{ style }} row"> {{ message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <form class = "ui inverted form" action="{% url 'inventory:medicine_add' %}" method="POST">
+                            <form class = "ui inverted form" method="POST">
                                 {% csrf_token %}
                                 <div class="field">
                                     <label>Medicine</label>

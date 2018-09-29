@@ -26,7 +26,7 @@
                 <td style="width:100px;">{{ data.foodtype }}</td>
                 <td>{{ data.description }}</td>
                 <td class="center aligned" style="width:100px;">
-                    <a href="#" style="margin-right:10px;">
+                    <a href="{% url 'inventory:food_edit' data.id %}" style="margin-right:10px;">
                         <i class="blue edit icon"></i>
                     </a>
                     <a onclick="return confirm('Are you sure?')" class = "button"   href="{% url 'inventory:food_delete' data.id %}">
