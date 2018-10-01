@@ -19,11 +19,10 @@ from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('profiles/', include ('profiles.urls', namespace='profiles')),
+    path('', include ('profiles.urls', namespace='profiles')),
     path('deployment/', include('deployment.urls', namespace='deployment')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
     path('planningandacquiring/', include ('planningandacquiring.urls', namespace='planningandacquiring')),
     path('training/', include ('training.urls', namespace='training')),
     path('unitmanagement/', include ('unitmanagement.urls', namespace='unitmanagement')),
-
 ]

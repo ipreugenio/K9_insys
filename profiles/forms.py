@@ -5,3 +5,4 @@ from datetime import date, datetime
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+

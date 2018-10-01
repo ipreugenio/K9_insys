@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>K9 Coast Guard</title>
+
+    <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
+    <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}">
+</head>
+<body>
+    <!--START OF TOP MENU-->
+        <div class="ui top attached menu">
+            <div class="right menu">
+                <a class="ui item" href="{% url 'profiles:register'%}" style="font-weight: bold;">SIGN-UP</a>
+                <a class="ui item" href="{% url 'profiles:login'%}" style="font-weight: bold;">LOGIN</a>
+            </div>
+        </div>
+    <!--END OF TOP MENU-->
+
+    <div class="ui centered container">
+        <div class="ui center aligned grid">
+            <div class="row">
+                    <div class="eight wide computer column" style="margin-top: 20px;">
+                            <img src="{% static 'images/k9_logo.png' %}">
+                    </div>
+            </div>
+            <div class="row">
+                <div class="ui container">
+                       <div class = "ui two column centered grid">
+                            <div class="six wide column">               
+                                <div class="ui inverted segment">
+                                    <div class="ui left aligned inverted form">
+                                        <div class="field">
+                                            <label>Serial Number</label>
+                                            <input placeholder="Serial Number" type="text">
+                                        </div>
+                                        <div class="field">
+                                            <label>Password</label>
+                                            <input placeholder="Password" type="password">
+                                        </div>
+                                     
+                                        <div class="ui inverted center aligned segment" style="padding: 0px;">
+                                            <div class="ui center aligned orange button">Submit</div>
+                                        </div>
+                                    </div>
+                                </div>           
+                            </div>
+                       </div>
+                </div>
+                
+            </div>
+             
+        </div>
+    </div>
+
+</body>
+    
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'semantic/semantic.min.js' %}"></script>
+    <script src="{% static 'custome/custom_jquery.js' %}"></script>
+
+      
+    {% block script%}
+    {% endblock%}
+
+</html>

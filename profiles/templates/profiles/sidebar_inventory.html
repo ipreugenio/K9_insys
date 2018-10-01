@@ -7,18 +7,46 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu">
+                                <div class="ui pointing vertical menu" style="width:230px;">
+                                        <div class = "subdiv">
+                                                <p class = "submenu" href="{% url 'inventory:medicine_add'%}" style="font-weight:bold;color:black;font-size:15px;">Inventory Menu</p>
+                                                
+                                        </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="#">Inventory</a>
-                                            <i class="bell icon "></i>
+                                            <a class = "submenu" href="{% url 'inventory:medicine_add'%}">Add Medicine</a>
+                                            <i class="plus circle icon "></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 1</a>
-                                            <i class="bell icon"></i>
+                                            <a class = "submenu" href="{% url 'inventory:food_add'%}">Add Dog Food</a>
+                                            <i class="plus circle icon "></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 2</a>
-                                            <i class="bell icon"></i>
+                                            <a class = "submenu" href="{% url 'inventory:equipment_add'%}">Add Equipment</a>
+                                            <i class="plus circle icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="{% url 'inventory:medicine_list'%}">Medicine List View</a>
+                                            <i class="list alternate icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="{% url 'inventory:food_list'%}">Dog Food List View</a>
+                                            <i class="list alternate icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                            <a class = "submenu" href="{% url 'inventory:equipment_list'%}">Equipment List View</a>
+                                            <i class="list alternate icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                        <a class = "submenu" href="{% url 'inventory:medicine_inventory_list'%}">Medicine Inventory List View</a>
+                                        <i class="list alternate icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                        <a class = "submenu" href="{% url 'inventory:food_inventory_list'%}">Dog Food Inventory List View</a>
+                                        <i class="list alternate icon "></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                        <a class = "submenu" href="{% url 'inventory:equipment_inventory_list'%}">Equipment Inventory List View</a>
+                                        <i class="list alternate icon "></i>
                                     </div>
                                    
                                 </div>
@@ -33,28 +61,4 @@
         </div>
       </div>
 
-      <style>
-          .submenu{
-                color: #666666;
-                display: block;
-                font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-                display: list-item;
-                table-layout: fixed;
-                background-color: transparent;
-                list-style-type: none;
-                list-style-position: outside;
-                line-height: 1.14285714em;
-              
-            }
-            .submenu:hover{
-                color: black;
-            }
-            .subdiv{
-                display: flex; 
-                padding: 8px;  
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-          
-      </style>
 {% endblock%}

@@ -2,13 +2,15 @@
 
 {% block sidebar%}
     <div class="ui bottom attached segment pushable">
-        <div class="ui inverted labeled icon left inline vertical sidebar menu" style="">
-            <a class="item" href="{% url 'profiles:index'%}"><i class="chart line icon"></i>Dashboard</a>
-            <a class="item" href="{% url 'planningandacquiring:index'%}"><i class="clipboard list icon"></i>Planning and Acquiring</a>
+        <div class="ui inverted labeled icon left inline vertical sidebar menu" id = "sidebar"style="">
+            <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
+            <a class="item" href="{% url 'profiles:dashboard'%}"><i class="chart line icon"></i>Dashboard</a>
+            <a class="item" href="{% url 'planningandacquiring:add_K9_form'%}"><i class="clipboard list icon"></i>Planning and Acquiring</a>
             <a class="item" href="{% url 'training:index'%}"><i class="bell icon"></i>Training</a>
             <a class="item" href="{% url 'deployment:index'%}"><i class="shipping fast icon"></i>Deployment</a>
-            <a class="item" href="{% url 'inventory:index'%}"><i class="boxes icon"></i>Inventory</a>
+            <a class="item" href="{% url 'inventory:medicine_add'%}"><i class="boxes icon"></i>Inventory</a>
             <a class="item" href="{% url 'unitmanagement:index'%}"><i class="folder open icon"></i>Unit Management</a>
+            <a class="item" href="{% url 'profiles:login'%}">Logout</a>
         </div>
        
          <!--html pages-->
@@ -21,10 +23,11 @@
     </div>
 {% endblock%}
 
+
 {% block script%}
-    <script>
+<script>
         $(document).ready(function(){
-           $('.ui.sidebar')
+           $('#sidebar')
             .sidebar({
                 context: $('.bottom.segment')
             })
@@ -33,7 +36,7 @@
             $('.ui.menu .ui.dropdown').dropdown({
                 on: 'hover'
             });
-            
+       
             $('.ui.menu .item').on('click', function() {   
                 $(this)
                 .addClass('active')
