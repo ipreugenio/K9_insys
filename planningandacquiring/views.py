@@ -17,13 +17,23 @@ def index(request):
 #Form format
 def add_K9(request):
     form = add_K9_form(request.POST)
+    style = "ui teal message"
     if request.method == 'POST':
         if form.is_valid():
             form.save()
 
+            style = "ui green message"
+            messages.success(request, 'K9 has been successfully Added!')
+            form = add_K9_form()
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
     context = {
         'Title' : "Add K9",
-        'form' : add_K9_form
+        'form' : add_K9_form,
+        'style': style,
             }
 
     return render(request, 'planningandacquiring/add_K9.html', context)
@@ -47,3 +57,8 @@ def K9_detailview(request, id):
     }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
+
+'''
+def delete_K9(request, id):
+    k9 = K9.objects.get(id=id)
+'''

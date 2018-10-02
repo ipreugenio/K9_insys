@@ -10,6 +10,6 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     #path('/<int:id>/', views., name=''),
-    path('logout/', auth_views.logout, name='logout'),
+    #path('logout/', auth_views.logout, name='logout'),
     
 ];
