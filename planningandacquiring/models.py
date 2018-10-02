@@ -57,3 +57,4 @@ class Medicine_Assignment(models.Model):
 class Equipment(models.Model):
     name = models.CharField('name', max_length=200)
     description = models.CharField('description', max_length=200)
+
