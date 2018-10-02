@@ -21,10 +21,12 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:500px;" >{{ data.equipment }}</td>
+                <td style="width:500px;" >
+                    <a href="{% url 'inventory:equipment_inventory_count' data.id %}">{{ data.equipment }}</a>
+                </td>
                 <td>{{ data.quantity }}</td>
                 <td class="center aligned" style="width:100px;">
-                    <a href="#" style="margin-right:10px;">
+                    <a href="{% url 'inventory:equipment_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
                     </a>
                 </td>       

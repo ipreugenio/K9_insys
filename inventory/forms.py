@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from inventory.models import Medicine, Food, Equipment
+from inventory.models import Medicine, Food, Equipment, Medicine_Inventory, Food_Inventory, Equipment_Inventory
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -29,7 +29,14 @@ class MedicineForm(forms.ModelForm):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
        
-
+class MedicineCountForm(forms.ModelForm):
+    class Meta:
+        model = Medicine_Inventory
+        fields = ('medicine', 'quantity')
+    
+    def __init__(self, *args, **kwargs):
+        super(MedicineCountForm, self).__init__(*args, **kwargs)
+        self.fields['medicine'].required = False
 #Food
 class FoodForm(forms.ModelForm):
     
@@ -50,6 +57,15 @@ class FoodForm(forms.ModelForm):
         super(FoodForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
 
+class FoodCountForm(forms.ModelForm):
+    class Meta:
+        model = Food_Inventory
+        fields = ('food', 'quantity')
+    
+    def __init__(self, *args, **kwargs):
+        super(FoodCountForm, self).__init__(*args, **kwargs)
+        self.fields['food'].required = False
+
 #Equipment
 class EquipmentForm(forms.ModelForm):
     
@@ -62,6 +78,14 @@ class EquipmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EquipmentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+
+class EquipementCountForm(forms.ModelForm):
+    class Meta:
+        model = Equipment_Inventory
+        fields = ('equipment', 'quantity')
     
+    def __init__(self, *args, **kwargs):
+        super(EquipementCountForm, self).__init__(*args, **kwargs)
+        self.fields['equipment'].required = False
 
 

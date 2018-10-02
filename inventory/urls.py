@@ -24,8 +24,12 @@ urlpatterns = [
     path('list-medicine-inventory', views.medicine_inventory_list, name='medicine_inventory_list'),
     path('list-food-inventory', views.food_inventory_list, name='food_inventory_list'),
     path('list-equipment-inventory', views.equipment_inventory_list, name='equipment_inventory_list'),
-    #inventory Count
+    #inventory Count List
     path('medicine-inventory-count/<int:id>/', views.medicine_inventory_count, name='medicine_inventory_count'),
     path('food-inventory-count/<int:id>/', views.food_inventory_count, name='food_inventory_count'),
     path('equipment-inventory-count/<int:id>/', views.equipment_inventory_count, name='equipment_inventory_count'),
+    #inventory Count Form
+    path('medicine-count-form/<int:id>/', views.medicine_count_form, name='medicine_count_form'),
+    path('food-count-form/<int:id>/', views.food_count_form, name='food_count_form'),
+    path('equipment-count-form/<int:id>/', views.equipment_count_form, name='equipment_count_form'),
 ];

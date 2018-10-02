@@ -9,6 +9,7 @@ from inventory.models import Medicine, Food, Equipment, Medicine_Inventory, Food
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Equipment_Inventory_Count
 
 from inventory.forms import MedicineForm, FoodForm, EquipmentForm
+from inventory.forms import MedicineCountForm, FoodCountForm, EquipementCountForm
 # Create your views here.
 
 def index(request):
@@ -218,8 +219,7 @@ def equipment_inventory_list(request):
     }
     return render (request, 'inventory/equipment_inventory_list.html',context)
 
-#Inventory Count
-
+#Inventory Count List
 def medicine_inventory_count(request, id):
     i = Medicine.objects.get(id=id)
     data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-time')
@@ -246,3 +246,82 @@ def equipment_inventory_count(request, id):
         'data' : data,
     }
     return render (request, 'inventory/equipment_inventory_count.html', context)
+
+#Inventory Count Form
+#TODO
+#ADD USER
+def medicine_count_form(request, id):
+    data = Medicine_Inventory.objects.get(id=id)
+    form = MedicineCountForm(request.POST or None)
+    if request.method == 'POST':
+      
+        #Get session user id
+        # user_id = request.session['session_userid']
+        # current_user = User.objects.get(id=user_id)
+
+        data.quantity = request.POST.get('quantity')
+        data.save()
+        #TODO 
+        # add user = current_user
+        Medicine_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        return redirect('inventory:medicine_inventory_count', id = data.id)
+            
+    context = {
+        'title': data.medicine,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+    }
+    return render (request, 'inventory/medicine_count_form.html', context)
+
+#TODO
+#ADD USER
+def food_count_form(request, id):
+    data = Food_Inventory.objects.get(id=id)
+    form = FoodCountForm(request.POST or None)
+    if request.method == 'POST':
+      
+        #Get session user id
+        # user_id = request.session['session_userid']
+        # current_user = User.objects.get(id=user_id)
+
+        data.quantity = request.POST.get('quantity')
+        data.save()
+        #TODO 
+        # add user = current_user
+        Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        return redirect('inventory:food_inventory_count', id = data.id)
+            
+    context = {
+        'title': data.food,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+    }
+    return render (request, 'inventory/food_count_form.html', context)
+
+#TODO
+#ADD USER
+def equipment_count_form(request, id):
+    data = Equipment_Inventory.objects.get(id=id)
+    form = EquipementCountForm(request.POST or None)
+    if request.method == 'POST':
+      
+        #Get session user id
+        # user_id = request.session['session_userid']
+        # current_user = User.objects.get(id=user_id)
+
+        data.quantity = request.POST.get('quantity')
+        data.save()
+        #TODO 
+        # add user = current_user
+        Equipment_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        return redirect('inventory:equipment_inventory_count', id = data.id)
+            
+    context = {
+        'title': data.equipment,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+    }
+    return render (request, 'inventory/equipment_count_form.html', context)
