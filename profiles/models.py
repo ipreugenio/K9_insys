@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date as d
 
 # Create your models here.
 class Users(models.Model):
@@ -73,7 +74,7 @@ class Users(models.Model):
         #delta = dt.now().date() - self.birth_date
         #return delta.days
         today = d.today()
-        birthdate = self.birth_date
+        birthdate = self.birthdate
         return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
 
     def save(self, *args, **kwargs):

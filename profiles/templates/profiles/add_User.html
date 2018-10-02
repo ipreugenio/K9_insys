@@ -1,0 +1,129 @@
+{% extends "profiles/sidebar_um.html" %} {% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="{{ style }}">{{message}}</div>
+    {% endfor %}
+{% endif %}
+
+<form action="{% url 'profiles:add_User_form' %}" method="post">
+    {% csrf_token %}
+
+    <div class="ui equal width form">
+    <div class="fields">
+        <div class="field">
+    <label>Serial Number</label>
+    {{form.serial_number}}
+        </div>
+        <div class="field">
+    <label>Position</label>
+    {{form.position}}
+        </div>
+        <div class="field">
+    <label>Rank</label>
+    {{form.rank}}
+        </div></div>
+
+    <div class="fields">
+        <div class="field">
+    <label>First Name</label>
+    {{form.firstname}}
+        </div>
+
+        <div class="field">
+    <label>Last Name</label>
+    {{form.lastname}}
+        </div>
+
+    <div class="field">
+    <label>Extension Name</label>
+    {{form.extensionname}}
+    </div></div>
+
+        <div class="fields">
+            <div class="field">
+                <label>Middle Name</label>
+                {{form.middlename}}
+            </div>
+            <div class="field">
+    <label>Nickname</label>
+    {{form.nickname}}
+    </div>
+        <div class="field">
+    <label>Birthdate</label>
+    {{form.birthdate}}
+        </div></div>
+
+         <div class="fields">
+            <div class="field">
+    <label>Birth Place</label>
+    {{form.birthplace}}
+            </div>
+    <div class="field">
+    <label>Gender</label>
+    {{form.gender}}
+            </div>
+            <div class="field">
+    <label>Civil Status</label>
+    {{form.civilstatus}}
+            </div>
+    <div class="field">
+    <label>Citizenship</label>
+    {{form.citizenship}}
+    </div></div>
+
+    <div class="fields">
+        <div class="field">
+    <label>Religion</label>
+    {{form.religion}}
+        </div>
+
+     <div class="field">
+    <label>Blood Type</label>
+    {{form.bloodtype}}
+     </div>
+    <div class="field">
+    <label>Distinct Feature</label>
+    {{form.distinct_feature}}
+    </div></div>
+ <div class="fields">
+            <div class="field">
+    <label>Hair Color</label>
+    {{form.haircolor}}
+            </div>
+
+     <div class="field">
+    <label>Eye Color</label>
+    {{form.eyecolor}}
+     </div>
+     <div class="field">
+    <label>Skin Color</label>
+    {{form.skincolor}}
+     </div></div>
+ <div class="fields">
+      <div class="field">
+    <label>Height</label>
+    {{form.height}}
+      </div>
+            <div class="field">
+    <label>Weight</label>
+    {{form.weight}}
+            </div>
+            <div class="field">
+    <label>Head Size</label>
+    {{form.headsize}}
+            </div>
+            <div class="field">
+    <label>Foot Size</label>
+    {{form.footsize}}
+            </div>
+            <div class="field">
+    <label>Body Build</label>
+    {{form.bodybuild}}
+            </div></div>
+
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+
+</form>
+
+{% endblock %}
