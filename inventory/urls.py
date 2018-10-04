@@ -32,4 +32,8 @@ urlpatterns = [
     path('medicine-count-form/<int:id>/', views.medicine_count_form, name='medicine_count_form'),
     path('food-count-form/<int:id>/', views.food_count_form, name='food_count_form'),
     path('equipment-count-form/<int:id>/', views.equipment_count_form, name='equipment_count_form'),
+    #inventory Receive Form
+    path('medicine-receive-form/<int:id>/', views.medicine_receive_form, name='medicine_receive_form'),
+    path('food-receive-form/<int:id>/', views.food_receive_form, name='food_receive_form'),
+    path('equipment-receive-form/<int:id>/', views.equipment_receive_form, name='equipment_receive_form'),
 ];

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-
+import datetime
 from inventory.models import Medicine, Food, Equipment, Medicine_Inventory, Food_Inventory, Equipment_Inventory
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Equipment_Inventory_Count
 
@@ -222,7 +222,7 @@ def equipment_inventory_list(request):
 #Inventory Count List
 def medicine_inventory_count(request, id):
     i = Medicine.objects.get(id=id)
-    data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-time')
+    data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     context = {
         'title': i.medicine_fullname,
         'data' : data,
@@ -231,7 +231,7 @@ def medicine_inventory_count(request, id):
 
 def food_inventory_count(request, id):
     i = Food.objects.get(id=id)
-    data = Food_Inventory_Count.objects.filter(inventory=id).order_by('-time')
+    data = Food_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     context = {
         'title': i.food,
         'data' : data,
@@ -240,7 +240,7 @@ def food_inventory_count(request, id):
 
 def equipment_inventory_count(request, id):
     i = Equipment.objects.get(id=id)
-    data = Equipment_Inventory_Count.objects.filter(inventory=id).order_by('-time')
+    data = Equipment_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     context = {
         'title': i.equipment,
         'data' : data,
@@ -263,7 +263,7 @@ def medicine_count_form(request, id):
         data.save()
         #TODO 
         # add user = current_user
-        Medicine_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        Medicine_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
         return redirect('inventory:medicine_inventory_count', id = data.id)
             
     context = {
@@ -271,6 +271,7 @@ def medicine_count_form(request, id):
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
+        'label': 'Physical Count',
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -289,7 +290,7 @@ def food_count_form(request, id):
         data.save()
         #TODO 
         # add user = current_user
-        Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
         return redirect('inventory:food_inventory_count', id = data.id)
             
     context = {
@@ -297,6 +298,7 @@ def food_count_form(request, id):
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
+        'label': 'Physical Count',
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -315,7 +317,7 @@ def equipment_count_form(request, id):
         data.save()
         #TODO 
         # add user = current_user
-        Equipment_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'))
+        Equipment_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
         return redirect('inventory:equipment_inventory_count', id = data.id)
             
     context = {
@@ -323,5 +325,85 @@ def equipment_count_form(request, id):
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
+        'label': 'Physical Count',
+    }
+    return render (request, 'inventory/equipment_count_form.html', context)
+
+#Inventory add quantity
+def medicine_receive_form(request, id):
+    data = Medicine_Inventory.objects.get(id=id)
+    form = MedicineCountForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            current_quantity = data.quantity
+            data.quantity = int(current_quantity) + int(request.POST.get('quantity'))
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Medicine has been successfully Updated!')
+            form = MedicineCountForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+        
+        return HttpResponseRedirect('../../list-medicine-inventory')
+
+    context = {
+        'title': data.medicine,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+        'label': 'No. of Received Items ',
+    }
+    return render (request, 'inventory/medicine_count_form.html', context)
+
+def food_receive_form(request, id):
+    data = Food_Inventory.objects.get(id=id)
+    form = FoodCountForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            current_quantity = data.quantity
+            data.quantity = int(current_quantity) + int(request.POST.get('quantity'))
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Food has been successfully Updated!')
+            form = FoodCountForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+        
+        return HttpResponseRedirect('../../list-food-inventory')
+
+    context = {
+        'title': data.food,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+        'label': 'No. of Received Items ',
+    }
+    return render (request, 'inventory/food_count_form.html', context)
+
+def equipment_receive_form(request, id):
+    data = Equipment_Inventory.objects.get(id=id)
+    form = EquipementCountForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            current_quantity = data.quantity
+            data.quantity = int(current_quantity) + int(request.POST.get('quantity'))
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Equipment has been successfully Updated!')
+            form = EquipementCountForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+        
+        return HttpResponseRedirect('../../list-equipment-inventory')
+
+    context = {
+        'title': data.equipment,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+        'label': 'No. of Received Items',
     }
     return render (request, 'inventory/equipment_count_form.html', context)

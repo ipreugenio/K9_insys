@@ -64,10 +64,10 @@ class Users(models.Model):
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)
     #profile image dito
-    height = models.IntegerField('height', max_length=200)
-    weight = models.IntegerField('weight', max_length=200)
-    headsize = models.IntegerField('headsize', max_length=200)
-    footsize = models.IntegerField('footsize', max_length=200)
+    height = models.IntegerField('height')
+    weight = models.IntegerField('weight')
+    headsize = models.IntegerField('headsize')
+    footsize = models.IntegerField('footsize')
     bodybuild = models.CharField('bodybuild', max_length=200)
 
     def calculate_age(self):
@@ -83,7 +83,7 @@ class Users(models.Model):
 
 class Personal_Info(models.Model):
     UserID = models.ForeignKey(Users, on_delete=models.CASCADE)
-    mobile_number = models.IntegerField('mobile_number', max_length=200)
+    mobile_number = models.IntegerField('mobile_number')
     email_address = models.EmailField('email_address', max_length=200)
     tel_number = models.CharField('tel_number', max_length=200)
     street = models.CharField('street', max_length=200)
@@ -94,6 +94,6 @@ class Personal_Info(models.Model):
     mother_birthdate = models.DateField('mother_birthdate', max_length=200)
     father_name = models.CharField('father_name', max_length=200)
     father_birthdate = models.DateField('father_birthdate', max_length=200)
-    tin = models.IntegerField('tin', max_length=200)
-    philhealth = models.IntegerField('philhealth', max_length=200)
+    tin = models.IntegerField('tin')
+    philhealth = models.IntegerField('philhealth')
 
