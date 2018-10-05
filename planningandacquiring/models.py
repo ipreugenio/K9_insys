@@ -30,7 +30,9 @@ class K9(models.Model):
     age = models.IntegerField('age', default = 0)
     year_retired = models.DateField('year_retired', blank=True, null=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
+    status = models.CharField('status', max_length=200, default="unclassified")
     microchip = models.CharField('microchip', max_length=200)
+    
 
     def __str__(self):
         return str(self.name)
@@ -45,6 +47,9 @@ class K9(models.Model):
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         super(K9, self).save(*args, **kwargs)
+
+#TODO
+#FAMILY TREE - MOTHER AND FATHER
 
 class Medicine(models.Model):
     name = models.CharField('name', max_length=200)

@@ -2,7 +2,7 @@
 
 {% block sidebar%}
     <div class="ui bottom attached segment pushable">
-        <div class="ui inverted labeled icon left inline vertical sidebar menu" id = "sidebar"style="">
+        <div class="ui inverted labeled icon left inline vertical sidebar menu" id = "sidebar" >
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
             <a class="item" href="{% url 'profiles:dashboard'%}"><i class="chart line icon"></i>Dashboard</a>
             <a class="item" href="{% url 'planningandacquiring:add_K9_form'%}"><i class="clipboard list icon"></i>Planning and Acquiring</a>
@@ -26,24 +26,26 @@
 
 {% block script%}
 <script>
-        $(document).ready(function(){
-           $('#sidebar')
-            .sidebar({
+    $(document).ready(function(){
+        
+        $( "#menu" ).on("click", function() {
+            $('#sidebar').sidebar({
                 context: $('.bottom.segment')
-            })
-            .sidebar('attach events', '.menu .item');
-            
-            $('.ui.menu .ui.dropdown').dropdown({
-                on: 'hover'
-            });
-       
-            $('.ui.menu .item').on('click', function() {   
-                $(this)
-                .addClass('active')
-                .siblings()
-                .removeClass('active'); 
-            })
+            }).sidebar('attach events', '.menu .item');
         });
-     </script>
+
+
+        $('.ui.menu .ui.dropdown').dropdown({
+            on: 'hover'
+        });
+
+        $('.ui.menu .item').on('click', function() {   
+            $(this)
+            .addClass('active')
+            .siblings()
+            .removeClass('active'); 
+        })
+    });
+</script>
 
 {% endblock%}
