@@ -32,7 +32,7 @@ class Medicine_Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
 
-     def __str__(self):
+    def __str__(self):
         return self.medicine
 
 #TODO
@@ -105,5 +105,5 @@ class Equipment_Inventory_Count(models.Model):
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
-     def __str__(self):
+    def __str__(self):
         return self.inventory
