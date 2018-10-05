@@ -29,6 +29,9 @@
                     <a href="{% url 'inventory:equipment_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
                     </a>
+                    <a href="{% url 'inventory:equipment_receive_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal dolly flatbed icon"></i>
+                    </a>
                 </td>       
             </tr>
             {% endfor %}
