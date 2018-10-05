@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
 
+
 # Create your models here.
 
 class K9(models.Model):
