@@ -1,11 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import add_User_form
-from .models import Users
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+
+from profiles.forms import add_User_form
+from profiles.models import User
+
 # Create your views here.
 
 def dashboard(request):

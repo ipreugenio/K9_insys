@@ -1,0 +1,61 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}{{ name }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class = "ui segment">
+    <table class="ui two column celled table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <td>{{data.date}}</td>
+            </tr>
+            <tr>
+                <th>Problem</th>
+                <td>{{data.problem}}</td>
+            </tr>
+            <tr>
+                <th>Treatment</th>
+                <td>{{data.treatment}}</td>
+            </tr>
+                        
+        </thead>
+    </table>
+</div>
+<div class = "ui segment">
+    <table class="ui three column celled table">
+        <thead>
+            <tr>
+                <th>Medicine</th>
+                <th>Quantity</th>
+                <th>Dosage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medicine in medicine %}
+            <tr>
+                <td>{{medicine.medicine}}</td>
+                <td>{{medicine.quantity}}</td>
+                <td>{{medicine.dosage}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="ui basic segment">
+    <a href="{% url 'unitmanagement:health_history' dog.id %}" class="ui blue button">Back</a>
+</div>
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+    } );
+    
+</script>
+ {% endblock %}

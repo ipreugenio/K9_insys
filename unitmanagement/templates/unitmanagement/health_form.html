@@ -1,0 +1,65 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="ui inverted segment">
+        <form class="ui inverted form" method="POST" id="myForm"  data-url="{% url 'unitmanagement:health_form' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="three fields">
+                <div class="four wide field">
+                    <label>Dog Name : Serial Number</label>
+                    {{form.dog}}
+                </div>
+                <div class="field"></div>
+                <div class="field"></div>
+            </div>
+            <div class="field">
+                <label>Problem</label>
+                {{form.problem}}
+            </div>
+            <div class="field">
+                <label>Treatment</label>
+                {{form.treatment}}
+            </div>
+            <div class="ui inverted right aligned segment" style="padding: 0px;">
+                <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+            </div>
+            <table style="width:100%">
+                <tbody>
+                {% for form in formset %}
+                <tr id="{{ form.prefix }}-row" class="formset_class">
+                    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+                    {% for field in form %}
+                    {% if form.instance.pk %} {{ form.DELETE }}{% endif %}
+                            <span class ="text-danger small">{{field.errors}}</span>
+                            <th>{{field.label_tag}}</th>
+                            <td>{{field}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {{formset.management_form}}
+        </form>
+    </div>
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+        
+        $(function() {
+            $('#myForm .formset_class').formset({
+                prefix: '{{ formset.prefix }}'
+            });            
+        })
+    } );
+    
+</script>
+ {% endblock %}

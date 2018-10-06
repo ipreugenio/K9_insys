@@ -38,7 +38,7 @@ class K9(models.Model):
     
 
     def __str__(self):
-        return str(self.name)
+        return str(self.name) +' - #'+ str(self.serial_number)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date

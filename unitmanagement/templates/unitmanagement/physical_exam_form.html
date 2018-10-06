@@ -1,0 +1,102 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="ui inverted segment">
+    <form class="ui inverted form" method="POST">
+        {% csrf_token %}
+        <div class="three fields">
+            <div class="six wide field">
+                <label>Dog Name : Serial Number</label>
+                {{form.dog}}
+            </div>
+            <div class="three wide field">
+                <label>Cage Number</label>
+                {{form.cage_number}}
+            </div>
+            <div class="field"></div>
+        </div>
+        <div class="four fields">
+            <div class="four wide field">
+                <label>General Appearance</label>
+                {{form.general_appearance}}
+            </div>
+            <div class="four wide field">
+                <label>Integumentary</label>
+                {{form.integumentary}}
+            </div>
+            <div class="field">
+                <label>Musculo Skeletal</label>
+                {{form.musculo_skeletal}}
+            </div>
+            <div class="field">
+                <label>Respiratory</label>
+                {{form.respiratory}}
+            </div>
+        </div>
+        <div class="four fields">
+            <div class="field">
+                <label>Genito Urinarye</label>
+                {{form.genito_urinary}}
+            </div>
+            <div class="field">
+                <label>Nervous</label>
+                {{form.nervous}}
+            </div>
+            <div class="field">
+                <label>Circulatory</label>
+                {{form.circulatory}}
+            </div>
+            <div class="field">
+                <label>Digestive</label>
+                {{form.digestive}}
+            </div>
+        </div>
+        <div class="four fields">
+            <div class="field">
+                <label>Mucous Membrances</label>
+                {{form.mucous_membrances}}
+            </div>
+            <div class="field">
+                <label>Lymph Nodes</label>
+                {{form.lymph_nodes}}
+            </div>
+            <div class="field">
+                <label>Eyes</label>
+                {{form.eyes}}
+            </div>
+            <div class="field">
+                <label>Ears</label>
+                {{form.ears}}
+            </div>
+        </div>
+        <div class="field">
+            <label>Remarks and Recommendations</label>
+            {{form.remarks}}
+        </div>
+        <div class="ui inverted right aligned segment" style="padding: 0px;">
+            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+
+        $("#dogname").on("change paste keyup", function() {
+            res = 100;
+            $('#serialnumber').val(res);
+        });
+    
+    } );
+    
+</script>
+ {% endblock %}
