@@ -16,7 +16,7 @@
                                     <div class="{{ style }} row"> {{ message }}</div>
                                 {% endfor %}
                             {% endif %}
-                            <form class = "ui inverted form" method="POST">
+                            <form class = "ui inverted fluid form" method="POST">
                                 {% csrf_token %}
                                 <div class="two fields">
                                     <div class="field">
@@ -29,15 +29,18 @@
                                     </div>
                                 </div>
 
-                                <div class="three fields">
-                                    <div class="field">
-                                        <label>{{label}}</label>
+                                <div class="field">
+                                    <div class="inline field">
+                                        <div class="field">
+                                                <label>{{label}}</label>
+                                        </div>
                                         {{form.quantity}}
+                                        <div class="ui left pointing blue basic label">
+                                            Item per pc
+                                        </div>
                                     </div>
-                                    <div class="field"></div>
-                                    <div class="field"></div>
-                                </div>
-                              
+                                </div>  
+
                                 <div class="ui inverted right aligned segment" style="padding: 0px;">
                                     <button onclick="return confirm('Are you sure?')"  class = "ui button green" type="submit" >{{ actiontype }}</button>
                                 </div>

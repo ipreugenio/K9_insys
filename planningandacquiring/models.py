@@ -28,9 +28,12 @@ class K9(models.Model):
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', blank=True)
     age = models.IntegerField('age', default = 0)
+    source = models.CharField('source', max_length=200, default="Not Specified")
     year_retired = models.DateField('year_retired', blank=True, null=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
-    status = models.CharField('status', max_length=200, default="unclassified")
+    status = models.CharField('status', max_length=200, default="Material Dog")
+    training_status = models.CharField('training_status', max_length=200, default="Unclassified")
+    capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200)
     
 
@@ -42,8 +45,11 @@ class K9(models.Model):
         #return delta.days
         today = d.today()
         birthdate = self.birth_date
-        return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-
+        bday = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        if bday < 1:
+            bday = 0
+        return bday
+        
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         super(K9, self).save(*args, **kwargs)
@@ -59,7 +65,7 @@ class Medicine_Assignment(models.Model):
     milligram = models.DecimalField('milligram', decimal_places=3, max_digits=12, default=0)
     K9 = models.ForeignKey(K9, on_delete=models.CASCADE)
 
-class Equipment(models.Model):
+class Miscellaneous(models.Model):
     name = models.CharField('name', max_length=200)
     description = models.CharField('description', max_length=200)
 

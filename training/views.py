@@ -12,10 +12,10 @@ def index(request):
     return render (request, 'training/index.html')
 
 def classify_k9_list(request):
-    data_unclassified = K9.objects.filter(status="unclassified")
-    data_classified = K9.objects.filter(status="classified")
-    data_ontraining = K9.objects.filter(status="on-training")
-    data_trained = K9.objects.filter(status="trained")
+    data_unclassified = K9.objects.filter(training_status="Unclassified")
+    data_classified = K9.objects.filter(training_status="Classified")
+    data_ontraining = K9.objects.filter(training_status="On-Training")
+    data_trained = K9.objects.filter(training_status="Trained")
     context = {
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
@@ -28,6 +28,12 @@ def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
     if request.method == 'POST':
         print(request.POST.get('select_classify'))
+        data.capability = request.POST.get('select_classify')
+        data.training_status = "Classified"
+        data.save()
+        style = "ui green message" 
+        messages.success(request, 'K9 has been successfully Classied!')
+
     context = {
         'title': data.name,
         'data': data,

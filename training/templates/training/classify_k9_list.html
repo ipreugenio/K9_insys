@@ -9,7 +9,7 @@
     <a class="item" data-tab="third">Trained</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata" class="ui celled table">
+    <table id="tabledata1" class="ui seven column celled table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -17,6 +17,7 @@
                 <th>Color</th>
                 <th>Sex</th>
                 <th>Age</th>
+                <th>Classification</th>
                 <th></th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
                 <td>{{data_unclassified.age}}</td>
+                <td>{{data_unclassified.capability}}</td>
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -36,36 +38,38 @@
         </tbody>
     </table>
 </div>
-<div class="ui bottom attached tab segment" data-tab="second">
-<table id="tabledata" class="ui celled table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Breed</th>
-            <th>Color</th>
-            <th>Sex</th>
-            <th>Age</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data_classified in data_classified %}
-        <tr>
-            <td>{{data_classified.name}}</td>
-            <td >{{data_classified.breed}}</td>
-            <td>{{data_classified.color}}</td>
-            <td >{{data_classified.sex}}</td>
-            <td>{{data_classified.age}}</td>
-            <td style="text-align:center;">
-                <a href="{% url 'training:classify_k9_select' data_classified.id %}" class = "tiny ui blue basic button">Select</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="ui tab segment" data-tab="second">
+    <table id="tabledata2" class="ui seven column celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Breed</th>
+                <th>Color</th>
+                <th>Sex</th>
+                <th>Age</th>
+                <th>Classification</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data_classified in data_classified %}
+            <tr>
+                <td>{{data_classified.name}}</td>
+                <td >{{data_classified.breed}}</td>
+                <td>{{data_classified.color}}</td>
+                <td >{{data_classified.sex}}</td>
+                <td>{{data_classified.age}}</td>
+                <td>{{data_classified.capability}}</td>
+                <td style="text-align:center;">
+                    <a href="{% url 'training:classify_k9_select' data_classified.id %}" class = "tiny ui blue basic button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-<div class="ui bottom attached tab segment" data-tab="third">
-<table id="tabledata" class="ui celled table">
+<div class="ui tab segment" data-tab="third">
+<table id="tabledata3" class="ui seven column celled table">
     <thead>
         <tr>
             <th>Name</th>
@@ -73,17 +77,19 @@
             <th>Color</th>
             <th>Sex</th>
             <th>Age</th>
+            <th>Classification</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        {% for data_classified in data_classified %}
+        {% for data_ontraining in data_ontraining %}
         <tr>
             <td>{{data_ontraining.name}}</td>
             <td >{{data_ontraining.breed}}</td>
             <td>{{data_ontraining.color}}</td>
             <td >{{data_ontraining.sex}}</td>
             <td>{{data_ontraining.age}}</td>
+            <td>{{data_ontraining.capability}}</td>
             <td style="text-align:center;">
                 <a href="{% url 'training:classify_k9_select' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
             </td>
@@ -92,8 +98,8 @@
     </tbody>
 </table>
 </div>
-<div class="ui bottom attached tab segment" data-tab="fourth">
-<table id="tabledata" class="ui celled table">
+<div class="ui tab segment" data-tab="fourth">
+<table id="tabledata4" class="ui seven column celled table">
     <thead>
         <tr>
             <th>Name</th>
@@ -101,17 +107,19 @@
             <th>Color</th>
             <th>Sex</th>
             <th>Age</th>
+            <th>Classification</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        {% for data_classified in data_classified %}
+        {% for data_trained in data_trained %}
         <tr>
             <td>{{data_trained.name}}</td>
             <td >{{data_trained.breed}}</td>
             <td>{{data_trained.color}}</td>
             <td >{{data_trained.sex}}</td>
             <td>{{data_trained.age}}</td>
+            <td>{{data_trained.capability}}</td>
             <td style="text-align:center;">
                 <a href="{% url 'training:classify_k9_select' data_trained.id %}" class = "tiny ui blue basic button">Select</a>
             </td>
@@ -125,7 +133,10 @@
 <script type="text/javascript">
         
     $(document).ready(function() {
-        $('#tabledata').DataTable();
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('#tabledata3').DataTable();
+        $('#tabledata4').DataTable();
         $('.menu .item').tab();
     });
     

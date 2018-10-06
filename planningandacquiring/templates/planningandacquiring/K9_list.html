@@ -3,7 +3,7 @@
     {{Title}}
     <div class="sub header">List of all K9s on record</div>
 </h1>
-		<table class="ui celled table">
+		<table id="tabledata" class="ui celled table">
         	<thead>
           	<tr>
               <th>Name</th>
@@ -15,7 +15,7 @@
               <th>Age</th>
               <th>Year Retired</th>
               <th>Assignment</th>
-              <th>Microchip</th>
+			  <th>Microchip</th>
           	</tr>
     		</thead>
     		<tbody>
@@ -32,7 +32,7 @@
                         <td>{{ K9.age}}</td>
                         <td>{{ K9.year_retired}}</td>
                         <td>{{ K9.assignment}}</td>
-                        <td>{{ K9.microchip}}</td>
+						<td>{{ K9.microchip}}</td>
     				</tr>
 				{% endfor %}
 			{% else %}
@@ -45,5 +45,12 @@
         </tbody>
     </table>
 
-
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		$('#tabledata').DataTable();
+		$('.menu .item').tab();
+	});
+	
+</script>
 {% endblock %}
