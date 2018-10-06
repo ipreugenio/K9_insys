@@ -2,9 +2,11 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
+from django.forms import formset_factory, inlineformset_factory
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine
 from planningandacquiring.models import K9
+from inventory.models import Medicine
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -51,6 +53,12 @@ class HealthForm(forms.ModelForm):
         fields = ('dog','problem', 'treatment')
 
 class HealthMedicineForm(forms.ModelForm):
+
     class Meta:
         model = HealthMedicine
         fields = ('health','medicine', 'quantity', 'dosage')
+
+    health = forms.ModelChoiceField(queryset = Health.objects.all())
+    medicine = forms.ModelChoiceField(queryset = Medicine.objects.all())
+    
+HealthMedicineFormSet = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1)

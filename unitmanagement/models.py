@@ -23,9 +23,10 @@ class Health(models.Model):
 #try not reference medicine foreign key
 class HealthMedicine(models.Model):
     health = models.ForeignKey(Health, on_delete=models.CASCADE)
-    medicine = models.CharField('medicine', max_length=200)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    #medicine = models.CharField('medicine', max_length=200)
     quantity = models.IntegerField('quantity', default=0)
-    dosage = models.CharField('dosage', max_length=200, default="Not Specified")
+    dosage = models.CharField('dosage', max_length=200, default="")
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog)

@@ -24,7 +24,7 @@
         {% for data in data %}
         <tr>
             <td>
-                <a href="{% url 'unitmanagement:health_history' data.id %}">{{ data.serial_number }}</a>
+                <a href="{% url 'unitmanagement:health_history' data.id %}">#{{ data.serial_number }}</a>
             </td>
             <td>{{ data.name }}</td>
             <td>{{ data.breed }}</td>
