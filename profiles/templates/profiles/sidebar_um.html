@@ -13,14 +13,21 @@
                                            
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 1</a>
+                                            <a class = "submenu" href="{% url 'profiles:add_User_form'%}">Add User</a>
                                             <i class="bell icon"></i>
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 2</a>
-                                            <i class="bell icon"></i>
+                                            <a class = "submenu" href="{% url 'unitmanagement:health_form'%}">Health Form</a>
+                                            <i class="first aid icon"></i>
                                     </div>
-                                   
+                                    <div class = "subdiv">
+                                        <a class = "submenu" href="{% url 'unitmanagement:physical_exam_form'%}">Physical Exam Form</a>
+                                        <i class="heartbeat icon"></i>
+                                    </div>
+                                    <div class = "subdiv">
+                                        <a class = "submenu" href="{% url 'unitmanagement:health_record'%}">Health Records</a>
+                                        <i class="h square icon"></i>
+                                    </div>
                                 </div>
                         </div>
                         <!>

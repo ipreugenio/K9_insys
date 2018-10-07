@@ -13,7 +13,8 @@
 <table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>Equipment</th>
+            <th>Miscellaneous</th>
+            <th>Unit of Measurement</th>
             <th>Qauntity</th>
             <th></th>
         </tr>
@@ -21,11 +22,17 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:500px;" >{{ data.equipment }}</td>
+                <td style="width:400px;" >
+                    <a href="{% url 'inventory:miscellaneous_inventory_count' data.id %}">{{ data.miscellaneous }}</a>
+                </td>
+                <td>{{ data.miscellaneous.uom }}</td>
                 <td>{{ data.quantity }}</td>
                 <td class="center aligned" style="width:100px;">
-                    <a href="#" style="margin-right:10px;">
+                    <a href="{% url 'inventory:miscellaneous_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
+                    </a>
+                    <a href="{% url 'inventory:miscellaneous_receive_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal dolly flatbed icon"></i>
                     </a>
                 </td>       
             </tr>

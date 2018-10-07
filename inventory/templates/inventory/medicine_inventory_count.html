@@ -1,0 +1,43 @@
+{% extends "profiles/sidebar_inventory.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th>Quantity</th>
+            <th>Date Counted</th>
+            <th>Counted By</th>
+        </tr>
+    </thead>
+        <tbody>
+            {% for data in data %}
+            <tr>
+                <td>{{ data.quantity }}</td>
+                <td>{{ data.date_counted }}</td>    
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="ui basic segment">
+        <a href="{% url 'inventory:medicine_inventory_list'%}" class="ui blue button">Back</a>
+    </div>
+    <script type="text/javascript">
+               
+        $(document).ready(function() {
+	        $('#tabledata').DataTable();
+            // $(function() {
+            //     $( ".message" ).slideUp( 4000, function() {
+                   
+            //     });
+            // });
+        } );
+    </script>
+ {% endblock %}

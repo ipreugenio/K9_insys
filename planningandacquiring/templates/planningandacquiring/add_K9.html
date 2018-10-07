@@ -5,6 +5,11 @@
   <div class="sub header">Input K9 data here</div>
 </h1>
 <div class="ui inverted segment">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{{ style }} row"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
 <form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_form' %}" method="post">
     {% csrf_token %}
     <div class="fields">
@@ -33,9 +38,15 @@
         </div>
     </div>
 
-    <div class="four wide field">
-        <label>Birthdate</label>
-        {{form.birth_date}}
+    <div class="fields">
+        <div class="four wide field">
+            <label>Source</label>
+            {{form.source}}
+        </div>
+        <div class="four wide field">
+            <label>Birthdate</label>
+            {{form.birth_date}}
+        </div>
     </div>
 
     <div class="four wide field">

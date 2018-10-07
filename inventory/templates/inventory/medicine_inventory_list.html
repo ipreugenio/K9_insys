@@ -15,7 +15,7 @@
         <tr>
             <th>Medicine</th>
             <th>Dose</th>
-            <th>Qauntity</th>
+            <th>Quantity</th>
             <th></th>
         </tr>
     </thead>
@@ -23,13 +23,16 @@
             {% for data in data %}
             <tr>
                 <td style="width:500px;" >
-                    <a href="{% url 'inventory:medicine_inventory_count' data.id  %}"> {{ data.medicine }}</a>
+                    <a href="{% url 'inventory:medicine_inventory_count' data.id %}"> {{ data.medicine }}</a>
                 </td>
                 <td>{{ data.medicine.dosage }}</td>
                 <td>{{ data.quantity }}</td>
                 <td class="center aligned" style="width:100px;">
-                    <a href="#" style="margin-right:10px;">
-                        <i class="teal list ol icon"></i>
+                    <a href="{% url 'inventory:medicine_count_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal boxes icon"></i>
+                    </a>
+                    <a href="{% url 'inventory:medicine_receive_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal dolly flatbed icon"></i>
                     </a>
                 </td>       
             </tr>
