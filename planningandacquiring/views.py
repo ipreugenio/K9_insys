@@ -93,6 +93,8 @@ def donation_confirmed(request):
         k9_donated.save()
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
+        k9.delete()
+        donator.delete()
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_form,
