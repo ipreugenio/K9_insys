@@ -108,7 +108,7 @@ class K9_New_Owner(models.Model):
 class K9_Donated(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     owner = models.ForeignKey(K9_Past_Owner, on_delete=models.CASCADE)
-    date_donated = models.DateField('date_adopted', auto_now_add=True)
+    date_donated = models.DateField('date_donated', auto_now_add=True)
 
     def __str__(self):
         return str(self.k9)
@@ -121,19 +121,11 @@ class K9_Adopted(models.Model):
     def __str__(self):
         return str(self.k9)
 
-class K9_Father(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "father")
-    offspring = models.ForeignKey(K9, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return str(self.k9)
-
-class K9_Mother(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother")
-    offspring = models.ForeignKey(K9, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.k9.name)
+class K9_Parent(models.Model):
+    mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother", blank=True, null=True)
+    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
+    offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
 class Medicine(models.Model):
     name = models.CharField('name', max_length=200)

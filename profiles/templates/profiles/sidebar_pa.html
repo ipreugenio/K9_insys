@@ -13,32 +13,25 @@
                                             
                                     </div>
                                     <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:add_K9_form'%}" >Receive Donated K9 Form</a>
+                                            <a class = "submenu" href="{% url 'planningandacquiring:add_donated_K9_form'%}" >Receive Donated K9 Form</a>
                                             <i class="plus circle icon "></i>
                                     </div>
+
                                     <div class = "subdiv">
+                                            <a class = "submenu" href="{% url 'planningandacquiring:add_K9_parents_form'%}">Breeding Form</a>
+                                            <i class="plus circle icon "></i>
+                                    </div>
+
+                                       <div class = "subdiv">
                                             <a class = "submenu" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
                                             <i class="list alternate icon "></i>
                                     </div>
 
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Breeding Form</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
+                                </div>
 
-                                </div>
-                            <!-- <div class="ui pointing vertical menu">
-                                <div class="item">
-                                    <b>K9 Menu</b>
-                                    <div class="menu">
-                                        <a class="item" href="{% url 'planningandacquiring:add_K9_form'%}">Add K9 Form</a>
-                                        <a class="item" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
-                                    </div>
-                                </div>
-                            </div> -->
 
                         </div>
-                        <!>
+
                         <div class="thirteen wide column">
                             {% block content %}
                             {% endblock %}

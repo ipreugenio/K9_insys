@@ -1,30 +1,40 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
-
 <h1 class="ui header">
  {{Title}}
-  <div class="sub header">Input K9 donation receiving data here</div>
+  <div class="sub header">Input K9 breeding data here</div>
 </h1>
 
 <div class="ui ordered steps">
+  <div class="completed step">
+    <div class="content">
+      <div class="title">K9 Parents Form</div>
+      <div class="description">Select K9 Parents</div>
+    </div>
+  </div>
+  <div class="completed step">
+    <div class="content">
+      <div class="title">Confirm Parents</div>
+      <div class="description">Verify selected parents</div>
+    </div>
+  </div>
   <div class="active step">
     <div class="content">
-      <div class="title">K9 Form</div>
-      <div class="description">Provide your received K9 Data</div>
+      <div class="title">Offspring Form</div>
+      <div class="description">Provide K9 offspring data</div>
     </div>
   </div>
   <div class="disabled step">
     <div class="content">
-      <div class="title">Previous Ownership Form</div>
-      <div class="description">Provide previous owner data</div>
-    </div>
-  </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Confirm Adoption</div>
-      <div class="description">Verify adoption details</div>
+      <div class="title">Confirm Breeding</div>
+      <div class="description">Verify breeding details</div>
     </div>
   </div>
 </div>
+ {% if messages %}
+        {% for message in messages %}
+            <div class="{{ style }} row"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
 <div class="ui inverted segment">
     {% if messages %}
@@ -32,7 +42,7 @@
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_form' %}" method="post">
+<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" method="post">
     {% csrf_token %}
     <div class="fields">
         <div class="sixteen wide field">
@@ -75,5 +85,6 @@
 </form>
 
 </div>
+
 
 {% endblock %}
