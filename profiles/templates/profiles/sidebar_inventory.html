@@ -7,48 +7,36 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu" style="width:230px;">
-                                        <div class = "subdiv">
-                                                <p class = "submenu" href="{% url 'inventory:medicine_add'%}" style="font-weight:bold;color:black;font-size:15px;">Inventory Menu</p>
-                                                
-                                        </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:medicine_add'%}">Add Medicine</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:food_add'%}">Add Dog Food</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:miscellaneous_add'%}">Add Miscellaneous Item</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:medicine_list'%}">Medicine List View</a>
-                                            <i class="list alternate icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:food_list'%}">Dog Food List View</a>
-                                            <i class="list alternate icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'inventory:miscellaneous_list'%}">Miscellaneous List View</a>
-                                            <i class="list alternate icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                        <a class = "submenu" href="{% url 'inventory:medicine_inventory_list'%}">Medicine Inventory List View</a>
-                                        <i class="list alternate icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                        <a class = "submenu" href="{% url 'inventory:food_inventory_list'%}">Dog Food Inventory List View</a>
-                                        <i class="list alternate icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                        <a class = "submenu" href="{% url 'inventory:miscellaneous_inventory_list'%}">Miscellaneous Inventory List View</a>
-                                        <i class="list alternate icon "></i>
-                                    </div>
-                                   
+                                <div class="ui tiny pointing vertical menu" style="width:230px;">
+                                        <a class="item"> <b>Inventory Menu</b></a>
+                                        
+                                        <a href="{% url 'inventory:medicine_add'%}" class="item">Add Medicine
+                                                <i class="plus circle icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:food_add'%}" class="item">Add Dog Food
+                                                <i class="plus circle icon"></i>
+                                        </a> 
+                                        <a href="{% url 'inventory:miscellaneous_add'%}" class="item">Add Miscellaneous Item
+                                                <i class="plus circle icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:medicine_list'%}" class="item">Medicine List View
+                                                <i class="list alternate icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:food_list'%}" class="item">Dog Food List View
+                                                <i class="list alternate icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:miscellaneous_list'%}" class="item">Miscellaneous List View
+                                                <i class="list alternate icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:medicine_inventory_list'%}" class="item">Medicine Inventory List View
+                                                <i class="clipboard list icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:food_inventory_list'%}" class="item">Dog Food Inventory List View
+                                                <i class="clipboard list icon"></i>
+                                        </a>  
+                                        <a href="{% url 'inventory:miscellaneous_inventory_list'%}" class="item">Miscellaneous Inventory List View
+                                                <i class="clipboard list icon"></i>
+                                        </a>  
                                 </div>
                         </div>
                         <!>

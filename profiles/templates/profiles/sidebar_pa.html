@@ -7,36 +7,22 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu" style="width:230px;">
-                                    <div class = "subdiv">
-                                        <p class = "submenu" style="font-weight:bold;color:black;font-size:15px;">K9 Menu</p>
-                                            
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:add_K9_form'%}" >Receive Donated K9 Form</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
-                                            <i class="list alternate icon "></i>
-                                    </div>
-
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Breeding Form</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-
-                                </div>
-                            <!-- <div class="ui pointing vertical menu">
-                                <div class="item">
-                                    <b>K9 Menu</b>
-                                    <div class="menu">
-                                        <a class="item" href="{% url 'planningandacquiring:add_K9_form'%}">Add K9 Form</a>
-                                        <a class="item" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
-                                    </div>
-                                </div>
-                            </div> -->
-
+                            <div class="ui tiny pointing vertical menu" style="width:230px;">
+                                    <a class="item"> <b>Planning and Acquiring Menu</b></a>
+                                
+                                <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
+                                    <i class="list alternate icon"></i>
+                                </a>  
+                                <a href="{% url 'planningandacquiring:add_K9_form'%}" class="item">Receive Donated K9 Form
+                                    <i class="plus circle icon"></i>
+                                </a>  
+                                <a href="" class="item">Breeding Form
+                                    <i class="plus circle icon"></i>
+                                </a>  
+                                <a href="" class="item">Add Deployment Location
+                                    <i class="plus circle icon"></i>
+                                </a>  
+                            </div>
                         </div>
                         <!>
                         <div class="thirteen wide column">

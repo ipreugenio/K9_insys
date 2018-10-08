@@ -7,19 +7,15 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu" style="width:230px;">
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#" style="font-weight:bold;color:black;font-size:15px;">Deployment Menu</a>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 1</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 2</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                   
+                                <div class="ui tiny pointing vertical menu" style="width:230px;">
+                                    <a class="item"> <b>Deployment Menu</b></a>
+                                    
+                                    <a href="{% url 'deployment:deployed_dogs'%}" class="item">Deployed Dogs
+                                        <i class="list alternate icon"></i>
+                                    </a>  
+                                    <a href="{% url 'deployment:requested_dogs'%}" class="item">Requested Dogs
+                                        <i class="phone icon"></i>
+                                    </a>  
                                 </div>
                         </div>
                         <!>
@@ -30,30 +26,6 @@
                     </div>
               </div>
         </div>
-      </div>
+    </div>
 
-      <style>
-          .submenu{
-                color: #666666;
-                display: block;
-                font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-                display: list-item;
-                table-layout: fixed;
-                background-color: transparent;
-                list-style-type: none;
-                list-style-position: outside;
-                line-height: 1.14285714em;
-              
-            }
-            .submenu:hover{
-                color: black;
-            }
-            .subdiv{
-                display: flex; 
-                padding: 8px;  
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-          
-      </style>
 {% endblock%}

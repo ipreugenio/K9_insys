@@ -39,7 +39,7 @@ def add_User(request):
             messages.warning(request, 'Invalid input data!')
 
     context = {
-        'Title': "Add User",
+        'title': "Add User Form",
         'form': add_User_form,
         'style': style,
     }

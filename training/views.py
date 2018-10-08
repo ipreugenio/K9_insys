@@ -41,4 +41,7 @@ def classify_k9_select(request, id):
     return render (request, 'training/classify_k9_select.html', context)
     
 def training_records(request):
-    return render (request, 'training/training_records.html')
+    context = {
+        'title': 'Training Records',
+    }
+    return render (request, 'training/training_records.html', context)
