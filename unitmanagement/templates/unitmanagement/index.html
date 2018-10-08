@@ -2,6 +2,51 @@
 
 {% block content %}
 <div class="ui fluid container">
-        <h1>Unit Management</h1>
+		<h1 class="ui header">
+		{{title}}
+			<div class="sub header">UI Formset for Health form Medicine Section. See Health Form for further
+				details. When submit is clicked, insert data to database. 
+				See def index and def health_form in views. Need to integrate codes. 
+				Remove and Add field NOT WORKING.
+			</div>
+		</h1>
+        <div class="ui inverted segment">
+			<form class="ui inverted form" method="POST">
+				{% csrf_token %}
+				<div class="three fields">
+					<div class="field">
+						<label>Medicine</label>
+						<select class="ui search dropdown" name = "dropdown">
+							{% for data in data %}
+							<option value={{data.id}}>{{data.medicine_fullname}}</option>
+							{% endfor %}
+						</select>  
+					</div>
+					<div class="five wide field">
+							<label for="">Dosage</label>
+							{{form.dosage}}
+					</div>
+					<div class="field">
+						<div class="inline field">
+							<div class="field">
+									<label>Quantity</label>
+							</div>
+							{{form.quantity}}
+							<div class="ui left pointing red label button">
+								Remove
+							</div>
+						</div>
+					</div>  
+					
+				</div>
+				<div class="field">
+					<button class="ui blue button">Add Field</button>
+				</div>
+				<div class="ui inverted right aligned segment" style="padding: 0px;">
+					<button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+				</div>
+				
+			</form>  
+        </div>
 </div>
 {% endblock%}

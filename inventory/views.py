@@ -82,7 +82,6 @@ def food_add(request):
         print(form.errors)
         if form.is_valid():
             form.save()
-            
             #save in food inventory
             data_id = Food.objects.last() 
             Food_Inventory.objects.create(food = data_id, quantity = 0)

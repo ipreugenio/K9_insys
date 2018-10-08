@@ -21,7 +21,7 @@ class Medicine(models.Model):
         return str(self.dose) +' ' + str(self.uom)
         
     def save(self, *args, **kwargs):
-        self.medicine_fullname = str(self.medicine) +' ' + str(self.dose) + str(self.uom) 
+        self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom) 
         super(Medicine, self).save(*args, **kwargs)
         
 

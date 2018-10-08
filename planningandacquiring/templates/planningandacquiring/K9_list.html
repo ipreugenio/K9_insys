@@ -19,8 +19,6 @@
           	</tr>
     		</thead>
     		<tbody>
-
-			{% if k9 %}
 				{% for K9 in k9 %}
     				<tr>
     					<td><a  href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
@@ -35,13 +33,6 @@
 						<td>{{ K9.microchip}}</td>
     				</tr>
 				{% endfor %}
-			{% else %}
-			<tr>
-				<p>There are no K9s to display</p>
-			</tr>
-
-			{% endif %}
-
         </tbody>
     </table>
 
