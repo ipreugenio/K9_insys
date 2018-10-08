@@ -7,7 +7,7 @@ from inventory.models import Medicine
 class Health(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
     dog_name = models.CharField('dog_name', max_length=200)
-    serial_number = models.IntegerField('serial_number', default=0)
+    serial_number = models.CharField('serial_number', max_length=200, default="#")
     date = models.DateField('date', auto_now_add=True)
     problem = models.TextField('problem', max_length=200)
     treatment = models.TextField('treatment', max_length=200)
@@ -20,11 +20,11 @@ class Health(models.Model):
         self.serial_number = self.dog.serial_number
         super(Health, self).save(*args, **kwargs)
 #TODO
-#try not reference medicine foreign key
+#try not to reference medicine foreign key so if Medicine is deleted, record is kept
 class HealthMedicine(models.Model):
     health = models.ForeignKey(Health, on_delete=models.CASCADE)
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
-    #medicine = models.CharField('medicine', max_length=200)
+    medicine_id = models.IntegerField('medicine_id',default=0)
+    medicine = models.CharField('medicine', max_length=200)
     quantity = models.IntegerField('quantity', default=0)
     dosage = models.CharField('dosage', max_length=200, default="")
 

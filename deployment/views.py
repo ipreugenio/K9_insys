@@ -4,10 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+
+from inventory.models import Medicine
 # Create your views here.
 
 def index(request):
-    return render (request, 'deployment/index.html')
+    context = {
+      'title':'Deployment'
+    }
+    return render (request, 'deployment/index.html', context)
 
 def deployed_dogs(request):
     context = {

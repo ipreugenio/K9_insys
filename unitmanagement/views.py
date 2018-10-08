@@ -8,10 +8,28 @@ from django.contrib import messages
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm
+from inventory.models import Medicine
+from unitmanagement.models import HealthMedicine, Health
 # Create your views here.
 
 def index(request):
-    return render (request, 'unitmanagement/index.html')
+    data = Medicine.objects.all()
+    form = HealthMedicineForm(request.POST or None)
+    res = ""
+    med_id = ""
+    if request.method == "POST":
+        res = request.POST.get('dropdown')
+        med_id = Medicine.objects.get(id=res)
+        hm = Health.objects.last()
+        HealthMedicine.objects.create(health = hm, medicine_id = med_id.id,
+        medicine = med_id.medicine_fullname, quantity = 10, dosage = "take 3x a day")
+        form = HealthMedicineForm()
+    context = {
+        'title': "Unit Management Test Page",
+        'data': data,
+        'form': form,
+    }
+    return render (request, 'unitmanagement/index.html', context)
 
 #TODO
 #FIX THIS as well as Health_forms.html
