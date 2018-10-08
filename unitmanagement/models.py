@@ -40,7 +40,7 @@ class PhysicalExam(models.Model):
 
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
     dog_name = models.CharField('dog_name', max_length=200)
-    serial_number = models.IntegerField('serial_number', default=0)
+    serial_number = models.CharField('serial_number', max_length=200, default="#")
     date = models.DateField('date', auto_now_add=True)
     #veterinary = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     veterinary = models.CharField('veterinary', max_length=200, default="Change this to Foreign Key User")

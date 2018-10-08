@@ -97,11 +97,16 @@
 
 <form action="{% url 'planningandacquiring:donation_confirmed' %}" method="post">
  {% csrf_token %}
+
+ 
+ <div class="ui center aligned basic segment">
     <div class="ui buttons">
-  <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Start Over</button>
-  <div class="or"></div>
-  <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Confirm</button>
+        <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Start Over</button>
+        <div class="or"></div>
+        <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Confirm</button>
+      </div>
 </div>
+  
 
 </form>
 
