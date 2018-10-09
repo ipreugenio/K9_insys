@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import add_User_form, add_personal_form
-from .models import User
+from .forms import add_User_form, add_personal_form, add_education_form
+from .models import User, Personal_Info, Education
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
@@ -32,16 +32,13 @@ def add_User(request):
         print(form.errors)
         if form.is_valid():
             new_form = form.save()
-
             formID = new_form.pk
             request.session["session_userid"] = formID
 
-
             style = "ui green message"
             messages.success(request, 'User has been successfully Added!')
-            form = add_User_form()
 
-            return redirect('add_personal_info.html')
+            return HttpResponseRedirect('add_personal_form/')
 
         else:
             style = "ui red message"
@@ -49,15 +46,12 @@ def add_User(request):
 
     context = {
         'title': "Add User Form",
-        'form': add_User_form,
+        'form': form,
         'style': style,
 
     }
 
-    '''if form.is_valid():
-        return redirect('add_personal_info')
-    else:
-        return render(request, 'profiles/add_User.html', context)'''
+    return render(request, 'profiles/add_User.html', context)
 
 
 def add_personal_info(request):
@@ -67,21 +61,75 @@ def add_personal_info(request):
         print(form.errors)
         if form.is_valid():
             personal_info = form.save(commit=False)
-            personal_info.UserID = request.session["session_userid"]
+            UserID = request.session["session_userid"]
+            user = User.objects.get(id=UserID)
+            personal_info.UserID = user
             personal_info.save()
             style = "ui green message"
             messages.success(request, 'User has been successfully Added!')
             form = add_User_form
-            user = User.objects.get(id = request.session["session_userid"])
-            user_name = str(user.Name)
+
+            return HttpResponseRedirect('add_education/')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
+    user = User.objects.get(id=request.session["session_userid"])
+    user_name = str(user)
     context = {
         'Title': "Add Personal Information for " + user_name,
-        'form': add_personal_form,
+        'form': form,
         'style': style,
     }
-
+    print(form)
     return render(request, 'profiles/add_personal_info.html', context)
+
+def add_education(request):
+    form = add_education_form(request.POST)
+    style = ""
+    if request.method == 'POST':
+
+        if form.is_valid():
+            personal_info = form.save(commit=False)
+            UserID = request.session["session_userid"]
+            user = User.objects.get(id=UserID)
+            personal_info.UserID = user
+            personal_info.save()
+            style = "ui green message"
+            messages.success(request, 'User has been successfully Added!')
+            form = add_User_form
+
+            return HttpResponseRedirect('user_list/')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    user = User.objects.get(id=request.session["session_userid"])
+    user_name = str(user)
+    context = {
+        'Title': "Add Education Information for " + user_name,
+        'form': form,
+        'style': style,
+    }
+    print(form)
+    return render(request, 'profiles/add_education.html', context)
+
+#Listview format
+def user_listview(request):
+    user = User.objects.all()
+    context = {
+        'Title' : 'User List',
+        'user' : user
+    }
+
+    return render(request, 'profiles/user_list.html', context)
+
+#Detailview format
+def user_detailview(request, id):
+    user = User.objects.get(id = id)
+    context = {
+        'Title': 'User Details',
+        'user' : user
+    }
+
+    return render(request, 'profiles/user_detail.html', context)
