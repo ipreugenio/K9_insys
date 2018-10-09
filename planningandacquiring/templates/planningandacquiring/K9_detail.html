@@ -34,12 +34,29 @@
                 <td>{{k9.age}}</td>
                 </tr>
             <tr>
-              <th>Year Retired</th>
-                <td>{{k9.year_retired}}</td>
+            <tr>
+              <th>Source</th>
+                <td>{{k9.source}}</td>
+                </tr>
+            <tr>
+              <th>Status</th>
+                <td>{{k9.status}}</td>
+                </tr>
+            <tr>
+              <th>Training Status</th>
+                <td>{{k9.training_status}}</td>
+                </tr>
+            <tr>
+              <th>Capability</th>
+                <td>{{k9.capability}}</td>
                 </tr>
             <tr>
               <th>Assignment</th>
                 <td>{{k9.assignment}}</td>
+                </tr>
+            <tr>
+              <th>Year Retired</th>
+                <td>{{k9.year_retired}}</td>
                 </tr>
             <tr>
               <th>Microchip</th>
@@ -48,4 +65,7 @@
 
     		</thead>
         </table>
+        <div class="ui basic segment">
+            <a href="{% url 'planningandacquiring:K9_list'%}" class="ui blue button">Back</a>
+        </div>
 {% endblock %}

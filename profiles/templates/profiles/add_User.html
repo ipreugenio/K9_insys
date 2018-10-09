@@ -1,10 +1,14 @@
 {% extends "profiles/sidebar_um.html" %} {% block content %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="{{ style }}">{{message}}</div>
-    {% endfor %}
-{% endif %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <div class="ui fluid container">
     <div class="ui inverted segment">
     <form class="ui inverted equal width form" action="{% url 'profiles:add_User_form' %}" method="POST">

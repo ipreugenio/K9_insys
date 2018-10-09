@@ -7,20 +7,16 @@
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-                                <div class="ui pointing vertical menu" style="width:230px;">
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#"  style="font-weight:bold;color:black;font-size:15px;">Training Menu</a>
+                                <div class="ui tiny pointing vertical menu" style="width:230px;">
+                                        <a class="item"> <b>Training Menu</b></a>
+                                        
+                                        <a href="{% url 'training:classify_k9_list'%}" class="item">Classify Dogs
+                                            <i class="clipboard check icon"></i>
+                                        </a>  
+                                        <a href="{% url 'training:training_records'%}" class="item">Training Records
+                                            <i class="folder open icon"></i>
+                                        </a>  
                                     </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 1</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="#">Subsection 2</a>
-                                            <i class="bell icon"></i>
-                                    </div>
-                                   
-                                </div>
                         </div>
                         <!>
                         <div class="thirteen wide column">

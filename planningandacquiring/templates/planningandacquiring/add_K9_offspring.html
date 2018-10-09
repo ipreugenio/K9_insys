@@ -1,0 +1,90 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+<h1 class="ui header">
+ {{Title}}
+  <div class="sub header">Input K9 breeding data here</div>
+</h1>
+
+<div class="ui ordered steps">
+  <div class="completed step">
+    <div class="content">
+      <div class="title">K9 Parents Form</div>
+      <div class="description">Select K9 Parents</div>
+    </div>
+  </div>
+  <div class="completed step">
+    <div class="content">
+      <div class="title">Confirm Parents</div>
+      <div class="description">Verify selected parents</div>
+    </div>
+  </div>
+  <div class="active step">
+    <div class="content">
+      <div class="title">Offspring Form</div>
+      <div class="description">Provide K9 offspring data</div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Confirm Breeding</div>
+      <div class="description">Verify breeding details</div>
+    </div>
+  </div>
+</div>
+ {% if messages %}
+        {% for message in messages %}
+            <div class="{{ style }} row"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+<div class="ui inverted segment">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{{ style }} row"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" method="post">
+    {% csrf_token %}
+    <div class="fields">
+        <div class="sixteen wide field">
+            <label>Name</label>
+            {{form.name}}
+        </div>
+    </div>
+
+    <div class="fields">
+        <div class="eight wide field">
+            <label>Breed</label>
+            {{form.breed}}
+        </div>
+        <div class="four wide field">
+            <label>Sex</label>
+            {{form.sex}}
+        </div>
+        <div class="four wide field">
+            <label>Color</label>
+            {{form.color}}
+        </div>
+    </div>
+
+    <div class="fields">
+        <div class="four wide field">
+            <label>Birthdate</label>
+            {{form.birth_date}}
+        </div>
+            <div class="four wide field">
+        <label>Microchip</label>
+        {{form.microchip}}
+    </div>
+    </div>
+
+
+
+    <div class="ui inverted right aligned segment" style="padding: 0px;">
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Next Step</button>
+    </div>
+</form>
+
+</div>
+
+
+{% endblock %}

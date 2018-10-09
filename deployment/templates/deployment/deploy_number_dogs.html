@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_inventory.html" %}  
+{% extends "profiles/sidebar_deployment.html" %}  
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -10,26 +10,25 @@
     {% endif %}
 </div>
 
-<table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
+<table id="tabledata" class="ui four column celled table responsive nowrap">
     <thead>
         <tr>
-            <th>Quantity</th>
-            <th>Date Counted</th>
-            <th>Counted By</th>
+            <th>Capability</th>
+            <th>Demand</th>
+            <th>No. of Dogs Deploy</th>
+            <th></th>
         </tr>
     </thead>
         <tbody>
-            {% for data in data %}
+            
             <tr>
-                <td>{{ data.quantity }}</td>
-                <td>{{ data.date_counted }}</td>    
+               <td>SOmetthing</td>
+               <td>SOmetthing</td>
+               <td>SOmetthing</td>
             </tr>
-            {% endfor %}
+            
         </tbody>
     </table>
-    <div class="ui basic segment">
-        <a href="{% url 'inventory:food_inventory_list'%}" class="ui blue button">Back</a>
-    </div>
     <script type="text/javascript">
                
         $(document).ready(function() {

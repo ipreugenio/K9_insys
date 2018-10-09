@@ -2,7 +2,7 @@ from django.db import models
 from datetime import date as d
 
 # Create your models here.
-class Users(models.Model):
+class User(models.Model):
     SEX = (
         ('M', 'Male'),
         ('F', 'Female')
@@ -82,7 +82,7 @@ class Users(models.Model):
         super(Users, self).save(*args, **kwargs)
 
 class Personal_Info(models.Model):
-    UserID = models.ForeignKey(Users, on_delete=models.CASCADE)
+    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
     mobile_number = models.IntegerField('mobile_number')
     email_address = models.EmailField('email_address', max_length=200)
     tel_number = models.CharField('tel_number', max_length=200)

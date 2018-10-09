@@ -1,0 +1,113 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+
+
+<h1 class="ui header">
+ {{Title}}
+  <div class="sub header">Input K9 donation receiving data here</div>
+</h1>
+
+<div class="ui ordered steps">
+  <div class="completed step">
+    <div class="content">
+      <div class="title">K9 Form</div>
+      <div class="description">Provide your received K9 Data</div>
+    </div>
+  </div>
+  <div class="completed step">
+    <div class="content">
+      <div class="title">Previous Ownership Form</div>
+      <div class="description">Provide previous owner data</div>
+    </div>
+  </div>
+  <div class="active step">
+    <div class="content">
+      <div class="title">Confirm Adoption</div>
+      <div class="description">Verify adoption details</div>
+    </div>
+  </div>
+</div>
+        <h2 class="ui dividing header">K9 Information</h2>
+		<table class="ui celled table">
+        	<thead>
+          	<tr>
+                <th>Name</th>
+                <td>{{k9.name}}</td>
+                </tr>
+            <tr>
+              <th>Serial Number</th>
+                <td>{{k9.serial_number}}</td>
+                </tr>
+            <tr>
+              <th>Breed</th>
+                <td>{{k9.breed}}</td>
+                </tr>
+            <tr>
+              <th>Sex</th>
+                <td>{{k9.sex}}</td>
+                </tr>
+            <tr>
+			  <th>Color</th>
+                <td>{{k9.color}}</td>
+                </tr>
+            <tr>
+              <th>Birthdate</th>
+                <td>{{k9.birth_date}}</td>
+                </tr>
+            <tr>
+              <th>Age</th>
+                <td>{{k9.age}}</td>
+                </tr>
+            <tr>
+              <th>Microchip</th>
+                <td>{{k9.microchip}}</td>
+            </tr>
+            <tr>
+              <th>Source</th>
+                <td>{{k9.source}}</td>
+                </tr>
+            <tr>
+
+    		</thead>
+        </table>
+
+<h2 class="ui dividing header">Donator Information</h2>
+		<table class="ui celled table">
+        	<thead>
+          	<tr>
+                <th>Name</th>
+                <td>{{donator}}</td>
+                </tr>
+            <tr>
+              <th>Email</th>
+                <td>{{donator.email}}</td>
+                </tr>
+            <tr>
+              <th>Contact Number</th>
+                <td>{{donator.contact_no}}</td>
+                </tr>
+            <tr>
+              <th>Address</th>
+                <td>{{donator.address}}</td>
+                </tr>
+
+
+    		</thead>
+        </table>
+
+
+<form action="{% url 'planningandacquiring:donation_confirmed' %}" method="post">
+ {% csrf_token %}
+
+ 
+ <div class="ui center aligned basic segment">
+    <div class="ui buttons">
+        <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Start Over</button>
+        <div class="or"></div>
+        <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Confirm</button>
+      </div>
+</div>
+  
+
+</form>
+
+{% endblock %}

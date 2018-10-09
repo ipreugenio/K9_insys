@@ -1,12 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import add_User_form, add_personal_form
-from .models import Users
+from .models import User
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
+
 # Create your views here.
 
 def dashboard(request):
@@ -47,7 +48,7 @@ def add_User(request):
             messages.warning(request, 'Invalid input data!')
 
     context = {
-        'Title': "Add User",
+        'title': "Add User Form",
         'form': add_User_form,
         'style': style,
 
@@ -71,7 +72,7 @@ def add_personal_info(request):
             style = "ui green message"
             messages.success(request, 'User has been successfully Added!')
             form = add_User_form
-            user = Users.objects.get(id = request.session["session_userid"])
+            user = User.objects.get(id = request.session["session_userid"])
             user_name = str(user.Name)
         else:
             style = "ui red message"

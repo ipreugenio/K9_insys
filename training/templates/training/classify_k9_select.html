@@ -1,0 +1,99 @@
+{% extends "profiles/sidebar_training.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">Classify {{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="ui segment">
+    <table class="ui two column celled table">
+        <thead>
+            <tr>
+                <th>Age</th>
+                <td>{{data.age}}</td>
+            </tr>
+            <tr>
+                <th>Breed</th>
+                <td>{{data.breed}}</td>
+            </tr>
+            <tr>
+                <th>Father</th>
+                <td>Father</td>
+            </tr>
+            <tr>
+                <th>Mother</th>
+                <td>Mother</td>
+            </tr>
+            <tr>
+                <th>Classification</th>
+                <td>{{data.capability}}</td>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<div class = "ui segment">
+    <table class="ui two column celled table">
+        <thead>
+            <tr>
+                <th>Categories</th>
+                <th>Skills</th>
+            </tr>
+            <tr>
+                <th>Demand</th>
+                <td>Somthing</td>
+            </tr>
+            <tr>
+                <th>Family History(F)</th>
+                <td>Somthing</td>
+            </tr>
+            <tr>
+                <th>Family History(M)</th>
+                <td>Somthing</td>
+            </tr>
+            <tr>
+                <th>Breed</th>
+                <td>Somthing</td>
+            </tr>
+            <tr>
+                <th>Behaviour</th>
+                <td>Somthing</td>
+            </tr>
+                        
+        </thead>
+    </table>
+</div>
+
+<form class="ui form" action="" method="POST">
+    {% csrf_token %}
+    <div class="six fields">
+        <div class="field"></div>
+        <div class="field"></div>
+        <div class="field">
+            <select name="select_classify" id="select_classify">
+                <option value="SAR">SAR</option>
+                <option value="NDD">NDD</option>
+                <option value="EDD">EDD</option>
+            </select>
+        </div>
+        <div class="field">
+            <button class="ui green button">Submit</button>
+        </div>
+        <div class="field"></div>
+        <div class="field"></div>
+    </div>
+</form>
+
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+    
+    } );
+    
+</script>
+ {% endblock %}

@@ -3,7 +3,7 @@
     {{Title}}
     <div class="sub header">List of all K9s on record</div>
 </h1>
-		<table class="ui celled table">
+		<table id="tabledata" class="ui celled table">
         	<thead>
           	<tr>
               <th>Name</th>
@@ -15,15 +15,13 @@
               <th>Age</th>
               <th>Year Retired</th>
               <th>Assignment</th>
-              <th>Microchip</th>
+			  <th>Microchip</th>
           	</tr>
     		</thead>
     		<tbody>
-
-			{% if k9 %}
 				{% for K9 in k9 %}
     				<tr>
-    					<td><a  href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9}}</a></td>
+    					<td><a  href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
                         <td>{{ K9.serial_number }}</td>
     					<td>{{ K9.breed }}</td>
     					<td>{{ K9.sex }}</td>
@@ -32,18 +30,18 @@
                         <td>{{ K9.age}}</td>
                         <td>{{ K9.year_retired}}</td>
                         <td>{{ K9.assignment}}</td>
-                        <td>{{ K9.microchip}}</td>
+						<td>{{ K9.microchip}}</td>
     				</tr>
 				{% endfor %}
-			{% else %}
-			<tr>
-				<p>There are no K9s to display</p>
-			</tr>
-
-			{% endif %}
-
         </tbody>
     </table>
 
-
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		$('#tabledata').DataTable();
+		$('.menu .item').tab();
+	});
+	
+</script>
 {% endblock %}

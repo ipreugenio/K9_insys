@@ -5,11 +5,11 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime
-from inventory.models import Medicine, Food, Equipment, Medicine_Inventory, Food_Inventory, Equipment_Inventory
-from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Equipment_Inventory_Count
+from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
+from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Miscellaneous_Inventory_Count
 
-from inventory.forms import MedicineForm, FoodForm, EquipmentForm
-from inventory.forms import MedicineCountForm, FoodCountForm, EquipementCountForm
+from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm
+from inventory.forms import MedicineCountForm, FoodCountForm, MiscellaneousCountForm
 # Create your views here.
 
 def index(request):
@@ -70,7 +70,7 @@ def medicine_edit(request, id):
 def medicine_delete(request, id):
     data = Medicine.objects.get(id=id)
     data.delete()
-    messages.success(request, 'Dog Food has been Successfully Deleted!')
+    messages.success(request, 'Medicine has been Successfully Deleted!')
     return HttpResponseRedirect('../../list-medicine')
 
 
@@ -82,7 +82,6 @@ def food_add(request):
         print(form.errors)
         if form.is_valid():
             form.save()
-            
             #save in food inventory
             data_id = Food.objects.last() 
             Food_Inventory.objects.create(food = data_id, quantity = 0)
@@ -135,64 +134,65 @@ def food_delete(request, id):
     messages.success(request, 'Dog Food has been Successfully Deleted!')
     return HttpResponseRedirect('../../list-food')
 
-#Equipemnt
-def equipment_add(request):
-    form = EquipmentForm(request.POST)
+#Miscellaneous
+def miscellaneous_add(request):
+    form = MiscellaneousForm(request.POST)
     style = "ui teal message"
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
             form.save()
             
-            #save in equipment inventory
-            data_id = Equipment.objects.last() 
-            Equipment_Inventory.objects.create(equipment = data_id, quantity = 0)
+            #save in miscellaneous inventory
+            data_id = Miscellaneous.objects.last() 
+            Miscellaneous_Inventory.objects.create(miscellaneous = data_id, quantity = 0)
 
             style = "ui green message"
-            messages.success(request, 'Equipment has been successfully Added!')
-            form = EquipmentForm()
+            messages.success(request, 'Miscellaneous Item has been successfully Added!')
+            form = MiscellaneousForm()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
     context = {
         'form': form,
-        'title': 'Add Equipment Form',
-        'texthelp': 'Input Equipment data here',
+        'title': 'Add Miscellaneous Item Form',
+        'texthelp': 'Input Miscellaneous data here',
         'actiontype': 'Submit',
         'style' : style,
     }
-    return render (request, 'inventory/equipment_add.html', context)
+    return render (request, 'inventory/miscellaneous_add.html', context)
 
-def equipment_list(request):
-    data = Equipment.objects.all()
+def miscellaneous_list(request):
+    data = Miscellaneous.objects.all()
     context = {
-        'title': 'Equipment List',
+        'title': 'Miscellaneous List',
         'data' : data,
     }
-    return render (request, 'inventory/equipment_list.html', context)
+    return render (request, 'inventory/miscellaneous_list.html', context)
 
-def equipment_edit(request, id):
-    item = Equipment.objects.get(id=id)
-    form = Equipment(request.POST or None, instance = item)
+def miscellaneous_edit(request, id):
+    item = Miscellaneous.objects.get(id=id)
+    form = MiscellaneousForm(request.POST or None, instance = item)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('../../list-equipment')
+            messages.success(request, 'Miscellaneous Item has been successfully Edited!')
+            return HttpResponseRedirect('../../list-miscellaneous')
           
     context = {
         'form': form,
-        'title': 'Edit Equipment Form',
-        'texthelp': 'Edit Equipment data here',
+        'title': 'Edit Miscellaneous Form',
+        'texthelp': 'Edit Miscellaneous data here',
         'actiontype': 'Submit',
     }
-    return render (request, 'inventory/equipment_add.html',context)
+    return render (request, 'inventory/miscellaneous_add.html',context)
 
-def equipment_delete(request, id):
-    data = Equipment.objects.get(id=id)
+def miscellaneous_delete(request, id):
+    data = Miscellaneous.objects.get(id=id)
     data.delete()
-    messages.success(request, 'Dog Food has been Successfully Deleted!')
-    return HttpResponseRedirect('../../list-equipment')
+    messages.success(request, 'Miscellaneous Item has been Successfully Deleted!')
+    return HttpResponseRedirect('../../list-miscellaneous')
 
 #Inventory
 def medicine_inventory_list(request):
@@ -211,13 +211,13 @@ def food_inventory_list(request):
     }
     return render (request, 'inventory/food_inventory_list.html',context)
 
-def equipment_inventory_list(request):
-    data = Equipment_Inventory.objects.all()
+def miscellaneous_inventory_list(request):
+    data = Miscellaneous_Inventory.objects.all()
     context = {
-        'title': 'Equipment Inventory List',
+        'title': 'Miscellaneous Inventory List',
         'data' : data,
     }
-    return render (request, 'inventory/equipment_inventory_list.html',context)
+    return render (request, 'inventory/miscellaneous_inventory_list.html',context)
 
 #Inventory Count List
 def medicine_inventory_count(request, id):
@@ -238,14 +238,14 @@ def food_inventory_count(request, id):
     }
     return render (request, 'inventory/food_inventory_count.html', context)
 
-def equipment_inventory_count(request, id):
-    i = Equipment.objects.get(id=id)
-    data = Equipment_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
+def miscellaneous_inventory_count(request, id):
+    i = Miscellaneous.objects.get(id=id)
+    data = Miscellaneous_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     context = {
-        'title': i.equipment,
+        'title': i.miscellaneous,
         'data' : data,
     }
-    return render (request, 'inventory/equipment_inventory_count.html', context)
+    return render (request, 'inventory/miscellaneous_inventory_count.html', context)
 
 #Inventory Count Form
 #TODO
@@ -304,9 +304,9 @@ def food_count_form(request, id):
 
 #TODO
 #ADD USER
-def equipment_count_form(request, id):
-    data = Equipment_Inventory.objects.get(id=id)
-    form = EquipementCountForm(request.POST or None)
+def miscellaneous_count_form(request, id):
+    data = Miscellaneous_Inventory.objects.get(id=id)
+    form = MiscellaneousCountForm(request.POST or None)
     if request.method == 'POST':
       
         #Get session user id
@@ -317,17 +317,17 @@ def equipment_count_form(request, id):
         data.save()
         #TODO 
         # add user = current_user
-        Equipment_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
-        return redirect('inventory:equipment_inventory_count', id = data.id)
+        Miscellaneous_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
+        return redirect('inventory:miscellaneous_inventory_count', id = data.id)
             
     context = {
-        'title': data.equipment,
+        'title': data.miscellaneous,
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
         'label': 'Physical Count',
     }
-    return render (request, 'inventory/equipment_count_form.html', context)
+    return render (request, 'inventory/miscellaneous_count_form.html', context)
 
 #Inventory add quantity
 def medicine_receive_form(request, id):
@@ -378,32 +378,32 @@ def food_receive_form(request, id):
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
-        'label': 'No. of Received Items ',
+        'label': 'Kg. of Received Items ',
     }
     return render (request, 'inventory/food_count_form.html', context)
 
-def equipment_receive_form(request, id):
-    data = Equipment_Inventory.objects.get(id=id)
-    form = EquipementCountForm(request.POST or None)
+def miscellaneous_receive_form(request, id):
+    data = Miscellaneous_Inventory.objects.get(id=id)
+    form = MiscellaneousCountForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
             current_quantity = data.quantity
             data.quantity = int(current_quantity) + int(request.POST.get('quantity'))
             data.save()
             style = "ui green message"
-            messages.success(request, 'Equipment has been successfully Updated!')
-            form = EquipementCountForm()
+            messages.success(request, 'Miscellaneous Item has been successfully Updated!')
+            form = MiscellaneousCountForm()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
         
-        return HttpResponseRedirect('../../list-equipment-inventory')
+        return HttpResponseRedirect('../../list-miscellaneous-inventory')
 
     context = {
-        'title': data.equipment,
+        'title': data.miscellaneous,
         'form': form,
         'data' : data,
         'actiontype': 'Submit',
         'label': 'No. of Received Items',
     }
-    return render (request, 'inventory/equipment_count_form.html', context)
+    return render (request, 'inventory/miscellaneous_count_form.html', context)
