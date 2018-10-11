@@ -6,6 +6,9 @@ from datetime import date as d
 
 # Create your models here.
 
+#class K9_price(models.Model):
+
+
 class K9(models.Model):
     SEX = (
         ('M', 'Male'),
@@ -23,25 +26,12 @@ class K9(models.Model):
 
     BREED = (
 
-        ('Akita', 'Akita'),
-        ('Alaskan Malamute', 'Alaskan Malamute'),
-        ('Australian Sheperd', 'Australian Sheperd'),
-        ('Basset Hound', 'Basset Hound'),
-        ('Bernese Mountain Dog', 'Bernese Mountain Dog'),
-        ('Boxer', 'Boxer'),
-        ('Bulldog', 'Bulldog'),
-        ('Chow Chow', 'Chow Chow'),
-        ('Dalmatian', 'Dalmatian'),
-        ('Dobermann', 'Dobermann'),
-        ('Englsih Mastiff', 'English Mastiff'),
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
         ('German Sheperd', 'German Sheperd'),
         ('Golden Retriever', 'Golden Retriever'),
-        ('Greyhound', 'Greyhound'),
-        ('Great Dane', 'Great Dane'),
+        ('Jack Russel', 'Jack Russel'),
         ('Labrador Retriever', 'Labrador Retriever'),
-        ('Rottweiler', 'Rottweiler'),
-        ('Shi Tzu', 'Shi Tzu'),
-        ('Siberian Husky', 'Siberian Husky'),
         ('Mixed', 'Mixed'),
     )
 
@@ -63,7 +53,7 @@ class K9(models.Model):
     
 
     def __str__(self):
-        return str(self.name)
+        return str(self.name) + " : " + str(self.serial_number)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date

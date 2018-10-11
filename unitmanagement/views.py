@@ -31,7 +31,7 @@ def index(request):
     }
     return render (request, 'unitmanagement/index.html', context)
 
-#TODO
+#TODO Formset does not got to db
 #FIX THIS as well as Health_forms.html
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
@@ -45,6 +45,7 @@ def health_form(request):
 
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
+
             print(formset)
             if formset.is_valid():
                 for form in formset:

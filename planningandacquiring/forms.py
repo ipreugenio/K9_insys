@@ -7,6 +7,14 @@ from .models import K9, K9_Past_Owner, K9_Parent
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class add_unaffiliated_K9_form(forms.ModelForm):
+    class Meta:
+        model = K9
+        fields = ('name', 'breed', 'sex', 'color', 'birth_date')
+        widgets = {
+            'birth_date': DateInput(),
+        }
+
 class add_donated_K9_form(forms.ModelForm):
     class Meta:
         model = K9
@@ -35,7 +43,7 @@ class add_K9_parents_form(forms.ModelForm):
 class add_offspring_K9_form(forms.ModelForm):
     class Meta:
         model = K9
-        fields = ('name', 'breed', 'sex', 'color', 'birth_date')
+        fields = ('name', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }

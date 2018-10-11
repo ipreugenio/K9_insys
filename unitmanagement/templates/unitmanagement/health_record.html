@@ -12,8 +12,8 @@
 <table id="tabledata" class="ui six column celled table">
     <thead>
         <tr>
-            <th>Serial Number</th>
             <th>Dog Name</th>
+            <th>Serial Number</th>
             <th>Breed</th>
             <th>Sex</th>
             <th>Age</th>
@@ -24,9 +24,12 @@
         {% for data in data %}
         <tr>
             <td>
-                <a href="{% url 'unitmanagement:health_history' data.id %}">{{ data.serial_number }}</a>
+                <a href="{% url 'unitmanagement:health_history' data.id %}">{{ data.name }}</a>
             </td>
-            <td>{{ data.name }}</td>
+            <td>
+            {{ data.serial_number }}
+            </td>
+
             <td>{{ data.breed }}</td>
             <td>{{ data.sex }}</td>
             <td>{{ data.age }}</td>
