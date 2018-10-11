@@ -10,7 +10,7 @@ class DateInput(forms.DateInput):
 class add_donated_K9_form(forms.ModelForm):
     class Meta:
         model = K9
-        fields = ('name', 'breed', 'sex', 'color', 'birth_date', 'microchip')
+        fields = ('name', 'breed', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }
@@ -35,7 +35,7 @@ class add_K9_parents_form(forms.ModelForm):
 class add_offspring_K9_form(forms.ModelForm):
     class Meta:
         model = K9
-        fields = ('name', 'breed', 'sex', 'color', 'birth_date', 'microchip')
+        fields = ('name', 'breed', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }

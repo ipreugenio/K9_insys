@@ -232,9 +232,11 @@ def K9_listview(request):
 #Detailview format
 def K9_detailview(request, id):
     k9 = K9.objects.get(id = id)
+    parent = K9_Parent.objects.get(offspring = k9)
     context = {
         'Title': 'K9 Details',
-        'k9' : k9
+        'k9' : k9,
+        'parent': parent
     }
     # TODO Add K9 parents to detail view
 

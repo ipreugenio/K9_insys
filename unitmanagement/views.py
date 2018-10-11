@@ -41,7 +41,7 @@ def health_form(request):
         if form.is_valid():
             new_form = form.save()
             new_form = new_form.pk
-            form_instance = PurchaseRequisition.objects.get(id=new_form)
+            form_instance = Health.objects.get(id=new_form)
 
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
