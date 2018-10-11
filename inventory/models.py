@@ -11,11 +11,8 @@ class Medicine(models.Model):
     medicine = models.CharField(max_length=100)
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
     uom = models.CharField('uom', choices=UOM, max_length=10, default='mg')
-    description = models.CharField(max_length=100, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
-=======
     description = models.CharField(max_length=500, blank=True, null=True)
->>>>>>> 71bd1c813b58387639032fafcf438b12b6672b6b
+    price = models.DecimalField('price', max_digits=50, decimal_places=2)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
