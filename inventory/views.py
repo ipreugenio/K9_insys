@@ -36,7 +36,7 @@ def medicine_add(request):
 
     context = {
         'form': form,
-        'title': 'Add Medicine Form',
+        'title': 'Medicine Form',
         'texthelp': 'Input Medicine data here',
         'actiontype': 'Submit',
         'style' : style,
@@ -95,7 +95,7 @@ def food_add(request):
 
     context = {
         'form': form,
-        'title': 'Add Dog Food Form',
+        'title': 'Dog Food Form',
         'texthelp': 'Input Dog food data here',
         'actiontype': 'Submit',
         'style' : style,
@@ -156,7 +156,7 @@ def miscellaneous_add(request):
 
     context = {
         'form': form,
-        'title': 'Add Miscellaneous Item Form',
+        'title': 'Miscellaneous Item Form',
         'texthelp': 'Input Miscellaneous data here',
         'actiontype': 'Submit',
         'style' : style,

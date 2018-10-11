@@ -6,6 +6,7 @@ from django.db.models import aggregates
 from django.contrib import messages
 
 from inventory.models import Medicine
+from deployment.forms import LocationForm
 # Create your views here.
 
 def index(request):
@@ -31,3 +32,25 @@ def deploy_number_dogs(request):
         'title': 'Deploy Number of Dogs',
     }
     return render (request, 'deployment/deploy_number_dogs.html', context)
+
+def location_form(request):
+    form = LocationForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Location has been successfully Added!')
+            form = LocationForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'title': 'Location Form',
+        'texthelp': 'Input Location data here',
+        'form': form,
+        'actiontype': 'Submit',
+        'style':style,
+    }
+    return render (request, 'deployment/location_form.html', context)
