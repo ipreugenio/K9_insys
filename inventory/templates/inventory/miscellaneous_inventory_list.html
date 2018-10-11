@@ -10,29 +10,32 @@
     {% endif %}
 </div>
 
-<table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
+<table id="tabledata" class="ui four column celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
             <th>Miscellaneous</th>
             <th>Unit of Measurement</th>
-            <th>Qauntity</th>
+            <th>Quantity</th>
             <th></th>
         </tr>
     </thead>
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:400px;" >
+                <td>
                     <a href="{% url 'inventory:miscellaneous_inventory_details' data.id %}">{{ data.miscellaneous }}</a>
                 </td>
                 <td>{{ data.miscellaneous.uom }}</td>
                 <td>{{ data.quantity }}</td>
-                <td class="center aligned" style="width:100px;">
+                <td class="two wide center aligned">
                     <a href="{% url 'inventory:miscellaneous_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
                     </a>
                     <a href="{% url 'inventory:miscellaneous_receive_form' data.id %}" style="margin-right:10px;">
                         <i class="teal dolly flatbed icon"></i>
+                    </a>
+                    <a href="{% url 'inventory:miscellaneous_subtract_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal truck icon"></i>
                     </a>
                 </td>       
             </tr>

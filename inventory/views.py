@@ -5,9 +5,11 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime
+
 from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Miscellaneous_Inventory_Count
 from inventory.models import Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
+from inventory.models import Medicine_Subtracted_Trail, Food_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 
 from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm
 from inventory.forms import MedicineCountForm, FoodCountForm, MiscellaneousCountForm
@@ -181,6 +183,7 @@ def medicine_inventory_details(request, id):
     i = Medicine.objects.get(id=id)
     data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Medicine_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
+    data3 = Medicine_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')
     form = MedicineForm(request.POST or None, instance = i)
     style=""
     if request.method == 'POST':
@@ -195,6 +198,7 @@ def medicine_inventory_details(request, id):
         'title': i.medicine_fullname,
         'data' : data,
         'data2': data2,
+        'data3': data3,
         'form': form,
         'actiontype': 'Update',
         'style': style,
@@ -205,13 +209,14 @@ def food_inventory_details(request, id):
     i = Food.objects.get(id=id)
     data = Food_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Food_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
+    data3 = Food_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')
     form = FoodForm(request.POST or None, instance = i)
     style=""
     if request.method == 'POST':
         if form.is_valid():
             form.save()
             style = "ui green message"
-            messages.success(request, 'Food has been successfully Updated!')
+            messages.success(request, 'Dog Food has been successfully Updated!')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -219,6 +224,7 @@ def food_inventory_details(request, id):
         'title': i.food,
         'data' : data,
         'data2': data2,
+        'data3': data3,
         'form': form,
         'actiontype': 'Update',
         'style': style,
@@ -229,6 +235,7 @@ def miscellaneous_inventory_details(request, id):
     i = Miscellaneous.objects.get(id=id)
     data = Miscellaneous_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Miscellaneous_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
+    data3 = Miscellaneous_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')
     form = MiscellaneousForm(request.POST or None, instance = i)
     style=""
     if request.method == 'POST':
@@ -243,6 +250,7 @@ def miscellaneous_inventory_details(request, id):
         'title': i.miscellaneous,
         'data' : data,
         'data2': data2,
+        'data3': data3,
         'form': form,
         'actiontype': 'Update',
         'style': style,
@@ -283,6 +291,7 @@ def medicine_count_form(request, id):
         'actiontype': 'Submit',
         'label': 'Physical Count',
         'style':style,
+        'texthelp': 'Input Medicine Physical Count data here',
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -291,6 +300,7 @@ def medicine_count_form(request, id):
 def food_count_form(request, id):
     data = Food_Inventory.objects.get(id=id)
     form = FoodCountForm(request.POST or None)
+    style = ""
     if request.method == 'POST':
         if form.is_valid():
             #Get session user id
@@ -304,12 +314,12 @@ def food_count_form(request, id):
             Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
             style = "ui green message"
             form = FoodCountForm()
-            messages.success(request, 'Food has been successfully Updated!')
+            messages.success(request, 'Dog Food has been successfully Updated!')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
         
-        return HttpResponseRedirect('../../list-medicine-inventory')
+        return HttpResponseRedirect('../../list-food-inventory')
             
     context = {
         'title': data.food,
@@ -318,6 +328,7 @@ def food_count_form(request, id):
         'actiontype': 'Submit',
         'label': 'Physical Count',
         'style':style,
+        'texthelp': 'Input Dog Food Physical Count here',
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -326,6 +337,7 @@ def food_count_form(request, id):
 def miscellaneous_count_form(request, id):
     data = Miscellaneous_Inventory.objects.get(id=id)
     form = MiscellaneousCountForm(request.POST or None)
+    style = ""
     if request.method == 'POST':
         if form.is_valid():
             #Get session user id
@@ -344,7 +356,7 @@ def miscellaneous_count_form(request, id):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
         
-        return HttpResponseRedirect('../../list-medicine-inventory')
+        return HttpResponseRedirect('../../list-miscellaneous-inventory')
             
     context = {
         'title': data.miscellaneous,
@@ -352,6 +364,7 @@ def miscellaneous_count_form(request, id):
         'data' : data,
         'actiontype': 'Submit',
         'label': 'Physical Count',
+        'texthelp': 'Input Miscellaneous Physical Count here',
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)
 
@@ -383,6 +396,7 @@ def medicine_receive_form(request, id):
         'actiontype': 'Submit',
         'label': 'No. of Received Items ',
         'style': style,
+        'texthelp': 'Input Received Medicine Quantity here',
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -410,6 +424,7 @@ def food_receive_form(request, id):
         'data' : data,
         'actiontype': 'Submit',
         'label': 'Kg. of Received Items ',
+        'texthelp': 'Input Received Dog Food Quantity here',
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -437,5 +452,63 @@ def miscellaneous_receive_form(request, id):
         'data' : data,
         'actiontype': 'Submit',
         'label': 'No. of Received Items',
+        'texthelp': 'Input Received Miscellaneous Items Quantity here',
+    }
+    return render (request, 'inventory/miscellaneous_count_form.html', context)
+
+#Inventory subtract quantity
+def food_subtract_form(request, id):
+    data = Food_Inventory.objects.get(id=id)
+    form = FoodCountForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            current_quantity = data.quantity
+            data.quantity = int(current_quantity) - int(request.POST.get('quantity'))
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Food has been successfully Updated!')
+            form = FoodCountForm()
+            Food_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+        
+        return HttpResponseRedirect('../../list-food-inventory')
+
+    context = {
+        'title': data.food,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+        'label': 'Kg. of Food Subtracted',
+        'texthelp': 'Input Subtracted Dog Food Quantity here',
+    }
+    return render (request, 'inventory/food_count_form.html', context)
+
+def miscellaneous_subtract_form(request, id):
+    data = Miscellaneous_Inventory.objects.get(id=id)
+    form = MiscellaneousCountForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            current_quantity = data.quantity
+            data.quantity = int(current_quantity) - int(request.POST.get('quantity'))
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Miscellaneous Item has been successfully Updated!')
+            form = MiscellaneousCountForm()
+            Miscellaneous_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+        
+        return HttpResponseRedirect('../../list-miscellaneous-inventory')
+
+    context = {
+        'title': data.miscellaneous,
+        'form': form,
+        'data' : data,
+        'actiontype': 'Submit',
+        'label': 'No. of Items Subtracted',
+        'texthelp': 'Input Subtracted Miscellaneous Items Quantity here',
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)

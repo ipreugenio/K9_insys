@@ -30,4 +30,7 @@ urlpatterns = [
     path('medicine-receive-form/<int:id>/', views.medicine_receive_form, name='medicine_receive_form'),
     path('food-receive-form/<int:id>/', views.food_receive_form, name='food_receive_form'),
     path('miscellaneous-receive-form/<int:id>/', views.miscellaneous_receive_form, name='miscellaneous_receive_form'),
+    #inventory Subtract Form
+    path('food-subtract-form/<int:id>/', views.food_subtract_form, name='food_subtract_form'),
+    path('miscellaneous-subtract-form/<int:id>/', views.miscellaneous_subtract_form, name='miscellaneous_subtract_form'),
 ];

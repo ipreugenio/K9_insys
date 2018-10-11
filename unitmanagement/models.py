@@ -9,25 +9,19 @@ class Health(models.Model):
     date = models.DateField('date', auto_now_add=True)
     problem = models.TextField('problem', max_length=200)
     treatment = models.TextField('treatment', max_length=200)
-    
-    def __str__(self):
-        return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog_name)
+    status = models.CharField('status', max_length=200, default="Pending")
 
-    def save(self, *args, **kwargs):
-        self.dog_name = self.dog.name
-        self.serial_number = self.dog.serial_number
-        super(Health, self).save(*args, **kwargs)
-#TODO
-#try not to reference medicine foreign key so if Medicine is deleted, record is kept
+    def __str__(self):
+        return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
+
 class HealthMedicine(models.Model):
     health = models.ForeignKey(Health, on_delete=models.CASCADE)
-    medicine_id = models.IntegerField('medicine_id',default=0)
-    medicine = models.CharField('medicine', max_length=200)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
     dosage = models.CharField('dosage', max_length=200, default="")
-
+    
     def __str__(self):
-        return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog)
+        return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog.name)
 
 class PhysicalExam(models.Model):
     EXAMSTATUS = (
@@ -37,8 +31,6 @@ class PhysicalExam(models.Model):
     )
 
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
-    dog_name = models.CharField('dog_name', max_length=200)
-    serial_number = models.CharField('serial_number', max_length=200, default="#")
     date = models.DateField('date', auto_now_add=True)
     #veterinary = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     veterinary = models.CharField('veterinary', max_length=200, default="Change this to Foreign Key User")
@@ -58,9 +50,12 @@ class PhysicalExam(models.Model):
     remarks = models.TextField('remarks', max_length=200)
 
     def __str__(self):
-        return str(self.date) + ': ' + str(self.dog)
+        return str(self.date) + ': ' + str(self.dog.name)
 
-    def save(self, *args, **kwargs):
-        self.dog_name = self.dog.name
-        self.serial_number = self.dog.serial_number
-        super(PhysicalExam, self).save(*args, **kwargs)
+#DISTEPER, MEASLES, PARVOVIRUS, HEPATITIS, RABIES, PARAINLUENZA, BORDETELLA, LEPTOSPIROSIS
+#CORONAVIRUS, LYME
+class MedicalRecord(models.Model):
+    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.id) + '-' + str(self.dog.name)

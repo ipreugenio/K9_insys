@@ -55,6 +55,16 @@ class Medicine_Received_Trail(models.Model):
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
 
+class Medicine_Subtracted_Trail(models.Model):
+    inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.medicine.medicine_fullname
+
 #Food
 class Food(models.Model):
     FOODTYPE = (
@@ -99,6 +109,16 @@ class Food_Received_Trail(models.Model):
 
     def __str__(self):
         return self.inventory.food.food
+
+class Food_Subtracted_Trail(models.Model):
+    inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.medicine.medicine_fullname
 
 class Miscellaneous(models.Model):
     UOM = (
@@ -147,3 +167,13 @@ class Miscellaneous_Received_Trail(models.Model):
 
     def __str__(self):
         return self.inventory.miscellaneous.miscellaneous
+
+class Miscellaneous_Subtracted_Trail(models.Model):
+    inventory = models.ForeignKey(Miscellaneous_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.medicine.medicine_fullname

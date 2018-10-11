@@ -8,7 +8,8 @@
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">{{ title }}</a>
     <a class="item" data-tab="second">Physical Count</a>
-    <a class="item" data-tab="third">Received Miscellaneous Supplies</a>
+    <a class="item" data-tab="third">Received Miscellaneous Quantity</a>
+    <a class="item" data-tab="fourth">Sent Miscellaneous Quantity</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
     {% if messages %}
@@ -83,7 +84,26 @@
         </tbody>
     </table>
 </div>
-
+<div class="ui tab segment" data-tab="fourth">
+    <table id="tabledata3" class="ui three column celled table responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Quantity Sent</th>
+                <th>Date Sent</th>
+                <th>Sent By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data3 in data3 %}
+            <tr>
+                <td>{{ data3.quantity }}</td>
+                <td>{{ data3.date_subtracted }}</td>    
+                <td></td>    
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 <div class="ui basic segment">
     <a href="{% url 'inventory:miscellaneous_inventory_list'%}" class="ui blue button">Back</a>
 </div>
@@ -94,6 +114,7 @@
         $(document).ready(function() {
 	        $('#tabledata1').DataTable();
             $('#tabledata2').DataTable();
+            $('#tabledata3').DataTable();
             $('.menu .item').tab();
             // $(function() {
             //     $( ".message" ).slideUp( 4000, function() {

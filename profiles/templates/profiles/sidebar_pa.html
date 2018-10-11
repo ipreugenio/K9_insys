@@ -3,72 +3,30 @@
 {% block sidebar_module %}
     <div class="pusher">
         <div class="ui basic segment">
-
               <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
-
-                                <div class="ui pointing vertical menu" style="width:230px;">
-                                    <a class="item"> <b>Planning and Acquiring Menu</b></a>
-
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:add_donated_K9_form'%}" >Receive Donated K9 Form</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-
-                                    <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:add_K9_parents_form'%}">Breeding Form</a>
-                                            <i class="plus circle icon "></i>
-                                    </div>
-
-                                       <div class = "subdiv">
-                                            <a class = "submenu" href="{% url 'planningandacquiring:K9_list'%}">K9 List View</a>
-                                            <i class="list alternate icon "></i>
-                                    </div>
-
-                                    <!--
-                                    <a href="" class="item">Add Deployment Location
-                                    <i class="plus circle icon"></i>
-                                </a>
-                                -->
-                                </div>
-
-
-
-
+                            <div class="ui tiny pointing vertical menu" style="width:230px;">
+                                <a class="item"> <b>Planning and Acquiring Menu</b></a>
+                                <a href="{% url 'planningandacquiring:add_donated_K9_form'%}" class="item">Receive Donated K9 Form
+                                        <i class="plus circle icon"></i>
+                                </a>  
+                                <a href="{% url 'planningandacquiring:add_K9_parents_form'%}" class="item">Breeding Form
+                                        <i class="plus circle icon"></i>
+                                </a> 
+                                <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
+                                        <i class="list alternate icon"></i>
+                                </a>  
+                            </div>
                         </div>
-
+                        
                         <div class="thirteen wide column">
                             {% block content %}
                             {% endblock %}
                         </div>
                     </div>
-              </div>
+                </div>
         </div>
-      </div>
+    </div>
 
-      <style>
-          .submenu{
-                color: #666666;
-                display: block;
-                font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-                display: list-item;
-                table-layout: fixed;
-                background-color: transparent;
-                list-style-type: none;
-                list-style-position: outside;
-                line-height: 1.14285714em;
-              
-            }
-            .submenu:hover{
-                color: black;
-            }
-            .subdiv{
-                display: flex; 
-                padding: 8px;  
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-          
-      </style>
 {% endblock%}
