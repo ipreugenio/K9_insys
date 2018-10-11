@@ -7,7 +7,7 @@
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">User Information</a>
     <a class="item" data-tab="second">Personal Information</a>
-    <!--<a class="item" data-tab="third">Education</a>-->
+    <a class="item" data-tab="third">Education</a>
 </div>
 
 <div class="ui tab segment active" data-tab="first">
@@ -159,6 +159,46 @@
             </tr>
         </table>
 </div>
+<div class="ui tab segment" data-tab="third">
+    <table id="tabledata3" class="ui celled table">
+            <tr>
+                <td>Primary Education</td>
+                <td>{{education.primary_education}}</td>
+            </tr>
+            <tr>
+                <td>Primary Education School Year</td>
+                <td>{{education.pe_schoolyear}}</td>
+            </tr>
+            <tr>
+                <td>Primary Education Degree</td>
+                <td>{{education.pe_degree}}</td>
+            </tr>
+            <tr>
+                <td>Secondary Education</td>
+                <td>{{education.secondary_education}}</td>
+            </tr>
+            <tr>
+                <td>Secondary Education School Year</td>
+                <td>{{education.se_schoolyear}}</td>
+            </tr>
+            <tr>
+                <td>Secondary Education Degree</td>
+                <td>{{education.se_degree}}</td>
+            </tr>
+            <tr>
+                <td>Tertiary Education</td>
+                <td>{{education.tertiary_education}}</td>
+            </tr>
+            <tr>
+                <td>Tertiary Education School Year</td>
+                <td>{{education.te_schoolyear}}</td>
+            </tr>
+            <tr>
+                <td>Tertiary Education Degree</td>
+                <td>{{education.te_degree}}</td>
+            </tr>
+        </table>
+</div>
 
         <div class="ui basic segment">
             <a href="{% url 'profiles:user_list'%}" class="ui blue button">Back</a>
@@ -169,6 +209,8 @@
     $(document).ready(function() {
         $('#tabledata1');
         $('#tabledata2');
+        $('#tabledata3');
+
         $('.menu .item').tab();
     });
 
