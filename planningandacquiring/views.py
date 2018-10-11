@@ -162,6 +162,17 @@ def add_offspring_K9(request):
          if form.is_valid():
              k9 = form.save()
              k9.source = "Breeding"
+             mother_id = request.session['mother_id']
+             father_id = request.session['father_id']
+             mother = K9.objects.get(id=mother_id)
+             father = K9.objects.get(id=father_id)
+
+             if mother.breed != father.breed:
+                breed = "Mixed"
+             else:
+                breed = mother.breed
+
+             k9.breed = breed
              k9.save()
 
              request.session['offspring_id'] = k9.id
@@ -218,6 +229,11 @@ def breeding_confirmed(request):
             'form': add_K9_parents_form
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
+
+#TODO adding of K9s beside breeding and donation
+#def add_unaffiliated_K9(request):
+
+
 #Listview format
 def K9_listview(request):
     k9 = K9.objects.all()
@@ -226,19 +242,26 @@ def K9_listview(request):
         'k9' : k9
     }
 
-
     return render(request, 'planningandacquiring/K9_list.html', context)
 
 #Detailview format
 def K9_detailview(request, id):
     k9 = K9.objects.get(id = id)
-    parent = K9_Parent.objects.get(offspring = k9)
-    context = {
-        'Title': 'K9 Details',
-        'k9' : k9,
-        'parent': parent
-    }
-    # TODO Add K9 parents to detail view
+
+
+    try:
+        parent = K9_Parent.objects.get(offspring=k9)
+    except K9_Parent.DoesNotExist:
+        context = {
+            'Title': 'K9 Details',
+            'k9' : k9,
+        }
+    else:
+        context = {
+            'Title': 'K9 Details',
+            'k9': k9,
+            'parent': parent
+        }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
 
