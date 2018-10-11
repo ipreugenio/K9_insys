@@ -32,7 +32,7 @@ def classify_k9_select(request, id):
         data.training_status = "Classified"
         data.save()
         style = "ui green message" 
-        messages.success(request, 'K9 has been successfully Classied!')
+        messages.success(request, 'K9 has been successfully Classified!')
 
     context = {
         'title': data.name,
