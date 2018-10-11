@@ -1,0 +1,103 @@
+{% extends "profiles/sidebar_um.html" %} {% block content %}
+<h1 class="ui header">
+    {{k9}}
+    <div class="sub header">User details for {{user}}</div>
+</h1>
+		<table class="ui celled table">
+        	<thead>
+          	<tr>
+                <th>Name</th>
+                <td>{{user}}</td>
+                </tr>
+            <tr>
+              <th>Serial Number</th>
+                <td>{{user.serial_number}}</td>
+                </tr>
+            <tr>
+              <th>Position</th>
+                <td>{{user.position}}</td>
+                </tr>
+            <tr>
+              <th>Rank</th>
+                <td>{{user.rank}}</td>
+                </tr>
+            <tr>
+			  <th>Nickname</th>
+                <td>{{user.nickname}}</td>
+                </tr>
+            <tr>
+              <th>Birthdate</th>
+                <td>{{user.birthdate}}</td>
+                </tr>
+            <tr>
+              <th>Age</th>
+                <td>{{user.age}}</td>
+                </tr>
+            <tr>
+            <tr>
+              <th>Birthplace</th>
+                <td>{{user.birthplace}}</td>
+                </tr>
+            <tr>
+              <th>Gender</th>
+                <td>{{user.gender}}</td>
+                </tr>
+            <tr>
+              <th>Civil Status</th>
+                <td>{{user.civilstatus}}</td>
+                </tr>
+            <tr>
+              <th>Citizenship</th>
+                <td>{{user.citizenship}}
+            <tr>
+              <th>Religion</th>
+                <td>{{user.religion}}</td>
+                </tr>
+            <tr>
+              <th>Bloodtype</th>
+                <td>{{user.bloodtype}}</td>
+                </tr>
+            <tr>
+              <th>Distinct Feature</th>
+                <td>{{user.distinct_feature}}</td>
+            </tr>
+            <tr>
+              <th>Hair Color</th>
+                <td>{{user.haircolor}}</td>
+            </tr>
+            <tr>
+              <th>Eye Color</th>
+                <td>{{user.eyecolor}}</td>
+            </tr>
+            <tr>
+              <th>Skin Color</th>
+                <td>{{user.skincolor}}</td>
+            </tr>
+            <tr>
+              <th>Height</th>
+                <td>{{user.height}}</td>
+            </tr><tr>
+              <th>Weight</th>
+                <td>{{user.weight}}</td>
+            </tr>
+            <tr>
+              <th>Head Size</th>
+                <td>{{user.headsize}}</td>
+            </tr>
+            <tr>
+              <th>Foot Size</th>
+                <td>{{user.footsize}}</td>
+            </tr>
+            <tr>
+              <th>Body Build</th>
+                <td>{{user.bodybuild}}</td>
+            </tr>
+
+
+
+    		</thead>
+        </table>
+        <div class="ui basic segment">
+            <a href="{% url 'profiles:user_list'%}" class="ui blue button">Back</a>
+        </div>
+{% endblock %}
