@@ -6,6 +6,9 @@ from datetime import date as d
 
 # Create your models here.
 
+#class K9_price(models.Model):
+
+
 class K9(models.Model):
     SEX = (
         ('M', 'Male'),
@@ -23,29 +26,16 @@ class K9(models.Model):
 
     BREED = (
 
-        ('Akita', 'Akita'),
-        ('Alaskan Malamute', 'Alaskan Malamute'),
-        ('Australian Sheperd', 'Australian Sheperd'),
-        ('Basset Hound', 'Basset Hound'),
-        ('Bernese Mountain Dog', 'Bernese Mountain Dog'),
-        ('Boxer', 'Boxer'),
-        ('Bulldog', 'Bulldog'),
-        ('Chow Chow', 'Chow Chow'),
-        ('Dalmatian', 'Dalmatian'),
-        ('Dobermann', 'Dobermann'),
-        ('Englsih Mastiff', 'English Mastiff'),
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
         ('German Sheperd', 'German Sheperd'),
         ('Golden Retriever', 'Golden Retriever'),
-        ('Greyhound', 'Greyhound'),
-        ('Great Dane', 'Great Dane'),
+        ('Jack Russel', 'Jack Russel'),
         ('Labrador Retriever', 'Labrador Retriever'),
-        ('Rottweiler', 'Rottweiler'),
-        ('Shi Tzu', 'Shi Tzu'),
-        ('Siberian Husky', 'Siberian Husky'),
         ('Mixed', 'Mixed'),
     )
 
-    serial_number = models.CharField('serial_number', max_length=200)
+    serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned')
     name = models.CharField('name', max_length=200)
     #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
     breed = models.CharField('breed', choices=BREED, max_length=200)
@@ -59,11 +49,11 @@ class K9(models.Model):
     status = models.CharField('status', max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
     capability = models.CharField('capability', max_length=200, default="None")
-    microchip = models.CharField('microchip', max_length=200)
+    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned')
     
 
     def __str__(self):
-        return str(self.name) +' - '+ str(self.serial_number)
+        return str(self.name) + " : " + str(self.serial_number)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -77,9 +67,12 @@ class K9(models.Model):
         
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
+        '''
+        Serial Numbers and Microchips are given after training
         lead_zero = str(self.id).zfill(5)
         serial_number = '#%s' % (lead_zero)
         self.serial_number = str(serial_number)
+        '''
         super(K9, self).save(*args, **kwargs)
 
 
@@ -108,7 +101,7 @@ class K9_New_Owner(models.Model):
 class K9_Donated(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     owner = models.ForeignKey(K9_Past_Owner, on_delete=models.CASCADE)
-    date_donated = models.DateField('date_adopted', auto_now_add=True)
+    date_donated = models.DateField('date_donated', auto_now_add=True)
 
     def __str__(self):
         return str(self.k9)
@@ -121,19 +114,11 @@ class K9_Adopted(models.Model):
     def __str__(self):
         return str(self.k9)
 
-class K9_Father(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "father")
-    offspring = models.ForeignKey(K9, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return str(self.k9)
-
-class K9_Mother(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother")
-    offspring = models.ForeignKey(K9, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.k9.name)
+class K9_Parent(models.Model):
+    mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother", blank=True, null=True)
+    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
+    offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
 class Medicine(models.Model):
     name = models.CharField('name', max_length=200)

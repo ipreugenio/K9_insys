@@ -56,14 +56,13 @@ class HealthMedicineForm(forms.ModelForm):
 
     class Meta:
         model = HealthMedicine
-        fields = ('health','medicine_id', 'medicine', 'quantity', 'dosage')
+        fields = ('medicine', 'quantity', 'dosage')
 
-    health = forms.ModelChoiceField(queryset = Health.objects.all())
     medicine = forms.ModelChoiceField(queryset = Medicine.objects.all())
 
     def __init__(self, *args, **kwargs):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
-        self.fields['medicine_id'].required = False
         self.fields['medicine'].required = False
+
 
 #HealthMedicineFormSet = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1)

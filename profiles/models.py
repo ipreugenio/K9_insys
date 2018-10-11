@@ -48,7 +48,7 @@ class User(models.Model):
     rank = models.CharField('rank', max_length=200)
     firstname = models.CharField('firstname', max_length=200)
     lastname = models.CharField('lastname', max_length=200)
-    extensionname = models.CharField('extensionname', max_length=200, default="None")
+    extensionname = models.CharField('extensionname', max_length=200, default="None", blank=True)
     middlename = models.CharField('middlename', max_length=200)
     nickname = models.CharField('nickname', max_length=200)
     birthdate = models.DateField('birthdate', blank=True)
@@ -79,11 +79,14 @@ class User(models.Model):
 
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
-        super(Users, self).save(*args, **kwargs)
+        super(User, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return str(self.firstname) + ' ' + str(self.middlename) + ' ' + str(self.lastname)
 
 class Personal_Info(models.Model):
     UserID = models.ForeignKey(User, on_delete=models.CASCADE)
-    mobile_number = models.IntegerField('mobile_number')
+    mobile_number = models.CharField('mobile_number', max_length=200)
     email_address = models.EmailField('email_address', max_length=200)
     tel_number = models.CharField('tel_number', max_length=200)
     street = models.CharField('street', max_length=200)
@@ -97,3 +100,14 @@ class Personal_Info(models.Model):
     tin = models.IntegerField('tin')
     philhealth = models.IntegerField('philhealth')
 
+class Education(models.Model):
+    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
+    primary_education = models.CharField('primary_education', max_length=200)
+    secondary_education = models.CharField('secondary_education', max_length=200)
+    tertiary_education = models.CharField('tertiary_education', max_length=200)
+    pe_schoolyear = models.CharField('pe_schoolyear', max_length=200)
+    se_schoolyear = models.CharField('se_schoolyear', max_length=200)
+    te_schoolyear = models.CharField('te_schoolyear', max_length=200)
+    pe_degree = models.CharField('pe_degree', max_length=200)
+    se_degree = models.CharField('pe_degree', max_length=200)
+    te_degree = models.CharField('pe_degree', max_length=200)

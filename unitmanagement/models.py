@@ -6,8 +6,6 @@ from inventory.models import Medicine
 
 class Health(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
-    dog_name = models.CharField('dog_name', max_length=200)
-    serial_number = models.CharField('serial_number', max_length=200, default="#")
     date = models.DateField('date', auto_now_add=True)
     problem = models.TextField('problem', max_length=200)
     treatment = models.TextField('treatment', max_length=200)

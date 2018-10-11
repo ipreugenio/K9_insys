@@ -1,0 +1,35 @@
+{% extends "profiles/sidebar_um.html" %} {% block content %}
+<h1 class="ui header">
+    {{Title}}
+    <div class="sub header">List of all users on record</div>
+</h1>
+		<table id="tabledata" class="ui celled table">
+        	<thead>
+          	<tr>
+              <th>Name</th>
+              <th>Serial Number</th>
+              <th>Position</th>
+              <th>Rank</th>
+          	</tr>
+    		</thead>
+    		<tbody>
+				{% for User in user %}
+    				<tr>
+    					<td><a  href="{% url 'profiles:user_detail' User.id %}">{{User}}</a></td>
+                        <td>{{ User.serial_number }}</td>
+    					<td>{{ User.position }}</td>
+    					<td>{{ User.rank}}</td>
+    				</tr>
+				{% endfor %}
+        </tbody>
+    </table>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabledata').DataTable();
+		$('.menu .item').tab();
+	});
+
+</script>
+{% endblock %}

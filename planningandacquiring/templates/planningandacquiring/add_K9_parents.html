@@ -1,0 +1,81 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+<h1 class="ui header">
+ {{Title}}
+  <div class="sub header">Input K9 breeding data here</div>
+</h1>
+
+<div class="ui ordered steps">
+  <div class="active step">
+    <div class="content">
+      <div class="title">K9 Parents Form</div>
+      <div class="description">Select K9 Parents</div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Confirm Parents</div>
+      <div class="description">Verify selected parents</div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Offspring Form</div>
+      <div class="description">Provide K9 offspring data</div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Confirm Breeding</div>
+      <div class="description">Verify breeding details</div>
+    </div>
+  </div>
+</div>
+ {% if messages %}
+        {% for message in messages %}
+            <div class="{{ style }} row"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_parents_form' %}" method="post">
+
+  {% csrf_token %}
+<div class="ui placeholder segment">
+  <div class="ui two column stackable center aligned grid">
+    <div class="ui vertical divider">Parents</div>
+    <div class="middle aligned row">
+
+      <div class="column">
+        <div class="ui icon header">
+          <i class="venus icon"></i>
+          Mother
+        </div>
+        <div class="field">
+
+        {{form.mother}}
+
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="ui icon header">
+          <i class="mars icon"></i>
+          Father
+        </div>
+
+      <div class = "field">
+
+      {{form.father}}
+
+      </div>
+      </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="ui center aligned segment" style="padding: 0px;">
+        <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
+    </div>
+
+</form>
+
+{% endblock %}

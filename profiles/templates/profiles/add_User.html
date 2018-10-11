@@ -9,6 +9,27 @@
     {% endif %}
 </div>
 
+<div class="ui ordered steps">
+  <div class="active step">
+    <div class="content">
+      <div class="title">User Information</div>
+      <div class="description">Provide basic information of user</div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Personal Information</div>
+      <div class="description">Add personal information about the user </div>
+    </div>
+  </div>
+  <div class="disabled step">
+    <div class="content">
+      <div class="title">Education</div>
+      <div class="description">Add education information of the user</div>
+    </div>
+  </div>
+</div>
+
 <div class="ui fluid container">
     <div class="ui inverted segment">
     <form class="ui inverted equal width form" action="{% url 'profiles:add_User_form' %}" method="POST">
@@ -107,11 +128,11 @@
         </div>
         <div class="fields">
              <div class="field">
-                <label>Height</label>
+                <label>Height (in cm)</label>
                 {{form.height}}
             </div>
             <div class="field">
-                <label>Weight</label>
+                <label>Weight (in kg)</label>
                 {{form.weight}}
             </div>
             <div class="field">
