@@ -31,8 +31,7 @@ class Medicine_Inventory(models.Model):
     quantity = models.IntegerField('quantity', default=0)
 
     def __str__(self):
-        return self.medicine
-
+        return self.medicine.medicine_fullname
 #TODO
 # add user
 class Medicine_Inventory_Count(models.Model):
@@ -43,7 +42,18 @@ class Medicine_Inventory_Count(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory
+        return self.inventory.medicine.medicine_fullname
+   
+
+class Medicine_Received_Trail(models.Model):
+    inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_received = models.DateField('date_received', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.medicine.medicine_fullname
 
 #Food
 class Food(models.Model):
@@ -66,7 +76,7 @@ class Food_Inventory(models.Model):
     quantity = models.IntegerField('quantity', default=0)
 
     def __str__(self):
-        return self.food
+        return self.food.food
 
 #TODO
 # add user
@@ -78,9 +88,18 @@ class Food_Inventory_Count(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory
+        return self.inventory.food.food
 
-#Miscellaneous
+class Food_Received_Trail(models.Model):
+    inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_received = models.DateField('date_received', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.food.food
+
 class Miscellaneous(models.Model):
     UOM = (
         ('pc', 'pc'),
@@ -103,10 +122,10 @@ class Miscellaneous(models.Model):
 class Miscellaneous_Inventory(models.Model):
     miscellaneous = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
- 
+    
     def __str__(self):
-        return self.miscellaneous
-
+        return self.miscellaneous.miscellaneous
+ 
 #TODO
 # add user
 class Miscellaneous_Inventory_Count(models.Model):
@@ -117,4 +136,14 @@ class Miscellaneous_Inventory_Count(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory
+        return self.inventory.miscellaneous.miscellaneous
+
+class Miscellaneous_Received_Trail(models.Model):
+    inventory = models.ForeignKey(Miscellaneous_Inventory, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    date_received = models.DateField('date_received', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.miscellaneous.miscellaneous

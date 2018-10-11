@@ -23,7 +23,7 @@
             {% for data in data %}
             <tr>
                 <td style="width:500px;" >
-                    <a href="{% url 'inventory:food_inventory_count' data.id %}">{{ data.food }}</a>
+                    <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
                 </td>
                 <td>{{ data.food.foodtype }}</td>
                 <td>{{ data.quantity }}</td>
