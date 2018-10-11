@@ -3,101 +3,172 @@
     {{k9}}
     <div class="sub header">User details for {{user}}</div>
 </h1>
-		<table class="ui celled table">
-        	<thead>
+
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">User Information</a>
+    <a class="item" data-tab="second">Personal Information</a>
+    <!--<a class="item" data-tab="third">Education</a>-->
+</div>
+<div class="ui tab segment active" data-tab="first">
+ <table id="tabledata1" class="ui celled table">
           	<tr>
-                <th>Name</th>
+                <td>Name</td>
                 <td>{{user}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Serial Number</th>
+                <td>Serial Number</td>
                 <td>{{user.serial_number}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Position</th>
+              <td>Position</td>
                 <td>{{user.position}}</td>
                 </tr>
             <tr>
-              <th>Rank</th>
+              <td>Rank</td>
                 <td>{{user.rank}}</td>
-                </tr>
+            </tr>
             <tr>
-			  <th>Nickname</th>
+			  <td>Nickname</td>
                 <td>{{user.nickname}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Birthdate</th>
+              <td>Birthdate</td>
                 <td>{{user.birthdate}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Age</th>
+              <td>Age</td>
                 <td>{{user.age}}</td>
-                </tr>
+            </tr>
             <tr>
-            <tr>
-              <th>Birthplace</th>
+              <td>Birthplace</td>
                 <td>{{user.birthplace}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Gender</th>
+              <td>Gender</td>
                 <td>{{user.gender}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Civil Status</th>
+              <td>Civil Status</td>
                 <td>{{user.civilstatus}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Citizenship</th>
-                <td>{{user.citizenship}}
+              <td>Citizenship</td>
+                <td>{{user.citizenship}}</td>
+            </tr>
             <tr>
-              <th>Religion</th>
+              <td>Religion</td>
                 <td>{{user.religion}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Bloodtype</th>
+              <td>Bloodtype</td>
                 <td>{{user.bloodtype}}</td>
-                </tr>
+            </tr>
             <tr>
-              <th>Distinct Feature</th>
+              <td>Distinct Feature</td>
                 <td>{{user.distinct_feature}}</td>
             </tr>
             <tr>
-              <th>Hair Color</th>
+              <td>Hair Color</td>
                 <td>{{user.haircolor}}</td>
             </tr>
             <tr>
-              <th>Eye Color</th>
+              <td>Eye Color</td>
                 <td>{{user.eyecolor}}</td>
             </tr>
             <tr>
-              <th>Skin Color</th>
+              <td>Skin Color</td>
                 <td>{{user.skincolor}}</td>
             </tr>
             <tr>
-              <th>Height</th>
+              <td>Height</td>
                 <td>{{user.height}}</td>
-            </tr><tr>
-              <th>Weight</th>
+            </tr>
+            <tr>
+              <td>Weight</td>
                 <td>{{user.weight}}</td>
             </tr>
             <tr>
-              <th>Head Size</th>
+              <td>Head Size</td>
                 <td>{{user.headsize}}</td>
             </tr>
             <tr>
-              <th>Foot Size</th>
+              <td>Foot Size</td>
                 <td>{{user.footsize}}</td>
             </tr>
             <tr>
-              <th>Body Build</th>
+              <td>Body Build</td>
                 <td>{{user.bodybuild}}</td>
             </tr>
-
-
-
-    		</thead>
         </table>
+</div>
+<div class="ui tab segment" data-tab="second">
+    <table id="tabledata2" class="ui celled table">
+            <tr>
+                <td>Mobile Number</td>
+                <td>{{personal_info.mobile_number}}</td>
+            </tr>
+            <tr>
+                <td>Email Address</td>
+                <td>{{personal_info.email_address}}</td>
+            </tr>
+            <tr>
+                <td>Telephone Number</td>
+                <td>{{personal_info.tel_number}}</td>
+            </tr>
+            <tr>
+                <td>Street</td>
+                <td>{{personal_info.street}}</td>
+            </tr>
+            <tr>
+                <td>Barangay</td>
+                <td>{{personal_info.barangay}}</td>
+            </tr>
+            <tr>
+                <td>City</td>
+                <td>{{personal_info.city}}</td>
+            </tr>
+            <tr>
+                <td>Province</td>
+                <td>{{personal_info.province}}</td>
+            </tr>
+            <tr>
+                <td>Mother's Name</td>
+                <td>{{personal_info.mother_name}}</td>
+            </tr>
+            <tr>
+                <td>Mother's Birthdate</td>
+                <td>{{personal_info.mother_birthdate}}</td>
+            </tr>
+            <tr>
+                <td>Father's Name</td>
+                <td>{{personal_info.father_name}}</td>
+            </tr>
+            <tr>
+                <td>Father's Birthdate</td>
+                <td>{{personal_info.father_birthdate}}</td>
+            </tr>
+            <tr>
+                <td>TIN</td>
+                <td>{{personal_info.tin}}</td>
+            </tr>
+            <tr>
+                <td>Philhealth</td>
+                <td>{{personal_info.philhealth}}</td>
+            </tr>
+        </table>
+</div>
+
         <div class="ui basic segment">
             <a href="{% url 'profiles:user_list'%}" class="ui blue button">Back</a>
         </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('.menu .item').tab();
+    });
+
+</script>
 {% endblock %}

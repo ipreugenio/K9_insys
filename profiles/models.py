@@ -48,7 +48,7 @@ class User(models.Model):
     rank = models.CharField('rank', max_length=200)
     firstname = models.CharField('firstname', max_length=200)
     lastname = models.CharField('lastname', max_length=200)
-    extensionname = models.CharField('extensionname', max_length=200, default="None")
+    extensionname = models.CharField('extensionname', max_length=200, default="None", blank=True)
     middlename = models.CharField('middlename', max_length=200)
     nickname = models.CharField('nickname', max_length=200)
     birthdate = models.DateField('birthdate', blank=True)

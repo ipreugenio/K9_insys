@@ -5,6 +5,28 @@
         <div class="{{ style }}">{{message}}</div>
     {% endfor %}
 {% endif %}
+
+<div class="ui ordered steps">
+  <div class="completed step">
+    <div class="content">
+      <div class="title">User Information</div>
+      <div class="description">Provide basic information of user</div>
+    </div>
+  </div>
+  <div class="completed step">
+    <div class="content">
+      <div class="title">Personal Information</div>
+      <div class="description">Add personal information about the user </div>
+    </div>
+  </div>
+  <div class="active step">
+    <div class="content">
+      <div class="title">Education</div>
+      <div class="description">Add education information of the user</div>
+    </div>
+  </div>
+</div>
+
 <div class="ui fluid container">
     <div class="ui inverted segment">
     <form class="ui inverted equal width form" action="{% url 'profiles:add_education' %}" method="POST">
