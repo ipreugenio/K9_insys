@@ -126,12 +126,14 @@ def user_listview(request):
 #Detailview format
 def user_detailview(request, id):
     user = User.objects.get(id = id)
-    personal_info = Personal_Info.objects.get(id = id)
+    personal_info = Personal_Info.objects.get(UserID = id)
+    education = Education.objects.get(UserID=id)
 
     context = {
         'Title': 'User Details',
         'user' : user,
         'personal_info': personal_info,
+        'education': education
     }
 
     return render(request, 'profiles/user_detail.html', context)
