@@ -8,12 +8,7 @@ class Medicine(models.Model):
         ('mg', 'mg'),
         ('mL', 'mL'),
     )
-    TYPE = (
-        ('Drug', 'Drug'),
-        ('Vaccine', 'Vaccine'),
-    )
     medicine = models.CharField(max_length=100)
-    med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
     uom = models.CharField('uom', choices=UOM, max_length=10, default='mg')
     description = models.CharField(max_length=500, blank=True, null=True)

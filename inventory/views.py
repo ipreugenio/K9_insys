@@ -457,34 +457,6 @@ def miscellaneous_receive_form(request, id):
     return render (request, 'inventory/miscellaneous_count_form.html', context)
 
 #Inventory subtract quantity
-def medicine_subtract_form(request, id):
-    data = Medicine_Inventory.objects.get(id=id)
-    form = MedicineCountForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            current_quantity = data.quantity
-            data.quantity = int(current_quantity) - int(request.POST.get('quantity'))
-            data.save()
-            style = "ui green message"
-            messages.success(request, 'Medicine has been successfully Updated!')
-            form = MedicineCountForm()
-            Medicine_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
-        
-        return HttpResponseRedirect('../../list-medicine-inventory')
-
-    context = {
-        'title': data.medicine,
-        'form': form,
-        'data' : data,
-        'actiontype': 'Submit',
-        'label': 'No. of Medicine Items Subtracted',
-        'texthelp': 'Input Subtracted Medicine Quantity here',
-    }
-    return render (request, 'inventory/medicine_count_form.html', context)
-
 def food_subtract_form(request, id):
     data = Food_Inventory.objects.get(id=id)
     form = FoodCountForm(request.POST or None)

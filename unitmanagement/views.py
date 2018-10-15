@@ -8,9 +8,9 @@ import datetime
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord
+from unitmanagement.models import HealthMedicine, Health
 # Create your views here.
 
 def index(request):
@@ -101,7 +101,6 @@ def health_history(request, id):
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data)
     phyexam_data = PhysicalExam.objects.filter(dog = data)
-    vaccine_data = VaccinceRecord.objects.filter(dog = data)
     context = {
         'title': "Health History of ",
         'name': data.name,
@@ -109,7 +108,6 @@ def health_history(request, id):
         'data': data,
         'health_data': health_data, 
         'phyexam_data': phyexam_data, 
-        'vaccine_data': vaccine_data, 
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -184,23 +182,3 @@ def medicine_approve(request, id):
         return redirect('unitmanagement:health_details', id = data.id)
 
     return redirect('unitmanagement:health_details', id = data.id)
-     
-#Vaccination form
-def vaccination_form(request):
-    form = VaccinationForm(request.POST or None)
-    style=""
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            style = "ui green message"
-            messages.success(request, 'Vaccination has been successfully recorded!')
-            form = VaccinationForm()
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
-    context = {
-        'title': "Vaccination",
-        'actiontype': "Submit",
-        'form': form,
-    }
-    return render (request, 'unitmanagement/vaccination_form.html', context)
