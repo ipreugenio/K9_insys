@@ -52,10 +52,29 @@ class PhysicalExam(models.Model):
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
 
-#DISTEPER, MEASLES, PARVOVIRUS, HEPATITIS, RABIES, PARAINLUENZA, BORDETELLA, LEPTOSPIROSIS
-#CORONAVIRUS, LYME
-class MedicalRecord(models.Model):
+#TODO
+#add vet user
+class VaccinceRecord(models.Model):
+    DISEASE = (
+        ('BORDETELLA', 'BORDETELLA'),
+        ('CORONAVIRUS', 'CORONAVIRUS'),
+        ('DISTEPER', 'DISTEPER'),
+        ('HEPATITIS', 'HEPATITIS'),
+        ('LEPTOSPIROSIS', 'LEPTOSPIROSIS'),
+        ('LYME', 'LYME'),
+        ('MEASLES', 'MEASLES'),
+        ('PARAINLUENZA', 'PARAINLUENZA'),
+        ('PARVOVIRUS', 'PARVOVIRUS'),
+        ('RABIES', 'RABIES'),
+        ('TRACHEOBRONCHTIS', 'TRACHEOBRONCHTIS'),
+    )
+
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    disease = models.CharField('disease', choices=DISEASE, max_length=200)
+    date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
+    date_validity = models.DateField('date_validity', blank=True,)
+    #veterinary = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     
     def __str__(self):
-        return str(self.id) + '-' + str(self.dog.name)
+        return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)
