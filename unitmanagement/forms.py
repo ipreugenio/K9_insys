@@ -4,9 +4,10 @@ from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord
 from planningandacquiring.models import K9
 from inventory.models import Medicine
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -64,5 +65,28 @@ class HealthMedicineForm(forms.ModelForm):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
         self.fields['medicine'].required = False
 
+class VaccinationForm(forms.ModelForm):
+    DISEASE = (
+        ('BORDETELLA', 'BORDETELLA'),
+        ('CORONAVIRUS', 'CORONAVIRUS'),
+        ('DISTEPER', 'DISTEPER'),
+        ('HEPATITIS', 'HEPATITIS'),
+        ('LEPTOSPIROSIS', 'LEPTOSPIROSIS'),
+        ('LYME', 'LYME'),
+        ('MEASLES', 'MEASLES'),
+        ('PARAINLUENZA', 'PARAINLUENZA'),
+        ('PARVOVIRUS', 'PARVOVIRUS'),
+        ('RABIES', 'RABIES'),
+        ('TRACHEOBRONCHTIS', 'TRACHEOBRONCHTIS'),
+    )
+    dog = forms.ModelChoiceField(queryset = K9.objects.all().order_by('name'))
+    disease = forms.CharField(widget = forms.Select(choices=DISEASE))
+    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
+    
+    class Meta:
+        model = VaccinceRecord
+        fields = ('dog', 'vaccine', 'disease', 'date_validity')
+        widgets = {
+            'date_validity': DateInput(),
+        }
 
-#HealthMedicineFormSet = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1)
