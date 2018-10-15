@@ -35,7 +35,7 @@ class K9(models.Model):
         ('Mixed', 'Mixed'),
     )
 
-    serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned')
+    serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
     breed = models.CharField('breed', choices=BREED, max_length=200)
@@ -49,7 +49,7 @@ class K9(models.Model):
     status = models.CharField('status', max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
     capability = models.CharField('capability', max_length=200, default="None")
-    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned')
+    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
     
 
     def __str__(self):

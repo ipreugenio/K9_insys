@@ -62,14 +62,25 @@
               <th>Microchip</th>
                 <td>{{k9.microchip}}</td>
             </tr>
+             {% if parent_exist %}
             <tr>
-              <th>Mother</th>
+                <th>Mother</th>
                 <td>{{parent.mother}}</td>
             </tr>
             <tr>
-              <th>Father</th>
+                <th>Father</th>
                 <td>{{parent.father}}</td>
             </tr>
+            {% else %}
+            <tr>
+                <th>Mother</th>
+                <td>Unknown</td>
+            </tr>
+            <tr>
+                <th>Father</th>
+                <td>Unknown</td>
+            </tr>
+            {% endif %}
 
     		</thead>
         </table>

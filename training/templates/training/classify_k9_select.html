@@ -20,14 +20,25 @@
                 <th>Breed</th>
                 <td>{{data.breed}}</td>
             </tr>
-            <tr>
-                <th>Father</th>
-                <td>Father</td>
-            </tr>
+            {% if parent_exist %}
             <tr>
                 <th>Mother</th>
-                <td>Mother</td>
+                <td>{{parent.mother}}</td>
             </tr>
+            <tr>
+                <th>Father</th>
+                <td>{{parent.father}}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <th>Mother</th>
+                <td>Unknown</td>
+            </tr>
+            <tr>
+                <th>Father</th>
+                <td>Unknown</td>
+            </tr>
+            {% endif %}
             <tr>
                 <th>Classification</th>
                 <td>{{data.capability}}</td>
