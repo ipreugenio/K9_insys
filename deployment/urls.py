@@ -8,5 +8,6 @@ urlpatterns = [
     path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),
+    path('location-form', views.location_form, name='location_form'),
     #path('/<int:id>/', views., name=''),
 ];

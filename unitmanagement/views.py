@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+import datetime
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm
-from inventory.models import Medicine
+from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health
 # Create your views here.
 
@@ -36,6 +37,7 @@ def index(request):
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     form = HealthForm(request.POST or None)
+    style=""
     if request.method == "POST":
         print(form)
         if form.is_valid():
@@ -50,19 +52,25 @@ def health_form(request):
             if formset.is_valid():
                 for form in formset:
                     form.save()
+                style = "ui green message"
+                messages.success(request, 'Health Form has been successfully recorded!')
+            else:
+                style = "ui red message"
+                messages.warning(request, 'Invalid input data!')
            
     context = {
         'title': "Health Form",
         'form':HealthForm,
         'formset':medicine_formset(),
         'actiontype': "Submit",
+        'style': style,
     }
     return render (request, 'unitmanagement/health_form.html', context)
 
 def physical_exam_form(request):
     form = PhysicalExamForm(request.POST or None)
     form.fields["dog"].queryset = K9.objects.all().order_by('name')
-
+    style=""
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -107,12 +115,27 @@ def health_details(request, id):
     data = Health.objects.get(id=id)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
+    count = 0
+    style = "ui red message"
+
+    for med in medicine:
+        i = Medicine_Inventory.objects.filter(id = med.medicine.id)# get Inventory Items 
+        for x in i:
+            if x.quantity >= med.quantity:
+                count = count+1
+    
+    if medicine.count() == count:
+        style = "ui green message"
+    else:
+        style = "ui red message"
+
     context = {
         'title': "Health Details of ",
         'name': dog.name,
         'data': data,
         'medicine': medicine,
         'dog': dog,
+        'style':style,
     }
     return render (request, 'unitmanagement/health_details.html', context)
 
@@ -126,3 +149,36 @@ def physical_exam_details(request, id):
         'dog': dog,
     }
     return render (request, 'unitmanagement/physical_exam_details.html', context)
+
+#Approval of medicine 
+def medicine_approve(request, id):
+    data = Health.objects.get(id=id) #get health details
+    medicine = HealthMedicine.objects.filter(health=data) #get medicine in health  
+    count = 0
+   
+    for med in medicine: #form items
+        i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items 
+        for x in i:
+            print("Inventory Items", x.medicine, x.quantity)
+            print("Form Items", med.medicine, med.quantity)
+            if (x.quantity >= med.quantity):
+                count = count+1
+
+    print(count)
+
+    if medicine.count() == count:
+        for med in medicine:
+            i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items 
+            for x in i:
+                Medicine_Subtracted_Trail.objects.create(inventory = x, quantity = med.quantity, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                x.quantity = (x.quantity - med.quantity)
+                data.status = "Approved"
+                data.save()
+                x.save()
+     
+        messages.success(request, 'Medicine Acquisition has been approved!')
+    else:
+        messages.warning(request, 'Insufficient Inventory!')
+        return redirect('unitmanagement:health_details', id = data.id)
+
+    return redirect('unitmanagement:health_details', id = data.id)

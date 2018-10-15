@@ -5,7 +5,7 @@
     <h3 class="ui header">{{ title }}{{ name }}</h3>
     {% if messages %}
         {% for message in messages %}
-            <div class="ui green message" > {{ message }}</div>
+            <div class="{{style}}" > {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
@@ -24,7 +24,14 @@
                 <th>Treatment</th>
                 <td>{{data.treatment}}</td>
             </tr>
-                        
+            <tr>
+                <th>Veterinarian</th>
+                <td>Veterinarian Name Here</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td id = "status">{{data.status}}</td>
+            </tr>
         </thead>
     </table>
 </div>
@@ -48,13 +55,27 @@
         </tbody>
     </table>
 </div>
-<div class="ui basic segment">
-    <a href="{% url 'unitmanagement:health_history' dog.id %}" class="ui blue button">Back</a>
-</div>
+<form method="POST" action = "{% url 'unitmanagement:medicine_approve' data.id%}">{% csrf_token %}
+    <div class="ui center aligned basic segment">
+        <div class="ui buttons">
+            <a href="{% url 'unitmanagement:health_history' dog.id %}" class="ui blue button">Back</a>
+            <div class="or"></div>
+            <button type = "submit" id = "approve_btn" class="ui green button">Approve</button>
+        </div>
+    </div>
+</form>
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata').DataTable();
+
+        $(function() {
+            var res = $('#status').text();
+            if($('#status').text()=='Approved'){
+               $('#approve_btn').prop('disabled', true);
+            }
+        });
+
     } );
     
 </script>

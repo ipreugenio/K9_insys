@@ -18,14 +18,18 @@
                             {% endif %}
                             <form class = "ui inverted form" method="POST">
                                 {% csrf_token %}
-                                <div class="two fields">
-                                    <div class="field">
+                                <div class="three fields">
+                                    <div class="seven wide field">
                                         <label>Miscellaneous</label>
                                         {{form.miscellaneous}}
                                     </div>
-                                    <div class="field">
+                                    <div class="five wide field">
                                         <label>Unit of Measurement</label>
                                         {{form.uom}}
+                                    </div>
+                                    <div class="four wide field">
+                                        <label>Price</label>
+                                        {{form.price}}
                                     </div>
                                 </div>
 
@@ -35,7 +39,7 @@
                                 </div>
 
                                 <div class="ui inverted right aligned segment" style="padding: 0px;">
-                                    <button class = "ui button green" type="submit" >{{ actiontype }}</button>
+                                    <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
                                 </div>
                             </form>
                         </div>

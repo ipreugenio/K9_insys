@@ -14,11 +14,12 @@
     <a class="item" data-tab="second">Physical Exam</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui seven column celled table">
+    <table id="tabledata1" class="ui three column celled table">
         <thead>
             <tr>
                 <th>Date</th>
                 <th>Problem</th>
+                <th class="center aligned">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -28,13 +29,22 @@
                     <a href="{% url 'unitmanagement:health_details' health_data.id %}">{{health_data.date}}</a>
                 </td>
                 <td>{{health_data.problem}}</td>
+                {% if health_data.status == "Approved" %}
+                <td class="center aligned positive three column wide">
+                    <i class="icon checkmark"></i>{{health_data.status}}
+                </td>
+                {% else %}
+                    <td class="center aligned warning three column wide">
+                        <i class="hourglass half icon"></i>{{health_data.status}}
+                    </td>
+                {% endif%}
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 <div class="ui tab segment" data-tab="second">
-    <table id="tabledata2" class="ui seven column celled table">
+    <table id="tabledata2" class="ui two column celled table">
         <thead>
             <tr>
                 <th>Date</th>

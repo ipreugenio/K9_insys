@@ -10,7 +10,7 @@
     {% endif %}
 </div>
 
-<table id="tabledata" class="ui celled table responsive nowrap" style="width:100%">
+<table id="tabledata" class="ui four column celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
             <th>Medicine</th>
@@ -22,12 +22,12 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td style="width:500px;" >
-                    <a href="{% url 'inventory:medicine_inventory_count' data.id %}"> {{ data.medicine }}</a>
+                <td>
+                    <a href="{% url 'inventory:medicine_inventory_details' data.id %}"> {{ data.medicine }}</a>
                 </td>
                 <td>{{ data.medicine.dosage }}</td>
                 <td>{{ data.quantity }}</td>
-                <td class="center aligned" style="width:100px;">
+                <td class="two wide center aligned">
                     <a href="{% url 'inventory:medicine_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal boxes icon"></i>
                     </a>

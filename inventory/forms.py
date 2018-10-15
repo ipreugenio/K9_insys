@@ -23,7 +23,7 @@ class MedicineForm(forms.ModelForm):
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
@@ -51,7 +51,7 @@ class FoodForm(forms.ModelForm):
 
     class Meta:
         model = Food
-        fields = ('food', 'foodtype', 'description')
+        fields = ('food', 'foodtype', 'description', 'price')
 
     def __init__(self, *args, **kwargs):
         super(FoodForm, self).__init__(*args, **kwargs)
@@ -84,7 +84,7 @@ class MiscellaneousForm(forms.ModelForm):
 
     class Meta:
         model = Miscellaneous
-        fields = ( 'miscellaneous', 'description', 'uom')
+        fields = ( 'miscellaneous', 'description', 'uom', 'price')
 
     def __init__(self, *args, **kwargs):
         super(MiscellaneousForm, self).__init__(*args, **kwargs)
