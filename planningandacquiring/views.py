@@ -257,10 +257,12 @@ def K9_detailview(request, id):
             'k9' : k9,
         }
     else:
+        parent_exist = 1
         context = {
             'Title': 'K9 Details',
             'k9': k9,
-            'parent': parent
+            'parent': parent,
+            'parent_exist': parent_exist
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
