@@ -17,7 +17,7 @@ class Medicine(models.Model):
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
     uom = models.CharField('uom', choices=UOM, max_length=10, default='mg')
     description = models.CharField(max_length=500, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -81,7 +81,7 @@ class Food(models.Model):
     food = models.CharField(max_length=100)
     foodtype = models.CharField('foodtype', choices=FOODTYPE, max_length=50)
     description = models.CharField(max_length=100, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
     def __str__(self):
         return self.food
@@ -139,7 +139,7 @@ class Miscellaneous(models.Model):
     miscellaneous = models.CharField(max_length=100)
     uom = models.CharField(max_length=100, choices=UOM)
     description = models.CharField(max_length=100, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
     def __str__(self):
         return self.miscellaneous

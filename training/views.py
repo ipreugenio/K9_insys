@@ -10,14 +10,14 @@ from .forms import TestForm
 from collections import OrderedDict
 
 #classifier stuff
-import pandas as pd
+'''import pandas as pd
 import igraph
 from igraph import *
 
 
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+import plotly.graph_objs.layout as lout'''
 
 # Create your views here.
 
