@@ -13,6 +13,51 @@ from django.contrib import messages
 # Create your views here.
 
 def index(request):
+	data = [[],[],[]]
+    total = 0
+    date_from = ''
+    date_to = ''
+    if request.method == 'POST':
+        print(request.POST.get('date_from'))
+        print(request.POST.get('date_to'))
+        date_from = request.POST.get('date_from')
+        date_to = request.POST.get('date_to')
+      
+        i = Medicine_Subtracted_Trail.objects.values('name').distinct().filter(date_subtracted__range=[date_from, date_to])
+        count=0
+
+        c = [] #quantity
+        d = [] #price
+
+        #get quantity
+        for x in i:
+            q = Medicine_Subtracted_Trail.objects.filter(name=x['name']).aggregate(sum=Sum('quantity'))['sum']
+            c.append(q)
+
+        #get price 
+        #k=Medicine_Subtracted_Trail.objects.all()
+        for x in i:
+            p=Medicine.objects.get(medicine_fullname=x['name'])
+            d.append(p.price)
+
+        for x in i:
+            print(x['name'])
+            n=x['name']
+            data[count].append(n)
+            data[count].append(c[count])
+            data[count].append(d[count]*c[count])
+            total=total+d[count]*c[count]
+            count= count+1
+
+        print(data[2])
+
+    context = {
+        'title' : "Medicine Used Report",
+        'data': data,
+        'total':total,
+        'date_from': date_from,
+        'date_to':date_to,
+    }
     return render (request, 'planningandacquiring/index.html')
 
 #Form format

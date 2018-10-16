@@ -63,13 +63,19 @@ class Medicine_Received_Trail(models.Model):
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.IntegerField('quantity', default=0)
+    name = models.CharField(max_length=100)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+	quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
-
+	 
+    def save(self, *args, **kwargs):
+        self.name = str(self.inventory.medicine.medicine_fullname)
+        self.price = str(self.inventory.medicine.price)
+        super(Medicine_Subtracted_Trail, self).save(*args, **kwargs)
 #Food
 class Food(models.Model):
     FOODTYPE = (
