@@ -11,8 +11,8 @@ from datetime import date as d
 
 class K9(models.Model):
     SEX = (
-        ('M', 'Male'),
-        ('F', 'Female')
+        ('Male', 'Male'),
+        ('Female', 'Female')
     )
 
     COLOR = (

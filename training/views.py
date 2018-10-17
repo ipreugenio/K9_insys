@@ -10,6 +10,11 @@ from .forms import TestForm
 from collections import OrderedDict
 
 
+#classifier stuff
+import pandas as pd
+import igraph
+from igraph import *
+
 
 #graphing imports
 import igraph

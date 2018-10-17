@@ -154,3 +154,27 @@ class Location(models.Model):
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     zip_code = models.IntegerField('zip_code')
     address = models.CharField('address', max_length=500, default='None')
+
+class Areas(models.Model):
+
+    AREA = (
+        ('FOU NCR-CL', 'FOU NCR-CL'),
+        ('FOU NWLZN', 'FOU NWLZN'),
+        ('FOU NELZN', 'FOU NELZN'),
+        ('FOU SOUTHERN TAG', 'FOU SOUTHERN TAG'),
+        ('FOU BICOL', 'FOU BICOL'),
+        ('FOU PALAWAN', 'FOU PALAWAN'),
+        ('FOU CENTRAL VISAYAS', 'FOU CENTRAL VISAYAS'),
+        ('FOU EASTERN VISAYAS', 'FOU EASTERN VISAYAS'),
+        ('FOU WESTERN VISAYAS', 'FOU WESTERN VISAYAS'),
+        ('FOU SWM', 'FOU SWM'),
+        ('FOU SEM', 'FOU SEM'),
+        ('FOU NM', 'FOU NM'),
+        ('FOU SV(DUMAGUETE)', 'FOU SV(DUMAGUETE)'),
+    )
+    area = models.CharField('area', choices=AREA, max_length=100, default='None')
+    team = models.CharField('team', max_length=500)
+    handlers = models.IntegerField('handlers', default='None')
+    EDD = models.IntegerField('EDD', default='None')
+    NDD = models.IntegerField('NDD', default='None')
+    SAR = models.IntegerField('SAR', default='None')

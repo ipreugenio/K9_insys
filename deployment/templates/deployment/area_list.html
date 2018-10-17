@@ -1,0 +1,39 @@
+{% extends "profiles/sidebar_deployment.html" %} {% block content %}
+<h1 class="ui header">
+    {{Title}}
+    <div class="sub header">List of areas</div>
+</h1>
+		<table id="tabledata" class="ui celled table">
+        	<thead>
+          	<tr>
+              <th>FOU</th>
+              <th>TEAM</th>
+              <th>Number of Handlers</th>
+              <th>EDD</th>
+              <th>NDD</th>
+              <th>SAR</th>
+          	</tr>
+    		</thead>
+    		<tbody>
+				{% for Areas in areas %}
+    				<tr>
+    					<td>{{Areas.area}}</a></td>
+                        <td>{{ Areas.team }}</td>
+    					<td>{{ Areas.handlers }}</td>
+    					<td>{{ Areas.EDD }}</td>
+                        <td>{{ Areas.NDD }}</td>
+                        <td>{{ Areas.SAR }}</td>
+    				</tr>
+				{% endfor %}
+        </tbody>
+    </table>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabledata').DataTable();
+		$('.menu .item').tab();
+	});
+
+</script>
+{% endblock %}

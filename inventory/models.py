@@ -8,11 +8,16 @@ class Medicine(models.Model):
         ('mg', 'mg'),
         ('mL', 'mL'),
     )
+    TYPE = (
+        ('Drug', 'Drug'),
+        ('Vaccine', 'Vaccine'),
+    )
     medicine = models.CharField(max_length=100)
+    med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
     uom = models.CharField('uom', choices=UOM, max_length=10, default='mg')
     description = models.CharField(max_length=500, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -58,13 +63,19 @@ class Medicine_Received_Trail(models.Model):
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.IntegerField('quantity', default=0)
+    name = models.CharField(max_length=100)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+	quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
-
+	 
+    def save(self, *args, **kwargs):
+        self.name = str(self.inventory.medicine.medicine_fullname)
+        self.price = str(self.inventory.medicine.price)
+        super(Medicine_Subtracted_Trail, self).save(*args, **kwargs)
 #Food
 class Food(models.Model):
     FOODTYPE = (
@@ -76,7 +87,7 @@ class Food(models.Model):
     food = models.CharField(max_length=100)
     foodtype = models.CharField('foodtype', choices=FOODTYPE, max_length=50)
     description = models.CharField(max_length=100, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
     def __str__(self):
         return self.food
@@ -134,7 +145,7 @@ class Miscellaneous(models.Model):
     miscellaneous = models.CharField(max_length=100)
     uom = models.CharField(max_length=100, choices=UOM)
     description = models.CharField(max_length=100, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
     def __str__(self):
         return self.miscellaneous

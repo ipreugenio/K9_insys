@@ -20,9 +20,15 @@
     <form class="ui form" method="POST">
         <h4 class="ui dividing header">Details</h4>
             {% csrf_token %}
-            <div class="field">
-                <label>Medicine</label>
-                {{form.medicine}}
+            <div class = "two fields">
+                <div class="twelve wide field">
+                    <label>Medicine</label>
+                    {{form.medicine}}
+                </div>
+                <div class="four wide field">
+                    <label>Type</label>
+                    {{form.med_type}}
+                </div>
             </div>
 
             <div class="three fields">

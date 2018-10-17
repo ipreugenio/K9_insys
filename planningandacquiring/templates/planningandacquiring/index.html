@@ -1,7 +1,71 @@
 {% extends "profiles/sidebar_pa.html" %}  
 
 {% block content %}
-<div class="ui fluid container">
-        <h1>Planning and Acquiring</h1>
+<div class="ui inverted segment" style="padding:20px;">
+        <h3 class="ui header">{{ title }}</h3>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{{style}}" > {{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+<div class="ui segment">
+        <form class="ui form" method="POST">
+        {% csrf_token %}
+                <div class="three fields">
+                        <div class="field">
+                                <label>Date From</label>
+                                <input type="date" name="date_from" id="date_from">
+                        </div>
+                        <div class="field">
+                                <label>Date To</label>
+                                <input type="date" name="date_to" id="date_to">
+                        </div>
+                        <div class="field">
+                                <div class="ui left aligned basic segment" style="padding: 0px;margin-top: 24px;">
+                                        <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >Generate</button>
+                                </div>
+                        </div>
+                </div>
+        </form>
+
+        {% if date_from %}
+        <div class="ui center alignedbasic segment">
+                <h3>{{date_from}} to {{date_to}}</h2>
+        </div>
+        {% endif%}
+
+        <table id="tabledata" class="ui two three celled table responsive nowrap" style="width:100%">
+                <thead>
+                        <tr>
+                                <th>Inventory</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                        </tr>
+                </thead>
+                <tbody>
+                        {% for data in data %}
+                        <tr>
+                                <td>{{data.0}}</td>
+                                <td>{{data.1}}</td>    
+                                <td>{{data.2}}</td>    
+                        </tr>
+                        {% endfor %}
+                </tbody>
+        </table>
+
+        <div class="ui basic segment">
+                <div style="font-weight:bold; font-size:18px;">
+                        <label>Total:</label>
+                        <span>{{total}}</span>
+                </div>
+        </div>
 </div>
+<script type="text/javascript">
+            
+        $(document).ready(function() {
+        $('#tabledata').DataTable();
+        } );
+        
+    </script>
 {% endblock%}
