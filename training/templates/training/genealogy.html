@@ -1,6 +1,8 @@
 {% extends "profiles/sidebar_training.html" %}
 {% block content %}
 
+
+
    <form class = "ui form" action="{% url 'training:genealogy' %}" method="post">
        {% csrf_token %}
        SELECT K9 {{form.k9}}
@@ -9,6 +11,14 @@
 
  {% if tree %}
  {{ tree|safe }}
+{% endif %}
+
+ {% if skill_in_general %}
+ {{ skill_in_general|safe }}
+{% endif %}
+
+{% if skill_by_gender %}
+ {{ skill_by_gender|safe }}
 {% endif %}
 
 

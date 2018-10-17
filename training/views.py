@@ -9,15 +9,26 @@ from .models import K9_Genealogy
 from .forms import TestForm
 from collections import OrderedDict
 
-#classifier stuff
-import pandas as pd
+
+
+#graphing imports
 import igraph
 from igraph import *
-
-
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
+
+#statistical imports
+import pandas as pd
+
+# from statsmodels.tsa.ar_model import AR
+# from statsmodels.tsa.arima_model import ARMA
+# from statsmodels.tsa.statespace.sarimax import SARIMAX
+# from statsmodels.tsa.vector_ar.var_model import VAR
+# from statsmodels.tsa.statespace.varmax import VARMAX
+# from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+# from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from random import random
 
 # Create your views here.
 
@@ -63,7 +74,20 @@ def classify_k9_select(request, id):
         }
 
     return render (request, 'training/classify_k9_select.html', context)
-    
+
+def forecasting():
+    # # Autoregression
+    # # contrived dataset
+    # data = [x + random() for x in range(1, 100)]
+    # # fit model
+    # model = AR(data)
+    # model_fit = model.fit()
+    # # make prediction
+    # yhat = model_fit.predict(len(data), len(data))
+    # print(yhat)
+
+    return None
+
 def training_records(request):
     context = {
         'title': 'Training Records',
@@ -71,8 +95,7 @@ def training_records(request):
     return render (request, 'training/training_records.html', context)
 
 
-def K9_skill_classifier(request):
-
+def gender_count_between_breeds():
     k9_set = K9.objects.all()
 
     breed = []
@@ -88,19 +111,18 @@ def K9_skill_classifier(request):
         female_count.append(F.count())
         loop += 1
 
-
     male = go.Bar(
         x=breed,
-        y= male_count,
-        name = "Male",
-        text = male_count
+        y=male_count,
+        name="Male",
+        text=male_count
     )
 
     female = go.Bar(
         x=breed,
-        y= female_count,
+        y=female_count,
         name="Female",
-        text = female_count
+        text=female_count
     )
 
     data = [male, female]
@@ -108,22 +130,190 @@ def K9_skill_classifier(request):
     layout = go.Layout(
         title="Gender Count for " + str(k9_set.count()) + " Dogs",
         barmode='group'
-        )
+    )
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+    return graph
+
+def skill_count_between_breeds():
+    k9_set = K9.objects.exclude(capability="None")
+
+    breed = []
+    sar_count = []
+    ndd_count = []
+    edd_count = []
+
+    loop = 0
+    for k9 in k9_set:
+        breed.append(k9.breed)
+        S = K9.objects.filter(capability='SAR', breed=breed[loop])
+        N = K9.objects.filter(capability='NDD', breed=breed[loop])
+        E = K9.objects.filter(capability='EDD', breed=breed[loop])
+        sar_count.append(S.count())
+        ndd_count.append(N.count())
+        edd_count.append(E.count())
+        loop += 1
+
+    SAR = go.Bar(
+        x=breed,
+        y=sar_count,
+        name="SAR",
+        text=sar_count
+    )
+
+    NDD = go.Bar(
+        x=breed,
+        y=ndd_count,
+        name="NDD",
+        text=ndd_count
+    )
+
+    EDD = go.Bar(
+        x=breed,
+        y=edd_count,
+        name="EDD",
+        text=edd_count
+    )
+
+    data = [SAR, NDD, EDD]
+
+    layout = go.Layout(
+        title="Skill Count for " + str(k9_set.count()) + " Dogs Based on Breed",
+        barmode='group'
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
+def skill_percentage_between_sexes():
+    k9_set = K9.objects.exclude(capability="None")
+    m_sar_count = []
+    m_ndd_count = []
+    m_edd_count = []
+
+    f_sar_count = []
+    f_ndd_count = []
+    f_edd_count = []
+    for k9 in k9_set:
+        if (k9.sex == "M"):
+            if (k9.capability == "SAR"):
+                m_sar_count.append(None)
+            elif (k9.capability == "NDD"):
+                m_ndd_count.append(None)
+            else:
+                m_edd_count.append(None)
+        else:
+            if (k9.capability == "SAR"):
+                f_sar_count.append(None)
+            elif (k9.capability == "NDD"):
+                f_ndd_count.append(None)
+            else:
+                f_edd_count.append(None)
+
+
+    fig = go.Figure(
+    data = [
+        {
+            "values": [len(m_sar_count), len(m_ndd_count), len(m_edd_count)], # count for males
+            "labels": [
+                "SAR", "NDD", "EDD"
+            ],
+            "text": ["SAR", "NDD", "EDD"],
+            "textposition": "inside",
+            "domain": {"x": [0, .48]},
+            "name": "Males",
+            "hoverinfo": "label+value+name",
+            "hole": .4,
+            "type": "pie"
+        },
+        {
+            "values": [len(f_sar_count), len(f_ndd_count), len(f_edd_count)],
+            "labels": [
+                "SAR", "NDD", "EDD"
+            ],
+            "text": ["SAR", "NDD", "EDD"],
+            "textposition": "inside",
+            "domain": {"x": [.52, 1]},
+            "name": "Females",
+            "hoverinfo": "label+value+name",
+            "hole": .4,
+            "type": "pie"
+        }],
+
+    layout =  {
+        "title": "Skill Percentage for " + str(k9_set.count()) + " Assigned Dogs Based on Sexes",
+        "annotations": [
+            {
+                "font": {
+                    "size": 20
+                },
+                "showarrow": False,
+                "text": "Males",
+                "x": 0.20,
+                "y": 0.5
+            },
+            {
+                "font": {
+                    "size": 20
+                },
+                "showarrow": False,
+                "text": "Females",
+                "x": 0.8,
+                "y": 0.5
+            }
+        ]
+    }
+    )
+
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
+#TODO check if ratio ba talaga tawag dito just in case
+def skill_count_ratio():
+    k9_set = K9.objects.exclude(capability="None")
+
+    SAR = K9.objects.filter(capability="SAR")
+    NDD = K9.objects.filter(capability="NDD")
+    EDD = K9.objects.filter(capability="EDD")
+
+    labels = ['SAR', 'NDD', 'EDD']
+    values = [SAR.count(), NDD.count(), EDD.count()]
+
+    trace = go.Pie(labels=labels, values=values,
+                    hoverinfo = 'label+value', textinfo = 'percent',)
+
+    data = [trace]
+
+    layout = go.Layout(
+        title="Skill Ratio for " + str(k9_set.count()) + " Assigned Dogs",
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
+def K9_skill_classifier(request):
+
+    bar_gender_count = gender_count_between_breeds()
+    pie_skill_ratio = skill_count_ratio()
+    bar_skill_count_from_breed = skill_count_between_breeds()
+    pie_skill_percentage_from_sexes = skill_percentage_between_sexes()
+    forecasting()
+
     context = {
-        'graph': graph,
+        'bar_gender_count': bar_gender_count,
+        'pie_skill_ratio' : pie_skill_ratio,
+        'bar_skill_count_from_breed': bar_skill_count_from_breed,
+        'pie_skill_percentage_from_sexes': pie_skill_percentage_from_sexes
     }
 
     return render(request, 'training/k9_skill_classifier.html', context)
-
-
-def forecasting(request):
-
-    return None
-
 
 def make_annotations(pos, labels, M):
     #test = list(map(str, range(7)))
@@ -225,11 +415,16 @@ def generate_family_tree(id):
             offspring_name = str(offspring.name)
             o_index = g.vs.find(name=offspring_name)
 
+        connection = []
+
         if o is not None and f is not None:
             g.add_edges([(o_index, f_index)])
+            connection.append("Father")
         if o is not None and m is not None:
             g.add_edges([(o_index, m_index)])
+            connection.append("Mother")
 
+        g.es["relation"] = connection
 
     #vertex_count = len(genes)
     #v_label = map(str, range(7))
@@ -266,20 +461,15 @@ def generate_family_tree(id):
         Ye += [2 * M - position[edge[0]][1], 2 * M - position[edge[1]][1], None]
 
     labels = g.vs["name"]
-    '''
-    details = []
-
-    for count in range(7):
-        desc = "[Name: " + str(g.vs["name"][count]) + "] [Age: " + str(g.vs["age"][count]) + "] [Gender: " + str(g.vs["gender"][count]) +"]"
-        details.append(desc)
-    '''
-
+    relation = g.es["relation"]
+    print(relation)
 
     lines = go.Scatter(x=Xe,
                        y=Ye,
                        mode='lines',
-                       line=dict(color='rgb(210,210,210)', width=1),
-                       hoverinfo='none'
+                       text=(list(relation)),
+                       hoverinfo='text',
+                       line=dict(color='rgb(210,210,210)', width=2),
                        )
     dots = go.Scatter(x=Xn,
                       y=Yn,
@@ -301,12 +491,15 @@ def generate_family_tree(id):
                 showticklabels=False,
                 )
 
-    layout = dict(title='Family Tree for K9 '+ str(target),
+    layout = dict(title='Descendants of K9 '+ str(target),
+                  autosize=True,
                   annotations=make_annotations(position, labels, M),
                   font=dict(size=12),
                   showlegend=False,
                   xaxis=lout.XAxis(axis),
                   yaxis=lout.YAxis(axis),
+                  width=1000,
+                  height=800,
                   margin=dict(l=40, r=40, b=85, t=100),
                   hovermode='closest',
                   plot_bgcolor='rgb(248,248,248)'
@@ -316,86 +509,162 @@ def generate_family_tree(id):
     fig = dict(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
-    '''
-    nr_vertices = 7
-    v_label = map(str, range(nr_vertices))
-    print(v_label)
-    G = Graph.Tree(nr_vertices, 2)  # 2 stands for children number
-    lay = G.layout('rt')
-
-    position = {k: lay[k] for k in range(nr_vertices)}
-    Y = [lay[k][1] for k in range(nr_vertices)]
-    M = max(Y)
-
-    es = EdgeSeq(G)  # sequence of edges
-    E = [e.tuple for e in G.es]  # list of edges
-
-    L = len(position)
-    Xn = [position[k][0] for k in range(L)]
-    Yn = [2 * M - position[k][1] for k in range(L)]
-    Xe = []
-    Ye = []
-    for edge in E:
-        Xe += [position[edge[0]][0], position[edge[1]][0], None]
-        Ye += [2 * M - position[edge[0]][1], 2 * M - position[edge[1]][1], None]
-
-    labels = list(v_label)
-
-    lines = go.Scatter(x=Xe,
-                       y=Ye,
-                       mode='lines',
-                       line=dict(color='rgb(210,210,210)', width=1),
-                       hoverinfo='none'
-                       )
-    dots = go.Scatter(x=Xn,
-                      y=Yn,
-                      mode='markers',
-                      name='',
-                      marker=dict(#symbol='dot',
-                                  size=18,
-                                  color='#6175c1',  # '#DB4551',
-                                  line=dict(color='rgb(50,50,50)', width=1)
-                                  ),
-                      text= (list(labels)),
-                      hoverinfo='text',
-                      opacity=0.8
-                      )
-
-    axis = dict(showline=False,  # hide axis line, grid, ticklabels and  title
-                zeroline=False,
-                showgrid=False,
-                showticklabels=False,
-                )
-
-    layout = dict(title='Tree with Reingold-Tilford Layout',
-                  annotations=make_annotations(position, v_label, M),
-                  font=dict(size=12),
-                  showlegend=False,
-                  xaxis= lout.XAxis(axis),
-                  yaxis= lout.YAxis(axis),
-                  margin=dict(l=40, r=40, b=85, t=100),
-                  hovermode='closest',
-                  plot_bgcolor='rgb(248,248,248)'
-                  )
-
-    data = [lines, dots]
-    fig = dict(data=data, layout=layout)
-    fig['layout'].update(annotations=make_annotations(position, v_label, M))
-    #py.iplot(fig, filename='Tree-Reingold-Tilf')
-
-
-    #data = [lines, dots]
-    #fig = go.Figure(data=data,layout=layout)
-    #fig['layout'].update(annotations=make_annotations(position, v_label))
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-    '''
     return graph
+
+def skills_from_father_side(id):
+
+    return None
+def skills_from_mother_side(id):
+    return None
+def skills_from_gender(id):
+    k9_family = K9_Genealogy.objects.filter(zero=id)
+
+    k9_list = []
+    for k9 in k9_family:
+        if k9.o is not None:
+            cursor = k9.o
+            k9_list.append(cursor.id)
+        if k9.f is not None:
+            cursor = k9.f
+            k9_list.append(cursor.id)
+        if k9.m is not None:
+            cursor = k9.m
+            k9_list.append(cursor.id)
+
+    k9_list = remove_duplicates(k9_list)
+
+    k9_set = K9.objects.filter(pk__in=k9_list).exclude(capability="None")
+
+    m_sar_count = []
+    m_ndd_count = []
+    m_edd_count = []
+
+    f_sar_count = []
+    f_ndd_count = []
+    f_edd_count = []
+    for k9 in k9_set:
+        if (k9.sex == "M"):
+            if (k9.capability == "SAR"):
+                m_sar_count.append(None)
+            elif (k9.capability == "NDD"):
+                m_ndd_count.append(None)
+            else:
+                m_edd_count.append(None)
+        else:
+            if (k9.capability == "SAR"):
+                f_sar_count.append(None)
+            elif (k9.capability == "NDD"):
+                f_ndd_count.append(None)
+            else:
+                f_edd_count.append(None)
+
+    fig = go.Figure(
+        data=[
+            {
+                "values": [len(m_sar_count), len(m_ndd_count), len(m_edd_count)],  # count for males
+                "labels": [
+                    "SAR", "NDD", "EDD"
+                ],
+                "text": ["SAR", "NDD", "EDD"],
+                "textposition": "inside",
+                "domain": {"x": [0, .48]},
+                "name": "Males",
+                "hoverinfo": "label+value+name",
+                "hole": .4,
+                "type": "pie"
+            },
+            {
+                "values": [len(f_sar_count), len(f_ndd_count), len(f_edd_count)],
+                "labels": [
+                    "SAR", "NDD", "EDD"
+                ],
+                "text": ["SAR", "NDD", "EDD"],
+                "textposition": "inside",
+                "domain": {"x": [.52, 1]},
+                "name": "Females",
+                "hoverinfo": "label+value+name",
+                "hole": .4,
+                "type": "pie"
+            }],
+
+        layout={
+            "title": "Skill Percentage for " + str(k9_set.count()) + " Assigned Dogs from Descendants Based on Sexes",
+            "annotations": [
+                {
+                    "font": {
+                        "size": 20
+                    },
+                    "showarrow": False,
+                    "text": "Males",
+                    "x": 0.20,
+                    "y": 0.5
+                },
+                {
+                    "font": {
+                        "size": 20
+                    },
+                    "showarrow": False,
+                    "text": "Females",
+                    "x": 0.8,
+                    "y": 0.5
+                }
+            ]
+        }
+    )
+
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
+
+def skill_in_general(id):
+    k9_family = K9_Genealogy.objects.filter(zero = id)
+
+    k9_list = []
+    for k9 in k9_family:
+        if k9.o is not None:
+            cursor = k9.o
+            k9_list.append(cursor.id)
+        if k9.f is not None:
+            cursor = k9.f
+            k9_list.append(cursor.id)
+        if k9.m is not None:
+            cursor = k9.m
+            k9_list.append(cursor.id)
+
+    k9_list = remove_duplicates(k9_list)
+
+    k9_set = K9.objects.filter(pk__in=k9_list).exclude(capability="None")
+
+    SAR = K9.objects.filter(capability="SAR", pk__in=k9_list)
+    NDD = K9.objects.filter(capability="NDD", pk__in=k9_list)
+    EDD = K9.objects.filter(capability="EDD", pk__in=k9_list)
+
+    labels = ['SAR', 'NDD', 'EDD']
+    values = [SAR.count(), NDD.count(), EDD.count()]
+
+    trace = go.Pie(labels=labels, values=values,
+                   hoverinfo='label+value', textinfo='percent', )
+
+    data = [trace]
+
+    layout = go.Layout(
+        title="Skill Ratio for " + str(k9_set.count()) + " Assigned Dogs from Descendants",
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
 
 def genealogy(request):
 
     form = TestForm
 
-    tree =""
+    tree = ""
+    general = ""
+    gender = ""
 
     if request.method == 'POST':
 
@@ -445,13 +714,21 @@ def genealogy(request):
                 flag = 1
 
             if cancel == 1:
+                print("STR ID = " + str(target.id))
                 tree = generate_family_tree(target.id)
+                general = skill_in_general(target.id)
+                gender = skills_from_gender(target.id)
+                #TODO Put other family related graphs here
+
             else:
                 tree = "K9 has no descendants!"
+
 
     context = {
             'form': form,
             'tree': tree,
+            'skill_in_general': general,
+            'skill_by_gender': gender
             }
 
 
