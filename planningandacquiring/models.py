@@ -120,15 +120,7 @@ class K9_Parent(models.Model):
     father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
     offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
-class Medicine(models.Model):
-    name = models.CharField('name', max_length=200)
-    description = models.CharField('description', max_length=200)
-
-class Medicine_Assignment(models.Model):
-    milligram = models.DecimalField('milligram', decimal_places=3, max_digits=12, default=0)
-    K9 = models.ForeignKey(K9, on_delete=models.CASCADE)
-
-class Miscellaneous(models.Model):
-    name = models.CharField('name', max_length=200)
-    description = models.CharField('description', max_length=200)
+class K9_Quantity(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    date_bought = models.DateField('date_bought', blank=True, null=True)
 

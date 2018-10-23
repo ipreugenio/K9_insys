@@ -4,17 +4,21 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from planningandacquiring.models import K9, K9_Parent
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy
 from .forms import TestForm
 from collections import OrderedDict
 
 
-#classifier stuff
+#statistical imports
+from math import *
+from sklearn.metrics import mean_squared_error
 import pandas as pd
-import igraph
-from igraph import *
-
+import numpy as np
+import matplotlib.pylab as plt
+from matplotlib.pylab import rcParams
+from datetime import datetime, date
+from dateutil.parser import parse
 
 #graphing imports
 import igraph
@@ -23,22 +27,37 @@ import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
 
-#statistical imports
-import pandas as pd
+#print(pd.__version__) #Version retrieved is not correct
 
-# from statsmodels.tsa.ar_model import AR
-# from statsmodels.tsa.arima_model import ARMA
-# from statsmodels.tsa.statespace.sarimax import SARIMAX
-# from statsmodels.tsa.vector_ar.var_model import VAR
-# from statsmodels.tsa.statespace.varmax import VARMAX
-# from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-# from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random
+from faker import Faker
+from statsmodels.tsa.ar_model import AR
+from statsmodels.tsa.arima_model import ARMA
+from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.vector_ar.var_model import VAR
+from statsmodels.tsa.statespace.varmax import VARMAX
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from random import random, randint
+from statsmodels.tsa.stattools import adfuller, kpss
+import statsmodels.api as sm
+
 
 # Create your views here.
 
 def index(request):
     return render (request, 'training/index.html')
+
+def timeseries_generator():
+    fake = Faker()
+    for x in range(100):
+        number = randint(1, 60)
+        date = fake.date_between(start_date='-12y', end_date='-2y')
+
+        date_quantity = K9_Quantity(quantity = number, date_bought = date)
+        date_quantity.save()
+
+    return None
 
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
@@ -80,24 +99,83 @@ def classify_k9_select(request, id):
 
     return render (request, 'training/classify_k9_select.html', context)
 
-def forecasting():
-    # # Autoregression
-    # # contrived dataset
-    # data = [x + random() for x in range(1, 100)]
-    # # fit model
-    # model = AR(data)
-    # model_fit = model.fit()
-    # # make prediction
-    # yhat = model_fit.predict(len(data), len(data))
-    # print(yhat)
+#Use in forecasting to test if original data is stationary
+def test_stationarity(timeseries, index):
+    # Determing rolling statistics
+    # Set at which index will test data start
 
-    return None
+    rolmean = timeseries.rolling(index).mean()
+    rolstd = timeseries.rolling(index).std()
+
+    idx = pd.IndexSlice
+
+    # Perform Dickey-Fuller test:
+    print('Results of Dickey-Fuller Test:')
+    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
+    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+    for key, value in dftest[4].items():
+        dfoutput['Critical Value (%s)' % key] = value
+    print(dfoutput)
+
+    #Check Root Mean Squared Error, the lower the better
+    #rms = sqrt(mean_squared_error())
+    #print(rms)
+
+    ts_d = []
+    ts_q = []
+
+    for index, row in timeseries.iterrows():
+
+        ts_q.append(row["Quantity"])
+        ts_d.append(index)
+
+    mean_d = []
+    mean_q = []
+
+    for index, row in rolmean.iterrows():
+        mean_q.append(row["Quantity"])
+        mean_d.append(index)
+
+    std_d = []
+    std_q = []
+
+    for index, row in rolstd.iterrows():
+        std_q.append(row["Quantity"])
+        std_d.append(index)
+
+
+    naive = go.Scatter(
+        x=list(ts_d),
+        y=list(ts_q),
+        name = "Original"
+    )
+    ave = go.Scatter(
+        x=list(mean_d),
+        y=list(mean_q),
+        name = "Rolling Mean"
+    )
+    sdev = go.Scatter(
+        x=list(std_d),
+        y=list(std_q),
+        name = "Rolling Standard Deviation"
+    )
+
+
+    data = [naive, ave, sdev]
+
+    layout = go.Layout(
+        title="Stationary Test"
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
 
 def training_records(request):
-    context = {
-        'title': 'Training Records',
-    }
-    return render (request, 'training/training_records.html', context)
+
+    return None
 
 
 def gender_count_between_breeds():
@@ -110,8 +188,8 @@ def gender_count_between_breeds():
     loop = 0
     for k9 in k9_set:
         breed.append(k9.breed)
-        M = K9.objects.filter(sex='M', breed=breed[loop])
-        F = K9.objects.filter(sex='F', breed=breed[loop])
+        M = K9.objects.filter(sex='Male', breed=breed[loop])
+        F = K9.objects.filter(sex='Female', breed=breed[loop])
         male_count.append(M.count())
         female_count.append(F.count())
         loop += 1
@@ -133,7 +211,7 @@ def gender_count_between_breeds():
     data = [male, female]
 
     layout = go.Layout(
-        title="Gender Count for " + str(k9_set.count()) + " Dogs",
+        title="Gender Count for " + str(k9_set.count()) + " Dogs Based on Breed",
         barmode='group'
     )
 
@@ -185,7 +263,7 @@ def skill_count_between_breeds():
     data = [SAR, NDD, EDD]
 
     layout = go.Layout(
-        title="Skill Count for " + str(k9_set.count()) + " Dogs Based on Breed",
+        title="Skill Count for " + str(k9_set.count()) + " Assigned Dogs Based on Breed",
         barmode='group'
     )
 
@@ -204,7 +282,7 @@ def skill_percentage_between_sexes():
     f_ndd_count = []
     f_edd_count = []
     for k9 in k9_set:
-        if (k9.sex == "M"):
+        if (k9.sex == "Male"):
             if (k9.capability == "SAR"):
                 m_sar_count.append(None)
             elif (k9.capability == "NDD"):
@@ -309,7 +387,6 @@ def K9_skill_classifier(request):
     pie_skill_ratio = skill_count_ratio()
     bar_skill_count_from_breed = skill_count_between_breeds()
     pie_skill_percentage_from_sexes = skill_percentage_between_sexes()
-    forecasting()
 
     context = {
         'bar_gender_count': bar_gender_count,
@@ -397,11 +474,6 @@ def generate_family_tree(id):
     g.vs["name"] = result #remove_duplicates
     #for extra in range(extras):
         #g.delete_vertices(count_before+1)
-
-    print(str(count_before))
-    print(str(count_after))
-    print("COMPLETE " + str(names))
-    print("INCOMPLETE " + str(g.vs["name"]))
 
     for gene in genepool:
         f = gene.f
@@ -548,7 +620,7 @@ def skills_from_gender(id):
     f_ndd_count = []
     f_edd_count = []
     for k9 in k9_set:
-        if (k9.sex == "M"):
+        if (k9.sex == "Male"):
             if (k9.capability == "SAR"):
                 m_sar_count.append(None)
             elif (k9.capability == "NDD"):

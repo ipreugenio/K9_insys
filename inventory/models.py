@@ -1,5 +1,5 @@
 from django.db import models
-from planningandacquiring.models import Medicine, Miscellaneous
+
 # Create your models here.
 
 #Medicine
@@ -63,9 +63,9 @@ class Medicine_Received_Trail(models.Model):
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2)
-	quantity = models.IntegerField('quantity', default=0)
+    name = models.CharField(max_length=100, default="")
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0)
+    quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
