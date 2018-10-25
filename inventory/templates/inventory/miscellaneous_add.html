@@ -18,21 +18,26 @@
                             {% endif %}
                             <form class = "ui inverted form" method="POST">
                                 {% csrf_token %}
-                                <div class="three fields">
-                                    <div class="seven wide field">
+                                <div class="two fields">
+                                    <div class="field">
                                         <label>Miscellaneous</label>
                                         {{form.miscellaneous}}
                                     </div>
-                                    <div class="five wide field">
+                                    <div class="field">
+                                        <label>Type</label>
+                                        {{form.misc_type}}
+                                    </div>
+                                </div>
+                                <div class="two fields">
+                                    <div class="field">
                                         <label>Unit of Measurement</label>
                                         {{form.uom}}
                                     </div>
-                                    <div class="four wide field">
+                                    <div class="field">
                                         <label>Price</label>
                                         {{form.price}}
                                     </div>
                                 </div>
-
                                 <div class="field">
                                     <label>Description</label>
                                     {{form.description}}

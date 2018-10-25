@@ -21,7 +21,7 @@ class Medicine(models.Model):
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.medicine
+        return self.medicine_fullname
     
     def dosage(self):
         return str(self.dose) +' ' + str(self.uom)
@@ -129,7 +129,7 @@ class Food_Subtracted_Trail(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory.medicine.medicine_fullname
+        return self.inventory.food.food
 
 class Miscellaneous(models.Model):
     UOM = (
@@ -142,8 +142,15 @@ class Miscellaneous(models.Model):
         ('tube', 'tube'),
     )
 
+    TYPE = (
+        ('Equipment', 'Equipment'),
+        ('Vet Supply', 'Vet Supply'),
+        ('Others', 'Others'),
+    )
+
     miscellaneous = models.CharField(max_length=100)
     uom = models.CharField(max_length=100, choices=UOM)
+    misc_type = models.CharField(max_length=100, choices=TYPE)
     description = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
@@ -187,4 +194,21 @@ class Miscellaneous_Subtracted_Trail(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory.medicine.medicine_fullname
+        return self.inventory.miscellaneous.miscellaneous
+
+class DamagedEquipemnt(models.Model):
+    CONCERN = (
+        ('Broken', 'Broken'),
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),   
+    )
+
+    inventory = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', default=0)
+    concern = models.CharField('concern', max_length=100, choices=CONCERN)
+    date = models.DateField('date', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.miscellaneous

@@ -1,0 +1,30 @@
+{% extends "profiles/sidebar_pa.html" %} {% block content %}
+<h1 class="ui header">
+    {{Title}}
+    <div class="sub header">List of all K9s on record</div>
+</h1>
+
+<form  class="ui form" action="{% url 'planningandacquiring:report' %}">
+    <div class="inline fields">
+            <div class="field">
+                <label for="">Date from:</label>
+                {{form.date_from}}
+            </div>
+            <div class="field">
+                <label for="">Date to:</label>
+                {{form.date_to}}
+            </div>
+            <div class="field">
+                <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+            </div>
+    </div>
+</form>
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		$('#tabledata').DataTable();
+		$('.menu .item').tab();
+	});
+	
+</script>
+{% endblock %}

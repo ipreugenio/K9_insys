@@ -8,6 +8,9 @@ from datetime import date as d
 
 #class K9_price(models.Model):
 
+class Date(models.Model):
+    date_from = models.DateField('date_from', blank=True, null=True)
+    date_to = models.DateField('date_to', blank=True, null=True)
 
 class K9(models.Model):
     SEX = (

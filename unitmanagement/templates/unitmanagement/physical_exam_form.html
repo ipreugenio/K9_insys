@@ -1,11 +1,14 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
-<div class="ui inverted segment" style="padding:20px;">
-    <h3 class="ui header">{{ title }}</h3>
+<div class="ui basic segment"  style="margin-bottom:0px;">
+    <h2 class="ui header">
+        {{title}}
+        <div class="sub header">Input data of Physical Exam Here</div>
+    </h2>
     {% if messages %}
         {% for message in messages %}
-            <div class="ui green message" > {{ message }}</div>
+            <div class="{{style}}" > {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
