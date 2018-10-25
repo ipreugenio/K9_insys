@@ -1,15 +1,18 @@
 {% extends "profiles/sidebar_deployment.html" %}
 
 {% block content %}
-<h1>{{Title}}</h1>
-{% if messages %}
-    {% for message in messages %}
-        <div class="{{ style }}">{{message}}</div>
-    {% endfor %}
-{% endif %}
-
+<h2 class="ui header">
+    {{title}}
+    <div class="sub header">Input location details Here</div>
+</h2>
+       
 <div class="ui fluid container">
     <div class="ui inverted segment">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{{ style }}">{{message}}</div>
+            {% endfor %}
+        {% endif %}
     <form class="ui inverted equal width form" action="{% url 'deployment:add_location' %}" method="POST">
         {% csrf_token %}
         <div class="fields">

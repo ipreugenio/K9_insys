@@ -18,9 +18,7 @@ urlpatterns = [
     path('breeding_confirmed/', views.breeding_confirmed, name='breeding_confirmed'),
     path('K9_list/', views.K9_listview, name='K9_list'),
     path('K9_detail/<int:id>', views.K9_detailview, name='K9_detail'),
-<<<<<<< HEAD
     path('report/', views.report, name='report'),
-=======
+    path('index/', views.index, name='index'),
     path('K9_forecast/', views.K9_forecast, name='K9_forecast')
->>>>>>> 15ee613692f457124a5115246ddd8eba13620da9
 ];

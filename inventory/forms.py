@@ -4,10 +4,10 @@ from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
 from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
+from inventory.models import DamagedEquipemnt
 
 class DateInput(forms.DateInput):
     input_type = 'date'
-
 
 #Medicine
 class MedicineForm(forms.ModelForm):
@@ -79,12 +79,19 @@ class MiscellaneousForm(forms.ModelForm):
         ('tube', 'tube'),
     )
 
+    TYPE = (
+        ('Equipment', 'Equipment'),
+        ('Vet Supply', 'Vet Supply'),
+        ('Others', 'Others'),
+    )
+
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
     uom = forms.CharField(max_length=10, label = 'uom', widget = forms.Select(choices=UOM))
+    misc_type = forms.CharField(max_length=10, label = 'misc_type', widget = forms.Select(choices=TYPE))
 
     class Meta:
         model = Miscellaneous
-        fields = ( 'miscellaneous', 'description', 'uom', 'price')
+        fields = ( 'miscellaneous', 'description', 'uom', 'price', 'misc_type')
 
     def __init__(self, *args, **kwargs):
         super(MiscellaneousForm, self).__init__(*args, **kwargs)
@@ -98,5 +105,19 @@ class MiscellaneousCountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(MiscellaneousCountForm, self).__init__(*args, **kwargs)
         self.fields['miscellaneous'].required = False
+
+class DamagedEquipmentForm(forms.ModelForm):
+    CONCERN = (
+        ('Broken', 'Broken'),
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),   
+    )
+
+    concern = forms.CharField(max_length=10, label = 'concern', widget = forms.Select(choices=CONCERN))
+    inventory = forms.ModelChoiceField(queryset = Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
+
+    class Meta:
+        model = DamagedEquipemnt
+        fields = ('inventory', 'quantity', 'concern')
 
 

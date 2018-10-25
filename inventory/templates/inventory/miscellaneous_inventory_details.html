@@ -21,15 +21,19 @@
         <h4 class="ui dividing header">Details</h4>
             {% csrf_token %}
             <div class="three fields">
-                <div class="seven wide field">
+                <div class="six wide field">
                     <label>Miscellaneous</label>
                     {{form.miscellaneous}}
                 </div>
                 <div class="five wide field">
+                        <label>Type</label>
+                        {{form.misc_type}}
+                    </div>
+                <div class="three wide field">
                     <label>Unit of Measurement</label>
                     {{form.uom}}
                 </div>
-                <div class="four wide field">
+                <div class="three wide field">
                     <label>Price</label>
                     {{form.price}}
                 </div>

@@ -4,16 +4,19 @@
     <div class="sub header">List of all K9s on record</div>
 </h1>
 
-<form action="{% url 'planningandacquiring:report' %}">
-    <div class="two column fields">
-        <div>
-            <label for="">Date from</label>
-            {{form.date_from}}
-        </div>
-        <div>
-            <label for="">Date to</label>
-            {{form.date_to}}
-        </div>
+<form  class="ui form" action="{% url 'planningandacquiring:report' %}">
+    <div class="inline fields">
+            <div class="field">
+                <label for="">Date from:</label>
+                {{form.date_from}}
+            </div>
+            <div class="field">
+                <label for="">Date to:</label>
+                {{form.date_to}}
+            </div>
+            <div class="field">
+                <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+            </div>
     </div>
 </form>
 <script type="text/javascript">

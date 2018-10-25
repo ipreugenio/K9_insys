@@ -34,4 +34,7 @@ urlpatterns = [
     path('medicine-subtract-form/<int:id>/', views.medicine_subtract_form, name='medicine_subtract_form'),
     path('food-subtract-form/<int:id>/', views.food_subtract_form, name='food_subtract_form'),
     path('miscellaneous-subtract-form/<int:id>/', views.miscellaneous_subtract_form, name='miscellaneous_subtract_form'),
+    #damaged form
+    path('damaged-form', views.damaged_form, name='damaged_form'),
+    path('damaged-report-list', views.damaged_report_list, name='damaged_report_list'),
 ];

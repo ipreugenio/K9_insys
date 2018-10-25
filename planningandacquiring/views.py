@@ -9,13 +9,9 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
-<<<<<<< HEAD
+from .forms import ReportDateForm
 
-from.forms import ReportDateForm
-# Create your views here.
-=======
 from faker import Faker
-# Create your views here.
 
 #statistical imports
 from math import *
@@ -44,7 +40,7 @@ from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
 import statsmodels.api as sm
 
->>>>>>> 15ee613692f457124a5115246ddd8eba13620da9
+# Create your views here.
 
 def index(request):
     data = [[],[],[]]
@@ -82,9 +78,6 @@ def index(request):
             data[count].append(d[count]*c[count])
             total=total+d[count]*c[count]
             count= count+1
-
-        print(data[2])
-
     context = {
         'title' : "Medicine Used Report",
         'data': data,
@@ -92,7 +85,7 @@ def index(request):
         'date_from': date_from,
         'date_to':date_to,
     }
-    return render (request, 'planningandacquiring/index.html')
+    return render (request, 'planningandacquiring/index.html', context)
 
 def report(request):
     form = ReportDateForm()
