@@ -8,12 +8,20 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.http import JsonResponse
 from django.contrib import messages
-# Create your views here.
 
+from.forms import ReportDateForm
 # Create your views here.
 
 def index(request):
     return render (request, 'planningandacquiring/index.html')
+
+def report(request):
+    form = ReportDateForm()
+    context = {
+        'Title' : "REPORT",
+        'form': form,
+        }
+    return render (request, 'planningandacquiring/report.html', context)
 
 #Form format
 def add_donated_K9(request):
