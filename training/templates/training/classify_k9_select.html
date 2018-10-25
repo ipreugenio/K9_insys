@@ -21,13 +21,28 @@
                 <td>{{data.breed}}</td>
             </tr>
             <tr>
-                <th>Father</th>
-                <td>Father</td>
+                <th>Sex</th>
+                <td>{{data.sex}}</td>
             </tr>
+            {% if parent_exist %}
             <tr>
                 <th>Mother</th>
-                <td>Mother</td>
+                <td>{{parent.mother}}</td>
             </tr>
+            <tr>
+                <th>Father</th>
+                <td>{{parent.father}}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <th>Mother</th>
+                <td>Unknown</td>
+            </tr>
+            <tr>
+                <th>Father</th>
+                <td>Unknown</td>
+            </tr>
+            {% endif %}
             <tr>
                 <th>Classification</th>
                 <td>{{data.capability}}</td>
@@ -36,31 +51,43 @@
     </table>
 </div>
 
+<div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+   <i class="question icon"></i>Information
+  </div>
+  <ul class="list">
+    <li>Below this is a list of suggested skill assignment based from current data.</li>
+      <li>Click on a category to view corresponding data diagram.</li>
+  </ul>
+</div>
+
 <div class = "ui segment">
-    <table class="ui two column celled table">
+    <table class="ui four column celled table">
         <thead>
             <tr>
                 <th>Categories</th>
                 <th>Skills</th>
+                <th>Categories</th>
+                <th>Skills</th>
             </tr>
             <tr>
-                <th>Demand</th>
+                <th data-tooltip= "Click here to view data diagram on currently demanded skill">Demand</th>
+                <td>Somthing</td>
+                <th data-tooltip= "Click here to view data diagram on fraction of all skills">Ratio</th>
                 <td>Somthing</td>
             </tr>
             <tr>
-                <th>Family History(F)</th>
+                <th data-tooltip= "Click here to view data diagram on hereditary skills (all members)">Family History (General)</th>
+                <td>Somthing</td>
+                <th data-tooltip= "Click here to view data diagram on hereditary skills (members with the same breed)">Family History (Gender)</th>
                 <td>Somthing</td>
             </tr>
+
             <tr>
-                <th>Family History(M)</th>
+                <th data-tooltip= "Click here to view data diagram on skill count on current breed">Breed</th>
                 <td>Somthing</td>
-            </tr>
-            <tr>
-                <th>Breed</th>
-                <td>Somthing</td>
-            </tr>
-            <tr>
-                <th>Behaviour</th>
+                <th data-tooltip= "Click here to view data diagram on skill count on current sex">Sex</th>
                 <td>Somthing</td>
             </tr>
                         

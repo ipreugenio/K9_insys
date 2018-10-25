@@ -14,8 +14,8 @@ class Date(models.Model):
 
 class K9(models.Model):
     SEX = (
-        ('M', 'Male'),
-        ('F', 'Female')
+        ('Male', 'Male'),
+        ('Female', 'Female')
     )
 
     COLOR = (
@@ -38,7 +38,7 @@ class K9(models.Model):
         ('Mixed', 'Mixed'),
     )
 
-    serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned')
+    serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
     breed = models.CharField('breed', choices=BREED, max_length=200)
@@ -52,7 +52,7 @@ class K9(models.Model):
     status = models.CharField('status', max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
     capability = models.CharField('capability', max_length=200, default="None")
-    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned')
+    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
     
 
     def __str__(self):
@@ -123,15 +123,7 @@ class K9_Parent(models.Model):
     father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
     offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
-class Medicine(models.Model):
-    name = models.CharField('name', max_length=200)
-    description = models.CharField('description', max_length=200)
-
-class Medicine_Assignment(models.Model):
-    milligram = models.DecimalField('milligram', decimal_places=3, max_digits=12, default=0)
-    K9 = models.ForeignKey(K9, on_delete=models.CASCADE)
-
-class Miscellaneous(models.Model):
-    name = models.CharField('name', max_length=200)
-    description = models.CharField('description', max_length=200)
+class K9_Quantity(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    date_bought = models.DateField('date_bought', blank=True, null=True)
 

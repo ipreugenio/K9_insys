@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Location
+from deployment.models import Location, Areas
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -162,3 +162,9 @@ class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
         fields = ('city', 'zip_code', 'address')
+
+class add_location_form(forms.ModelForm):
+    class Meta:
+        model = Areas
+        fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
+

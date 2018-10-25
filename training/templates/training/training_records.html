@@ -10,6 +10,16 @@
     {% endif %}
 </div>
 
+
+{% if stationary_test %}
+ {{ stationary_test|safe }}
+{% endif %}
+
+
+{% if ar_graph %}
+ {{ ar_graph|safe }}
+{% endif %}
+
 <script type="text/javascript">
         
     $(document).ready(function() {
