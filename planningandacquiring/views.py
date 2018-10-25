@@ -95,12 +95,11 @@ def add_donated_K9(request):
     if request.method == 'POST':
         if form.is_valid():
             k9 = form.save()
-            k9.source = "Donation"
+            k9.source = "Procurement"
             k9.save()
 
             request.session['k9_id'] = k9.id
-            return HttpResponseRedirect('add_donator_form/')
-
+            return HttpResponseRedirect('confirm_donation/')
 
         else:
             style = "ui red message"
@@ -115,6 +114,7 @@ def add_donated_K9(request):
 
     return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
+'''
 def add_donator(request):
     form = add_donator_form(request.POST)
     style = "ui teal message"
@@ -137,38 +137,29 @@ def add_donator(request):
     }
 
     return render(request, 'planningandacquiring/add_donator.html', context)
-
+'''
 
 def confirm_donation(request):
 
     k9_id = request.session['k9_id']
-    donator_id = request.session['donator_id']
-
     k9= K9.objects.get(id = k9_id)
-    donator = K9_Past_Owner.objects.get(id = donator_id)
 
     context = {
         'Title': "Receive Donated K9",
         'k9': k9,
-        'donator': donator
-    }
 
+    }
     return render(request, 'planningandacquiring/confirm_K9_donation.html', context)
 
 def donation_confirmed(request):
     k9_id = request.session['k9_id']
-    donator_id = request.session['donator_id']
 
     k9 = K9.objects.get(id=k9_id)
-    donator = K9_Past_Owner.objects.get(id=donator_id)
 
     if 'ok' in request.POST:
-        k9_donated = K9_Donated(k9 = k9, owner = donator)
-        k9_donated.save()
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
         k9.delete()
-        donator.delete()
         context = {
             'Title': "Receive Donated K9",
             'form': add_donated_K9_form,
@@ -176,6 +167,7 @@ def donation_confirmed(request):
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
 def add_K9_parents(request):
+
     form = add_K9_parents_form(request.POST)
     style = "ui teal message"
     if request.method == 'POST':
@@ -183,6 +175,15 @@ def add_K9_parents(request):
             parents = form.save(commit=False)
             mother = parents.mother
             father = parents.father
+
+
+            mother = K9.objects.get(id = mother.id)
+            father = K9.objects.get(id = father.id)
+
+            print("MOTHER")
+            print(mother)
+            print("FATHER")
+            print(father)
 
             request.session["mother_id"] = mother.id
             request.session["father_id"] = father.id
@@ -198,6 +199,7 @@ def add_K9_parents(request):
         'Title': "K9_Breeding",
         'form': form,
         'style': style,
+
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
@@ -302,7 +304,6 @@ def breeding_confirmed(request):
             'form': add_K9_parents_form
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
-
 
 
 #Listview format

@@ -31,14 +31,16 @@ class add_donator_form(forms.ModelForm):
         fields = ('first_name', 'middle_name', 'last_name', 'email', 'contact_no', 'address')
 
 class add_K9_parents_form(forms.ModelForm):
+
     class Meta:
         model = K9_Parent
         fields = ('mother', 'father', 'offspring')
 
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
-        self.fields['mother'].queryset = self.fields['mother'].queryset.exclude(sex="M")
-        self.fields['father'].queryset = self.fields['father'].queryset.exclude(sex="F")
+        self.fields['mother'].queryset = self.fields['mother'].queryset.exclude(sex="Male")
+        self.fields['father'].queryset = self.fields['father'].queryset.exclude(sex="Female")
+
 
 class add_offspring_K9_form(forms.ModelForm):
     class Meta:

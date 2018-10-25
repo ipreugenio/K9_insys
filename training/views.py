@@ -174,8 +174,7 @@ def test_stationarity(timeseries, index):
 
 
 def training_records(request):
-
-    return None
+    return render(request, 'training/training_records.html')
 
 
 def gender_count_between_breeds():
