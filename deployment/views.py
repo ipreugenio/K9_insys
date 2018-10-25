@@ -56,6 +56,7 @@ def location_form(request):
     }
     return render (request, 'deployment/location_form.html', context)
 
+
 def add_location(request):
     form = add_location_form(request.POST or None)
     style = ""
@@ -64,19 +65,20 @@ def add_location(request):
             form.save()
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
-            form = LocationForm()
+            form = add_location_form()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
     context = {
-        'title': 'Location Form',
-        'texthelp': 'Input deployment data here',
+        'title': 'Team Form',
+        'texthelp': 'Input team data here',
         'form': form,
         'actiontype': 'Submit',
         'style':style,
     }
     return render (request, 'deployment/add_location.html', context)
+
 
 def area_list_view(request):
     areas = Areas.objects.all()
@@ -86,3 +88,13 @@ def area_list_view(request):
     }
 
     return render(request, 'deployment/area_list.html', context)
+
+def area_detailview(request, id):
+    areas = Areas.objects.get(id = id)
+
+    context = {
+        'Title': 'Team Details',
+        'areas' : areas,
+    }
+
+    return render(request, 'deployment/area_detail.html', context)

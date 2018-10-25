@@ -8,12 +8,13 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.http import JsonResponse
 from django.contrib import messages
+from faker import Faker
 # Create your views here.
 
 # Create your views here.
 
 def index(request):
-	data = [[],[],[]]
+    data = [[],[],[]]
     total = 0
     date_from = ''
     date_to = ''
@@ -282,6 +283,13 @@ def breeding_confirmed(request):
 #Listview format
 def K9_listview(request):
     k9 = K9.objects.all()
+
+    '''
+    for x in range(50):
+        date = fake.date_between(start_date='-6y', end_date='-1y')
+        name = fake.name()
+        dog = K9(name = name, birth_date = date)
+        dog.save()'''
     context = {
         'Title' : 'K9 List',
         'k9' : k9

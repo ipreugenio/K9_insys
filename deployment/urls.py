@@ -11,5 +11,6 @@ urlpatterns = [
     path('location-form', views.location_form, name='location_form'),
     path('add_location/', views.add_location, name='add_location'),
     path('area_list/', views.area_list_view, name='area_list'),
+    path('area_detail/<int:id>', views.area_detailview, name='area_detail'),
     #path('/<int:id>/', views., name=''),
 ];

@@ -65,7 +65,7 @@ class Medicine_Subtracted_Trail(models.Model):
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     price = models.DecimalField('price', max_digits=50, decimal_places=2)
-	quantity = models.IntegerField('quantity', default=0)
+    quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 

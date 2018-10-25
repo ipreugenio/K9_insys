@@ -5,14 +5,14 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent
-from .models import K9_Genealogy
-from .forms import TestForm
+from .models import K9_Genealogy, User, K9_Handler
+from .forms import TestForm, add_handler_form
 from collections import OrderedDict
 
 
 #classifier stuff
 import pandas as pd
-import igraph
+'''import igraph
 from igraph import *
 
 
@@ -21,7 +21,7 @@ import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+import plotly.graph_objs.layout as lout'''
 
 #statistical imports
 import pandas as pd
@@ -45,6 +45,8 @@ def classify_k9_list(request):
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
+
+
     context = {
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
@@ -79,6 +81,36 @@ def classify_k9_select(request, id):
         }
 
     return render (request, 'training/classify_k9_select.html', context)
+
+def assign_k9_select(request, id):
+    form = add_handler_form(request.POST)
+    style = "ui teal message"
+    handlers = User.objects.filter(position="Handler")
+    k9 = K9.objects.get(id=id)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            handler_id = request.POST.get('handler')
+            handler = User.objects.get(id=handler_id)
+            K9_Handler.objects.create(k9 = k9, handler = handler)
+            k9.training_status = "On-Training"
+            k9.save()
+            messages.success(request, 'K9 has been assigned to a handler!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            print(form)
+
+    context = {
+        'Title': "K9 Assignment for " + k9.name,
+        'form': form,
+        'style': style,
+        'handler': handlers,
+    }
+    return render (request, 'training/assign_k9_select.html', context)
+
+
+
 
 def forecasting():
     # # Autoregression
@@ -738,3 +770,4 @@ def genealogy(request):
 
 
     return render(request, 'training/genealogy.html', context)
+

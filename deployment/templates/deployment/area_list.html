@@ -6,23 +6,13 @@
 		<table id="tabledata" class="ui celled table">
         	<thead>
           	<tr>
-              <th>FOU</th>
               <th>TEAM</th>
-              <th>Number of Handlers</th>
-              <th>EDD</th>
-              <th>NDD</th>
-              <th>SAR</th>
           	</tr>
     		</thead>
     		<tbody>
 				{% for Areas in areas %}
     				<tr>
-    					<td>{{Areas.area}}</a></td>
-                        <td>{{ Areas.team }}</td>
-    					<td>{{ Areas.handlers }}</td>
-    					<td>{{ Areas.EDD }}</td>
-                        <td>{{ Areas.NDD }}</td>
-                        <td>{{ Areas.SAR }}</td>
+                        <td><a  href="{% url 'deployment:area_detail' Areas.id %}">{{ Areas.team }}</a></td>
     				</tr>
 				{% endfor %}
         </tbody>
