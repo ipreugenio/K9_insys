@@ -19,14 +19,14 @@
           	</tr>
     		</thead>
     		<tbody>
-				{% for Areas in areas %}
+				{% for assignment in team_assignment %}
     				<tr>
-    					<td>{{Areas.area}}</a></td>
-                        <td>{{ Areas.team }}</td>
-    					<td>{{ Areas.handlers }}</td>
-    					<td>{{ Areas.EDD }}</td>
-                        <td>{{ Areas.NDD }}</td>
-                        <td>{{ Areas.SAR }}</td>
+    					<td>{{assignment.area}}</a></td>
+                        <td>{{assignment.team }}</td>
+    					<td>{{assignment.handlers }}</td>
+    					<td>{{assignment.EDD }}</td>
+                        <td>{{assignment.NDD }}</td>
+                        <td>{{assignment.SAR }}</td>
     				</tr>
 				{% endfor %}
         </tbody>

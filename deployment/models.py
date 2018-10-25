@@ -155,8 +155,7 @@ class Location(models.Model):
     zip_code = models.IntegerField('zip_code')
     address = models.CharField('address', max_length=500, default='None')
 
-class Areas(models.Model):
-
+class Area(models.Model):
     AREA = (
         ('FOU NCR-CL', 'FOU NCR-CL'),
         ('FOU NWLZN', 'FOU NWLZN'),
@@ -172,9 +171,30 @@ class Areas(models.Model):
         ('FOU NM', 'FOU NM'),
         ('FOU SV(DUMAGUETE)', 'FOU SV(DUMAGUETE)'),
     )
-    area = models.CharField('area', choices=AREA, max_length=100, default='None')
-    team = models.CharField('team', max_length=500)
-    handlers = models.IntegerField('handlers', default='None')
-    EDD = models.IntegerField('EDD', default='None')
-    NDD = models.IntegerField('NDD', default='None')
-    SAR = models.IntegerField('SAR', default='None')
+
+    name = models.CharField('name', choices=AREA, max_length=100, default='None')
+
+    def __str__(self):
+        return self.name
+
+class Team(models.Model):
+    area = models.ForeignKey('area', on_delete=models.CASCADE)
+    name = models.CharField('name', max_length=500, default="Team")
+
+    def __str__(self):
+        return self.name
+
+class Team_Assignment(models.Model):
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    handlers = models.IntegerField('handlers', default=0)
+    EDD = models.IntegerField('EDD', default=0)
+    NDD = models.IntegerField('NDD', default=0)
+    SAR = models.IntegerField('SAR', default=0)
+
+    def __str__(self):
+        area = Area.objects.get(id=self.area)
+        team = Team.objects.get(id=self.team)
+        area_name = area.name
+        team_name = team.name
+        return str(area_name + " : " + team_name)

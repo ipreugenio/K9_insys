@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Location, Areas
+from deployment.models import Location, Team_Assignment, Area, Team
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -163,8 +163,23 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ('city', 'zip_code', 'address')
 
-class add_location_form(forms.ModelForm):
+
+class assign_team_form(forms.ModelForm):
     class Meta:
-        model = Areas
+        model = Team_Assignment
         fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['team'].queryset = Team.objects.none()
+
+            if 'area' in self.data:
+                try:
+                    area_id = int(self.data.get('area'))
+                    self.fields['team'].queryset = Team.objects.filter(area_id=area_id).order_by('name')
+                except (ValueError, TypeError):
+                    pass  # invalid input from the client; ignore and fallback to empty City queryset
+            elif self.instance.pk:
+                self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
+
 

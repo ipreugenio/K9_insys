@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from .models import Areas
+from .models import Area, Team, Team_Assignment
 
 from inventory.models import Medicine
-from deployment.forms import LocationForm, add_location_form
+from deployment.forms import LocationForm, assign_team_form
 # Create your views here.
 
 def index(request):
@@ -56,8 +56,8 @@ def location_form(request):
     }
     return render (request, 'deployment/location_form.html', context)
 
-def add_location(request):
-    form = add_location_form(request.POST or None)
+def assign_team(request):
+    form = assign_team_form(request.POST or None)
     style = ""
     if request.method == 'POST':
         if form.is_valid():
@@ -76,13 +76,22 @@ def add_location(request):
         'actiontype': 'Submit',
         'style':style,
     }
-    return render (request, 'deployment/add_location.html', context)
+    return render (request, 'deployment/assign_team.html', context)
+
+def load_teams(request):
+    area_id = request.GET.get('area')
+    area = Area.objects.get(id = area_id)
+    teams = Team.objects.filter(area=area).order_by('name')
+
+    return render(request, 'deployment/ajax_load_teams.html', {'teams': teams})
 
 def area_list_view(request):
-    areas = Areas.objects.all()
+    team_assignment = Team_Assignment.objects.all()
     context = {
         'Title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
-        'areas' : areas
+        'team_assignment' : team_assignment
     }
 
     return render(request, 'deployment/area_list.html', context)
+
+

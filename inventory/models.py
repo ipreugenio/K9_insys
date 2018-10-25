@@ -149,8 +149,8 @@ class Miscellaneous(models.Model):
     )
 
     miscellaneous = models.CharField(max_length=100)
-    uom = models.CharField(max_length=100, choices=UOM)
-    misc_type = models.CharField(max_length=100, choices=TYPE)
+    uom = models.CharField(max_length=100, choices=UOM, default="pack")
+    misc_type = models.CharField(max_length=100, choices=TYPE, default="Equipment")
     description = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
 
