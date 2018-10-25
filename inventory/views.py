@@ -8,10 +8,10 @@ import datetime
 
 from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Miscellaneous_Inventory_Count
-from inventory.models import Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
+from inventory.models import Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail, DamagedEquipemnt
 from inventory.models import Medicine_Subtracted_Trail, Food_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 
-from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm
+from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm, DamagedEquipmentForm
 from inventory.forms import MedicineCountForm, FoodCountForm, MiscellaneousCountForm
 # Create your views here.
 
@@ -540,3 +540,32 @@ def miscellaneous_subtract_form(request, id):
         'texthelp': 'Input Subtracted Miscellaneous Items Quantity here',
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)
+
+#Damaged Form
+def damaged_form(request):
+    form = DamagedEquipmentForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Equipment has been successfully Reported!')
+            form = DamagedEquipmentForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+    context = {
+        'title': 'Report Equipment Concern',
+        'form' : form,
+        'style':style,
+    }
+    return render (request, 'inventory/damaged_form.html',context)
+    
+def damaged_report_list(request):
+    data = DamagedEquipemnt.objects.all()
+    
+    context = {
+        'title': 'Report Damaged Equipment List',
+        'data' : data,
+    }
+    return render (request, 'inventory/damaged_report_list.html',context)

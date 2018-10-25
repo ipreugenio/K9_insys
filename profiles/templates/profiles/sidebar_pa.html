@@ -8,7 +8,7 @@
                         <div class="three wide column">
                             <div class="ui tiny pointing vertical menu" style="width:230px;">
                                 <a class="item"> <b>Planning and Acquiring Menu</b></a>
-                                <a href="{% url 'planningandacquiring:add_donated_K9_form'%}" class="item">Receive Donated K9 Form
+                                <a href="{% url 'planningandacquiring:add_donated_K9_form'%}" class="item">Add K9 Data Form
                                         <i class="plus circle icon"></i>
                                 </a>  
                                 <a href="{% url 'planningandacquiring:add_K9_parents_form'%}" class="item">Breeding Form
@@ -16,7 +16,14 @@
                                 </a> 
                                 <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
                                         <i class="list alternate icon"></i>
-                                </a>  
+                                </a>
+                                 <a href="{% url 'planningandacquiring:K9_forecast'%}" class="item">K9 Forecasting
+                                       <i class="chart line icon"></i>
+                                </a>
+                                <a class="item">Budgeting
+                                        <i class="money bill alternate outline icon"></i>
+                                </a>
+
                             </div>
                         </div>
                         

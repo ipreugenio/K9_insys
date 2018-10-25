@@ -155,8 +155,7 @@ class Location(models.Model):
     zip_code = models.IntegerField('zip_code')
     address = models.CharField('address', max_length=500, default='None')
 
-class Areas(models.Model):
-
+class Area(models.Model):
     AREA = (
         ('FOU NCR-CL', 'FOU NCR-CL'),
         ('FOU NWLZN', 'FOU NWLZN'),
@@ -173,72 +172,29 @@ class Areas(models.Model):
         ('FOU SV(DUMAGUETE)', 'FOU SV(DUMAGUETE)'),
     )
 
-    TEAM = (
-        ('TEAM SOUTH HARBOR', 'TEAM SOUTH HARBOR'),
-        ('TEAM NORTH HARBOR', 'TEAM NORTH HARBOR'),
-        ('TEAM MALACANANG', 'TEAM MALACANANG'),
-        ('TEAM SUBIC', 'TEAM SUBIC'),
-        ('TEAM BATAAN', 'TEAM BATAAN'),
-        ('TEAM SUAL', 'TEAM SUAL'),
-        ('TEAM BATANES', 'TEAM BATANES'),
-        ('TEAM BATANGAS', 'TEAM BATANGAS'),
-        ('TEAM ROXAS', 'TEAM ROXAS'),
-        ('TEAM ABRA DE ILOG', 'TEAM ABRA DE ILOG'),
-        ('TEAM CALAPAN', 'TEAM CALAPAN'),
-        ('TEAM ROMBLON', 'TEAM ROMBLON'),
-        ('TEAM LUCENA', 'TEAM LUCENA'),
-        ('TEAM TABACO', 'TEAM TABACO'),
-        ('TEAM PILAR', 'TEAM PILAR'),
-        ('TEAM BULAN', 'TEAM BULAN'),
-        ('TEAM MASBATE', 'TEAM MASBATE'),
-        ('TEAM MATNOG', 'TEAM MATNOG'),
-        ('TEAM CATANDUANES', 'TEAM CATANDUANES'),
-        ('TEAM SABANG', 'TEAM SABANG'),
-        ('TEAM HONDA BAY', 'TEAM HONDA BAY'),
-        ('TEAM CUYO', 'TEAM CUYO'),
-        ('TEAM EL NIDO', 'TEAM EL NIDO'),
-        ('TEAM CEBU', 'TEAM CEBU'),
-        ('TEAM BATO', 'TEAM BATO'),
-        ('TEAM HAGNAYA', 'TEAM HAGNAYA'),
-        ('TEAM TAGBILARAN', 'TEAM TAGBILARAN'),
-        ('TEAM UBAY', 'TEAM UBAY'),
-        ('TEAM ORMOC', 'TEAM ORMOC'),
-        ('TEAM ALLEN', 'TEAM ALLEN'),
-        ('TEAM LILOAN', 'TEAM LILOAN'),
-        ('TEAM ILOILO', 'TEAM ILOILO'),
-        ('TEAM DUMANGAS', 'TEAM DUMANGAS'),
-        ('TEAM ROXAS', 'TEAM ROXAS'),
-        ('TEAM CATICLAN', 'TEAM CATICLAN'),
-        ('TEAM ZAMBOANGA', 'TEAM ZAMBOANGA'),
-        ('TEAM BASILAN', 'TEAM BASILAN'),
-        ('TEAM LAMITAN', 'TEAM LAMITAN'),
-        ('TEAM SULU', 'TEAM SULU'),
-        ('TEAM TAWI-TAWI', 'TEAM TAWI-TAWI'),
-        ('TEAM MAEWESS', 'TEAM MAEWESS'),
-        ('TEAM GENSAN', 'TEAM GENSAN'),
-        ('TEAM DAVSAM', 'TEAM DAVSAM'),
-        ('TEAM SARANGANI', 'TEAM SARANGANI'),
-        ('TEAM CAGAYAN DE ORO', 'TEAM CAGAYAN DE ORO'),
-        ('TEAM LIPATA', 'TEAM LIPATA'),
-        ('TEAM SURIGAO', 'TEAM SURIGAO'),
-        ('TEAM CAMIGUIN', 'TEAM CAMIGUIN'),
-        ('TEAM MUKAS', 'TEAM MUKAS'),
-        ('TEAM ILIGAN', 'TEAM ILIGAN'),
-        ('TEAM PLARIDEL', 'TEAM PLARIDEL'),
-        ('TEAM DAPITAN', 'TEAM DAPITAN'),
-        ('TEAM NASIPIT', 'TEAM NASIPIT'),
-        ('TEAM OZAMIS', 'TEAM OZAMIS'),
-        ('TEAM OROQUETA', 'TEAM OROQUETA'),
-        ('TEAM SIARGAO', 'TEAM SIARGAO'),
-        ('TEAM BANAGO', 'TEAM BANAGO'),
-        ('TEAM BREDCO', 'TEAM BREDCO'),
-        ('TEAM ESCALANTE', 'TEAM ESCALANTE'),
-        ('TEAM SAN CARLOS', 'TEAM SAN CARLOS')
-    )
+    name = models.CharField('name', choices=AREA, max_length=100, default='None')
 
-    area = models.CharField('area', choices=AREA, max_length=100, default='None')
-    team = models.CharField('team', choices=TEAM, max_length=500, default='None')
-    handlers = models.IntegerField('handlers', default='None')
-    EDD = models.IntegerField('EDD', default='None')
-    NDD = models.IntegerField('NDD', default='None')
-    SAR = models.IntegerField('SAR', default='None')
+    def __str__(self):
+        return self.name
+
+class Team(models.Model):
+    area = models.ForeignKey('area', on_delete=models.CASCADE)
+    name = models.CharField('name', max_length=500, default="Team")
+
+    def __str__(self):
+        return self.name
+
+class Team_Assignment(models.Model):
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    handlers = models.IntegerField('handlers', default=0)
+    EDD = models.IntegerField('EDD', default=0)
+    NDD = models.IntegerField('NDD', default=0)
+    SAR = models.IntegerField('SAR', default=0)
+
+    def __str__(self):
+        area = Area.objects.get(id=self.area)
+        team = Team.objects.get(id=self.team)
+        area_name = area.name
+        team_name = team.name
+        return str(area_name + " : " + team_name)

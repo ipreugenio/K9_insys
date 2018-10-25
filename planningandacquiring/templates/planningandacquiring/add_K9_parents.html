@@ -1,8 +1,8 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
-<h1 class="ui header">
+<h2 class="ui header">
  {{Title}}
   <div class="sub header">Input K9 breeding data here</div>
-</h1>
+</h2>
 
 <div class="ui ordered steps">
   <div class="active step">
@@ -48,11 +48,8 @@
           <i class="venus icon"></i>
           Mother
         </div>
-        <div class="field">
+{{form.mother}}
 
-        {{form.mother}}
-
-        </div>
       </div>
 
       <div class="column">
@@ -61,11 +58,7 @@
           Father
         </div>
 
-      <div class = "field">
-
-      {{form.father}}
-
-      </div>
+          {{form.father}}
       </div>
 
       </div>
@@ -77,5 +70,19 @@
     </div>
 
 </form>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabledata1').DataTable();
+		$('.menu .item').tab();
+		$('#tabledata2').DataTable();
+		$('.menu .item').tab();
+	});
+
+    $('.ui.radio.checkbox')
+    .checkbox()
+      ;
+</script>
 
 {% endblock %}
