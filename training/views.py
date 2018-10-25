@@ -5,14 +5,14 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
-from .models import K9_Genealogy
-from .forms import TestForm
+from .models import K9_Genealogy, K9_Handler, User
+from .forms import TestForm, add_handler_form
 from collections import OrderedDict
 
 
 #statistical imports
 from math import *
-from sklearn.metrics import mean_squared_error
+'''from sklearn.metrics import mean_squared_error'''
 import pandas as pd
 '''
 
@@ -32,7 +32,7 @@ import plotly.graph_objs.layout as lout'''
 #print(pd.__version__) #Version retrieved is not correct
 
 from faker import Faker
-from statsmodels.tsa.ar_model import AR
+'''from statsmodels.tsa.ar_model import AR
 from statsmodels.tsa.arima_model import ARMA
 from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -42,7 +42,7 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm
+import statsmodels.api as sm'''
 
 
 # Create your views here.

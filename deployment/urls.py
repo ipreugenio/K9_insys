@@ -12,6 +12,5 @@ urlpatterns = [
     path('assign_team/', views.assign_team, name='assign_team'),
     path('load-teams/', views.load_teams, name='ajax_load_teams'),  # <-- this one here
     path('area_list/', views.area_list_view, name='area_list'),
-    path('area_detail/<int:id>', views.area_detailview, name='area_detail'),
     #path('/<int:id>/', views., name=''),
 ];

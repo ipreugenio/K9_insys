@@ -16,12 +16,12 @@ from faker import Faker
 #statistical imports
 from math import *
 from decimal import Decimal
-from sklearn.metrics import mean_squared_error
+'''from sklearn.metrics import mean_squared_error'''
 import pandas as pd
 import numpy as np
 
 #graphing imports
-from igraph import *
+'''from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
@@ -38,7 +38,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from statsmodels.tsa.api import Holt
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm
+import statsmodels.api as sm'''
 
 # Create your views here.
 
