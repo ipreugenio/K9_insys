@@ -7,7 +7,7 @@ from django.contrib import messages
 from .models import Area, Team, Team_Assignment
 
 from inventory.models import Medicine
-from deployment.forms import LocationForm, assign_team_form
+from deployment.forms import LocationForm, assign_team_form, AreaForm, TeamForm
 # Create your views here.
 
 def index(request):
@@ -56,6 +56,50 @@ def location_form(request):
     }
     return render (request, 'deployment/location_form.html', context)
 
+def area_form(request):
+    form = AreaForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Area has been successfully Added!')
+            form = LocationForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'title': 'Area Form',
+        'texthelp': 'Input Location data here',
+        'form': form,
+        'actiontype': 'Submit',
+        'style':style,
+    }
+    return render (request, 'deployment/add_location.html', context)
+
+def team_form(request):
+    form = TeamForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Team has been successfully Added!')
+            form = LocationForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'title': 'Area Form',
+        'texthelp': 'Input Location data here',
+        'form': form,
+        'actiontype': 'Submit',
+        'style':style,
+    }
+    return render (request, 'deployment/add_team.html', context)
+
 
 def assign_team(request):
     form = assign_team_form(request.POST or None)
@@ -65,7 +109,6 @@ def assign_team(request):
             form.save()
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
-            form = add_location_form()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -95,4 +138,13 @@ def area_list_view(request):
     }
 
     return render(request, 'deployment/area_list.html', context)
+
+def area_list_detail(request, id):
+    team_assignment = Team_Assignment.objects.get(id = id)
+    context = {
+        'Title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
+        'team_assignment' : team_assignment
+    }
+
+    return render(request, 'deployment/area_detail.html', context)
 

@@ -1,7 +1,7 @@
 {% extends "profiles/sidebar_deployment.html" %} {% block content %}
 <h1 class="ui header">
     {{k9}}
-    <div class="sub header">Team details for {{areas.team}}</div>
+    <div class="sub header">Team details for {{team_assignment.team}}</div>
 </h1>
 
 <div class="ui top attached tabular menu">
@@ -11,7 +11,7 @@
 
 <div class="ui tab segment active" data-tab="first">
     <h3 class="ui dividing header">
-        {{areas.area}}
+        {{team_assignment.area}}
     </h3>
 
 
@@ -26,10 +26,10 @@
     <th>Search and Rescue</th>
   </tr></thead><tbody>
     <tr>
-      <td>{{areas.handlers}}</td>
-      <td>{{areas.EDD}}</td>
-      <td>{{areas.NDD}}</td>
-      <td>{{areas.SAR}}</td>
+      <td>{{team_assignment.handlers}}</td>
+      <td>{{team_assignment.EDD}}</td>
+      <td>{{team_assignment.NDD}}</td>
+      <td>{{team_assignment.SAR}}</td>
     </tr>
   </tbody>
 </table>

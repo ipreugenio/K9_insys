@@ -163,6 +163,15 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ('city', 'zip_code', 'address')
 
+class AreaForm(forms.ModelForm):
+    class Meta:
+        model = Area
+        fields = ('area',)
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ('team', 'area')
 
 class assign_team_form(forms.ModelForm):
     class Meta:
@@ -176,10 +185,10 @@ class assign_team_form(forms.ModelForm):
             if 'area' in self.data:
                 try:
                     area_id = int(self.data.get('area'))
-                    self.fields['team'].queryset = Team.objects.filter(area_id=area_id).order_by('name')
+                    self.fields['team'].queryset = Team.objects.filter(area_id=area_id).order_by('team')
                 except (ValueError, TypeError):
                     pass  # invalid input from the client; ignore and fallback to empty City queryset
             elif self.instance.pk:
-                self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
+                self.fields['team'].queryset = self.instance.area.team_set.order_by('team')
 
 

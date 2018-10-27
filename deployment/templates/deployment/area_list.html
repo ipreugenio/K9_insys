@@ -17,12 +17,8 @@
 				{% for assignment in team_assignment %}
     				<tr>
 
-    					<td>{{assignment.area}}</a></td>
-                        <td>{{assignment.team }}</td>
-    					<td>{{assignment.handlers }}</td>
-    					<td>{{assignment.EDD }}</td>
-                        <td>{{assignment.NDD }}</td>
-                        <td>{{assignment.SAR }}</td>
+						<td><a href="{% url 'deployment:area_detail' assignment.id %}">{{assignment.team }}</td>
+
     				</tr>
 				{% endfor %}
         </tbody>
