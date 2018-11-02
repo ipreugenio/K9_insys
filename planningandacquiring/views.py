@@ -31,11 +31,8 @@ from statsmodels.tsa.ar_model import AR
 from statsmodels.tsa.arima_model import ARMA
 from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.statespace.varmax import VARMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from statsmodels.tsa.api import Holt
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
 import statsmodels.api as sm
@@ -173,24 +170,33 @@ def donation_confirmed(request):
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
-def add_K9_parents(request):
+def add_K9_parents(request): #TODO Add capability to add a single parent
 
     form = add_K9_parents_form(request.POST)
     style = "ui teal message"
+    mothers = K9.objects.filter(sex="Female")
+    fathers = K9.objects.filter(sex="Male")
+
+    mother_list = []
+    father_list = []
+
+    for mother in mothers:
+        mother_list.append(mother)
+
+    for father in fathers:
+        father_list.append(father)
+
     if request.method == 'POST':
+
         if form.is_valid():
-            parents = form.save(commit=False)
-            mother = parents.mother
-            father = parents.father
 
+            mother_id = form.cleaned_data['mother']
+            father_id = form.cleaned_data['father']
 
-            mother = K9.objects.get(id = mother.id)
-            father = K9.objects.get(id = father.id)
+            #Tests if data id can be retrieved and related to tables
+            mother = K9.objects.get(id = mother_id)
+            father = K9.objects.get(id = father_id)
 
-            print("MOTHER")
-            print(mother)
-            print("FATHER")
-            print(father)
 
             request.session["mother_id"] = mother.id
             request.session["father_id"] = father.id
@@ -200,13 +206,15 @@ def add_K9_parents(request):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            print(form)
+
+
 
     context = {
         'Title': "K9_Breeding",
         'form': form,
         'style': style,
-
+        'mothers' : mother_list,
+        'fathers' : father_list
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
@@ -226,12 +234,26 @@ def confirm_K9_parents(request):
     return render(request, 'planningandacquiring/confirm_K9_parents.html', context)
 
 def K9_parents_confirmed(request):
+    mothers = K9.objects.filter(sex="Female")
+    fathers = K9.objects.filter(sex="Male")
+
+    mother_list = []
+    father_list = []
+
+    for mother in mothers:
+        mother_list.append(mother)
+
+    for father in fathers:
+        father_list.append(father)
+
     if 'ok' in request.POST:
         return HttpResponseRedirect('add_K9_offspring_form/')
     else:
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
+            'mothers': mother_list,
+            'fathers': father_list
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
@@ -405,18 +427,68 @@ def Simple_Exponential_Smoothing(data):
     size = int(len(X) * 0.66)
     data = data[0:size]
     model = SimpleExpSmoothing(data)
-    return model
+
+    model_fit = model.fit()
+
+    forecast = model_fit.fittedfcast
+    predict = model_fit.fcastvalues
+    predict = predict.flatten()
+    predict = predict.tolist()
+    predict = predict[0]
+    predict = round(predict)
+    #error = model_fit.sse
+    temp = np.delete(forecast, 0)
+    error = mean_squared_error(data, temp)
+    root_error = sqrt(error)
+    root_error = int(root_error * 10 ** 2) / 10.0 ** 2
+
+    SES = []
+
+    SES.append(forecast)
+    SES.append(predict)
+    SES.append(root_error)
+
+    print("SES COEF")
+    coef = model_fit.params
+    print(coef)
+
+    return SES
 
 def Holt_Winters_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data = data[0:size]
-    model = ExponentialSmoothing(data)
-    return model
+    model = ExponentialSmoothing(data, trend="additive", seasonal="additive", seasonal_periods=12)
+
+    model_fit = model.fit()
+
+    forecast = model_fit.fittedfcast
+    predict = model_fit.fcastvalues
+    predict = predict.flatten()
+    predict = predict.tolist()
+    predict = predict[0]
+    predict = round(predict)
+    # error = model_fit.sse
+    temp = np.delete(forecast, 0)
+    error = mean_squared_error(data, temp)
+    root_error = sqrt(error)
+    root_error = int(root_error * 10 ** 2) / 10.0 ** 2
+
+    HWES = []
+
+    HWES.append(forecast)
+    HWES.append(predict)
+    HWES.append(root_error)
+
+    print("HWES COEF")
+    coef = model_fit.params
+    print(coef)
+
+    return HWES
+
 
 
 def forecast(timeseries, model):
-
 
     # split dataset
     X = difference(timeseries.values)
@@ -434,6 +506,10 @@ def forecast(timeseries, model):
     print (model)
 
     model_fit = model.fit()
+
+    print("Model Fit")
+    print(model_fit)
+
     #window = model_fit.k_ar
     coef = model_fit.params
     print ("COEF DATA TYPE")
@@ -505,6 +581,9 @@ def graph_forecast(timeseries, models, title):
     return graph
 
 def scatter_model(timeseries, prediction, title):
+    print("PREDICTION")
+    print(prediction)
+
     predicted_quantity = []
     predicted_date = []
 
@@ -531,6 +610,41 @@ def scatter_model(timeseries, prediction, title):
     )
 
     return forecast
+
+
+def scatter_model_float(timeseries, prediction, title):
+    print("PREDICTION")
+    print(prediction)
+
+    predicted_quantity = []
+    predicted_date = []
+
+    # test data is 66% of all data
+    test_index = len(timeseries) * 0.66
+
+    ctr = 0
+    for index, row in timeseries.iterrows():
+        if ctr >= test_index:
+            predicted_date.append(index)
+        ctr += 1
+
+    ctr = 0
+    for array in prediction:
+        if ctr != test_index:
+            predicted_quantity.append(array)
+        ctr += 1
+
+    forecast = go.Scatter(
+        x=list(predicted_date),
+        y=list(predicted_quantity),
+        name=title
+    )
+
+    print("FORECAST")
+    print(forecast)
+
+    return forecast
+
 
 def Average(lst):
     return sum(lst) / len(lst)
@@ -589,7 +703,6 @@ def K9_forecast(request):
     )
 
 
-
     models = []
     errors = []
     predictions = []
@@ -639,26 +752,37 @@ def K9_forecast(request):
     errors.append(ARIMA_error)
     predictions.append(ARIMA_predict)
 
-    '''
-    SARMA_model = Seasonal_Autoregressive_Moving_Average(ts)
-    SARMA = forecast(ts, SARMA_model)
-    SARMA_scatter = scatter_model(ts, SARMA, "Seasonal Autoregressive Integrated Moving Average (SARIMA)")
+
+    # SARMA_model = Seasonal_Autoregressive_Moving_Average(ts)
+    # SARMA = forecast(ts, SARMA_model)
+    # SARMA_scatter = scatter_model(ts, SARMA, "Seasonal Autoregressive Integrated Moving Average (SARIMA)")
   
     
     SES_model = Simple_Exponential_Smoothing(ts)
-    SES = exp_smoothing_forecast(ts, SES_model)
-    SES_scatter = scatter_model(ts, SES, "Simple Exponential Smoothing (SES)")
+    SES_forecasts = SES_model[0]
+    SES_forecasts = SES_forecasts.tolist()
+    SES_predict = SES_model[1]
+    SES_error = SES_model[2]
+    SES_scatter = scatter_model_float(ts, SES_forecasts, "Single Exponential Smoothing (SES)")
+    models.append("SES")
+    errors.append(str(SES_error))
+    predictions.append(str(SES_predict))
 
-   
+ 
     HWES_model = Holt_Winters_Exponential_Smoothing(ts)
-    HWES = forecast(ts, HWES_model)
-    HWES_scatter = scatter_model(ts, HWES, "Simple Exponential Smoothing (SES)")
-    '''
+    HWES_forecasts = HWES_model[0]
+    HWES_forecasts = HWES_forecasts.tolist()
+    HWES_predict = HWES_model[1]
+    HWES_error = HWES_model[2]
+    HWES_scatter = scatter_model_float(ts, HWES_forecasts, "Holt Winters Exponential Smoothing (HWES)")
+    models.append("HWES")
+    errors.append(str(HWES_error))
+    predictions.append(str(HWES_predict))
 
 
-    Scatter_Models = [A_Scatter, AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter]
+    Scatter_Models = [A_Scatter, AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HWES_scatter]
 
-    graph_title = "Forecasting K9s to be Bought Using Various Models"
+    graph_title = "Forecasting K9s Demand Using Various Models"
     graph = graph_forecast(ts, Scatter_Models, graph_title)
 
 

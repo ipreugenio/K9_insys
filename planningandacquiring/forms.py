@@ -39,16 +39,41 @@ class add_donator_form(forms.ModelForm):
         model = K9_Past_Owner
         fields = ('first_name', 'middle_name', 'last_name', 'email', 'contact_no', 'address')
 
-class add_K9_parents_form(forms.ModelForm):
+class add_K9_parents_form(forms.Form):
 
+    females = K9.objects.filter(sex = "Female")
+    males = K9.objects.filter(sex="Male")
+
+    mother_list = []
+    father_list = []
+
+    for female in females:
+        data= (female.id, female.name)
+        mother_list.append(data)
+
+    for male in males:
+        data = (male.id, male.name)
+        father_list.append(data)
+
+    mother = forms.ChoiceField(choices = mother_list,
+                               widget=forms.RadioSelect)
+    father = forms.ChoiceField(choices = father_list,
+                               widget=forms.RadioSelect)
+
+    '''
     class Meta:
         model = K9_Parent
-        fields = ('mother', 'father', 'offspring')
+        fields = ('mother', 'father')
+    
 
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
-        self.fields['mother'].queryset = self.fields['mother'].queryset.exclude(sex="Male")
-        self.fields['father'].queryset = self.fields['father'].queryset.exclude(sex="Female")
+        #self.fields['mother'].queryset = self.fields['mother'].queryset.filter(sex="Female")
+        #self.fields['father'].queryset = self.fields['father'].queryset.filter(sex="Male")
+        #self.fields['mother'].widget = forms.RadioSelect
+        #self.fields['father'].widget = forms.RadioSelect
+    '''
+
 
 
 class add_offspring_K9_form(forms.ModelForm):

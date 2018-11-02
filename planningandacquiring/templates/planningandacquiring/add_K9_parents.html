@@ -1,4 +1,6 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
+{% load index %}
+
 <h2 class="ui header">
  {{Title}}
   <div class="sub header">Input K9 breeding data here</div>
@@ -35,35 +37,72 @@
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_parents_form' %}" method="post">
+<form class = "ui form" action="{% url 'planningandacquiring:add_K9_parents_form' %}" method="post">
 
   {% csrf_token %}
-<div class="ui placeholder segment">
-  <div class="ui two column stackable center aligned grid">
-    <div class="ui vertical divider">Parents</div>
-    <div class="middle aligned row">
 
-      <div class="column">
-        <div class="ui icon header">
-          <i class="venus icon"></i>
-          Mother
-        </div>
-{{form.mother}}
+    <div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Mother</a>
+    <a class="item" data-tab="second">Father</a>
+</div>
 
-      </div>
+    <div class="ui tab segment active" data-tab="first">
+    <table id="tabledata1" class="ui five column pink celled table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Breed</th>
+                <th>Color</th>
+                <th>Age</th>
 
-      <div class="column">
-        <div class="ui icon header">
-          <i class="mars icon"></i>
-          Father
-        </div>
+            </tr>
+        </thead>
 
-          {{form.father}}
-      </div>
+        <tbody>
 
-      </div>
+              {% for radio in form.mother %}
+            <tr>
+                <td>  <div class="ui radio checkbox"> {{radio.tag}} </div> </td>
+                <td>{{mothers|name:forloop.counter0 }}</td>
+                <td>{{mothers|breed:forloop.counter0 }}</td>
+                <td>{{mothers|color:forloop.counter0 }}</td>
+                <td>{{mothers|age:forloop.counter0 }}</td>
+            </tr>
+         {% endfor %}
+        </tbody>
+    </table>
     </div>
-  </div>
+
+    <div class="ui tab segment " data-tab="second">
+    <table id="tabledata2" class="ui five column blue celled table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                 <th>Breed</th>
+                <th>Color</th>
+                <th>Age</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+
+              {% for radio in form.father %}
+            <tr>
+                <td> <div class="ui radio checkbox">{{radio.tag}}</div> </td>
+                <td>{{fathers|name:forloop.counter0 }}</td>
+                <td>{{fathers|breed:forloop.counter0 }}</td>
+                <td>{{fathers|color:forloop.counter0 }}</td>
+                <td>{{fathers|age:forloop.counter0 }}</td>
+
+            </tr>
+         {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
 
   <div class="ui center aligned segment" style="padding: 0px;">
         <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
@@ -75,7 +114,6 @@
 
 	$(document).ready(function() {
 		$('#tabledata1').DataTable();
-		$('.menu .item').tab();
 		$('#tabledata2').DataTable();
 		$('.menu .item').tab();
 	});
