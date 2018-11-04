@@ -386,12 +386,13 @@ def predict(coef, history):
 
     return yhat
 
-
+#TODO Fix Error per model
 def Autoregression(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data = data[0:size]
     model = AR(data)
+    model = model.fit(transparams=True)
     return model
 
 def Moving_Average(data):
@@ -399,20 +400,25 @@ def Moving_Average(data):
     size = int(len(X) * 0.66)
     data = data[0:size]
     model = ARMA(data, order=(0, 1))
+    model = model.fit(transparams=True)
     return model
 
 def Autoregressive_Moving_Average(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data = data[0:size]
-    model = ARMA(data, order=(2, 1))
+    model = ARMA(data, order=(1, 2))
+    model = model.fit(transparams=True)
     return model
 
 def Autoregressive_Integrated_Moving_Average(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data = data[0:size]
-    model = ARIMA(data, order=(1, 1, 1))
+    model = ARIMA(data, order=(2, 0, 0))
+    model = model.fit(transparams=True)
+    print("MODEL FIT ARIMA")
+    print(model)
     return model
 
 def Seasonal_Autoregressive_Moving_Average(data):
@@ -420,12 +426,13 @@ def Seasonal_Autoregressive_Moving_Average(data):
     size = int(len(X) * 0.66)
     data = data[0:size]
     model = SARIMAX(data, order=(1, 1, 1), seasonal_order=(1, 1, 1, 1))
+    model = model.fit()
     return model
 
 def Simple_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
-    data = data[0:size]
+    data =  data[0:size]
     model = SimpleExpSmoothing(data)
 
     model_fit = model.fit()
@@ -454,11 +461,11 @@ def Simple_Exponential_Smoothing(data):
 
     return SES
 
-def Holt_Winters_Exponential_Smoothing(data):
+def Holt_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data = data[0:size]
-    model = ExponentialSmoothing(data, trend="additive", seasonal="additive", seasonal_periods=12)
+    model = ExponentialSmoothing(data, trend='additive')
 
     model_fit = model.fit()
 
@@ -487,25 +494,28 @@ def Holt_Winters_Exponential_Smoothing(data):
     return HWES
 
 
-
+#TODO Fix forecast to be viable for both stationary and non-stationary
 def forecast(timeseries, model):
 
     # split dataset
     X = difference(timeseries.values)
 
+    print("X")
+    print(X)
+
     #Use 66% of data for training
     size = int(len(X) * 0.66)
     train, test = X[0:size], X[size:]
 
-    data = timeseries[0:size]
-
-    # train data
-    #model = AR(data) >> Model is now a def parameter
+    print("TRAIN")
+    print(train)
+    print("TEST")
+    print(test)
 
     print("Model")
     print (model)
 
-    model_fit = model.fit()
+    model_fit = model
 
     print("Model Fit")
     print(model_fit)
@@ -526,6 +536,9 @@ def forecast(timeseries, model):
         obs = test[t]
         predictions.append(yhat)
         history.append(obs)
+
+    print("PREDICTIONS")
+    print(predictions)
     error = mean_squared_error(test, predictions)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
@@ -769,18 +782,18 @@ def K9_forecast(request):
     predictions.append(str(SES_predict))
 
  
-    HWES_model = Holt_Winters_Exponential_Smoothing(ts)
-    HWES_forecasts = HWES_model[0]
-    HWES_forecasts = HWES_forecasts.tolist()
-    HWES_predict = HWES_model[1]
-    HWES_error = HWES_model[2]
-    HWES_scatter = scatter_model_float(ts, HWES_forecasts, "Holt Winters Exponential Smoothing (HWES)")
-    models.append("HWES")
-    errors.append(str(HWES_error))
-    predictions.append(str(HWES_predict))
+    HES_model = Holt_Exponential_Smoothing(ts)
+    HES_forecasts = HES_model[0]
+    HES_forecasts = HES_forecasts.tolist()
+    HES_predict = HES_model[1]
+    HES_error = HES_model[2]
+    HES_scatter = scatter_model_float(ts, HES_forecasts, "Holt's Exponential Smoothing (HES)")
+    models.append("HES")
+    errors.append(str(HES_error))
+    predictions.append(str(HES_predict))
 
 
-    Scatter_Models = [A_Scatter, AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HWES_scatter]
+    Scatter_Models = [A_Scatter, AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HES_scatter]
 
     graph_title = "Forecasting K9s Demand Using Various Models"
     graph = graph_forecast(ts, Scatter_Models, graph_title)
@@ -795,3 +808,87 @@ def K9_forecast(request):
     }
 
     return render(request, 'planningandacquiring/forecast_k9_required.html', context)
+
+#Use in forecasting to test if original data is stationary
+def test_stationarity(timeseries, index):
+    # Determing rolling statistics
+    # Set at which index will test data start
+
+    rolmean = timeseries.rolling(index).mean()
+    rolstd = timeseries.rolling(index).std()
+
+    idx = pd.IndexSlice
+
+    # Perform Dickey-Fuller test:
+    print('Results of Dickey-Fuller Test:')
+    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
+    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+    for key, value in dftest[4].items():
+        dfoutput['Critical Value (%s)' % key] = value
+    print(dfoutput)
+
+    #Check Root Mean Squared Error, the lower the better
+    #rms = sqrt(mean_squared_error())
+    #print(rms)
+
+    ts_d = []
+    ts_q = []
+
+    for index, row in timeseries.iterrows():
+
+        ts_q.append(row["Quantity"])
+        ts_d.append(index)
+
+    mean_d = []
+    mean_q = []
+
+    for index, row in rolmean.iterrows():
+        mean_q.append(row["Quantity"])
+        mean_d.append(index)
+
+    std_d = []
+    std_q = []
+
+    for index, row in rolstd.iterrows():
+        std_q.append(row["Quantity"])
+        std_d.append(index)
+
+
+    naive = go.Scatter(
+        x=list(ts_d),
+        y=list(ts_q),
+        name = "Original"
+    )
+    ave = go.Scatter(
+        x=list(mean_d),
+        y=list(mean_q),
+        name = "Rolling Mean"
+    )
+    sdev = go.Scatter(
+        x=list(std_d),
+        y=list(std_q),
+        name = "Rolling Standard Deviation"
+    )
+
+
+    data = [naive, ave, sdev]
+
+    layout = go.Layout(
+        title="Stationary Test"
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
+def timeseries_generator():
+    fake = Faker()
+    for x in range(100):
+        number = randint(1, 60)
+        date = fake.date_between(start_date='-12y', end_date='-2y')
+
+        date_quantity = K9_Quantity(quantity = number, date_bought = date)
+        date_quantity.save()
+
+    return None

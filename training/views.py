@@ -48,16 +48,7 @@ import statsmodels.api as sm
 def index(request):
     return render (request, 'training/index.html')
 
-def timeseries_generator():
-    fake = Faker()
-    for x in range(100):
-        number = randint(1, 60)
-        date = fake.date_between(start_date='-12y', end_date='-2y')
 
-        date_quantity = K9_Quantity(quantity = number, date_bought = date)
-        date_quantity.save()
-
-    return None
 
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
@@ -99,78 +90,6 @@ def classify_k9_select(request, id):
 
     return render (request, 'training/classify_k9_select.html', context)
 
-#Use in forecasting to test if original data is stationary
-def test_stationarity(timeseries, index):
-    # Determing rolling statistics
-    # Set at which index will test data start
-
-    rolmean = timeseries.rolling(index).mean()
-    rolstd = timeseries.rolling(index).std()
-
-    idx = pd.IndexSlice
-
-    # Perform Dickey-Fuller test:
-    print('Results of Dickey-Fuller Test:')
-    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
-    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
-    for key, value in dftest[4].items():
-        dfoutput['Critical Value (%s)' % key] = value
-    print(dfoutput)
-
-    #Check Root Mean Squared Error, the lower the better
-    #rms = sqrt(mean_squared_error())
-    #print(rms)
-
-    ts_d = []
-    ts_q = []
-
-    for index, row in timeseries.iterrows():
-
-        ts_q.append(row["Quantity"])
-        ts_d.append(index)
-
-    mean_d = []
-    mean_q = []
-
-    for index, row in rolmean.iterrows():
-        mean_q.append(row["Quantity"])
-        mean_d.append(index)
-
-    std_d = []
-    std_q = []
-
-    for index, row in rolstd.iterrows():
-        std_q.append(row["Quantity"])
-        std_d.append(index)
-
-
-    naive = go.Scatter(
-        x=list(ts_d),
-        y=list(ts_q),
-        name = "Original"
-    )
-    ave = go.Scatter(
-        x=list(mean_d),
-        y=list(mean_q),
-        name = "Rolling Mean"
-    )
-    sdev = go.Scatter(
-        x=list(std_d),
-        y=list(std_q),
-        name = "Rolling Standard Deviation"
-    )
-
-
-    data = [naive, ave, sdev]
-
-    layout = go.Layout(
-        title="Stationary Test"
-    )
-
-    fig = go.Figure(data=data, layout=layout)
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-
-    return graph
 
 
 def training_records(request):
