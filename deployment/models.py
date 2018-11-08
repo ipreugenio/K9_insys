@@ -156,17 +156,17 @@ class Location(models.Model):
     address = models.CharField('address', max_length=500, default='None')
 
 class Area(models.Model):
-    area = models.CharField('area', max_length=100, default='')
+    name = models.CharField('name', max_length=100, default='')
 
     def __str__(self):
-        return self.area
+        return self.name
 
 class Team(models.Model):
     area = models.ForeignKey('area', on_delete=models.CASCADE)
-    team = models.CharField('name', max_length=500, default="")
+    name = models.CharField('name', max_length=500, default="")
 
     def __str__(self):
-        return self.team
+        return self.name
 
 class Team_Assignment(models.Model):
     area = models.ForeignKey(Area, on_delete=models.CASCADE)

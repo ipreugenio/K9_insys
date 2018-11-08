@@ -20,3 +20,8 @@ class add_handler_form(forms.ModelForm):
         super(add_handler_form, self).__init__(*args, **kwargs)
         self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Veterinarian")
         self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Administrator")
+        assigned_handler = K9_Handler.objects.all()
+        assigned_handler_list = []
+        for handler in assigned_handler:
+            assigned_handler_list.append(handler.id)
+        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)

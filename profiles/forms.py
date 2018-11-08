@@ -9,6 +9,31 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 class add_User_form(forms.ModelForm):
+    RANK = (
+        ('MCPO', 'MCPO'),
+        ('SCPO', 'SCPO'),
+        ('CPO', 'CPO'),
+        ('PO1', 'PO1'),
+        ('PO2', 'PO2'),
+        ('PO3', 'PO3'),
+        ('SN1/SW1', 'SN1/SW1'),
+        ('SN2/SW2', 'SN2/SW2'),
+        ('ASN/ASW', 'ASN/ASW'),
+        ('CCGM', 'CCGM'),
+        ('ADMIRAL', 'ADMIRAL'),
+        ('VICE ADMIRAL', 'VICE ADMIRAL'),
+        ('REAR ADMIRAL', 'REAR ADMIRAL'),
+        ('COMMO', 'COMMO'),
+        ('CAPT', 'CAPT'),
+        ('CDR', 'CDR'),
+        ('LCDR', 'LCDR'),
+        ('LT', 'LT'),
+        ('LTJG', 'LTJG'),
+        ('ENS', 'ENS'),
+        ('P/ENS', 'P/ENS')
+    )
+    rank = forms.CharField(max_length=50, label='rank', widget=forms.Select(choices=RANK))
+
     class Meta:
         model = User
         fields = ('serial_number', 'firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
