@@ -6,7 +6,9 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
+from training.models import Training
 from .forms import TestForm, add_handler_form
+from training.forms import TrainingUpdateForm
 from collections import OrderedDict
 
 
@@ -205,8 +207,79 @@ def test_stationarity(timeseries, index):
 
 
 def training_records(request):
-    return render(request, 'training/training_records.html')
+    data = K9.objects.all()
+    context = {
+        'title': "Training Records",
+        'data': data,
+    }
+    return render(request, 'training/training_records.html', context)
 
+def training_update_form(request, id):
+    data = K9.objects.get(training_id=id) # get k9
+    training = Training.objects.get(id=id) # get training record
+    form = TrainingUpdateForm(request.POST or None, instance = data)
+    
+    form.initial['stage1_1'] = training.stage1_1
+    form.initial['stage1_2'] = training.stage1_2
+    form.initial['stage1_3'] = training.stage1_3
+    form.initial['stage2_1'] = training.stage2_1
+    form.initial['stage2_2'] = training.stage2_2
+    form.initial['stage2_3'] = training.stage2_3
+    form.initial['stage3_1'] = training.stage3_1
+    form.initial['stage3_2'] = training.stage3_2
+    form.initial['stage3_3'] = training.stage3_3
+
+    if request.method == 'POST': 
+        #save training status
+        training.stage1_1=bool(request.POST.get('stage1_1'))
+        training.stage1_2=bool(request.POST.get('stage1_2'))
+        training.stage1_3=bool(request.POST.get('stage1_3'))
+        training.stage2_1=bool(request.POST.get('stage2_1'))
+        training.stage2_2=bool(request.POST.get('stage2_2'))
+        training.stage2_3=bool(request.POST.get('stage2_3'))
+        training.stage3_1=bool(request.POST.get('stage3_1'))
+        training.stage3_2=bool(request.POST.get('stage3_2'))
+        training.stage3_3=bool(request.POST.get('stage3_3'))
+       
+        training.save()
+        data.save()
+       
+
+        stage = "Stage 0"
+     
+        if training.stage3_3 == True:
+            stage = "Stage 3.3"
+        elif training.stage3_2 == True:
+            stage = "Stage 3.2"
+        elif training.stage3_1 == True:
+            stage= "Stage 3.1"
+        elif training.stage2_3 == True:
+            stage = "Stage 2.3"
+        elif training.stage2_2 == True:
+            stage = "Stage 2.2"
+        elif training.stage2_1 == True:
+            stage = "Stage 2.1"
+        elif training.stage1_3 == True:
+            stage = "Stage 1.3"
+        elif training.stage1_2 == True:
+            stage = "Stage 1.2"
+        elif training.stage1_1 == True:
+            stage = "Stage 1.1"
+
+        training.stage = stage
+        training.save()
+
+        data.training_level = stage
+        data.save()
+        messages.success(request, 'Training Progress has been successfully Updated!')
+
+    context = {
+        'title': data.name,
+        'data': data,
+        'form': form,
+    }
+    
+    return render(request, 'training/training_update_form.html', context)
 
 def gender_count_between_breeds():
     k9_set = K9.objects.all()

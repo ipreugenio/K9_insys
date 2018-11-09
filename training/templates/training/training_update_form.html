@@ -1,0 +1,90 @@
+{% extends "profiles/sidebar_training.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }} Training Status</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<table class="ui very basic four column table">
+    <thead>
+        <tr>
+            <th>Status: {{data.training_status}}</th>
+            <th>Type: {{data.status}}</th>
+            <th>Capability: {{data.capability}}</th>
+            <th>Level: {{data.training_level}}</th>
+        </tr>
+    </thead>
+</table>
+
+<form class="ui form" action="" method="POST">
+    {% csrf_token %}
+    <table class="ui celled table">
+        <thead>
+            <!--Stage 1-->
+            <tr>
+                <th>Stage 1.1</th>
+                <td>This is Stage 1.1 Training</td>
+                <td class="ui center aligned">{{form.stage1_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 1.2</th>
+                <td>This is Stage 1.2 Training</td>
+                <td class="ui center aligned">{{form.stage1_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 1.3</th>
+                <td>This is Stage 1.3 Training</td>
+                <td class="ui center aligned">{{form.stage1_3}}</td>
+            </tr>
+            <!--Stage 2-->
+            <tr>
+                <th>Stage 2.1</th>
+                <td>This is Stage 2.1 Training</td>
+                <td class="ui center aligned">{{form.stage2_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 2.2</th>
+                <td>This is Stage 2.2 Training</td>
+                <td class="ui center aligned">{{form.stage2_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 2.3</th>
+                <td>This is Stage 2.3 Training</td>
+                <td class="ui center aligned">{{form.stage2_3}}</td>
+            </tr>
+             <!--Stage 3-->
+            <tr>
+                <th>Stage 3.1</th>
+                <td>This is Stage 3.1 Training</td>
+                <td class="ui center aligned">{{form.stage3_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 3.2</th>
+                <td>This is Stage 3.2 Training</td>
+                <td class="ui center aligned">{{form.stage3_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 3.3</th>
+                <td>This is Stage 3.3 Training</td>
+                <td class="ui center aligned">{{form.stage3_3}}</td>
+            </tr>
+        </thead>
+    </table>
+    <div class="ui basic center aligned segment">
+            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >Submit</button>
+        </div>
+</form>
+
+
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+    } );
+    
+</script>
+ {% endblock %}

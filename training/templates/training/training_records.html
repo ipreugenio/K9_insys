@@ -9,22 +9,36 @@
         {% endfor %}
     {% endif %}
 </div>
-
-
-{% if stationary_test %}
- {{ stationary_test|safe }}
-{% endif %}
-
-
-{% if ar_graph %}
- {{ ar_graph|safe }}
-{% endif %}
-
+<table id="tabledata" class="ui six column celled table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Breed</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Status</th>
+            <th>Training Level</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in data %}
+        <tr>
+            <td>
+                <a href="{% url 'training:training_update_form' data.training_id %}">{{data.name}}</a>
+            </td>
+            <td>{{data.breed}}</td>
+            <td>{{data.sex}}</td>
+            <td>{{data.age}}</td>
+            <td>{{data.training_status}}</td>
+            <td>{{data.training_level}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <script type="text/javascript">
         
     $(document).ready(function() {
         $('#tabledata').DataTable();
-    
     } );
     
 </script>

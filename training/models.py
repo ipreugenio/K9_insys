@@ -15,3 +15,18 @@ class K9_Genealogy(models.Model):
 class K9_Handler(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "handler", blank=True, null=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="k9", blank=True, null=True)
+
+class Training(models.Model):
+    stage = models.CharField('stage', max_length=200, default="Stage 0")
+    stage1_1 = models.BooleanField(default=False)
+    stage1_2 = models.BooleanField(default=False)
+    stage1_3 = models.BooleanField(default=False)
+    stage2_1 = models.BooleanField(default=False)
+    stage2_2 = models.BooleanField(default=False)
+    stage2_3 = models.BooleanField(default=False)
+    stage3_1 = models.BooleanField(default=False)
+    stage3_2 = models.BooleanField(default=False)
+    stage3_3 = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.id) +': ' + str(self.stage)

@@ -11,6 +11,6 @@ urlpatterns = [
     path('k9-skill-classifier/', views.K9_skill_classifier, name='k9_skill_classifier'),
     path('genealogy/', views.genealogy, name='genealogy'),
     path('assign-k9/<int:id>', views.assign_k9_select, name='assign_k9_select'),
-    
+    path('training-update/<int:id>', views.training_update_form, name='training_update_form'),
     #path('/<int:id>/', views., name=''),
 ];
