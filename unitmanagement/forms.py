@@ -4,9 +4,9 @@ from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests
 from planningandacquiring.models import K9
-from inventory.models import Medicine
+from inventory.models import Medicine, Miscellaneous
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -90,3 +90,19 @@ class VaccinationForm(forms.ModelForm):
             'date_validity': DateInput(),
         }
 
+class RequestForm(forms.ModelForm):
+    CONCERN = (
+        ('Broken', 'Broken'),
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),
+    )
+    concern = forms.CharField(max_length=10, label='concern', widget=forms.Select(choices=CONCERN))
+    equipment = forms.ModelChoiceField(queryset=Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
+    class Meta:
+        model = Requests
+        fields = ('handler', 'equipment', 'remarks', 'concern')
+
+    def __init__(self, *args, **kwargs):
+        super(RequestForm, self).__init__(*args, **kwargs)
+        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Veterinarian")
+        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Administrator")

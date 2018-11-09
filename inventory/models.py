@@ -65,6 +65,7 @@ class Medicine_Received_Trail(models.Model):
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     #user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     name = models.CharField(max_length=100, default="")
     price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0)
     quantity = models.IntegerField('quantity', default=0)

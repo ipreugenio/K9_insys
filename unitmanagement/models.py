@@ -1,7 +1,8 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from inventory.models import Medicine
+from inventory.models import Medicine, Miscellaneous
+from profiles.models import User
 # Create your models here.
 
 class Health(models.Model):
@@ -78,3 +79,18 @@ class VaccinceRecord(models.Model):
     
     def __str__(self):
         return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)
+
+class Requests(models.Model):
+    CONCERN = (
+        ('Broken', 'Broken'),
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),
+    )
+
+    equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField('date', auto_now_add=True)
+    concern = models.CharField('concern', max_length=100, choices=CONCERN, default="")
+    remarks = models.CharField('remarks', max_length=200, blank=True)
+    request_status = models.CharField('request_status', max_length=200, default="Pending")
+    date_approved = models.DateField('date_approved', blank=True, null=True)

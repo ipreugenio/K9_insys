@@ -156,30 +156,14 @@ class Location(models.Model):
     address = models.CharField('address', max_length=500, default='None')
 
 class Area(models.Model):
-    AREA = (
-        ('FOU NCR-CL', 'FOU NCR-CL'),
-        ('FOU NWLZN', 'FOU NWLZN'),
-        ('FOU NELZN', 'FOU NELZN'),
-        ('FOU SOUTHERN TAG', 'FOU SOUTHERN TAG'),
-        ('FOU BICOL', 'FOU BICOL'),
-        ('FOU PALAWAN', 'FOU PALAWAN'),
-        ('FOU CENTRAL VISAYAS', 'FOU CENTRAL VISAYAS'),
-        ('FOU EASTERN VISAYAS', 'FOU EASTERN VISAYAS'),
-        ('FOU WESTERN VISAYAS', 'FOU WESTERN VISAYAS'),
-        ('FOU SWM', 'FOU SWM'),
-        ('FOU SEM', 'FOU SEM'),
-        ('FOU NM', 'FOU NM'),
-        ('FOU SV(DUMAGUETE)', 'FOU SV(DUMAGUETE)'),
-    )
-
-    name = models.CharField('name', choices=AREA, max_length=100, default='None')
+    name = models.CharField('name', max_length=100, default='')
 
     def __str__(self):
         return self.name
 
 class Team(models.Model):
     area = models.ForeignKey('area', on_delete=models.CASCADE)
-    name = models.CharField('name', max_length=500, default="Team")
+    name = models.CharField('name', max_length=500, default="")
 
     def __str__(self):
         return self.name

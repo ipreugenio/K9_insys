@@ -163,6 +163,15 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ('city', 'zip_code', 'address')
 
+class AreaForm(forms.ModelForm):
+    class Meta:
+        model = Area
+        fields = ('name',)
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ('area', 'name')
 
 class assign_team_form(forms.ModelForm):
     class Meta:

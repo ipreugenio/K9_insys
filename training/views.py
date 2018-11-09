@@ -5,8 +5,8 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
-from .models import K9_Genealogy
-from .forms import TestForm
+from .models import K9_Genealogy, K9_Handler, User
+from .forms import TestForm, add_handler_form
 from collections import OrderedDict
 
 
@@ -14,6 +14,8 @@ from collections import OrderedDict
 from math import *
 from sklearn.metrics import mean_squared_error
 import pandas as pd
+
+
 import numpy as np
 import matplotlib.pylab as plt
 from matplotlib.pylab import rcParams
@@ -55,6 +57,8 @@ def classify_k9_list(request):
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
+
+
     context = {
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
@@ -63,7 +67,7 @@ def classify_k9_list(request):
     }
     return render (request, 'training/classify_k9_list.html', context)
 
-#TODO Should be redio buttons
+#TODO Should be radio buttons
 #TODO Restrict Viable dogs to be trained for those who are 6 months old
 #TODO Add additional age for months
 #TODO Add additional classification, for breeding
@@ -93,6 +97,107 @@ def classify_k9_select(request, id):
         }
 
     return render (request, 'training/classify_k9_select.html', context)
+
+
+def assign_k9_select(request, id):
+    form = add_handler_form(request.POST)
+    style = "ui teal message"
+    handlers = User.objects.filter(position="Handler")
+    k9 = K9.objects.get(id=id)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            handler_id = request.POST.get('handler')
+            handler = User.objects.get(id=handler_id)
+            K9_Handler.objects.create(k9 = k9, handler = handler)
+            k9.training_status = "On-Training"
+            k9.save()
+            messages.success(request, 'K9 has been assigned to a handler!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            print(form)
+
+    context = {
+        'Title': "K9 Assignment for " + k9.name,
+        'form': form,
+        'style': style,
+        'handler': handlers,
+    }
+    return render (request, 'training/assign_k9_select.html', context)
+
+#Use in forecasting to test if original data is stationary
+def test_stationarity(timeseries, index):
+    # Determing rolling statistics
+    # Set at which index will test data start
+
+    rolmean = timeseries.rolling(index).mean()
+    rolstd = timeseries.rolling(index).std()
+
+    idx = pd.IndexSlice
+
+    # Perform Dickey-Fuller test:
+    print('Results of Dickey-Fuller Test:')
+    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
+    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+    for key, value in dftest[4].items():
+        dfoutput['Critical Value (%s)' % key] = value
+    print(dfoutput)
+
+    #Check Root Mean Squared Error, the lower the better
+    #rms = sqrt(mean_squared_error())
+    #print(rms)
+
+    ts_d = []
+    ts_q = []
+
+    for index, row in timeseries.iterrows():
+
+        ts_q.append(row["Quantity"])
+        ts_d.append(index)
+
+    mean_d = []
+    mean_q = []
+
+    for index, row in rolmean.iterrows():
+        mean_q.append(row["Quantity"])
+        mean_d.append(index)
+
+    std_d = []
+    std_q = []
+
+    for index, row in rolstd.iterrows():
+        std_q.append(row["Quantity"])
+        std_d.append(index)
+
+
+    naive = go.Scatter(
+        x=list(ts_d),
+        y=list(ts_q),
+        name = "Original"
+    )
+    ave = go.Scatter(
+        x=list(mean_d),
+        y=list(mean_q),
+        name = "Rolling Mean"
+    )
+    sdev = go.Scatter(
+        x=list(std_d),
+        y=list(std_q),
+        name = "Rolling Standard Deviation"
+    )
+
+
+    data = [naive, ave, sdev]
+
+    layout = go.Layout(
+        title="Stationary Test"
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
 
 
 
@@ -732,3 +837,4 @@ def genealogy(request):
 
 
     return render(request, 'training/genealogy.html', context)
+

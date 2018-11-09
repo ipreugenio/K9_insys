@@ -10,6 +10,7 @@ urlpatterns = [
     path('training-record', views.training_records, name='training_records'),
     path('k9-skill-classifier/', views.K9_skill_classifier, name='k9_skill_classifier'),
     path('genealogy/', views.genealogy, name='genealogy'),
+    path('assign-k9/<int:id>', views.assign_k9_select, name='assign_k9_select'),
     
     #path('/<int:id>/', views., name=''),
 ];

@@ -1,5 +1,6 @@
 from django.db import models
 from planningandacquiring.models import K9
+from profiles.models import User
 
 # Create your models here.
 
@@ -10,3 +11,7 @@ class K9_Genealogy(models.Model):
     f = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="f", blank=True, null=True)
     depth = models.IntegerField('depth',default=0) # family tree level
     zero = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="zero", blank=True, null=True) #latest born
+
+class K9_Handler(models.Model):
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "handler", blank=True, null=True)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="k9", blank=True, null=True)

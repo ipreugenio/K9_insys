@@ -13,7 +13,7 @@ urlpatterns = [
     path('add_User_form/add_personal_form/', views.add_personal_info, name='add_personal_form'),
     path('add_User_form/add_personal_form/add_education/', views.add_education, name='add_education'),
     path('user_list/', views.user_listview, name='user_list'),
-    path('user_detail/<int:id>', views.user_detailview, name='user_detail'),
+    path('/user_detail/<int:id>', views.user_detailview, name='user_detail'),
     #path('/<int:id>/', views., name=''),
     #path('logout/', auth_views.logout, name='logout'),
     

@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-import datetime
+import datetime as dt
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm, RequestForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests
 # Create your views here.
 
 def index(request):
@@ -204,3 +204,52 @@ def vaccination_form(request):
         'form': form,
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
+
+def requests_form(request):
+    form = RequestForm(request.POST or None)
+    style=""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Request has been successfully recorded!')
+            form = VaccinationForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+    context = {
+        'title': "Request of equipment",
+        'actiontype': "Submit",
+        'form': form,
+    }
+    return render (request, 'unitmanagement/request_form.html', context)
+
+def request_list(request):
+    data = Requests.objects.all()
+
+    context = {
+        'data': data,
+    }
+    return render (request, 'unitmanagement/request_list.html', context)
+
+def change_equipment(request, id):
+    data = Requests.objects.get(id=id)
+
+    status = "Approved"
+    changedate = dt.datetime.now()
+    if request.method == 'POST':
+        if 'ok' in request.POST:
+            data.request_status = status
+            data.date_approved = changedate
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Equipment has been successfully changed!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'data': data,
+    }
+
+    return render (request, 'unitmanagement/change_equipment.html', context)

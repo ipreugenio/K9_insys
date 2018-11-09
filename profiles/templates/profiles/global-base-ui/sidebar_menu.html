@@ -1,7 +1,7 @@
 {% extends "profiles/global-base-ui/global_base_ui.html" %}  
 
 {% block sidebar%}
-    <div class="ui bottom attached segment pushable">
+    <div class="ui inverted bottom attached segment pushable">
         <div class="ui inverted labeled icon left inline vertical sidebar menu" id = "sidebar" >
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
             <a class="item" href="{% url 'profiles:dashboard'%}"><i class="chart line icon"></i>Dashboard</a>
@@ -12,14 +12,15 @@
             <a class="item" href="{% url 'unitmanagement:index'%}"><i class="folder open icon"></i>Unit Management</a>
             <a class="item" href="{% url 'profiles:login'%}">Logout</a>
         </div>
-       
-         <!--html pages-->
+    
+        <!--html pages-->
         {% block sidebar_module %}
         {% endblock%}
 
         <!--DASHBOARD-->
         {% block dashboard %}
         {% endblock%}
+        
     </div>
 {% endblock%}
 
