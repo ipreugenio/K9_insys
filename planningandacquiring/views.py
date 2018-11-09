@@ -37,6 +37,7 @@ from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
 import statsmodels.api as sm
 
+
 # Create your views here.
 
 def index(request):
@@ -393,6 +394,8 @@ def Autoregression(data):
     data = data[0:size]
     model = AR(data)
     model = model.fit(transparams=True)
+    print("AR MODEL")
+    print(model)
     return model
 
 def Moving_Average(data):
@@ -433,6 +436,7 @@ def Simple_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
     data =  data[0:size]
+    test, train = X[0:size], X[size:]
     model = SimpleExpSmoothing(data)
 
     model_fit = model.fit()
@@ -443,15 +447,20 @@ def Simple_Exponential_Smoothing(data):
     predict = predict.tolist()
     predict = predict[0]
     predict = round(predict)
-    #error = model_fit.sse
-    temp = np.delete(forecast, 0)
-    error = mean_squared_error(data, temp)
+    fitted = model_fit.fittedvalues
+    print("SES DATA")
+    print(data)
+    print("SES FORECASTS")
+    print(forecast)
+    print("SES PREDICT")
+    print(predict)
+    error = mean_squared_error(data, fitted)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
 
     SES = []
 
-    SES.append(forecast)
+    SES.append(forecast) #TODO somehow prediction is not included in graph
     SES.append(predict)
     SES.append(root_error)
 
@@ -475,9 +484,8 @@ def Holt_Exponential_Smoothing(data):
     predict = predict.tolist()
     predict = predict[0]
     predict = round(predict)
-    # error = model_fit.sse
-    temp = np.delete(forecast, 0)
-    error = mean_squared_error(data, temp)
+    fitted = model_fit.fittedvalues
+    error = mean_squared_error(data, fitted)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
 
@@ -506,6 +514,8 @@ def forecast(timeseries, model):
     #Use 66% of data for training
     size = int(len(X) * 0.66)
     train, test = X[0:size], X[size:]
+    trainTS, testTS = timeseries[0:size], timeseries[size+1:]
+
 
     print("TRAIN")
     print(train)
@@ -539,7 +549,7 @@ def forecast(timeseries, model):
 
     print("PREDICTIONS")
     print(predictions)
-    error = mean_squared_error(test, predictions)
+    error = mean_squared_error(testTS, predictions)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
     print('Test MSE: %.3f' % error)
@@ -629,6 +639,7 @@ def scatter_model_float(timeseries, prediction, title):
     print("PREDICTION")
     print(prediction)
 
+
     predicted_quantity = []
     predicted_date = []
 
@@ -642,6 +653,10 @@ def scatter_model_float(timeseries, prediction, title):
         ctr += 1
 
     ctr = 0
+
+    while len(prediction) > len(predicted_date):
+        del prediction[0]
+
     for array in prediction:
         if ctr != test_index:
             predicted_quantity.append(array)
@@ -681,48 +696,33 @@ def K9_forecast(request):
 
     ts = df.set_index('Date')
 
-    size = int(len(ts) * 0.66)
-    print(size)
-    A_model = ts.rolling(size).mean()
-    print(A_model)
-    X = difference(ts.values)
-    train, test = X[0:size], X[size:]
-
-    non_difference_train = ts.values[0:size]
-
-    flat_train = non_difference_train.flatten()
-    list_train = flat_train.tolist()
-
-
-    mean = Average(list_train)
-    mean = round(mean)
 
     # error = mean_squared_error(list_train, A_model)
     # root_error = sqrt(error)
     # mean_root_error = int(root_error * 10 ** 2) / 10.0 ** 2
 
-    mean_d = []
-    mean_q = []
-
-    for index, row in A_model.iterrows():
-        mean_q.append(row["Quantity"])
-        mean_d.append(index)
-
-
-    A_Scatter = go.Scatter(
-        x=list(mean_d),
-        y=list(mean_q),
-        name="Mean"
-    )
+    # mean_d = []
+    # mean_q = []
+    #
+    # for index, row in A_model.iterrows():
+    #     mean_q.append(row["Quantity"])
+    #     mean_d.append(index)
+    #
+    #
+    # A_Scatter = go.Scatter(
+    #     x=list(mean_d),
+    #     y=list(mean_q),
+    #     name="Mean"
+    # )
 
 
     models = []
     errors = []
     predictions = []
 
-    models.append("Mean")
-    errors.append("")
-    predictions.append(mean)
+    # models.append("Mean")
+    # errors.append("")
+    # predictions.append(mean)
 
     AR_model = Autoregression(ts)
     AR_forecast = forecast(ts, AR_model)
@@ -774,6 +774,8 @@ def K9_forecast(request):
     SES_model = Simple_Exponential_Smoothing(ts)
     SES_forecasts = SES_model[0]
     SES_forecasts = SES_forecasts.tolist()
+    print("SES FIITED FCAST")
+    print(SES_forecasts)
     SES_predict = SES_model[1]
     SES_error = SES_model[2]
     SES_scatter = scatter_model_float(ts, SES_forecasts, "Single Exponential Smoothing (SES)")
@@ -793,7 +795,7 @@ def K9_forecast(request):
     predictions.append(str(HES_predict))
 
 
-    Scatter_Models = [A_Scatter, AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HES_scatter]
+    Scatter_Models = [AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HES_scatter]
 
     graph_title = "Forecasting K9s Demand Using Various Models"
     graph = graph_forecast(ts, Scatter_Models, graph_title)
