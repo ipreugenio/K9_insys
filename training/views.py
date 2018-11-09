@@ -63,6 +63,10 @@ def classify_k9_list(request):
     }
     return render (request, 'training/classify_k9_list.html', context)
 
+#TODO Should be redio buttons
+#TODO Restrict Viable dogs to be trained for those who are 6 months old
+#TODO Add additional age for months
+#TODO Add additional classification, for breeding
 def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
 

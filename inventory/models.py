@@ -2,6 +2,8 @@ from django.db import models
 
 # Create your models here.
 
+#TODO inventory information before
+
 #Medicine
 class Medicine(models.Model):
     UOM = (

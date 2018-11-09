@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
+from inventory.models import Medicine, Miscellaneous, Food
 
 
 # Create your models here.
@@ -38,6 +39,7 @@ class K9(models.Model):
         ('Mixed', 'Mixed'),
     )
 
+    #TODO Dog sizes based on breed, see docs
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
@@ -127,3 +129,52 @@ class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     date_bought = models.DateField('date_bought', blank=True, null=True)
 
+
+'''
+
+Demand = k9s deployed and requested
+all_current_non deployed
+k9s near retirement
+
+equipment
+equipment_reusable
+
+maintenance requirement left
+
+>>>> TODO >>
+
+demand[] = k9s_deployed + k9s_requested
+forecasted_demand = forecast(demand[])
+k9s_needed = forecasted_demand - k9_undeployed
+current_relevant_k9 = (all_k9s - (retired + failed))
+k9s_to_be_budgeted = forecasted_demand + current_relevant_k9
+k9s_to_be_bought = k9s_to_be_budgeted - k9s_birthed
+
+needed_equipment[] = forecasted_equipment[] - reusable_equipment[] + broken/missing
+needed_medicine[] = forecasted_medicine[] - current_medicine[]
+'''
+
+#TODO Add inventory attr > How many dogs each item can cater
+class Budget_allocation(models.Model):
+    k9s_needed = models.IntegerField('k9s_needed', default=1)
+    date_created = models.DateField('date_created', auto_now_add=True)
+    date_tobe_budgeted = models.DateField('date_tobe_budgeted')
+    #k9s_tobe_trained
+    #k9s_tobe_bought
+    #training_cost
+    #grand_total
+
+class Budget_food(models.Model):
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True) #1 sack per dog per month
+    quantity = models.IntegerField('quantity', default=1)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_equipment(models.Model):
+    equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=1)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_medicine(models.Model):
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default = 1)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
