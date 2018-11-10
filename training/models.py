@@ -27,6 +27,9 @@ class Training(models.Model):
     stage3_1 = models.BooleanField(default=False)
     stage3_2 = models.BooleanField(default=False)
     stage3_3 = models.BooleanField(default=False)
+    stage3_3 = models.BooleanField(default=False)
+    grade = models.CharField('grade', max_length=50, default='No Grade Yet')
+    remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
         return str(self.id) +': ' + str(self.stage)

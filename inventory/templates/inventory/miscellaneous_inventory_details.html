@@ -62,7 +62,7 @@
             <tr>
                 <td>{{ data.quantity }}</td>
                 <td>{{ data.date_counted }}</td>    
-                <td></td>    
+                <td>{{data.user}}</td>    
             </tr>
             {% endfor %}
         </tbody>
@@ -82,7 +82,7 @@
             <tr>
                 <td>{{ data2.quantity }}</td>
                 <td>{{ data2.date_received }}</td>    
-                <td></td>    
+                <td>{{data.user}}</td>  
             </tr>
             {% endfor %}
         </tbody>
@@ -102,7 +102,7 @@
             <tr>
                 <td>{{ data3.quantity }}</td>
                 <td>{{ data3.date_subtracted }}</td>    
-                <td></td>    
+                <td>{{data.user}}</td>   
             </tr>
             {% endfor %}
         </tbody>

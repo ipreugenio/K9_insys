@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
 
+from profiles.models import User
 
 # Create your models here.
 
@@ -40,17 +41,17 @@ class K9(models.Model):
 
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
-    #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     breed = models.CharField('breed', choices=BREED, max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', blank=True)
     age = models.IntegerField('age', default = 0)
     source = models.CharField('source', max_length=200, default="Not Specified")
-    year_retired = models.DateField('year_retired', blank=True, null=True)
+    year_retired = models.DateField('year_retired', blank=True, null=True, default="Not Applicable")
     assignment = models.CharField('assignment', max_length=200, default="None")
     status = models.CharField('status', max_length=200, default="Material Dog")
-    training_status = models.CharField('training_status', max_length=200, default="Unclassified")
+    training_status = models.CharField('training_status', max_length=200, default="Untrained")
     training_id = models.IntegerField('training_id', blank=True, null=True)
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     capability = models.CharField('capability', max_length=200, default="None")

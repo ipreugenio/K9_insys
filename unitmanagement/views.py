@@ -85,6 +85,7 @@ def physical_exam_form(request):
         'title': "Physical Exam",
         'actiontype': "Submit",
         'form': form,
+        'style': style,
     }
     return render (request, 'unitmanagement/physical_exam_form.html', context)
 

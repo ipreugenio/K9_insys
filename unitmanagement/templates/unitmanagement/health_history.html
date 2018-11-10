@@ -58,7 +58,7 @@
                 <td>
                     <a href="{% url 'unitmanagement:physical_exam_details' phyexam_data.id %}">{{phyexam_data.date}}</a>
                 </td>
-                <td >{{phyexam_data.cage_number}}</td>
+                <td >{{phyexam_data.veterinary}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -82,7 +82,7 @@
                 <td >{{vaccine_data.vaccine}}</td>
                 <td >{{vaccine_data.date_vaccinated}}</td>
                 <td >{{vaccine_data.date_validity}}</td>
-                <td >Vet Name Here</td>
+                <td >{{vaccine_data.veterinary}}</td>
             </tr>
             {% endfor %}
         </tbody>

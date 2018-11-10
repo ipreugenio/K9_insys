@@ -31,3 +31,10 @@ class TrainingUpdateForm(forms.ModelForm):
         model = Training
         fields = ('stage1_1', 'stage1_2', 'stage1_3', 'stage2_1', 'stage2_2', 'stage2_3', 'stage3_1', 
         'stage3_2', 'stage3_3')
+
+class SerialNumberForm(forms.Form):
+    serial_number = forms.CharField(max_length=100)
+    microchip = forms.CharField(max_length=100)
+    grade = forms.IntegerField()
+    remarks = forms.CharField(max_length=500, widget = forms.Textarea(attrs={'rows':'3'}))
+

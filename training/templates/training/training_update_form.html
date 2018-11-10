@@ -75,7 +75,7 @@
         </thead>
     </table>
     <div class="ui basic center aligned segment">
-            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >Submit</button>
+            <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>
         </div>
 </form>
 
@@ -84,6 +84,131 @@
         
     $(document).ready(function() {
         $('#tabledata').DataTable();
+        
+        if($("input[name='stage1_1']").is(':checked')){
+            $("input[name='stage1_1']").prop('disabled', true)
+        }
+        if($("input[name='stage1_2']").is(':checked')){
+          $("input[name='stage1_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage1_3']").is(':checked')){
+            $("input[name='stage1_3']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_1']").is(':checked')){
+            $("input[name='stage2_1']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_2']").is(':checked')){
+            $("input[name='stage2_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_3']").is(':checked')){
+            $("input[name='stage2_3']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_1']").is(':checked')){
+            $("input[name='stage3_1']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_2']").is(':checked')){
+            $("input[name='stage3_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_3']").is(':checked')){
+            $("input[name='stage3_3']").prop('disabled', true)
+            $("#btn").prop('disabled', true)
+        }
+       
+        //Stage3_3
+        $("input[name='stage3_3']").change(function() {
+            if ($("input[name='stage3_2']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage3_2
+        $("input[name='stage3_2']").change(function() {
+            if ($("input[name='stage3_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage3_1
+        $("input[name='stage3_1']").change(function() {
+            if ($("input[name='stage2_3']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        
+        //Stage2_3
+        $("input[name='stage2_3']").change(function() {
+            if ($("input[name='stage2_2']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage2_2
+        $("input[name='stage2_2']").change(function() {
+            if ($("input[name='stage2_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage2_2']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage2_1
+        $("input[name='stage2_1']").change(function() {
+            if ($("input[name='stage1_3']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        
+        //Stage1_3
+        $("input[name='stage1_3']").change(function() {
+            if ($("input[name='stage1_2']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_2']").prop('checked', false)
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage1_2
+        $("input[name='stage1_2']").change(function() {
+            if ($("input[name='stage1_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_1']").prop('checked', false)
+                $("input[name='stage1_2']").prop('checked', false)
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+
     } );
     
 </script>
