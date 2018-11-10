@@ -214,13 +214,14 @@ def requests_form(request):
             form.save()
             style = "ui green message"
             messages.success(request, 'Request has been successfully recorded!')
-            form = VaccinationForm()
+            form = RequestForm()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
     context = {
         'title': "Request of equipment",
         'actiontype': "Submit",
+        'style': style,
         'form': form,
     }
     return render (request, 'unitmanagement/request_form.html', context)
@@ -230,27 +231,30 @@ def request_list(request):
 
     context = {
         'data': data,
+        'title': 'Request Equipment List',
     }
     return render (request, 'unitmanagement/request_list.html', context)
 
 def change_equipment(request, id):
     data = Requests.objects.get(id=id)
-
-    status = "Approved"
+    style = ""
     changedate = dt.datetime.now()
     if request.method == 'POST':
         if 'ok' in request.POST:
-            data.request_status = status
+            data.request_status = "Approved"
             data.date_approved = changedate
             data.save()
             style = "ui green message"
-            messages.success(request, 'Equipment has been successfully changed!')
         else:
+            data.request_status = "Cancelled"
+            data.date_approved = changedate
+            data.save()
             style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
-
+    
+        messages.success(request, 'Equipment has been successfully changed!')
     context = {
         'data': data,
+        'style': style,
     }
 
     return render (request, 'unitmanagement/change_equipment.html', context)

@@ -39,7 +39,11 @@
             <th>Source</th>
             <td>{{data.source}}</td>
             <th>Year Retired</th>
+            {% if data.year_retired == None %}
+            <td>Not Applicable</td>
+            {%else%}
             <td>{{data.year_retired}}</td>
+            {% endif %}
         </tr>
         <tr>
             <th>Assignment</th>
@@ -62,7 +66,7 @@
         Clarrifications
     </div>
     <ul class="list">
-        <li>The pending status of the stage indicates that the dog has yet to complete the stage.</li>
+        <li>A pending status indicates that the K9 has yet to complete the stage.</li>
     </ul>
 </div>
 <div class="ui segment">

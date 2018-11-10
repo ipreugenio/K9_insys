@@ -64,21 +64,21 @@ def timeseries_generator():
     return None
 
 def classify_k9_list(request):
-    data_untrained = K9.objects.filter(training_status="Untrained")
     data_unclassified = K9.objects.filter(training_status="Unclassified")
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-    data_failed = K9.objects.filter(training_status="Failed")
+    data_breeeding = K9.objects.filter(training_status="For-Breeding")
+    data_adoption = K9.objects.filter(training_status="For-Adoption")
     
     context = {
         'title': 'K9 Classification',
-        'data_untrained': data_untrained,
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
-        'data_failed': data_failed,
+        'data_breeeding': data_breeeding,
+        'data_adoption': data_adoption,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -311,23 +311,18 @@ def training_update_form(request, id):
 def serial_number_form(request, id):
     form = SerialNumberForm(request.POST or None)
     style = "ui teal message"
-   
     data = K9.objects.get(training_id=id) # get k9
-    training = Training.objects.get(id=id) # get training record
-
+   
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
             data.serial_number = request.POST.get('serial_number')
             data.microchip = request.POST.get('microchip')
-            data.training_status = "Unclassified"
-            training.grade = str(request.POST.get('grade'))
-            training.remarks = request.POST.get('remarks')
-
+            data.training_status = request.POST.get('dog_type')
             data.save()
-            training.save()
+          
             style = "ui green message"
-            messages.success(request, 'Dog Training has been finalized!')
+            messages.success(request, 'K9 has been finalized!')
           
         else:
             style = "ui red message"
@@ -335,8 +330,8 @@ def serial_number_form(request, id):
 
     context = {
         'form': form,
-        'title': 'Trained Dog Finalization',
-        'texthelp': 'Input Final Dog Training Details Here',
+        'title': 'Trained K9 Finalization',
+        'texthelp': 'Input Final Details Here',
         'actiontype': 'Submit',
         'style' : style,
     }
@@ -344,7 +339,7 @@ def serial_number_form(request, id):
 
 def fail_dog(request, id):
     data = K9.objects.get(training_id=id) # get k9
-    data.training_status = "Failed"
+    data.training_status = "For-Adoption"
     data.save()
     training = Training.objects.get(id=id)
     training.grade = '0'
