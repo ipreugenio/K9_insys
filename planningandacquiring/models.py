@@ -5,10 +5,6 @@ from datetime import date as d
 from inventory.models import Medicine, Miscellaneous, Food
 
 
-# Create your models here.
-
-#class K9_price(models.Model):
-
 class Date(models.Model):
     date_from = models.DateField('date_from', blank=True, null=True)
     date_to = models.DateField('date_to', blank=True, null=True)
@@ -69,7 +65,7 @@ class K9(models.Model):
         if bday < 1:
             bday = 0
         return bday
-        
+
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         '''

@@ -338,6 +338,12 @@ def breeding_confirmed(request):
 
 #Listview format
 def K9_listview(request):
+
+    '''
+
+
+    '''
+
     k9 = K9.objects.all()
 
     '''
@@ -385,6 +391,19 @@ def difference(dataset):
         diff.append(value)
     return np.array(diff)
 
+def inverse_difference(last_ob, value):
+
+    return value + last_ob
+
+def running_total(dataset):
+    sum = list()
+    cumsum = 0
+    for i in range(1, len(dataset)):
+        value = dataset[i]
+        cumsum = cumsum + value
+        sum.append(cumsum)
+    return np.array(sum)
+
 
 # Make a prediction give regression coefficients and lag obs
 def predict(coef, history):
@@ -394,11 +413,12 @@ def predict(coef, history):
 
     return yhat
 
-#TODO Fix Error per model
+
 def Autoregression(data):
     X = difference(data.values)
+    X = difference(X)
     size = int(len(X) * 0.66)
-    data = data[0:size]
+    data = X[0:size]
     model = AR(data)
     model = model.fit(transparams=True)
     print("AR MODEL")
@@ -407,67 +427,71 @@ def Autoregression(data):
 
 def Moving_Average(data):
     X = difference(data.values)
+    X = difference(X)
     size = int(len(X) * 0.66)
-    data = data[0:size]
+    data = X[0:size]
     model = ARMA(data, order=(0, 1))
     model = model.fit(transparams=True)
     return model
 
 def Autoregressive_Moving_Average(data):
     X = difference(data.values)
+    X = difference(X)
+
     size = int(len(X) * 0.66)
-    data = data[0:size]
-    model = ARMA(data, order=(1, 2))
-    model = model.fit(transparams=True)
+    data = X[0:size]
+
+    print("ARMA DATA")
+    print(data)
+
+    model = ARMA(data, order=(2, 1))
+    model = model.fit(transparams=True, start_params=[1, .1, .1, .1])
     return model
+
 
 def Autoregressive_Integrated_Moving_Average(data):
     X = difference(data.values)
+    X = difference(X)
     size = int(len(X) * 0.66)
-    data = data[0:size]
-    model = ARIMA(data, order=(2, 0, 0))
-    model = model.fit(transparams=True)
+    data = X[0:size]
+    print("ARIMA DATA")
+    print(data)
+    model = ARIMA(data, order=(2, 1, 1))
+    model = model.fit(transparams=True, start_params=[1, .1, .1, .1])
     print("MODEL FIT ARIMA")
     print(model)
     return model
 
-def Seasonal_Autoregressive_Moving_Average(data):
-    X = difference(data.values)
-    size = int(len(X) * 0.66)
-    data = data[0:size]
-    model = SARIMAX(data, order=(1, 1, 1), seasonal_order=(1, 1, 1, 1))
-    model = model.fit()
-    return model
 
 def Simple_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
-    data =  data[0:size]
+    data, datax =  data[0:size], data[-size:]
     test, train = X[0:size], X[size:]
     model = SimpleExpSmoothing(data)
 
     model_fit = model.fit()
 
     forecast = model_fit.fittedfcast
+    temp = np.delete(forecast, 0)
     predict = model_fit.fcastvalues
     predict = predict.flatten()
     predict = predict.tolist()
     predict = predict[0]
     predict = round(predict)
-    fitted = model_fit.fittedvalues
     print("SES DATA")
     print(data)
     print("SES FORECASTS")
     print(forecast)
     print("SES PREDICT")
     print(predict)
-    error = mean_squared_error(data, fitted)
+    error = mean_squared_error(datax, temp)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
 
     SES = []
 
-    SES.append(forecast) #TODO somehow prediction is not included in graph
+    SES.append(forecast)
     SES.append(predict)
     SES.append(root_error)
 
@@ -480,19 +504,20 @@ def Simple_Exponential_Smoothing(data):
 def Holt_Exponential_Smoothing(data):
     X = difference(data.values)
     size = int(len(X) * 0.66)
-    data = data[0:size]
+    data, datax = data[0:size], data[-size:]
     model = ExponentialSmoothing(data, trend='additive')
 
     model_fit = model.fit()
 
     forecast = model_fit.fittedfcast
+    temp = np.delete(forecast, 0)
     predict = model_fit.fcastvalues
     predict = predict.flatten()
     predict = predict.tolist()
     predict = predict[0]
     predict = round(predict)
     fitted = model_fit.fittedvalues
-    error = mean_squared_error(data, fitted)
+    error = mean_squared_error(datax, temp)
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
 
@@ -509,11 +534,14 @@ def Holt_Exponential_Smoothing(data):
     return HWES
 
 
-#TODO Fix forecast to be viable for both stationary and non-stationary
+#TODO Fix to work with both stationarity and non-stationarity
 def forecast(timeseries, model):
 
     # split dataset
     X = difference(timeseries.values)
+    X = difference(X)
+
+    #TODO Differencing order should change depending on model.fit differencing order
 
     print("X")
     print(X)
@@ -521,13 +549,12 @@ def forecast(timeseries, model):
     #Use 66% of data for training
     size = int(len(X) * 0.66)
     train, test = X[0:size], X[size:]
-    trainTS, testTS = timeseries[0:size], timeseries[size+1:]
+    traind, testd = timeseries.values[0:size], timeseries.values[size+2:]
 
-
-    print("TRAIN")
-    print(train)
-    print("TEST")
-    print(test)
+    print("TRAIND")
+    print(traind)
+    print("TESTD")
+    print(testd)
 
     print("Model")
     print (model)
@@ -548,6 +575,7 @@ def forecast(timeseries, model):
     # walk forward over time steps in test
     history = [train[i] for i in range(len(train))]
     predictions = list()
+
     for t in range(len(test)):
         yhat = predict(coef, history)
         obs = test[t]
@@ -556,7 +584,10 @@ def forecast(timeseries, model):
 
     print("PREDICTIONS")
     print(predictions)
-    error = mean_squared_error(testTS, predictions)
+
+    #revert_differencing = summation(predictions)
+    revert_differencing = [inverse_difference(testd[i], predictions[i]) for i in range(len(predictions))] #TODO check if inverse differencing is correct
+    error = mean_squared_error(testd, revert_differencing) #TODO Confirm if forecast error parameters is correct
     root_error = sqrt(error)
     root_error = int(root_error * 10 ** 2) / 10.0 ** 2
     print('Test MSE: %.3f' % error)
@@ -564,13 +595,18 @@ def forecast(timeseries, model):
     print("Prediction : " + str(yhat))
 
 
+    yhat = revert_differencing[-1]
+
+    print("REVERT DIFFERENCING")
+    print(revert_differencing)
+
     yhat = yhat.flatten()
     yhat = yhat.tolist()
     yhat = yhat[0]
     yhat = round(yhat)
 
     data = []
-    data.append(predictions)
+    data.append(revert_differencing)
     data.append(yhat)
     data.append(root_error)
 
@@ -622,14 +658,17 @@ def scatter_model(timeseries, prediction, title):
 
     ctr = 0
     for index, row in timeseries.iterrows():
-        if ctr >= test_index:
+        if ctr >= test_index: # +1 if data is differenced
             predicted_date.append(index)
         ctr += 1
 
     ctr = 0
+    print("GRAPH PREDICTION")
+    print(prediction)
+
     for array in prediction:
         for row in array:
-            if ctr != test_index:
+            if ctr <= test_index:
                 predicted_quantity.append(row)
         ctr += 1
 
@@ -655,7 +694,7 @@ def scatter_model_float(timeseries, prediction, title):
 
     ctr = 0
     for index, row in timeseries.iterrows():
-        if ctr >= test_index:
+        if ctr >= test_index :
             predicted_date.append(index)
         ctr += 1
 
@@ -665,7 +704,7 @@ def scatter_model_float(timeseries, prediction, title):
         del prediction[0]
 
     for array in prediction:
-        if ctr != test_index:
+        if ctr <= test_index:
             predicted_quantity.append(array)
         ctr += 1
 

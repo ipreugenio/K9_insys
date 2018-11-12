@@ -155,6 +155,7 @@ class Location(models.Model):
     zip_code = models.IntegerField('zip_code')
     address = models.CharField('address', max_length=500, default='None')
 
+
 class Area(models.Model):
     name = models.CharField('name', max_length=100, default='')
 

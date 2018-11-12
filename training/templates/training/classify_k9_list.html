@@ -61,7 +61,7 @@
                 <td>{{data_classified.age}}</td>
                 <td>{{data_classified.capability}}</td>
                 <td style="text-align:center;">
-                    <a href="{% url 'training:classify_k9_select' data_classified.id %}" class = "tiny ui blue basic button">Select</a>
+                    <a href="{% url 'training:assign_k9_select' data_classified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
             </tr>
             {% endfor %}
