@@ -61,6 +61,7 @@ def classify_k9_list(request):
     data_trained = K9.objects.filter(training_status="Trained")
     data_breeeding = K9.objects.filter(training_status="For-Breeding")
     data_adoption = K9.objects.filter(training_status="For-Adoption")
+    data_deployment = K9.objects.filter(training_status="For-Deployment")
     
     context = {
         'title': 'K9 Classification',
@@ -70,6 +71,7 @@ def classify_k9_list(request):
         'data_trained': data_trained,
         'data_breeeding': data_breeeding,
         'data_adoption': data_adoption,
+        'data_deployment': data_deployment,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -228,9 +230,10 @@ def training_records(request):
     return render(request, 'training/training_records.html', context)
 
 def training_update_form(request, id):
-    data = K9.objects.get(training_id=id) # get k9
-    training = Training.objects.get(id=id) # get training record
+	data = K9.objects.get(id=id) # get k9
+    training = Training.objects.get(k9=data) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
+
 
     if request.method == 'POST': 
         #save training status
@@ -271,6 +274,8 @@ def training_update_form(request, id):
         else:
             training.stage3_3 = bool(request.POST.get('stage3_3'))
           
+        training.remarks = request.POST.get('remarks')
+        training.grade = request.POST.get('grade')
         training.save()
         data.save()
         
@@ -320,8 +325,8 @@ def training_update_form(request, id):
 def serial_number_form(request, id):
     form = SerialNumberForm(request.POST or None)
     style = "ui teal message"
-    data = K9.objects.get(training_id=id) # get k9
-   
+    data = K9.objects.get(id=id) # get k9
+	
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
@@ -347,17 +352,17 @@ def serial_number_form(request, id):
     return render (request, 'training/serial_number_form.html', context)
 
 def fail_dog(request, id):
-    data = K9.objects.get(training_id=id) # get k9
+    data = K9.objects.get(id=id) # get k9
     data.training_status = "For-Adoption"
     data.save()
-    training = Training.objects.get(id=id)
+    training = Training.objects.get(k9=data)
     training.grade = '0'
     training.save()
     return redirect('training:classify_k9_list')
 
 def training_details(request, id):
-    data = K9.objects.get(training_id=id) # get k9
-    training = Training.objects.get(id=id) # get training record
+    data = K9.objects.get(id=id) # get k9
+    training = Training.objects.get(k9=data) # get training record
 
     context = {
         'title': data,

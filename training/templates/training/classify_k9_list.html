@@ -11,6 +11,7 @@
     <a class="item" data-tab="fourth">Trained</a>
     <a class="item" data-tab="fifth">For Breeding</a>
     <a class="item" data-tab="sixth">For Adoption</a>
+    <a class="item" data-tab="seventh">For Deployment</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
     <table id="tabledata1" class="ui seven column celled table">
@@ -95,8 +96,8 @@
             <td>{{data_ontraining.age}}</td>
             <td>{{data_ontraining.training_level}}</td>
             <td style="width:140px;">
-                <a href="{% url 'training:training_update_form' data_ontraining.training_id %}" class = "tiny ui blue basic button">Select</a>
-                <a href="{% url 'training:fail_dog' data_ontraining.training_id %}" onclick="return confirm('Are you sure?')" class = "tiny ui red basic button">Drop</a>
+                <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
+                <a href="{% url 'training:fail_dog' data_ontraining.id %}" onclick="return confirm('Are you sure?')" class = "tiny ui red basic button">Drop</a>
             </td>
         </tr>
         {% endfor %}
@@ -156,7 +157,7 @@
                     <td>{{data_breeeding.age}}</td>
                     <td>{{data_breeeding.source}}</td>
                     <td style="text-align:center;">
-                        <a href="{% url 'training:training_details' data_breeeding.training_id %}" class = "tiny ui blue basic button">Select</a>
+                        <a href="{% url 'training:training_details' data_breeeding.id %}" class = "tiny ui blue basic button">Select</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -193,6 +194,36 @@
             </tbody>
         </table>
     </div>
+<div class="ui tab segment" data-tab="seventh">
+        <table id="tabledata7" class="ui seven column celled table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Breed</th>
+                    <th>Color</th>
+                    <th>Sex</th>
+                    <th>Age</th>
+                    <th>Training Level</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data_deployment in data_deployment %}
+                <tr>
+                    <td>{{data_deployment.name}}</td>
+                    <td >{{data_deployment.breed}}</td>
+                    <td>{{data_deployment.color}}</td>
+                    <td >{{data_deployment.sex}}</td>
+                    <td>{{data_deployment.age}}</td>
+                    <td>{{data_deployment.training_level}}</td>
+                    <td style="text-align:center;">
+                        <a href="{% url 'training:training_details' data_deployment.id %}" class = "tiny ui blue basic button">Select</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 <script type="text/javascript">
         
     $(document).ready(function() {
@@ -202,6 +233,7 @@
         $('#tabledata4').DataTable();
         $('#tabledata5').DataTable();
         $('#tabledata6').DataTable();
+        $('#tabledata7').DataTable();
         $('.menu .item').tab();
     });
     
