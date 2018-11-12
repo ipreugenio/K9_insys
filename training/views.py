@@ -8,7 +8,7 @@ from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
 from training.models import Training
 from .forms import TestForm, add_handler_form
-from training.forms import TrainingUpdateForm, SerialNumberForm
+from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
 from collections import OrderedDict
 
 
@@ -79,27 +79,39 @@ def classify_k9_list(request):
 #TODO Add additional classification, for breeding
 def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
+    form_skill = ClassifySkillForm(request.POST)
+    title = data.name
+    style = ""
 
     if request.method == 'POST':
-        print(request.POST.get('select_classify'))
-        data.capability = request.POST.get('select_classify')
-        data.training_status = "Classified"
-        data.save()
-        style = "ui green message" 
-        messages.success(request, 'K9 has been successfully Classified!')
+        if form_skill.is_valid():
+            data.capability = form_skill.cleaned_data['skill']
+            data.training_status = "Classified"
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'K9 has been successfully Classified!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Please select skill')
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
     except K9_Parent.DoesNotExist:
         context = {
             'data': data,
+            'form': form_skill,
+             'title': title,
+            'style': style
         }
     else:
         parent_exist = 1
         context = {
             'data': data,
             'parent': parent,
-            'parent_exist': parent_exist
+            'parent_exist': parent_exist,
+            'form': form_skill,
+            'title': title,
+            'style': style
         }
 
     return render (request, 'training/classify_k9_select.html', context)

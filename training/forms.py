@@ -8,6 +8,16 @@ from training.models import K9_Handler, Training
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class ClassifySkillForm(forms.Form):
+    CHOICES = (
+        ('EDD', 'EDD'),
+        ('NDD', 'NDD'),
+        ('SAR', 'SAR'),
+    )
+
+    skill = forms.ChoiceField(choices=CHOICES,
+                               widget=forms.RadioSelect)
+
 class TestForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.all())
 
