@@ -107,7 +107,7 @@ def add_donated_K9(request):
             request.session['k9_id'] = k9.id
             
             #create Training object when k9 is created, self.id of k9 will be the value of training_id
-            Training.objects.create()
+            Training.objects.create(k9=k9)
 
             return HttpResponseRedirect('confirm_donation/')
 
@@ -170,7 +170,7 @@ def donation_confirmed(request):
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
         #delete training record
-        training = Training.objects.get(id=k9.id)
+        training = Training.objects.get(k9=k9)
         training.delete()
         #delete k9
         k9.delete()
@@ -292,9 +292,6 @@ def add_offspring_K9(request):
 
              request.session['offspring_id'] = k9.id
 
-             #create Training object when k9 is created, self.id of k9 will be the value of training_id
-             Training.objects.create()
-             
              return HttpResponseRedirect('confirm_breeding/')
 
          else:
@@ -340,10 +337,11 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
+        Training.objects.create(k9=offspring)
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
         #delete training record
-        training = Training.objects.get(id=offspring.id)
+        training = Training.objects.get(k9=offspring)
         training.delete()
         #delete offspring
         offspring.delete()

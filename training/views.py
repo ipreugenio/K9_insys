@@ -230,10 +230,9 @@ def training_records(request):
     return render(request, 'training/training_records.html', context)
 
 def training_update_form(request, id):
-	data = K9.objects.get(id=id) # get k9
+    data = K9.objects.get(id=id) # get k9
     training = Training.objects.get(k9=data) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
-
 
     if request.method == 'POST': 
         #save training status
