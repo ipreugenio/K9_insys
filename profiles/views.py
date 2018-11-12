@@ -97,7 +97,8 @@ def add_education(request):
             personal_info.save()
             style = "ui green message"
             messages.success(request, 'User has been successfully Added!')
-            form = add_User_form
+            form = add_User_form()
+            return HttpResponseRedirect('../../../user_add_confirmed/')
 
         else:
             style = "ui red message"
@@ -137,3 +138,7 @@ def user_detailview(request, id):
     }
 
     return render(request, 'profiles/user_detail.html', context)
+
+#Detailview format
+def user_add_confirmed(request):
+    return render(request, 'profiles/user_add_confirmed.html')

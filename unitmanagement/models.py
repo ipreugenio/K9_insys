@@ -33,8 +33,7 @@ class PhysicalExam(models.Model):
 
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
     date = models.DateField('date', auto_now_add=True)
-    #veterinary = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    veterinary = models.CharField('veterinary', max_length=200, default="Change this to Foreign Key User")
+    veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cage_number = models.IntegerField('dog', default = "0")
     general_appearance = models.CharField('general_appearance', choices=EXAMSTATUS, max_length=200)
     integumentary = models.CharField('integumentary', choices=EXAMSTATUS, max_length=200)
@@ -75,7 +74,7 @@ class VaccinceRecord(models.Model):
     disease = models.CharField('disease', choices=DISEASE, max_length=200)
     date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
     date_validity = models.DateField('date_validity', blank=True,)
-    #veterinary = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)

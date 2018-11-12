@@ -19,28 +19,25 @@
                             <form class = "ui inverted form" method="POST">
                                 {% csrf_token %}
                                 <div class = "field">
-                                        <label>Handler</label>
-                                        {{data.handler}}
-                                </div>
-
-                                <div class = "two fields">
-                                    <div class="field">
-                                        <label>Equipment</label>
-                                        {{data.equipment}}
-                                    </div>
-                                </div>
-
-
-                             <div class="ui inverted center aligned segment" style="padding: 0px;">
-                                     <form action="" method="post">
-                                        {% csrf_token %}
-                                        <div class="ui buttons">
-                                            <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Cancel</button>
-                                            <div class="or"></div>
-                                            <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Approve</button>
+                                        <div class="field">
+                                            <label>Handler</label>
+                                            <input type="text" value="{{data.handler}}" readonly>
                                         </div>
-
-                            </form>
+                                </div>
+                                <div class="field">
+                                    <label>Equipment</label>
+                                    <input type="text" value="{{data.equipment}}" readonly>
+                                </div>
+                                
+                             <div class="ui inverted center aligned segment" style="padding: 0px;">
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <div class="ui buttons">
+                                        <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Cancel</button>
+                                        <div class="or"></div>
+                                        <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Approve</button>
+                                    </div>
+                                </form>
                              </div>
                         </div>
             </div>

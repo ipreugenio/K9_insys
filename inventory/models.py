@@ -1,5 +1,6 @@
 from django.db import models
 
+from profiles.models import User
 # Create your models here.
 
 #TODO inventory information before
@@ -9,9 +10,12 @@ class Medicine(models.Model):
     UOM = (
         ('mg', 'mg'),
         ('mL', 'mL'),
+        ('suspension', 'suspension'),
     )
     TYPE = (
-        ('Drug', 'Drug'),
+        ('Tablet', 'Tablet'),
+        ('Capsule', 'Capsule'),
+        ('Bottle', 'Bottle'),
         ('Vaccine', 'Vaccine'),
     )
     medicine = models.CharField(max_length=100)
@@ -43,7 +47,7 @@ class Medicine_Inventory(models.Model):
 # add user
 class Medicine_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -54,7 +58,7 @@ class Medicine_Inventory_Count(models.Model):
 
 class Medicine_Received_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -64,8 +68,7 @@ class Medicine_Received_Trail(models.Model):
 
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, default="")
     price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0)
     quantity = models.IntegerField('quantity', default=0)
@@ -106,7 +109,7 @@ class Food_Inventory(models.Model):
 # add user
 class Food_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -116,7 +119,7 @@ class Food_Inventory_Count(models.Model):
 
 class Food_Received_Trail(models.Model):
     inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -126,7 +129,7 @@ class Food_Received_Trail(models.Model):
 
 class Food_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Food_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -171,7 +174,7 @@ class Miscellaneous_Inventory(models.Model):
 # add user
 class Miscellaneous_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Miscellaneous_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -181,7 +184,7 @@ class Miscellaneous_Inventory_Count(models.Model):
 
 class Miscellaneous_Received_Trail(models.Model):
     inventory = models.ForeignKey(Miscellaneous_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -191,7 +194,7 @@ class Miscellaneous_Received_Trail(models.Model):
 
 class Miscellaneous_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Miscellaneous_Inventory, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -207,7 +210,7 @@ class DamagedEquipemnt(models.Model):
     )
 
     inventory = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     concern = models.CharField('concern', max_length=100, choices=CONCERN)
     date = models.DateField('date', auto_now_add=True)

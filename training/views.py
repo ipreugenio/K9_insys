@@ -6,7 +6,9 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
+from training.models import Training
 from .forms import TestForm, add_handler_form
+from training.forms import TrainingUpdateForm, SerialNumberForm
 from collections import OrderedDict
 
 
@@ -57,13 +59,17 @@ def classify_k9_list(request):
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-
-
+    data_breeeding = K9.objects.filter(training_status="For-Breeding")
+    data_adoption = K9.objects.filter(training_status="For-Adoption")
+    
     context = {
+        'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
+        'data_breeeding': data_breeeding,
+        'data_adoption': data_adoption,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -202,8 +208,151 @@ def test_stationarity(timeseries, index):
 
 
 def training_records(request):
-    return render(request, 'training/training_records.html')
+    data = K9.objects.all()
+    context = {
+        'title': "Training Records",
+        'data': data,
+    }
+    return render(request, 'training/training_records.html', context)
 
+def training_update_form(request, id):
+    data = K9.objects.get(training_id=id) # get k9
+    training = Training.objects.get(id=id) # get training record
+    form = TrainingUpdateForm(request.POST or None, instance = training)
+
+    if request.method == 'POST': 
+        #save training status
+        if training.stage1_1 == True:
+            training.stage1_1 = training.stage1_1
+        else:
+            training.stage1_1 = bool(request.POST.get('stage1_1'))
+        if training.stage1_2 == True:
+            training.stage1_2 = training.stage1_2
+        else:
+            training.stage1_2 = bool(request.POST.get('stage1_2'))
+        if training.stage1_3 == True:
+            training.stage1_3 = training.stage1_3
+        else:
+            training.stage1_3 = bool(request.POST.get('stage1_3'))
+        if training.stage2_1 == True:
+            training.stage2_1 = training.stage2_1
+        else:
+            training.stage2_1 = bool(request.POST.get('stage2_1'))
+        if training.stage2_2 == True:
+            training.stage2_2 = training.stage2_2
+        else:
+            training.stage2_2 = bool(request.POST.get('stage2_2'))
+        if training.stage2_3 == True:
+            training.stage2_3 = training.stage2_3
+        else:
+            training.stage2_3 = bool(request.POST.get('stage2_3'))
+        if training.stage3_1 == True:
+            training.stage3_1 = training.stage3_1
+        else:
+            training.stage3_1 = bool(request.POST.get('stage3_1'))
+        if training.stage3_2 == True:
+            training.stage3_2 = training.stage3_2
+        else:
+            training.stage3_2 = bool(request.POST.get('stage3_2'))
+        if training.stage3_3 == True:
+            training.stage3_3 = training.stage3_3
+        else:
+            training.stage3_3 = bool(request.POST.get('stage3_3'))
+          
+        training.save()
+        data.save()
+        
+        stage = "Stage 0"
+     
+        if training.stage3_3 == True:
+            stage = "Finished Training"
+        elif training.stage3_2 == True:
+            stage = "Stage 3.2"
+        elif training.stage3_1 == True:
+            stage= "Stage 3.1"
+        elif training.stage2_3 == True:
+            stage = "Stage 2.3"
+        elif training.stage2_2 == True:
+            stage = "Stage 2.2"
+        elif training.stage2_1 == True:
+            stage = "Stage 2.1"
+        elif training.stage1_3 == True:
+            stage = "Stage 1.3"
+        elif training.stage1_2 == True:
+            stage = "Stage 1.2"
+        elif training.stage1_1 == True:
+            stage = "Stage 1.1"
+
+        training.stage = stage
+        training.save()
+
+        if training.stage == "Finished Training":
+            data.training_status = "Trained"
+        else:
+            data.training_status = "On-Training"
+        
+        data.training_level = stage
+        data.save()
+        messages.success(request, 'Training Progress has been successfully Updated!')
+
+        return redirect('training:training_update_form', id = id)
+    context = {
+        'title': data.name,
+        'data': data,
+        'form': form,
+    }
+    
+    return render(request, 'training/training_update_form.html', context)
+
+#Trained Dog - Assign serial number Form
+def serial_number_form(request, id):
+    form = SerialNumberForm(request.POST or None)
+    style = "ui teal message"
+    data = K9.objects.get(training_id=id) # get k9
+   
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            data.serial_number = request.POST.get('serial_number')
+            data.microchip = request.POST.get('microchip')
+            data.training_status = request.POST.get('dog_type')
+            data.save()
+          
+            style = "ui green message"
+            messages.success(request, 'K9 has been finalized!')
+          
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'form': form,
+        'title': 'Trained K9 Finalization',
+        'texthelp': 'Input Final Details Here',
+        'actiontype': 'Submit',
+        'style' : style,
+    }
+    return render (request, 'training/serial_number_form.html', context)
+
+def fail_dog(request, id):
+    data = K9.objects.get(training_id=id) # get k9
+    data.training_status = "For-Adoption"
+    data.save()
+    training = Training.objects.get(id=id)
+    training.grade = '0'
+    training.save()
+    return redirect('training:classify_k9_list')
+
+def training_details(request, id):
+    data = K9.objects.get(training_id=id) # get k9
+    training = Training.objects.get(id=id) # get training record
+
+    context = {
+        'title': data,
+        'data': data,
+        'training':training,
+    }
+    return render (request, 'training/training_details.html', context)
 
 def gender_count_between_breeds():
     k9_set = K9.objects.all()

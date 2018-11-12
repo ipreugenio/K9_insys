@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity
+from training.models import Training
 from inventory.models import Medicine_Subtracted_Trail, Medicine
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -104,6 +105,10 @@ def add_donated_K9(request):
             k9.save()
 
             request.session['k9_id'] = k9.id
+            
+            #create Training object when k9 is created, self.id of k9 will be the value of training_id
+            Training.objects.create()
+
             return HttpResponseRedirect('confirm_donation/')
 
         else:
@@ -164,7 +169,12 @@ def donation_confirmed(request):
     if 'ok' in request.POST:
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
+        #delete training record
+        training = Training.objects.get(id=k9.id)
+        training.delete()
+        #delete k9
         k9.delete()
+
         context = {
             'Title': "Receive Donated K9",
             'form': add_donated_K9_form,
@@ -281,6 +291,10 @@ def add_offspring_K9(request):
              k9.save()
 
              request.session['offspring_id'] = k9.id
+
+             #create Training object when k9 is created, self.id of k9 will be the value of training_id
+             Training.objects.create()
+             
              return HttpResponseRedirect('confirm_breeding/')
 
          else:
@@ -328,7 +342,12 @@ def breeding_confirmed(request):
         k9_parent.save()
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
+        #delete training record
+        training = Training.objects.get(id=offspring.id)
+        training.delete()
+        #delete offspring
         offspring.delete()
+
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form

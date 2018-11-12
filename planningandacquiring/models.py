@@ -4,6 +4,7 @@ from datetime import timedelta as td
 from datetime import date as d
 from inventory.models import Medicine, Miscellaneous, Food
 
+from profiles.models import User
 
 class Date(models.Model):
     date_from = models.DateField('date_from', blank=True, null=True)
@@ -38,7 +39,7 @@ class K9(models.Model):
     #TODO Dog sizes based on breed, see docs
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
-    #handler = models.ForeignKey(Handler, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     breed = models.CharField('breed', choices=BREED, max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
@@ -49,10 +50,11 @@ class K9(models.Model):
     assignment = models.CharField('assignment', max_length=200, default="None")
     status = models.CharField('status', max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
+    training_id = models.IntegerField('training_id', blank=True, null=True)
+    training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
     
-
     def __str__(self):
         return str(self.name) + " : " + str(self.serial_number)
 
@@ -68,6 +70,7 @@ class K9(models.Model):
 
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
+        self.training_id = self.id
         '''
         Serial Numbers and Microchips are given after training
         lead_zero = str(self.id).zfill(5)
