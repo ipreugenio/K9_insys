@@ -11,19 +11,6 @@ from .forms import TestForm, add_handler_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
 from collections import OrderedDict
 
-
-#statistical imports
-from math import *
-from sklearn.metrics import mean_squared_error
-import pandas as pd
-
-
-import numpy as np
-import matplotlib.pylab as plt
-from matplotlib.pylab import rcParams
-from datetime import datetime, date
-from dateutil.parser import parse
-
 #graphing imports
 import igraph
 from igraph import *
@@ -33,21 +20,6 @@ import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
-from faker import Faker
-from statsmodels.tsa.ar_model import AR
-from statsmodels.tsa.arima_model import ARMA
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.statespace.varmax import VARMAX
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random, randint
-from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm
-
-
-# Create your views here.
 
 def index(request):
     return render (request, 'training/index.html')
@@ -76,7 +48,7 @@ def classify_k9_list(request):
 #TODO Should be radio buttons
 #TODO Restrict Viable dogs to be trained for those who are 6 months old
 #TODO Add additional age for months
-#TODO Add additional classification, for breeding
+#TODO Call methods that returns graphs and skill scores then compare
 def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
     form_skill = ClassifySkillForm(request.POST)
@@ -100,7 +72,7 @@ def classify_k9_select(request, id):
         context = {
             'data': data,
             'form': form_skill,
-             'title': title,
+            'title': title,
             'style': style
         }
     else:
@@ -143,80 +115,6 @@ def assign_k9_select(request, id):
         'handler': handlers,
     }
     return render (request, 'training/assign_k9_select.html', context)
-
-#Use in forecasting to test if original data is stationary
-def test_stationarity(timeseries, index):
-    # Determing rolling statistics
-    # Set at which index will test data start
-
-    rolmean = timeseries.rolling(index).mean()
-    rolstd = timeseries.rolling(index).std()
-
-    idx = pd.IndexSlice
-
-    # Perform Dickey-Fuller test:
-    print('Results of Dickey-Fuller Test:')
-    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
-    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
-    for key, value in dftest[4].items():
-        dfoutput['Critical Value (%s)' % key] = value
-    print(dfoutput)
-
-    #Check Root Mean Squared Error, the lower the better
-    #rms = sqrt(mean_squared_error())
-    #print(rms)
-
-    ts_d = []
-    ts_q = []
-
-    for index, row in timeseries.iterrows():
-
-        ts_q.append(row["Quantity"])
-        ts_d.append(index)
-
-    mean_d = []
-    mean_q = []
-
-    for index, row in rolmean.iterrows():
-        mean_q.append(row["Quantity"])
-        mean_d.append(index)
-
-    std_d = []
-    std_q = []
-
-    for index, row in rolstd.iterrows():
-        std_q.append(row["Quantity"])
-        std_d.append(index)
-
-
-    naive = go.Scatter(
-        x=list(ts_d),
-        y=list(ts_q),
-        name = "Original"
-    )
-    ave = go.Scatter(
-        x=list(mean_d),
-        y=list(mean_q),
-        name = "Rolling Mean"
-    )
-    sdev = go.Scatter(
-        x=list(std_d),
-        y=list(std_q),
-        name = "Rolling Standard Deviation"
-    )
-
-
-    data = [naive, ave, sdev]
-
-    layout = go.Layout(
-        title="Stationary Test"
-    )
-
-    fig = go.Figure(data=data, layout=layout)
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-
-    return graph
-
 
 
 def training_records(request):
@@ -360,7 +258,7 @@ def training_details(request, id):
     training = Training.objects.get(id=id) # get training record
 
     context = {
-        'title': data,
+        'title': str(data),
         'data': data,
         'training':training,
     }
@@ -406,9 +304,10 @@ def gender_count_between_breeds():
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+
     return graph
 
-def skill_count_between_breeds():
+def skill_count_between_breeds(id):
     k9_set = K9.objects.exclude(capability="None")
 
     breed = []
@@ -458,9 +357,41 @@ def skill_count_between_breeds():
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+    k9 = K9.objects.get(id = id)
+    k9_set = K9.filter.get(breed = k9.breed)
+
+    sar = 0
+    ndd = 0
+    edd = 0
+
+    skill_count = []
+
+    for dog in k9_set:
+        if dog.capability == "SAR":
+            sar += 1
+        elif dog.capability == "NDD":
+            ndd += 1
+        else:
+            edd += 1
+
+    skill_count.append(sar)
+    skill_count.append(ndd)
+    skill_count.append(edd)
+
+    sar_score = 0
+    ndd_score = 0
+    edd_score = 0
+
+    if max(skill_count) == sar:
+        sar_score = 1
+    elif max(skill_count) == ndd:
+        ndd_score = 1
+    else:
+        edd_score = 1
+
     return graph
 
-def skill_percentage_between_sexes():
+def skill_percentage_between_sexes(id):
     k9_set = K9.objects.exclude(capability="None")
     m_sar_count = []
     m_ndd_count = []
@@ -540,6 +471,37 @@ def skill_percentage_between_sexes():
     }
     )
 
+    k9 = K9.objects.get(id=id)
+    k9_gender = k9.sex
+
+    skill_count = []
+
+    if k9_gender == "Male":
+        skill_count.append(m_sar_count.count())
+        skill_count.append(m_ndd_count.count())
+        skill_count.append(m_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+    else:
+        skill_count.append(f_sar_count.count())
+        skill_count.append(f_ndd_count.count())
+        skill_count.append(f_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(skill_count) == SAR:
+        SAR_score = 1
+    elif max(skill_count) == NDD:
+        NDD_score = 1
+    else:
+        EDD_score = 1
+
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
     return graph
@@ -566,6 +528,17 @@ def skill_count_ratio():
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(values) == SAR.count():
+        SAR_score = 1
+    elif max(values) == NDD.count():
+        NDD_score = 1
+    else:
+        EDD_score = 1
 
     return graph
 
@@ -776,11 +749,7 @@ def generate_family_tree(id):
 
     return graph
 
-def skills_from_father_side(id):
 
-    return None
-def skills_from_mother_side(id):
-    return None
 def skills_from_gender(id):
     k9_family = K9_Genealogy.objects.filter(zero=id)
 
@@ -879,6 +848,38 @@ def skills_from_gender(id):
 
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+    k9 = K9.objects.get(id= id)
+    k9_gender = k9.sex
+
+    skill_count = []
+
+
+    if k9_gender == "Male":
+        skill_count.append(m_sar_count.count())
+        skill_count.append(m_ndd_count.count())
+        skill_count.append(m_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+    else:
+        skill_count.append(f_sar_count.count())
+        skill_count.append(f_ndd_count.count())
+        skill_count.append(f_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(skill_count) == SAR:
+        SAR_score = 1
+    elif max(skill_count) == NDD:
+        NDD_score = 1
+    else:
+        EDD_score = 1
+
     return graph
 
 
@@ -919,6 +920,17 @@ def skill_in_general(id):
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(values) == SAR.count():
+        SAR_score = 1
+    elif max(values) == NDD.count():
+        NDD_score = 1
+    else:
+        EDD_score = 1
 
     return graph
 
