@@ -24,7 +24,7 @@
         {% for data in data %}
         <tr>
             <td>
-                <a href="{% url 'training:training_details' data.training_id %}">{{data.name}}</a>
+                <a href="{% url 'training:training_details' data.id %}">{{data.name}}</a>
             </td>
             <td>{{data.breed}}</td>
             <td>{{data.sex}}</td>
