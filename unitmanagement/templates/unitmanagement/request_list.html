@@ -1,7 +1,9 @@
 {% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
-
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+</div>
 <table id="tabledata1" class="ui seven column celled table">
         <thead>
             <tr>
@@ -40,6 +42,18 @@
                             <a href="{% url 'unitmanagement:change_equipment' Data.id %}" class = "tiny ui blue basic button">Select</a>
                          </td>
                     </tr>
+                {%else%}
+                <tr class = "negative">
+                    <td>{{Data.date}}</td>
+                    <td>{{Data.handler}}</td>
+                    <td>{{Data.equipment}}</td>
+                    <td>{{Data.concern}}</td>
+                    <td>{{Data.remarks}}</td>
+                    <td><center><i class="icon close"></i> {{Data.request_status}}</center></td>
+                        <td style="text-align:center;">
+                        <a href="{% url 'unitmanagement:change_equipment' Data.id %}" class = "tiny ui blue basic button">Select</a>
+                        </td>
+                </tr>
                 {% endif %}
             {% endfor %}
         </tbody>

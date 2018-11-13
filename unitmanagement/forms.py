@@ -98,6 +98,8 @@ class RequestForm(forms.ModelForm):
     )
     concern = forms.CharField(max_length=10, label='concern', widget=forms.Select(choices=CONCERN))
     equipment = forms.ModelChoiceField(queryset=Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
+    remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
+    
     class Meta:
         model = Requests
         fields = ('handler', 'equipment', 'remarks', 'concern')

@@ -6,102 +6,88 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
+from planningandacquiring.models import K9_New_Owner, K9_Adopted
+from training.models import Training
 from .forms import TestForm, add_handler_form
+from planningandacquiring.forms import add_donator_form, AdoptionForms
+from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
 from collections import OrderedDict
-
-
-#statistical imports
-from math import *
-'''from sklearn.metrics import mean_squared_error'''
-import pandas as pd
-'''
-
-import numpy as np
-import matplotlib.pylab as plt
-from matplotlib.pylab import rcParams
-from datetime import datetime, date
-from dateutil.parser import parse
 
 #graphing imports
 import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout'''
+import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
-from faker import Faker
-'''from statsmodels.tsa.ar_model import AR
-from statsmodels.tsa.arima_model import ARMA
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.statespace.varmax import VARMAX
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random, randint
-from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm'''
-
-
-# Create your views here.
 
 def index(request):
     return render (request, 'training/index.html')
 
-def timeseries_generator():
-    fake = Faker()
-    for x in range(100):
-        number = randint(1, 60)
-        date = fake.date_between(start_date='-12y', end_date='-2y')
 
-        date_quantity = K9_Quantity(quantity = number, date_bought = date)
-        date_quantity.save()
-
-    return None
 
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-
-
+    data_adoption = K9.objects.filter(training_status="For-Adoption")
+    
     context = {
+        'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
+        'data_adoption': data_adoption,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
+#TODO Should be radio buttons
+#TODO Restrict Viable dogs to be trained for those who are 6 months old
+#TODO Add additional age for months
+#TODO Call methods that returns graphs and skill scores then compare
 def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
+    form_skill = ClassifySkillForm(request.POST)
+    title = data.name
+    style = ""
 
     if request.method == 'POST':
-        print(request.POST.get('select_classify'))
-        data.capability = request.POST.get('select_classify')
-        data.training_status = "Classified"
-        data.save()
-        style = "ui green message" 
-        messages.success(request, 'K9 has been successfully Classified!')
+        if form_skill.is_valid():
+            data.capability = form_skill.cleaned_data['skill']
+            data.training_status = "Classified"
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'K9 has been successfully Classified!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Please select skill')
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
     except K9_Parent.DoesNotExist:
         context = {
             'data': data,
+            'form': form_skill,
+            'title': title,
+            'style': style
         }
     else:
         parent_exist = 1
         context = {
             'data': data,
             'parent': parent,
-            'parent_exist': parent_exist
+            'parent_exist': parent_exist,
+            'form': form_skill,
+            'title': title,
+            'style': style
         }
 
     return render (request, 'training/classify_k9_select.html', context)
+
 
 def assign_k9_select(request, id):
     form = add_handler_form(request.POST)
@@ -130,83 +116,200 @@ def assign_k9_select(request, id):
     }
     return render (request, 'training/assign_k9_select.html', context)
 
-#Use in forecasting to test if original data is stationary
-def test_stationarity(timeseries, index):
-    # Determing rolling statistics
-    # Set at which index will test data start
-
-    rolmean = timeseries.rolling(index).mean()
-    rolstd = timeseries.rolling(index).std()
-
-    idx = pd.IndexSlice
-
-    # Perform Dickey-Fuller test:
-    print('Results of Dickey-Fuller Test:')
-    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
-    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
-    for key, value in dftest[4].items():
-        dfoutput['Critical Value (%s)' % key] = value
-    print(dfoutput)
-
-    #Check Root Mean Squared Error, the lower the better
-    #rms = sqrt(mean_squared_error())
-    #print(rms)
-
-    ts_d = []
-    ts_q = []
-
-    for index, row in timeseries.iterrows():
-
-        ts_q.append(row["Quantity"])
-        ts_d.append(index)
-
-    mean_d = []
-    mean_q = []
-
-    for index, row in rolmean.iterrows():
-        mean_q.append(row["Quantity"])
-        mean_d.append(index)
-
-    std_d = []
-    std_q = []
-
-    for index, row in rolstd.iterrows():
-        std_q.append(row["Quantity"])
-        std_d.append(index)
-
-
-    naive = go.Scatter(
-        x=list(ts_d),
-        y=list(ts_q),
-        name = "Original"
-    )
-    ave = go.Scatter(
-        x=list(mean_d),
-        y=list(mean_q),
-        name = "Rolling Mean"
-    )
-    sdev = go.Scatter(
-        x=list(std_d),
-        y=list(std_q),
-        name = "Rolling Standard Deviation"
-    )
-
-
-    data = [naive, ave, sdev]
-
-    layout = go.Layout(
-        title="Stationary Test"
-    )
-
-    fig = go.Figure(data=data, layout=layout)
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-
-    return graph
-
 
 def training_records(request):
-    return render(request, 'training/training_records.html')
+    data = K9.objects.all()
+    context = {
+        'title': "Training Records",
+        'data': data,
+    }
+    return render(request, 'training/training_records.html', context)
 
+def training_update_form(request, id):
+    data = K9.objects.get(id=id) # get k9
+    training = Training.objects.get(k9=data) # get training record
+    form = TrainingUpdateForm(request.POST or None, instance = training)
+
+    if request.method == 'POST': 
+        #save training status
+        if training.stage1_1 == True:
+            training.stage1_1 = training.stage1_1
+        else:
+            training.stage1_1 = bool(request.POST.get('stage1_1'))
+        if training.stage1_2 == True:
+            training.stage1_2 = training.stage1_2
+        else:
+            training.stage1_2 = bool(request.POST.get('stage1_2'))
+        if training.stage1_3 == True:
+            training.stage1_3 = training.stage1_3
+        else:
+            training.stage1_3 = bool(request.POST.get('stage1_3'))
+        if training.stage2_1 == True:
+            training.stage2_1 = training.stage2_1
+        else:
+            training.stage2_1 = bool(request.POST.get('stage2_1'))
+        if training.stage2_2 == True:
+            training.stage2_2 = training.stage2_2
+        else:
+            training.stage2_2 = bool(request.POST.get('stage2_2'))
+        if training.stage2_3 == True:
+            training.stage2_3 = training.stage2_3
+        else:
+            training.stage2_3 = bool(request.POST.get('stage2_3'))
+        if training.stage3_1 == True:
+            training.stage3_1 = training.stage3_1
+        else:
+            training.stage3_1 = bool(request.POST.get('stage3_1'))
+        if training.stage3_2 == True:
+            training.stage3_2 = training.stage3_2
+        else:
+            training.stage3_2 = bool(request.POST.get('stage3_2'))
+        if training.stage3_3 == True:
+            training.stage3_3 = training.stage3_3
+        else:
+            training.stage3_3 = bool(request.POST.get('stage3_3'))
+          
+        training.remarks = request.POST.get('remarks')
+        training.grade = request.POST.get('grade')
+        training.save()
+        data.save()
+        
+        stage = "Stage 0"
+     
+        if training.stage3_3 == True:
+            stage = "Finished Training"
+        elif training.stage3_2 == True:
+            stage = "Stage 3.2"
+        elif training.stage3_1 == True:
+            stage= "Stage 3.1"
+        elif training.stage2_3 == True:
+            stage = "Stage 2.3"
+        elif training.stage2_2 == True:
+            stage = "Stage 2.2"
+        elif training.stage2_1 == True:
+            stage = "Stage 2.1"
+        elif training.stage1_3 == True:
+            stage = "Stage 1.3"
+        elif training.stage1_2 == True:
+            stage = "Stage 1.2"
+        elif training.stage1_1 == True:
+            stage = "Stage 1.1"
+
+        training.stage = stage
+        training.save()
+
+        if training.stage == "Finished Training":
+            data.training_status = "Trained"
+        else:
+            data.training_status = "On-Training"
+        
+        data.training_level = stage
+        data.save()
+        messages.success(request, 'Training Progress has been successfully Updated!')
+
+        return redirect('training:training_update_form', id = id)
+    context = {
+        'title': data.name,
+        'data': data,
+        'form': form,
+    }
+    
+    return render(request, 'training/training_update_form.html', context)
+
+#Trained Dog - Assign serial number Form
+def serial_number_form(request, id):
+    form = SerialNumberForm(request.POST or None)
+    style = "ui teal message"
+    data = K9.objects.get(id=id) # get k9
+	
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            data.serial_number = request.POST.get('serial_number')
+            data.microchip = request.POST.get('microchip')
+            data.training_status = request.POST.get('dog_type')
+            data.save()
+          
+            style = "ui green message"
+            messages.success(request, 'K9 has been finalized!')
+          
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'form': form,
+        'title': 'Trained K9 Finalization',
+        'texthelp': 'Input Final Details Here',
+        'actiontype': 'Submit',
+        'style' : style,
+    }
+    return render (request, 'training/serial_number_form.html', context)
+
+def fail_dog(request, id):
+    data = K9.objects.get(id=id) # get k9
+    data.training_status = "For-Adoption"
+    data.save()
+    training = Training.objects.get(k9=data)
+    training.grade = '0'
+    training.save()
+    return redirect('training:classify_k9_list')
+
+def training_details(request, id):
+    data = K9.objects.get(id=id) # get k9
+    training = Training.objects.get(k9=data) # get training record
+
+    context = {
+        'title': str(data),
+        'data': data,
+        'training':training,
+    }
+    return render (request, 'training/training_details.html', context)
+
+def adoption_form(request, id):
+    data = K9.objects.get(id=id) # get k9
+    form = AdoptionForms(request.POST or None)
+    form.fields['email'].initial = ''
+    form.fields['contact_no'].initial = ''
+
+    if request.method == "POST":
+        if form.is_valid():
+            print('valid')
+            form.save()
+            no_id = form.save()
+            request.session['no_id'] = no_id.id 
+        return redirect('training:confirm_adoption', id = data.id)
+
+    context = {
+        'title': data,
+        'form': form,
+    }
+    return render (request, 'training/adoption_form.html', context)
+
+def confirm_adoption(request, id):
+    data = K9.objects.get(id=id) # get k9
+    no = request.session['no_id']
+    new_owner = K9_New_Owner.objects.get(id=no)
+    print(new_owner)
+    if request.method == "POST":
+        if 'ok' in request.POST:
+            print('ok')
+            K9_Adopted.objects.create(k9=data,owner=new_owner)   
+            data.training_status = 'Adopted'
+            data.save()        
+            return redirect('training:adoption_confirmed')
+        else:
+            print('not ok')
+            new_owner.delete()
+            return redirect('training:adoption_form', id = data.id)
+    context = {
+        'title': data,
+        'data': data,
+    }
+    return render (request, 'training/confirm_adoption.html', context)
+
+def adoption_confirmed(request):
+    return render (request, 'training/adoption_confirmed.html')
 
 def gender_count_between_breeds():
     k9_set = K9.objects.all()
@@ -248,9 +351,10 @@ def gender_count_between_breeds():
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+
     return graph
 
-def skill_count_between_breeds():
+def skill_count_between_breeds(id):
     k9_set = K9.objects.exclude(capability="None")
 
     breed = []
@@ -300,9 +404,41 @@ def skill_count_between_breeds():
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+    k9 = K9.objects.get(id = id)
+    k9_set = K9.filter.get(breed = k9.breed)
+
+    sar = 0
+    ndd = 0
+    edd = 0
+
+    skill_count = []
+
+    for dog in k9_set:
+        if dog.capability == "SAR":
+            sar += 1
+        elif dog.capability == "NDD":
+            ndd += 1
+        else:
+            edd += 1
+
+    skill_count.append(sar)
+    skill_count.append(ndd)
+    skill_count.append(edd)
+
+    sar_score = 0
+    ndd_score = 0
+    edd_score = 0
+
+    if max(skill_count) == sar:
+        sar_score = 1
+    elif max(skill_count) == ndd:
+        ndd_score = 1
+    else:
+        edd_score = 1
+
     return graph
 
-def skill_percentage_between_sexes():
+def skill_percentage_between_sexes(id):
     k9_set = K9.objects.exclude(capability="None")
     m_sar_count = []
     m_ndd_count = []
@@ -382,6 +518,37 @@ def skill_percentage_between_sexes():
     }
     )
 
+    k9 = K9.objects.get(id=id)
+    k9_gender = k9.sex
+
+    skill_count = []
+
+    if k9_gender == "Male":
+        skill_count.append(m_sar_count.count())
+        skill_count.append(m_ndd_count.count())
+        skill_count.append(m_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+    else:
+        skill_count.append(f_sar_count.count())
+        skill_count.append(f_ndd_count.count())
+        skill_count.append(f_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(skill_count) == SAR:
+        SAR_score = 1
+    elif max(skill_count) == NDD:
+        NDD_score = 1
+    else:
+        EDD_score = 1
+
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
     return graph
@@ -408,6 +575,17 @@ def skill_count_ratio():
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(values) == SAR.count():
+        SAR_score = 1
+    elif max(values) == NDD.count():
+        NDD_score = 1
+    else:
+        EDD_score = 1
 
     return graph
 
@@ -618,11 +796,7 @@ def generate_family_tree(id):
 
     return graph
 
-def skills_from_father_side(id):
 
-    return None
-def skills_from_mother_side(id):
-    return None
 def skills_from_gender(id):
     k9_family = K9_Genealogy.objects.filter(zero=id)
 
@@ -721,6 +895,38 @@ def skills_from_gender(id):
 
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
+    k9 = K9.objects.get(id= id)
+    k9_gender = k9.sex
+
+    skill_count = []
+
+
+    if k9_gender == "Male":
+        skill_count.append(m_sar_count.count())
+        skill_count.append(m_ndd_count.count())
+        skill_count.append(m_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+    else:
+        skill_count.append(f_sar_count.count())
+        skill_count.append(f_ndd_count.count())
+        skill_count.append(f_edd_count.count())
+        SAR = skill_count[0]
+        NDD = skill_count[1]
+        EDD = skill_count[2]
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(skill_count) == SAR:
+        SAR_score = 1
+    elif max(skill_count) == NDD:
+        NDD_score = 1
+    else:
+        EDD_score = 1
+
     return graph
 
 
@@ -761,6 +967,17 @@ def skill_in_general(id):
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    if max(values) == SAR.count():
+        SAR_score = 1
+    elif max(values) == NDD.count():
+        NDD_score = 1
+    else:
+        EDD_score = 1
 
     return graph
 

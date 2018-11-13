@@ -1,0 +1,210 @@
+{% extends "profiles/sidebar_training.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<table class="ui four column celled table">
+    <thead>
+        <tr>
+            <th>Serial Number</th>
+            <td>{{data.serial_number}}</td>
+            <th>Microchip</th>
+            <td>{{data.microchip}}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{data.name}}</td>
+            <th>Breed</th>
+            <td>{{data.breed}}</td>
+        </tr>
+        <tr>
+            <th>Sex</th>
+            <td>{{data.sex}}</td>
+            <th>Color</th>
+            <td>{{data.color}}</td>
+        </tr>
+        <tr>
+            <th>Birth Date</th>
+            <td>{{data.birth_date}}</td>
+            <th>Age</th>
+            <td>{{data.age}}</td>
+        </tr>
+        <tr>
+            <th>Source</th>
+            <td>{{data.source}}</td>
+            <th>Year Retired</th>
+            {% if data.year_retired == None %}
+            <td>Not Applicable</td>
+            {%else%}
+            <td>{{data.year_retired}}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>Assignment</th>
+            <td>{{data.assignment}}</td>
+            <th>Capability</th>
+            <td>{{data.capability}}</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>{{data.training_status}}</td>
+            <th>Training Level</th>
+            <td>{{data.training_level}}</td>
+        </tr>
+    </thead>
+</table>
+
+<div class="ui info message">
+    <i class="close icon"></i>
+    <div class="header">
+        Clarrifications
+    </div>
+    <ul class="list">
+        <li>A pending status indicates that the K9 has yet to complete the stage.</li>
+    </ul>
+</div>
+<div class="ui segment">
+    <div class="ui raised segment ">
+        <div class="paragraph">
+            <div class="medium line">
+               <h4>Grade:
+                    {% if training.grade == '0' %}
+                    <label class="ui big red circular label">{{training.grade}}</label>
+                    {% elif training.grade == 'No Grade Yet' %}
+                    <label class="ui big orange circular label">{{training.grade}}</label>
+                    {%else%}
+                    <label class="ui big green circular label">{{training.grade}}</label>
+                    {% endif %}
+               </h4>
+            </div>
+            <div class="short line">
+                
+            </div>
+          </div>
+    </div>
+    <table class="ui three column celled table">
+        <thead>
+            <tr>
+                <th>Stage 1.1</th>
+                <th>Description of Stage</th>
+                {% if training.stage1_1 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 1.2</th>
+                <th>Description of Stage</th>
+                {% if training.stage1_2 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 1.3</th>
+                <th>Description of Stage</th>
+                {% if training.stage1_3 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 2.1</th>
+                <th>Description of Stage</th>
+                {% if training.stage2_1 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 2.2</th>
+                <th>Description of Stage</th>
+                {% if training.stage2_2 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 2.3</th>
+                <th>Description of Stage</th>
+                {% if training.stage1_3 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 3.1</th>
+                <th>Description of Stage</th>
+                {% if training.stage3_1 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 3.2</th>
+                <th>Description of Stage</th>
+                {% if training.stage3_2 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Stage 3.3</th>
+                <th>Description of Stage</th>
+                {% if training.stage3_3 == True %}
+                <td>Passed</td>
+                {%elif training.grade == '0'%}
+                <td>Failed</td>
+                {%else%}
+                <td>Pending</td>
+                {% endif %}
+            </tr>
+        </thead>
+    </table>
+    <label class="ui large teal circular label">Remarks</label>
+    <div class="ui basic segment" style="padding:5px;margin-top: 0px;">
+        <p style="padding:2px;">{{training.remarks}}</p>
+    </div>
+</div>
+
+<div class="ui basic segment">
+    <a href="{% url 'training:training_records'%}" class="ui blue button">Back</a>
+</div>
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+    } );
+    
+</script>
+{% endblock %}

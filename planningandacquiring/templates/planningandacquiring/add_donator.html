@@ -49,22 +49,29 @@
         </div>
     </div>
 
-    <div class="fields">
-        <div class="eight wide field">
+    <div class="four fields">
+        <div class="field">
+            <label>Birthday</label>
+            {{form.birth_date}}
+        </div>
+        <div class="field">
+            <label>Sex</label>
+            {{form.sex}}
+        </div>
+        <div class="field">
             <label>Email</label>
             {{form.email}}
         </div>
-        <div class="eight wide field">
+        <div class="field">
             <label>Contact Number</label>
             {{form.contact_no}}
         </div>
     </div>
 
-        <div class="field">
-            <label>Address</label>
-            {{form.address}}
-        </div>
-
+    <div class="field">
+        <label>Address</label>
+        {{form.address}}
+    </div>
 
     <div class="ui inverted right aligned segment" style="padding: 0px;">
         <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Next Step</button>
