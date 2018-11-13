@@ -158,16 +158,12 @@ class Location(models.Model):
         ('Zamboanga', 'Zamboanga'),
     )
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
-<<<<<<< HEAD
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
-=======
-    zip_code = models.IntegerField('zip_code')
-    address = models.CharField('address', max_length=500, default='None')
+
 
 
 class Area(models.Model):
     name = models.CharField('name', max_length=100, default='')
->>>>>>> 5c7ee24edce3e0a440abb53c2307dc112f109dae
 
     def __str__(self):
         return str(self.city)
