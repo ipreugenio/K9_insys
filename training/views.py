@@ -6,8 +6,10 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
+from planningandacquiring.models import K9_New_Owner, K9_Adopted
 from training.models import Training
 from .forms import TestForm, add_handler_form
+from planningandacquiring.forms import add_donator_form, AdoptionForms
 from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
 from collections import OrderedDict
 
@@ -59,9 +61,7 @@ def classify_k9_list(request):
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-    data_breeeding = K9.objects.filter(training_status="For-Breeding")
     data_adoption = K9.objects.filter(training_status="For-Adoption")
-    data_deployment = K9.objects.filter(training_status="For-Deployment")
     
     context = {
         'title': 'K9 Classification',
@@ -69,9 +69,7 @@ def classify_k9_list(request):
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
-        'data_breeeding': data_breeeding,
         'data_adoption': data_adoption,
-        'data_deployment': data_deployment,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -369,6 +367,51 @@ def training_details(request, id):
         'training':training,
     }
     return render (request, 'training/training_details.html', context)
+
+def adoption_form(request, id):
+    data = K9.objects.get(id=id) # get k9
+    form = AdoptionForms(request.POST or None)
+    form.fields['email'].initial = ''
+    form.fields['contact_no'].initial = ''
+
+    if request.method == "POST":
+        if form.is_valid():
+            print('valid')
+            form.save()
+            no_id = form.save()
+            request.session['no_id'] = no_id.id 
+        return redirect('training:confirm_adoption', id = data.id)
+
+    context = {
+        'title': data,
+        'form': form,
+    }
+    return render (request, 'training/adoption_form.html', context)
+
+def confirm_adoption(request, id):
+    data = K9.objects.get(id=id) # get k9
+    no = request.session['no_id']
+    new_owner = K9_New_Owner.objects.get(id=no)
+    print(new_owner)
+    if request.method == "POST":
+        if 'ok' in request.POST:
+            print('ok')
+            K9_Adopted.objects.create(k9=data,owner=new_owner)   
+            data.training_status = 'Adopted'
+            data.save()        
+            return redirect('training:adoption_confirmed')
+        else:
+            print('not ok')
+            new_owner.delete()
+            return redirect('training:adoption_form', id = data.id)
+    context = {
+        'title': data,
+        'data': data,
+    }
+    return render (request, 'training/confirm_adoption.html', context)
+
+def adoption_confirmed(request):
+    return render (request, 'training/adoption_confirmed.html')
 
 def gender_count_between_breeds():
     k9_set = K9.objects.all()

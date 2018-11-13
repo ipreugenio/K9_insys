@@ -1,21 +1,15 @@
-{% extends "profiles/sidebar_pa.html" %} {% block content %}
+{% extends "profiles/sidebar_training.html" %} {% block content %}
 
 <h2 class="ui header">
- {{Title}}
-  <div class="sub header">Input K9 donation receiving data here</div>
+ {{title}}
+  <div class="sub header">Input K9 Adoption data here</div>
 </h2>
 
 <div class="ui ordered steps">
-  <div class="completed step">
-    <div class="content">
-      <div class="title">K9 Form</div>
-      <div class="description">Provide your received K9 Data</div>
-    </div>
-  </div>
   <div class="active step">
     <div class="content">
-      <div class="title">Previous Ownership Form</div>
-      <div class="description">Provide previous owner data</div>
+      <div class="title">Ownership Form</div>
+      <div class="description">Provide owner adoption data</div>
     </div>
   </div>
   <div class="disabled step">
@@ -32,7 +26,7 @@
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_donator_form'%}" method="post">
+<form class = "ui inverted form" action="" method="post">
     {% csrf_token %}
     <div class="fields">
         <div class="six wide field">

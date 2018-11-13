@@ -53,9 +53,6 @@ class K9(models.Model):
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
-    
-    def __str__(self):
-        return str(self.name) + " : " + str(self.serial_number)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -70,20 +67,28 @@ class K9(models.Model):
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         self.training_id = self.id
-        '''
-        Serial Numbers and Microchips are given after training
-        lead_zero = str(self.id).zfill(5)
-        serial_number = '#%s' % (lead_zero)
-        self.serial_number = str(serial_number)
-        '''
+        # Serial Numbers and Microchips are given after training
+        # lead_zero = str(self.id).zfill(5)
+        # serial_number = '#%s' % (lead_zero)
+        # self.serial_number = str(serial_number)
         super(K9, self).save(*args, **kwargs)
+    
+       
+    def __str__(self):
+        return str(self.name) + " : " + str(self.serial_number)
 
 
 class K9_Past_Owner(models.Model):
+    SEX = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
     first_name = models.CharField('first_name', max_length=200)
     middle_name = models.CharField('middle_name', max_length=200)
     last_name = models.CharField('last_name', max_length=200)
     address = models.CharField('address', max_length=200)
+    sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
+    birth_date = models.DateField('birth_date')
     email = models.EmailField('email', max_length=200, default = "not specified")
     contact_no = models.CharField('contact_no', max_length=200, default = "not specified")
 
@@ -91,10 +96,16 @@ class K9_Past_Owner(models.Model):
         return str(self.first_name) +' '+ str(self.middle_name) + ' ' + str(self.last_name)
 
 class K9_New_Owner(models.Model):
+    SEX = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
     first_name = models.CharField('first_name', max_length=200)
     middle_name = models.CharField('middle_name', max_length=200)
     last_name = models.CharField('last_name', max_length=200)
     address = models.CharField('address', max_length=200)
+    sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
+    birth_date = models.DateField('birth_date')
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 
@@ -127,9 +138,7 @@ class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     date_bought = models.DateField('date_bought', blank=True, null=True)
 
-
 '''
-
 Demand = k9s deployed and requested
 all_current_non deployed
 k9s near retirement
