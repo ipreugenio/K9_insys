@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 
+class Area(models.Model):
+    name = models.CharField('name', max_length=100, default='')
+
+    def __str__(self):
+        return self.name
+
 class Location(models.Model):
 
     CITY = (
@@ -152,14 +158,10 @@ class Location(models.Model):
         ('Zamboanga', 'Zamboanga'),
     )
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
-    zip_code = models.IntegerField('zip_code')
-    address = models.CharField('address', max_length=500, default='None')
-
-class Area(models.Model):
-    name = models.CharField('name', max_length=100, default='')
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return str(self.city)
 
 class Team(models.Model):
     area = models.ForeignKey('area', on_delete=models.CASCADE)
@@ -175,6 +177,8 @@ class Team_Assignment(models.Model):
     EDD = models.IntegerField('EDD', default=0)
     NDD = models.IntegerField('NDD', default=0)
     SAR = models.IntegerField('SAR', default=0)
+    date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
+    total_dogs = models.IntegerField('total_dogs', default=0)
 
     def __str__(self):
         area = Area.objects.get(id=self.area)
@@ -182,3 +186,19 @@ class Team_Assignment(models.Model):
         area_name = area.name
         team_name = team.name
         return str(area_name + " : " + team_name)
+
+class Current_Deployed(models.Model):
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    handlers = models.IntegerField('handlers', default=0, null=True, blank=True)
+    EDD = models.IntegerField('EDD', default=0, null=True, blank=True)
+    NDD = models.IntegerField('NDD', default=0, null=True, blank=True)
+    SAR = models.IntegerField('SAR', default=0, null=True, blank=True)
+
+    def __str__(self):
+        area = Area.objects.get(id=self.area)
+        team = Team.objects.get(id=self.team)
+        area_name = area.name
+        team_name = team.name
+        return str(area_name + " : " + team_name)
+

@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from .models import Area, Team, Team_Assignment
+from .models import Area, Team, Team_Assignment, Current_Deployed
+from training.models import K9_Handler
+from planningandacquiring.models import K9
 
 from inventory.models import Medicine
-from deployment.forms import LocationForm, assign_team_form, AreaForm, TeamForm
+from deployment.forms import LocationForm, assign_team_form, AreaForm, TeamForm, assign_current_form
 # Create your views here.
 
 def index(request):
@@ -106,7 +108,18 @@ def assign_team(request):
     style = ""
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            area1 = request.POST.get('area')
+            team1 = request.POST.get('team')
+            handlers1 = request.POST.get('handlers')
+            EDD1 = request.POST.get('EDD')
+            NDD1 = request.POST.get('NDD')
+            SAR1 = request.POST.get('SAR')
+            total_dogs1 = (int(EDD1) + int(NDD1) + int(SAR1))
+
+            Team_Assignment.objects.create(area_id=area1, team_id=team1, handlers=handlers1, EDD=EDD1, NDD=NDD1, SAR=SAR1, total_dogs=total_dogs1)
+
+            Current_Deployed.objects.create(area_id=area1, team_id=team1,
+                                            handlers='0', NDD='0', EDD='0', SAR='0')
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
         else:
@@ -141,10 +154,27 @@ def area_list_view(request):
 
 def area_list_detail(request, id):
     team_assignment = Team_Assignment.objects.get(id = id)
+    current_deployed = Current_Deployed.objects.get(id = id)
+    team = K9_Handler.objects.all()
+
+    k9_pk = []
+    for k9 in team:
+        temp = k9.k9
+        k9_pk.append(temp.id)
+
+    k9s = K9.objects.filter(pk__in = k9_pk)
+    capabilities = []
+
+    for k9 in k9s:
+        capabilities.append(k9)
+
     context = {
         'Title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
-        'team_assignment' : team_assignment
+        'team_assignment' : team_assignment,
+        'current_deployed': current_deployed,
+        'team': team,
+        'capability': capabilities
+
     }
 
     return render(request, 'deployment/area_detail.html', context)
-

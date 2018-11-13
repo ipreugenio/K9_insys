@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import add_User_form, add_personal_form, add_education_form
 from .models import User, Personal_Info, Education
+from deployment.models import Location
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory

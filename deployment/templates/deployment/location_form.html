@@ -20,18 +20,13 @@
                                     {% csrf_token %}
                                     <div class="two fields">
                                         <div class="field">
+                                            <label>Area</label>
+                                            {{form.area}}
+                                        </div>
+                                        <div class="field">
                                             <label>City</label>
                                             {{form.city}}
                                         </div>
-                                        <div class="field">
-                                            <label>Zip Code</label>
-                                            {{form.zip_code}}
-                                        </div>
-                                    </div>
-    
-                                    <div class="field">
-                                        <label>Address</label>
-                                            {{form.address}}
                                     </div>
     
                                     <div class="ui inverted right aligned segment" style="padding: 0px;">

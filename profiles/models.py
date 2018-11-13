@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date as d
+from deployment.models import Location
 
 # Create your models here.
 class User(models.Model):
@@ -91,7 +92,7 @@ class Personal_Info(models.Model):
     tel_number = models.CharField('tel_number', max_length=200)
     street = models.CharField('street', max_length=200)
     barangay = models.CharField('barangay', max_length=200)
-    city = models.CharField('city', max_length=200)
+    city = models.ForeignKey(Location, on_delete=models.CASCADE)
     province = models.CharField('province', max_length=200)
     mother_name = models.CharField('mother_name', max_length=200)
     mother_birthdate = models.DateField('mother_birthdate', max_length=200)
@@ -99,6 +100,7 @@ class Personal_Info(models.Model):
     father_birthdate = models.DateField('father_birthdate', max_length=200)
     tin = models.IntegerField('tin')
     philhealth = models.IntegerField('philhealth')
+
 
 class Education(models.Model):
     UserID = models.ForeignKey(User, on_delete=models.CASCADE)
