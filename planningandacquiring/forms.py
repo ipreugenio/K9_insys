@@ -72,7 +72,7 @@ class add_K9_parents_form(forms.Form):
     class Meta:
         model = K9_Parent
         fields = ('mother', 'father')
-    
+
 
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)

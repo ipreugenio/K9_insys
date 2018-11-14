@@ -34,7 +34,7 @@ def classify_k9_list(request):
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
     data_adoption = K9.objects.filter(training_status="For-Adoption")
-    
+
     context = {
         'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
@@ -101,6 +101,7 @@ def assign_k9_select(request, id):
             handler = User.objects.get(id=handler_id)
             K9_Handler.objects.create(k9 = k9, handler = handler)
             k9.training_status = "On-Training"
+            k9.handler = handler
             k9.save()
             messages.success(request, 'K9 has been assigned to a handler!')
         else:
@@ -130,7 +131,7 @@ def training_update_form(request, id):
     training = Training.objects.get(k9=data) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
 
-    if request.method == 'POST': 
+    if request.method == 'POST':
         #save training status
         if training.stage1_1 == True:
             training.stage1_1 = training.stage1_1
@@ -168,14 +169,14 @@ def training_update_form(request, id):
             training.stage3_3 = training.stage3_3
         else:
             training.stage3_3 = bool(request.POST.get('stage3_3'))
-          
+
         training.remarks = request.POST.get('remarks')
         training.grade = request.POST.get('grade')
         training.save()
         data.save()
-        
+
         stage = "Stage 0"
-     
+
         if training.stage3_3 == True:
             stage = "Finished Training"
         elif training.stage3_2 == True:
@@ -202,7 +203,7 @@ def training_update_form(request, id):
             data.training_status = "Trained"
         else:
             data.training_status = "On-Training"
-        
+
         data.training_level = stage
         data.save()
         messages.success(request, 'Training Progress has been successfully Updated!')
@@ -213,7 +214,7 @@ def training_update_form(request, id):
         'data': data,
         'form': form,
     }
-    
+
     return render(request, 'training/training_update_form.html', context)
 
 #Trained Dog - Assign serial number Form
@@ -221,7 +222,7 @@ def serial_number_form(request, id):
     form = SerialNumberForm(request.POST or None)
     style = "ui teal message"
     data = K9.objects.get(id=id) # get k9
-	
+
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
@@ -229,10 +230,10 @@ def serial_number_form(request, id):
             data.microchip = request.POST.get('microchip')
             data.training_status = request.POST.get('dog_type')
             data.save()
-          
+
             style = "ui green message"
             messages.success(request, 'K9 has been finalized!')
-          
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -277,7 +278,7 @@ def adoption_form(request, id):
             print('valid')
             form.save()
             no_id = form.save()
-            request.session['no_id'] = no_id.id 
+            request.session['no_id'] = no_id.id
         return redirect('training:confirm_adoption', id = data.id)
 
     context = {
@@ -294,9 +295,9 @@ def confirm_adoption(request, id):
     if request.method == "POST":
         if 'ok' in request.POST:
             print('ok')
-            K9_Adopted.objects.create(k9=data,owner=new_owner)   
+            K9_Adopted.objects.create(k9=data,owner=new_owner)
             data.training_status = 'Adopted'
-            data.save()        
+            data.save()
             return redirect('training:adoption_confirmed')
         else:
             print('not ok')
@@ -1057,4 +1058,3 @@ def genealogy(request):
 
 
     return render(request, 'training/genealogy.html', context)
-

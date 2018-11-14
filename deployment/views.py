@@ -4,12 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from .models import Area, Team, Team_Assignment, Current_Deployed
 from training.models import K9_Handler
 from planningandacquiring.models import K9
-
+from profiles.models import Personal_Info, User
 from inventory.models import Medicine
-from deployment.forms import LocationForm, assign_team_form, AreaForm, TeamForm, assign_current_form
+
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm
 # Create your views here.
 
 def index(request):
@@ -18,24 +19,175 @@ def index(request):
     }
     return render (request, 'deployment/index.html', context)
 
-def deployed_dogs(request):
+def add_area(request):
+    form = AreaForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Area has been successfully Added!')
+            form = AreaForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
     context = {
-        'title': 'Deployed Dogs',
+      'title':'Add Area Form',
+      'texthelp': 'Input Name of Area Here',
+      'form': form,
+      'actiontype': 'Submit',
+      'style':style,
     }
-    return render (request, 'deployment/deployed_dogs.html', context)
+    return render (request, 'deployment/add_area.html', context)
 
-def requested_dogs(request):
+def add_location(request):
+    form = LocationForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Location has been successfully Added!')
+            form = LocationForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
     context = {
-        'title': 'Requested Dogs',
+      'title':'Add Location Form',
+      'texthelp': 'Input Location Details Here',
+      'form': form,
+      'actiontype': 'Submit',
+      'style':style,
     }
-    return render (request, 'deployment/requested_dogs.html', context)
+    return render (request, 'deployment/add_location.html', context)
 
-def deploy_number_dogs(request):
+def assign_team_location(request):
+    form = AssignTeamForm(request.POST or None)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Location has been successfully Added!')
+            form = AssignTeamForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
     context = {
-        'title': 'Deploy Number of Dogs',
+      'title':'Assign Team to Location',
+      'texthelp': 'Input Team and Location Details Here',
+      'form': form,
+      'actiontype': 'Submit',
+      'style':style,
     }
-    return render (request, 'deployment/deploy_number_dogs.html', context)
+    return render (request, 'deployment/assign_team_location.html', context)
 
+def edit_team(request, id):
+    data = Team_Assignment.objects.get(id=id)
+    form = EditTeamForm(request.POST or None, instance = data)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            data.team = request.POST.get('team')
+            data.EDD_demand = request.POST.get('EDD_demand')
+            data.NDD_demand = request.POST.get('NDD_demand')
+            data.SAR_demand = request.POST.get('SAR_demand')
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'Team Details has been successfully Updated !')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+    context = {
+      'title': data.team,
+      'texthelp': 'Edit Team Details Here',
+      'form': form,
+      'data': data,
+      'actiontype': 'Submit',
+      'style':style,
+    }
+    return render(request, 'deployment/edit_team.html', context)
+
+def assigned_location_list(request):
+    data = Team_Assignment.objects.all()
+    context = {
+        'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
+        'data' : data
+    }
+
+    return render(request, 'deployment/assigned_location_list.html', context)
+
+def team_location_details(request, id):
+    data = Team_Assignment.objects.get(id=id)
+    k9 = Team_Dog_Deployed.objects.filter(team_assignment=data)
+    style = ""
+    #filter personal_info where city != Team_Assignment.city
+    handlers = Personal_Info.objects.exclude(city=data.location.city)
+
+    handler_can_deploy=[] # append the id of the handlers
+    for h in handlers:
+        handler_can_deploy.append(h.id)
+    #print(handler_can_deploy)
+
+    #get instance of user using personal_info.id
+    #id of user is the fk.id of person_info
+    user = User.objects.filter(id__in=handler_can_deploy)
+    #print(user)
+
+    user_deploy=[] # append the user itself
+    for u in user:
+        user_deploy.append(u.id)
+
+    # print(user_deploy)
+    # #filter K9 where handler = person_info and k9 assignment = None
+    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
+    #print(can_deploy)
+
+    #count deployed dogs
+    edd_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='EDD').count()
+    ndd_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='NDD').count()
+    sar_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='SAR').count()
+
+    #save count
+    data.EDD_deployed = edd_count
+    data.NDD_deployed = ndd_count
+    data.SAR_deployed = sar_count
+    data.save()
+
+    #dogs deployed
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data)
+
+    if request.method == 'POST':
+        checks =  request.POST.getlist('checks') # get the id of all the dogs checked
+        #print(checks)
+
+        #get the k9 instance of checked dogs
+        checked_dogs = K9.objects.filter(id__in=checks)
+        #print(checked_dogs)
+
+        for checked_dogs in checked_dogs:
+            Team_Dog_Deployed.objects.create(team_assignment=data, k9=checked_dogs)
+            dog = K9.objects.get(id=checked_dogs.id)
+            dog.assignment = str(data)
+            dog.save()
+
+        style = "ui green message"
+        messages.success(request, 'Dogs has been successfully Deployed!')
+
+        return redirect('deployment:team_location_details', id = id)
+
+    context = {
+        'title' : data,
+        'data' : data,
+        'k9' : k9,
+        'can_deploy':can_deploy,
+        'style': style,
+        'dogs_deployed':dogs_deployed,
+    }
+
+    return render(request, 'deployment/team_location_details.html', context)
+
+'''
 def location_form(request):
     form = LocationForm(request.POST or None)
     style = ""
@@ -66,7 +218,7 @@ def area_form(request):
             form.save()
             style = "ui green message"
             messages.success(request, 'Area has been successfully Added!')
-            form = LocationForm()
+            form = AreaForm()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -88,14 +240,14 @@ def team_form(request):
             form.save()
             style = "ui green message"
             messages.success(request, 'Team has been successfully Added!')
-            form = LocationForm()
+            form = TeamForm()
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
     context = {
-        'title': 'Area Form',
-        'texthelp': 'Input Location data here',
+        'title': 'Team Form',
+        'texthelp': 'Input team data here',
         'form': form,
         'actiontype': 'Submit',
         'style':style,
@@ -118,17 +270,17 @@ def assign_team(request):
 
             Team_Assignment.objects.create(area_id=area1, team_id=team1, handlers=handlers1, EDD=EDD1, NDD=NDD1, SAR=SAR1, total_dogs=total_dogs1)
 
-            Current_Deployed.objects.create(area_id=area1, team_id=team1,
-                                            handlers='0', NDD='0', EDD='0', SAR='0')
+            Current_Deployed.objects.create(area_id=area1, team_id=team1, handlers='0', NDD='0', EDD='0', SAR='0')
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
     context = {
-        'title': 'Team Form',
-        'texthelp': 'Input team data here',
+        'title': 'Assign Team Form',
+        'texthelp': 'Input assignment data here',
         'form': form,
         'actiontype': 'Submit',
         'style':style,
@@ -156,7 +308,7 @@ def area_list_detail(request, id):
     team_assignment = Team_Assignment.objects.get(id = id)
     current_deployed = Current_Deployed.objects.get(id = id)
     team = K9_Handler.objects.all()
-
+    form = DeployDogForm(request.POST or None)
     k9_pk = []
     for k9 in team:
         temp = k9.k9
@@ -167,14 +319,21 @@ def area_list_detail(request, id):
 
     for k9 in k9s:
         capabilities.append(k9)
+    #get all Personal_Info
+    #pi = Personal_Info.objects.exclude(city=)
+
+    #get all k9, with handler city != to team_assignment city
+    #k9 = K9.objects.filter(handler)
+    #Personal_Info is where the handler city is referenced
 
     context = {
         'Title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
         'team_assignment' : team_assignment,
         'current_deployed': current_deployed,
         'team': team,
-        'capability': capabilities
-
+        'capability': capabilities,
+        'form': form
     }
 
     return render(request, 'deployment/area_detail.html', context)
+'''

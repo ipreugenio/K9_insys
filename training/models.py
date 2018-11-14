@@ -1,7 +1,7 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from deployment.models import Team
+from deployment.models import Location
 
 # Create your models here.
 
@@ -15,9 +15,8 @@ class K9_Genealogy(models.Model):
 
 class K9_Handler(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "handler", blank=True, null=True)
-<<<<<<< HEAD
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="k9", blank=True, null=True)
-    deployment_area = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="deployment_area", blank=True, null=True)
+    deployment_area = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="deployment_area", blank=True, null=True)
 
     def __str__(self):
         handler = User.objects.get(id=self.handler)
@@ -25,11 +24,10 @@ class K9_Handler(models.Model):
         handler_name = handler.name
         k9_name = k9.name
         return str(handler_name + " : " + k9_name)
-=======
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
+    training = models.CharField('training', max_length=50, default="None")
     stage = models.CharField('stage', max_length=200, default="Stage 0")
     stage1_1 = models.BooleanField(default=False)
     stage1_2 = models.BooleanField(default=False)
@@ -45,4 +43,3 @@ class Training(models.Model):
 
     def __str__(self):
         return str(self.k9) +' - ' + str(self.stage)
->>>>>>> 5c7ee24edce3e0a440abb53c2307dc112f109dae

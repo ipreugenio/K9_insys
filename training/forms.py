@@ -15,8 +15,7 @@ class ClassifySkillForm(forms.Form):
         ('SAR', 'SAR'),
     )
 
-    skill = forms.ChoiceField(choices=CHOICES,
-                               widget=forms.RadioSelect)
+    skill = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
 
 class TestForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.all())
@@ -42,7 +41,7 @@ class TrainingUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Training
-        fields = ('stage1_1', 'stage1_2', 'stage1_3', 'stage2_1', 'stage2_2', 'stage2_3', 'stage3_1', 
+        fields = ('stage1_1', 'stage1_2', 'stage1_3', 'stage2_1', 'stage2_2', 'stage2_3', 'stage3_1',
         'stage3_2', 'stage3_3', 'grade', 'remarks')
 
     def __init__(self, *args, **kwargs):

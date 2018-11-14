@@ -3,7 +3,6 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
 from inventory.models import Medicine, Miscellaneous, Food
-
 from profiles.models import User
 
 class Date(models.Model):
@@ -39,7 +38,7 @@ class K9(models.Model):
     #TODO Dog sizes based on breed, see docs
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
-    #handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     breed = models.CharField('breed', choices=BREED, max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
@@ -72,8 +71,8 @@ class K9(models.Model):
         # serial_number = '#%s' % (lead_zero)
         # self.serial_number = str(serial_number)
         super(K9, self).save(*args, **kwargs)
-    
-       
+
+
     def __str__(self):
         return str(self.name) + " : " + str(self.serial_number)
 

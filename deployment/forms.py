@@ -3,10 +3,16 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Location, Team_Assignment, Area, Team, Current_Deployed
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed
+from planningandacquiring.models import K9
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class AreaForm(forms.ModelForm):
+    class Meta:
+        model = Area
+        fields = ('name',)
 
 class LocationForm(forms.ModelForm):
     CITY = (
@@ -160,13 +166,21 @@ class LocationForm(forms.ModelForm):
 
     class Meta:
         model = Location
-        fields = ('city', 'area')
+        fields = ('area', 'city', 'place')
 
-class AreaForm(forms.ModelForm):
+class AssignTeamForm(forms.ModelForm):
+    location = forms.ModelChoiceField(queryset = Location.objects.all())
+
     class Meta:
-        model = Area
-        fields = ('name',)
+        model = Team_Assignment
+        fields = ('location', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
+class EditTeamForm(forms.ModelForm):
+    class Meta:
+        model = Team_Assignment
+        fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
+
+'''
 class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
@@ -195,4 +209,10 @@ class assign_current_form(forms.ModelForm):
         model = Current_Deployed
         fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
 
+class DeployDogForm(forms.Form):
+    dog = forms.ModelMultipleChoiceField(queryset=K9.objects.all())
 
+    # widgets = {
+    # 'dog': forms.CheckboxSelectMultiple(),
+    # }
+'''
