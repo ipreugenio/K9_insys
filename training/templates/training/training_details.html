@@ -81,8 +81,8 @@
                <h4>Grade:
                    {% if edd.grade == '0' %}
                    <label class="ui big red circular label">{{edd.grade}}</label>
-                   {% elif edd.grade == 'No Grade Yet' %}
-                   <label class="ui big orange circular label">{{edd.grade}}</label>
+                   {% elif edd.grade == 'No Grade Yet' or edd.grade == '' %}
+                   <label class="ui big orange circular label">No Grade Yet</label>
                    {%else%}
                    <label class="ui big green circular label">{{edd.grade}}</label>
                    {% endif %}
@@ -205,8 +205,8 @@
              <h4>Grade:
                  {% if ndd.grade == '0' %}
                  <label class="ui big red circular label">{{ndd.grade}}</label>
-                 {% elif ndd.grade == 'No Grade Yet' %}
-                 <label class="ui big orange circular label">{{ndd.grade}}</label>
+                 {% elif ndd.grade == 'No Grade Yet' or ndd.grade == ''%}
+                 <label class="ui big orange circular label">No Grade Yet</label>
                  {%else%}
                  <label class="ui big green circular label">{{ndd.grade}}</label>
                  {% endif %}
@@ -329,8 +329,8 @@
              <h4>Grade:
                  {% if sar.grade == '0' %}
                  <label class="ui big red circular label">{{sar.grade}}</label>
-                 {% elif sar.grade == 'No Grade Yet' %}
-                 <label class="ui big orange circular label">{{sar.grade}}</label>
+                 {% elif sar.grade == 'No Grade Yet' or sar.grade == ''%}
+                 <label class="ui big orange circular label">No Grade Yet</label>
                  {%else%}
                  <label class="ui big green circular label">{{sar.grade}}</label>
                  {% endif %}

@@ -104,15 +104,28 @@ class K9_New_Owner(models.Model):
     last_name = models.CharField('last_name', max_length=200)
     address = models.CharField('address', max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
+    #age = models.IntegerField('age', default = 0)
     birth_date = models.DateField('birth_date')
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
+
+    # def calculate_age(self):
+    #     today = d.today()
+    #     birthdate = self.birth_date
+    #     bday = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    #     if bday < 1:
+    #         bday = 0
+    #     return bday
+
+    # def save(self, *args, **kwargs):
+    #     self.age = self.calculate_age()
+    #     super(K9_New_Owner, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.first_name) + ' ' + str(self.middle_name) + ' ' + str(self.last_name)
 
 class K9_Donated(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     owner = models.ForeignKey(K9_Past_Owner, on_delete=models.CASCADE)
     date_donated = models.DateField('date_donated', auto_now_add=True)
 

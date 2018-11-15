@@ -9,7 +9,6 @@
     <a class="item" data-tab="second">Classified</a>
     <a class="item" data-tab="third">On-Training</a>
     <a class="item" data-tab="fourth">Trained</a>
-    <a class="item" data-tab="fifth">For Adoption</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
     <table id="tabledata1" class="ui seven column celled table">
@@ -104,7 +103,7 @@
 </table>
 </div>
 <div class="ui tab segment" data-tab="fourth">
-<table id="tabledata4" class="ui seven column celled table">
+<table id="tabledata4" class="ui six column celled table">
     <thead>
         <tr>
             <th>Name</th>
@@ -112,7 +111,6 @@
             <th>Color</th>
             <th>Sex</th>
             <th>Age</th>
-            <th>Training Level</th>
             <th></th>
         </tr>
     </thead>
@@ -124,7 +122,6 @@
             <td>{{data_trained.color}}</td>
             <td >{{data_trained.sex}}</td>
             <td>{{data_trained.age}}</td>
-            <td>{{data_trained.training_level}}</td>
             <td style="text-align:center;">
                 <a href="{% url 'training:serial_number_form' data_trained.id %}" class = "tiny ui blue basic button">Assign SN</a>
             </td>
@@ -133,35 +130,7 @@
     </tbody>
 </table>
 </div>
-<div class="ui tab segment" data-tab="fifth">
-    <table id="tabledata5" class="ui seven column celled table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Breed</th>
-                <th>Color</th>
-                <th>Sex</th>
-                <th>Age</th>
-                <th>Training Level</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data_adoption in data_adoption %}
-            <tr>
-                <td>{{data_adoption.name}}</td>
-                <td >{{data_adoption.breed}}</td>
-                <td>{{data_adoption.color}}</td>
-                <td >{{data_adoption.sex}}</td>
-                <td>{{data_adoption.age}}</td>
-                <td style="text-align:center;">
-                    <a href="{% url 'training:adoption_form' data_adoption.id %}" class = "tiny ui blue basic button">Select</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+
 <script type="text/javascript">
 
     $(document).ready(function() {
@@ -169,7 +138,6 @@
         $('#tabledata2').DataTable();
         $('#tabledata3').DataTable();
         $('#tabledata4').DataTable();
-        $('#tabledata5').DataTable();
         $('.menu .item').tab();
     });
 

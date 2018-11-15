@@ -134,15 +134,16 @@
             $("#btn").prop('disabled', true)
         }
 
-        $("input[name='grade']").prop('disabled', true)
+        $("select[name='grade']").prop('disabled', true)
 
         //Stage3_3
         $("input[name='stage3_3']").change(function() {
             if ($("input[name='stage3_2']").is(':checked')){
-                $("input[name='grade']").prop('disabled', false)
+                $("select[name='grade']").prop('disabled', false)
             }else{
                 alert('Previous stage must be checked')
                 $("input[name='stage3_3']").prop('checked', false)
+                $("select[name='grade']").prop('disabled', true)
             }
         });
         //Stage3_2

@@ -67,6 +67,14 @@ def assign_team_location(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            location = form.cleaned_data['location']
+            l = Location.objects.get(id=location.id)
+
+            #change the status of the location
+            data = Location.objects.get(id=l.id)
+            data.status = 'assigned'
+            data.save()
+
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
             form = AssignTeamForm()

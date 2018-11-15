@@ -28,12 +28,36 @@ def index(request):
 
 
 
+def adoption_list(request):
+    for_adoption = K9.objects.filter(training_status='For-Adoption')
+    adopted = K9.objects.filter(training_status='Adopted')
+    context = {
+        'title': 'Adoption List',
+        'for_adoption': for_adoption,
+        'adopted': adopted,
+    }
+    
+    return render (request, 'training/for_adoption_list.html', context)
+
+
+def adoption_details(request, id):
+    k9 = K9.objects.get(id=id)
+    owner = K9_New_Owner.objects.all()
+    data =K9_Adopted.objects.filter(k9=k9).get(owner__id__in=owner)
+    
+
+    context = {
+        'title': data,
+        'data': data,
+    }
+    
+    return render (request, 'training/adoption_details.html', context)
+
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-    data_adoption = K9.objects.filter(training_status="For-Adoption")
 
     # TODO:
     '''
@@ -46,7 +70,6 @@ def classify_k9_list(request):
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
-        'data_adoption': data_adoption,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -319,6 +342,7 @@ def adoption_form(request, id):
     if request.method == "POST":
         if form.is_valid():
             print('valid')
+            form.k9 = data
             form.save()
             no_id = form.save()
             request.session['no_id'] = no_id.id
