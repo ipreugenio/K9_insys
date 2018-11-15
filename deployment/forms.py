@@ -181,11 +181,6 @@ class EditTeamForm(forms.ModelForm):
         fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
 '''
-class TeamForm(forms.ModelForm):
-    class Meta:
-        model = Team
-        fields = ('area', 'name')
-
 class assign_team_form(forms.ModelForm):
     class Meta:
         model = Team_Assignment
@@ -203,16 +198,4 @@ class assign_team_form(forms.ModelForm):
                     pass  # invalid input from the client; ignore and fallback to empty City queryset
             elif self.instance.pk:
                 self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
-
-class assign_current_form(forms.ModelForm):
-    class Meta:
-        model = Current_Deployed
-        fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
-
-class DeployDogForm(forms.Form):
-    dog = forms.ModelMultipleChoiceField(queryset=K9.objects.all())
-
-    # widgets = {
-    # 'dog': forms.CheckboxSelectMultiple(),
-    # }
 '''

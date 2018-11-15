@@ -42,4 +42,4 @@ class Training(models.Model):
     remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return str(self.k9) +' - ' + str(self.stage)
+        return str(self.k9) +' - ' + str(self.training) +' : ' + str(self.stage)

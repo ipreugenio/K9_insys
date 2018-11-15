@@ -11,15 +11,4 @@ urlpatterns = [
     path('assigned-location-list/', views.assigned_location_list, name='assigned_location_list'),
     path('team-location-details/<int:id>', views.team_location_details, name='team_location_details'),
     path('edit-team/<int:id>', views.edit_team, name='edit_team'),
-    # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
-    # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
-    # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),
-    # path('location-form', views.location_form, name='location_form'),
-    # path('assign_team/', views.assign_team, name='assign_team'),
-    # path('load-teams/', views.load_teams, name='ajax_load_teams'),  # <-- this one here
-    # path('area_list/', views.area_list_view, name='area_list'),
-    # path('add_location/', views.area_form, name='add_location'),
-    # path('add_team/', views.team_form, name='add_team'),
-    # path('area_detail/<int:id>', views.area_list_detail, name='area_detail'),
-    #path('/<int:id>/', views., name=''),
 ];
