@@ -169,7 +169,7 @@ class LocationForm(forms.ModelForm):
         fields = ('area', 'city', 'place')
 
 class AssignTeamForm(forms.ModelForm):
-    location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
+    '''location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))'''
 
     class Meta:
         model = Team_Assignment

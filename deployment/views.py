@@ -271,10 +271,11 @@ def request_dog_details(request, id):
         if 'approve' in request.POST:
             data2.status = "Approved"
             data2.save()
-            return HttpResponseRedirect('request_dog_list/')
-        else:
-            data2.request_status = "Denied"
+            return HttpResponseRedirect('../request_dog_list/')
+        elif 'deny' in request.POST:
+            data2.status = "Denied"
             data2.save()
+            return HttpResponseRedirect('../request_dog_list/')
 
         checks = request.POST.getlist('checks')  # get the id of all the dogs checked
         # print(checks)
