@@ -14,11 +14,11 @@ from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillFo
 from collections import OrderedDict
 
 #graphing imports
-import igraph
+'''import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+import plotly.graph_objs.layout as lout'''
 
 #print(pd.__version__) #Version retrieved is not correct
 

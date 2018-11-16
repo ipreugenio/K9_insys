@@ -19,13 +19,13 @@
       <div class="description">Add personal information about the user </div>
     </div>
   </div>
-  <div class="active step">
+  <div class="completed step">
     <div class="content">
       <div class="title">Education</div>
       <div class="description">Add education information of the user</div>
     </div>
   </div>
-        <div class="disabled step">
+        <div class="active step">
     <div class="content">
       <div class="title">Account</div>
       <div class="description">Add account of the user</div>
@@ -35,50 +35,20 @@
 
 <div class="ui fluid container">
     <div class="ui inverted segment">
-    <form class="ui inverted equal width form" action="{% url 'profiles:add_education' %}" method="POST">
+    <form class="ui inverted equal width form" action="{% url 'profiles:add_user_account' %}" method="POST">
         {% csrf_token %}
         <div class="fields">
             <div class="field">
-                <label>Primary Education</label>
-                {{form.primary_education}}
+                <label>Serial Number</label>
+                {{form.serial_number}}
             </div>
             <div class="field">
-                <label>School Year</label>
-                {{form.pe_schoolyear}}
+                <label>Email Address</label>
+                {{form.email_address}}
             </div>
             <div class="field">
-                <label>Degree</label>
-                {{form.pe_degree}}
-            </div>
-        </div>
-
-       <div class="fields">
-            <div class="field">
-                <label>Secondary Education</label>
-                {{form.secondary_education}}
-            </div>
-            <div class="field">
-                <label>School Year</label>
-                {{form.se_schoolyear}}
-            </div>
-            <div class="field">
-                <label>Degree</label>
-                {{form.se_degree}}
-            </div>
-        </div>
-
-        <div class="fields">
-            <div class="field">
-                <label>Tertiary Education</label>
-                {{form.tertiary_education}}
-            </div>
-            <div class="field">
-                <label>School Year</label>
-                {{form.te_schoolyear}}
-            </div>
-            <div class="field">
-                <label>Degree</label>
-                {{form.te_degree}}
+                <label>Password</label>
+                {{form.password}}
             </div>
         </div>
 

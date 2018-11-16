@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request
 from planningandacquiring.models import K9
 
 class DateInput(forms.DateInput):
@@ -216,3 +216,13 @@ class DeployDogForm(forms.Form):
     # 'dog': forms.CheckboxSelectMultiple(),
     # }
 '''
+
+class RequestForm(forms.ModelForm):
+    class Meta:
+        model = Dog_Request
+        fields = ('requester', 'location', 'area', 'EDD_needed', 'NDD_needed', 'SAR_needed', 'start_date', 'end_date')
+
+        widgets = {
+            'start_date': DateInput(),
+            'end_date': DateInput()
+        }

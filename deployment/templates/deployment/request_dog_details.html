@@ -1,0 +1,153 @@
+{% extends "profiles/sidebar_deployment.html" %}
+{% load index %}
+
+{% block content %}
+<h1 class="ui header">
+    {{data.team}}
+    <div class="sub header">Team details for {{data.team}}</div>
+</h1>
+
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Details</a>
+    <a class="item" data-tab="second">Deploy Dogs</a>
+</div>
+
+<div class="ui tab segment active" data-tab="first">
+  <div class="ui raised segment">
+    <table class="ui three column very basic table" style="width:50%;">
+      <tr>
+        <td><strong>Location: </strong>{{data2.location}}</td>
+        <td><strong>Start date: </strong>{{data2.start_date}}</td>
+        <td><strong>End date: </strong>{{data2.end_date}}</td>
+      </tr>
+    </table>
+  </div>
+  <div class="row">
+    <div class="column">
+      <div class="ui basic horizontal segments" style="border-style: none;">
+       <div class="ui basic segment" style="border-style: none;">
+         <label>No. of Dog Demand: </label>
+         <span class="ui red circular label">{{data2.total_dogs_demand}}</span>
+         <table class="ui three column celled red table">
+           <thead>
+             <tr>
+               <th>EDD Demand</th>
+               <th>NDD Demand</th>
+               <th>SAR Demand</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>{{data2.EDD_needed}}</td>
+               <td>{{data2.NDD_needed}}</td>
+               <td>{{data2.SAR_needed}}</td>
+             </tr>
+           </tbody>
+         </table>
+       </div>
+       <div class="ui basic segment" style="border-style: none;">
+         <label>No. of Dog Deployed: </label>
+         <span class="ui orange circular label">{{data2.total_dogs_deployed}}</span>
+         <table class="ui three column celled orange table">
+           <thead>
+             <tr>
+               <th>EDD Deployed</th>
+               <th>NDD Deployed</th>
+               <th>SAR Deployed</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>{{data2.EDD_deployed}}</td>
+               <td>{{data2.NDD_deployed}}</td>
+               <td>{{data2.SAR_deployed}}</td>
+             </tr>
+           </tbody>
+         </table>
+       </div>
+      </div>
+    </div>
+  </div>
+
+ <table id="tabledata1" class="ui four column celled table">
+       <thead>
+         <tr>
+           <th>Name</th>
+           <th>Serial Number</th>
+           <th>Capability</th>
+           <th>Handler</th>
+         </tr>
+     </thead>
+     <tbody>
+        	{% for dogs_deployed in dogs_deployed %}
+         <tr>
+           <td>{{dogs_deployed.k9.name}}</td>
+           <td>{{dogs_deployed.k9.serial_number}}</td>
+           <td>{{dogs_deployed.k9.capability}}</td>
+           <td>{{dogs_deployed.k9.handler}}</td>
+         </tr>
+         	{% endfor %}
+     </tbody>
+ </table>
+
+        <div class="ui center aligned segment" style="padding: 0px;">
+        <form action="" method="post">
+        {% csrf_token %}
+        <div class="ui buttons">
+           <button class="negative ui button" name="deny" onclick="return confirm('Are you sure?')">Deny</button>
+           <div class="or"></div>
+           <button class="ui positive button" name="approve" onclick="return confirm('Are you sure?')">Approve</button>
+           </div>
+        </form>
+        </div>
+</div>
+
+<div class="ui tab segment" data-tab="second">
+  {% if messages %}
+      {% for message in messages %}
+          <div class="{{ style }} row"> {{ message }}</div>
+      {% endfor %}
+  {% endif %}
+  <form class="ui form" method="POST">
+    {% csrf_token %}
+    <table id="tabledata2" class="ui four column celled table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Serial Number</th>
+              <th>Capability</th>
+              <th>Handler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for can_deploy in can_deploy %}
+            <tr class="ui center aligned">
+              <td style="width:10%;">
+                <input type="checkbox" name="checks" value="{{can_deploy.id}}">
+              </td>
+              <td style="width:22%;">{{can_deploy.name}}</td>
+              <td style="width:22%;">{{can_deploy.serial_number}}</td>
+              <td style="width:22%;">{{can_deploy.capability}}</td>
+              <td style="width:22%;">{{can_deploy.handler}}</td>
+            </tr>
+              {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="ui basic center aligned segment" style="padding: 0px;">
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('.menu .item').tab();
+    });
+
+</script>
+{% endblock %}

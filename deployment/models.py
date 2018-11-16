@@ -186,8 +186,33 @@ class Team_Assignment(models.Model):
         self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
         super(Team_Assignment, self).save(*args, **kwargs)
 
+class Dog_Request(models.Model):
+    requester = models.CharField('requester', max_length=100)
+    location = models.CharField('location', max_length=100)
+    area = models.ForeignKey(Location, on_delete=models.CASCADE)
+    EDD_needed = models.IntegerField('EDD_needed')
+    NDD_needed = models.IntegerField('NDD_needed')
+    SAR_needed = models.IntegerField('SAR_needed')
+    EDD_deployed = models.IntegerField('EDD_deployed', default=0)
+    NDD_deployed = models.IntegerField('NDD_deployed', default=0)
+    SAR_deployed = models.IntegerField('SAR_deployed', default=0)
+    total_dogs_demand = models.IntegerField('total_dogs_demand', default=0)
+    total_dogs_deployed = models.IntegerField('total_dogs_deployed', default=0)
+    start_date = models.DateField('start_date', null=True, blank=True)
+    end_date = models.DateField('end_date', null=True, blank=True)
+    status = models.CharField('status', max_length=100, default="Pending")
+
+    def __str__(self):
+        return str(self.requester) + ' - ' + str(self.location)
+
+    def save(self, *args, **kwargs):
+        self.total_dogs_demand = int(self.EDD_needed) + int(self.NDD_needed) + int(self.SAR_needed)
+        self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
+        super(Dog_Request, self).save(*args, **kwargs)
+
 class Team_Dog_Deployed(models.Model):
-    team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE)
+    team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
+    team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
 

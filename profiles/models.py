@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date as d
 
+
 # Create your models here.
 class User(models.Model):
     SEX = (
@@ -43,7 +44,13 @@ class User(models.Model):
         ('Brown', 'Brown')
     )
 
-    serial_number = models.CharField('serial_number', max_length=200)
+    STATUS = (
+        ('Working', 'Working'),
+        ('On-Leave', 'On-Leave'),
+        ('Retired', 'Retired'),
+        ('Dead', 'Dead')
+    )
+
     position = models.CharField('position', choices=POSITION, max_length=200)
     rank = models.CharField('rank', max_length=200)
     firstname = models.CharField('firstname', max_length=200)
@@ -63,16 +70,17 @@ class User(models.Model):
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)
-    #profile image dito
+    # profile image dito
     height = models.IntegerField('height')
     weight = models.IntegerField('weight')
     headsize = models.IntegerField('headsize')
     footsize = models.IntegerField('footsize')
     bodybuild = models.CharField('bodybuild', max_length=200)
+    status = models.CharField('status', choices=STATUS, max_length=200)
 
     def calculate_age(self):
-        #delta = dt.now().date() - self.birth_date
-        #return delta.days
+        # delta = dt.now().date() - self.birth_date
+        # return delta.days
         today = d.today()
         birthdate = self.birthdate
         return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
@@ -83,6 +91,7 @@ class User(models.Model):
 
     def __str__(self):
         return str(self.firstname) + ' ' + str(self.middlename) + ' ' + str(self.lastname)
+
 
 class Personal_Info(models.Model):
     CITY = (
@@ -235,7 +244,6 @@ class Personal_Info(models.Model):
 
     UserID = models.ForeignKey(User, on_delete=models.CASCADE)
     mobile_number = models.CharField('mobile_number', max_length=200)
-    email_address = models.EmailField('email_address', max_length=200)
     tel_number = models.CharField('tel_number', max_length=200)
     street = models.CharField('street', max_length=200)
     barangay = models.CharField('barangay', max_length=200)
@@ -260,3 +268,10 @@ class Education(models.Model):
     pe_degree = models.CharField('pe_degree', max_length=200)
     se_degree = models.CharField('pe_degree', max_length=200)
     te_degree = models.CharField('pe_degree', max_length=200)
+
+
+class Account(models.Model):
+    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
+    serial_number = models.CharField('serial_number', max_length=200)
+    email_address = models.EmailField('email_address', max_length=200)
+    password = models.CharField('password', max_length=200)

@@ -8,6 +8,7 @@
     <a class="item active" data-tab="first">User Information</a>
     <a class="item" data-tab="second">Personal Information</a>
     <a class="item" data-tab="third">Education</a>
+    <a class="item" data-tab="fourth">Account</a>
 </div>
 
 <div class="ui tab segment active" data-tab="first">
@@ -15,10 +16,6 @@
           	<tr>
                 <td>Name</td>
                 <td>{{user}}</td>
-            </tr>
-            <tr>
-                <td>Serial Number</td>
-                <td>{{user.serial_number}}</td>
             </tr>
             <tr>
               <td>Position</td>
@@ -110,10 +107,6 @@
                 <td>{{personal_info.mobile_number}}</td>
             </tr>
             <tr>
-                <td>Email Address</td>
-                <td>{{personal_info.email_address}}</td>
-            </tr>
-            <tr>
                 <td>Telephone Number</td>
                 <td>{{personal_info.tel_number}}</td>
             </tr>
@@ -199,6 +192,18 @@
             </tr>
         </table>
 </div>
+<div class="ui tab segment" data-tab="fourth">
+    <table id="tabledata4" class="ui celled table">
+            <tr>
+                <td>Serial Number</td>
+                <td>{{account.serial_number}}</td>
+            </tr>
+            <tr>
+                <td>Email Address</td>
+                <td>{{account.email_address}}</td>
+            </tr>
+        </table>
+</div>
 
         <div class="ui basic segment">
             <a href="{% url 'profiles:user_list'%}" class="ui blue button">Back</a>
@@ -210,6 +215,7 @@
         $('#tabledata1');
         $('#tabledata2');
         $('#tabledata3');
+        $('#tabledata4');
 
         $('.menu .item').tab();
     });
