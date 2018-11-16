@@ -15,8 +15,10 @@ urlpatterns = [
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
     path('training-details/<int:id>', views.training_details, name='training_details'),
     path('fail-dog/<int:id>', views.fail_dog, name='fail_dog'),
+    path('adoption-list', views.adoption_list, name='adoption_list'),
     path('adoption-form/<int:id>', views.adoption_form, name='adoption_form'),
     path('confirm-adoption/<int:id>', views.confirm_adoption, name='confirm_adoption'),
     path('adoption-confirmed', views.adoption_confirmed, name='adoption_confirmed'),
+    path('adoption-details/<int:id>', views.adoption_details, name='adoption_details'),
     #path('/<int:id>/', views., name=''),
 ];

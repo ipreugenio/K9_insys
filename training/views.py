@@ -10,8 +10,8 @@ from planningandacquiring.models import K9_New_Owner, K9_Adopted
 from training.models import Training
 from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form, AdoptionForms
-from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
-from collections import OrderedDict
+from training.forms import TrainingUpdateForm, SerialNumberForm
+# from collections import OrderedDict
 
 #graphing imports
 '''import igraph
@@ -19,6 +19,12 @@ from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout'''
+# #graphing imports
+# import igraph
+# from igraph import *
+# import plotly.offline as opy
+# import plotly.graph_objs as go
+# import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -28,12 +34,41 @@ def index(request):
 
 
 
+def adoption_list(request):
+    for_adoption = K9.objects.filter(training_status='For-Adoption')
+    adopted = K9.objects.filter(training_status='Adopted')
+    context = {
+        'title': 'Adoption List',
+        'for_adoption': for_adoption,
+        'adopted': adopted,
+    }
+    
+    return render (request, 'training/for_adoption_list.html', context)
+
+
+def adoption_details(request, id):
+    k9 = K9.objects.get(id=id)
+    owner = K9_New_Owner.objects.all()
+    data =K9_Adopted.objects.filter(k9=k9).get(owner__id__in=owner)
+    
+
+    context = {
+        'title': data,
+        'data': data,
+    }
+    
+    return render (request, 'training/adoption_details.html', context)
+
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-    data_adoption = K9.objects.filter(training_status="For-Adoption")
+
+    # TODO:
+    '''
+    if k9 has failed 2 trainign records, disable reasign button
+    '''
 
     context = {
         'title': 'K9 Classification',
@@ -41,7 +76,6 @@ def classify_k9_list(request):
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
-        'data_adoption': data_adoption,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -51,29 +85,52 @@ def classify_k9_list(request):
 #TODO Call methods that returns graphs and skill scores then compare
 def classify_k9_select(request, id):
     data = K9.objects.get(id=id)
-    form_skill = ClassifySkillForm(request.POST)
     title = data.name
     style = ""
 
+    edd = Training.objects.filter(k9=data).get(training='EDD')
+    ndd = Training.objects.filter(k9=data).get(training='NDD')
+    sar = Training.objects.filter(k9=data).get(training='SAR')
+	# TODO:
+	#if already has capability and on training from other records,
+	#previous record training will result to grade 0
+
     if request.method == 'POST':
-        if form_skill.is_valid():
-            data.capability = form_skill.cleaned_data['skill']
-            data.training_status = "Classified"
-            data.save()
-            style = "ui green message"
-            messages.success(request, 'K9 has been successfully Classified!')
+        print(data.capability)
+
+        if data.capability == 'EDD':
+            edd.grade = '0'
+            edd.save()
+        elif data.capability == 'NDD':
+            ndd.grade = '0'
+            ndd.save()
+        elif data.capability == 'SAR':
+            sar.grade = '0'
+            sar.save()    
         else:
-            style = "ui red message"
-            messages.warning(request, 'Please select skill')
+            pass
+        
+        if data.training_status == 'On-Training':
+            data.training_status == 'On-Training'
+        else:
+            data.training_status = "Classified"
+
+        data.capability = request.POST.get('radio')
+        data.save()
+
+        style = "ui green message"
+        messages.success(request, 'K9 has been successfully Classified!')
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
     except K9_Parent.DoesNotExist:
         context = {
             'data': data,
-            'form': form_skill,
             'title': title,
-            'style': style
+            'style': style,
+            'edd': edd,
+            'ndd': ndd,
+            'sar': sar,
         }
     else:
         parent_exist = 1
@@ -81,9 +138,11 @@ def classify_k9_select(request, id):
             'data': data,
             'parent': parent,
             'parent_exist': parent_exist,
-            'form': form_skill,
             'title': title,
-            'style': style
+            'style': style,
+            'edd': edd,
+            'ndd': ndd,
+            'sar': sar,
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -128,7 +187,7 @@ def training_records(request):
 
 def training_update_form(request, id):
     data = K9.objects.get(id=id) # get k9
-    training = Training.objects.get(k9=data) # get training record
+    training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
 
     if request.method == 'POST':
@@ -215,7 +274,13 @@ def training_update_form(request, id):
         'form': form,
     }
 
-    return render(request, 'training/training_update_form.html', context)
+    if data.capability == 'EDD':
+        return render(request, 'training/training_update_edd.html', context)
+    elif data.capability == 'NDD':
+        return render(request, 'training/training_update_ndd.html', context)
+    else:
+        return render(request, 'training/training_update_sar.html', context)
+
 
 #Trained Dog - Assign serial number Form
 def serial_number_form(request, id):
@@ -251,19 +316,26 @@ def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
     data.training_status = "For-Adoption"
     data.save()
-    training = Training.objects.get(k9=data)
-    training.grade = '0'
-    training.save()
+    training = Training.objects.filter(k9=data)
+
+    for training in training:
+        training.grade = '0'
+        training.save()
     return redirect('training:classify_k9_list')
 
 def training_details(request, id):
     data = K9.objects.get(id=id) # get k9
-    training = Training.objects.get(k9=data) # get training record
+    edd = Training.objects.filter(k9=data).get(training='EDD') # get training record
+    ndd = Training.objects.filter(k9=data).get(training='NDD')
+    sar = Training.objects.filter(k9=data).get(training='SAR')
 
+    print(edd.grade)
     context = {
         'title': str(data),
         'data': data,
-        'training':training,
+        'edd':edd,
+        'ndd':ndd,
+        'sar':sar,
     }
     return render (request, 'training/training_details.html', context)
 
@@ -276,6 +348,7 @@ def adoption_form(request, id):
     if request.method == "POST":
         if form.is_valid():
             print('valid')
+            form.k9 = data
             form.save()
             no_id = form.save()
             request.session['no_id'] = no_id.id

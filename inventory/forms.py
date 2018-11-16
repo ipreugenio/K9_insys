@@ -23,11 +23,12 @@ class MedicineForm(forms.ModelForm):
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'used_yearly')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+        self.fields['used_yearly'].required = False
        
 class MedicineCountForm(forms.ModelForm):
     class Meta:

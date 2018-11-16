@@ -1,11 +1,11 @@
-{% extends "profiles/sidebar_training.html" %}  
+{% extends "profiles/sidebar_training.html" %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
     <h3 class="ui header">Classify {{ title }}</h3>
     {% if messages %}
         {% for message in messages %}
-            <div class='ui green message' > {{ message }}</div>
+            <div class={{style}}> {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
@@ -94,20 +94,38 @@
                 <th data-tooltip= "Click here to view data diagram on skill count on current sex">Sex</th>
                 <td>Somthing</td>
             </tr>
-                        
+
         </thead>
     </table>
 </div>
 
-<form class="ui form" action="" method="POST">
+<form class="ui form" method="POST">
     {% csrf_token %}
     <div class="six fields">
         <div class="field"></div>
         <div class="field"></div>
-        <div class="field">
-            {% for radio in form.skill %}
-            {{ radio }}
-            {% endfor %}
+        <div class="inline fields" style="margin-top:10px;">
+          <div class="field">
+            {% if edd.grade == '0' or data.capability == 'EDD' %}
+              <input type="radio" name="radio" value="EDD" disabled>EDD
+            {%else%}
+              <input type="radio" name="radio" value="EDD">EDD
+            {%endif%}
+          </div>
+          <div class="field">
+            {% if ndd.grade == '0' or data.capability == 'NDD'%}
+              <input type="radio" name="radio" value="NDD" disabled>NDD
+            {%else%}
+              <input type="radio" name="radio" value="NDD">NDD
+            {%endif%}
+          </div>
+          <div class="field">
+            {% if sar.grade == '0' or data.capability == 'SAR' %}
+              <input type="radio" name="radio" value="SAR" disabled>SAR
+            {%else%}
+              <input type="radio" name="radio" value="SAR">SAR
+            {%endif%}
+          </div>
         </div>
         <div class="field">
             <button class="ui green button">Submit</button>
@@ -118,11 +136,13 @@
 </form>
 
 <script type="text/javascript">
-        
+
     $(document).ready(function() {
         $('#tabledata').DataTable();
-    
-    } );
-    
+
+        var selected = $("input[name='radio']");
+        alert(select.val)
+    });
+
 </script>
  {% endblock %}

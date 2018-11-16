@@ -24,6 +24,7 @@ class Medicine(models.Model):
     uom = models.CharField('uom', choices=UOM, max_length=10, default='mg')
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
+    used_yearly = models.IntegerField('used_yearly', default=0)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

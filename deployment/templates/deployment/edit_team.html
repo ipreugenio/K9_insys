@@ -17,7 +17,7 @@
                   <div class="{{ style }} row"> {{ message }}</div>
               {% endfor %}
           {% endif %}
-          <form class = "ui inverted form" method="POST">
+          <form class = "ui inverted form" method="POST" readonly>
              {% csrf_token %}
              <div class="two fields">
                <div class="field">
@@ -26,7 +26,7 @@
                </div>
                <div class="field">
                    <label>Location</label>
-                   <input type="text" name="location" value="{{data.location}}" disabled>
+                   <input type="text" name="location" value="{{data.location}}" readonly>
                </div>
              </div>
              <div class="three fields">
@@ -42,8 +42,8 @@
                       <label>Number of Search and Rescue needed</label>
                       {{form.SAR_demand}}
                   </div>
-             </div
-
+            </div>
+             
               <div class="ui inverted right aligned segment" style="padding: 0px;">
                   <button class = "ui button green" type="submit" >{{actiontype}}</button>
               </div>
