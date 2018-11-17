@@ -104,6 +104,7 @@
 
     $(document).ready(function() {
         $('#tabledata').DataTable();
+        $("select[name='grade']").prop('disabled', true)
 
         if($("input[name='stage1_1']").is(':checked')){
             $("input[name='stage1_1']").prop('disabled', true)
@@ -132,10 +133,10 @@
         if ($("input[name='stage3_3']").is(':checked')){
             $("input[name='stage3_3']").prop('disabled', true)
             $("#btn").prop('disabled', true)
+            $("textarea[name='remarks']").prop('disabled', true)
+            $("select[name='grade']").prop('disabled', true)
         }
 
-        
-        $("select[name='grade']").prop('disabled', true)
 
         //Stage3_3
         $("input[name='stage3_3']").change(function() {
@@ -147,7 +148,7 @@
                 $("select[name='grade']").prop('disabled', true)
             }
         });
-        
+
         //Stage3_2
         $("input[name='stage3_2']").change(function() {
             if ($("input[name='stage3_1']").is(':checked')){

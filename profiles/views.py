@@ -1,7 +1,4 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import add_User_form, add_personal_form, add_education_form, add_user_account
-from .models import User, Personal_Info, Education, Account
-from deployment.models import Location
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
@@ -9,6 +6,10 @@ from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login
+
+from profiles.models import User, Personal_Info, Education, Account
+from deployment.models import Location
+from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 
 # Create your views here.
 

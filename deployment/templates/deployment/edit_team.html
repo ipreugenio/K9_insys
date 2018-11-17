@@ -17,12 +17,12 @@
                   <div class="{{ style }} row"> {{ message }}</div>
               {% endfor %}
           {% endif %}
-          <form class = "ui inverted form" method="POST" readonly>
+          <form class = "ui inverted form" method="POST">
              {% csrf_token %}
              <div class="two fields">
                <div class="field">
                    <label>Team</label>
-                       {{form.team}}
+                       <input type="text" name="team" value="{{data.team}}" readonly>
                </div>
                <div class="field">
                    <label>Location</label>
@@ -43,7 +43,7 @@
                       {{form.SAR_demand}}
                   </div>
             </div>
-             
+
               <div class="ui inverted right aligned segment" style="padding: 0px;">
                   <button class = "ui button green" type="submit" >{{actiontype}}</button>
               </div>
@@ -52,4 +52,5 @@
     </div>
   </div>
 </div>
+
 {% endblock%}

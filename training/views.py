@@ -11,6 +11,8 @@ from training.models import Training
 from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form, AdoptionForms
 from training.forms import TrainingUpdateForm, SerialNumberForm
+import datetime
+
 # from collections import OrderedDict
 
 #graphing imports
@@ -32,8 +34,6 @@ import plotly.graph_objs.layout as lout'''
 def index(request):
     return render (request, 'training/index.html')
 
-
-
 def adoption_list(request):
     for_adoption = K9.objects.filter(training_status='For-Adoption')
     adopted = K9.objects.filter(training_status='Adopted')
@@ -42,7 +42,7 @@ def adoption_list(request):
         'for_adoption': for_adoption,
         'adopted': adopted,
     }
-    
+
     return render (request, 'training/for_adoption_list.html', context)
 
 
@@ -50,13 +50,13 @@ def adoption_details(request, id):
     k9 = K9.objects.get(id=id)
     owner = K9_New_Owner.objects.all()
     data =K9_Adopted.objects.filter(k9=k9).get(owner__id__in=owner)
-    
+
 
     context = {
         'title': data,
         'data': data,
     }
-    
+
     return render (request, 'training/adoption_details.html', context)
 
 def classify_k9_list(request):
@@ -106,10 +106,10 @@ def classify_k9_select(request, id):
             ndd.save()
         elif data.capability == 'SAR':
             sar.grade = '0'
-            sar.save()    
+            sar.save()
         else:
             pass
-        
+
         if data.training_status == 'On-Training':
             data.training_status == 'On-Training'
         else:
@@ -291,7 +291,7 @@ def serial_number_form(request, id):
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
-            data.serial_number = request.POST.get('serial_number')
+            data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
             data.microchip = request.POST.get('microchip')
             data.training_status = request.POST.get('dog_type')
             data.save()

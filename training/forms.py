@@ -60,6 +60,5 @@ class SerialNumberForm(forms.Form):
         ('For-Deployment', 'For-Deployment'),
         ('For-Breeding', 'For-Breeding'),
     )
-    serial_number = forms.CharField(max_length=200)
     microchip = forms.CharField(max_length=200)
     dog_type = forms.CharField(max_length=200, widget = forms.Select(choices=DOG_TYPE))

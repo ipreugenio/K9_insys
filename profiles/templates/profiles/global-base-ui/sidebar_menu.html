@@ -10,9 +10,10 @@
             <a class="item" href="{% url 'deployment:index'%}"><i class="road icon"></i>Deployment</a>
             <a class="item" href="{% url 'inventory:medicine_add'%}"><i class="warehouse icon"></i>Inventory</a>
             <a class="item" href="{% url 'profiles:add_User_form'%}"><i class="folder open icon"></i>Unit Management</a>
+            <a class="item" href="{% url 'training:adoption_list'%}"><i class="handshake icon"></i>Adoption</a>
             <a class="item" href="{% url 'profiles:login'%}">Logout</a>
         </div>
-
+        
         <!--html pages-->
         {% block sidebar_module %}
         {% endblock%}

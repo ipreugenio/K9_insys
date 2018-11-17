@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+import datetime
+
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User
 from inventory.models import Medicine
-
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm
 # Create your views here.
@@ -151,19 +152,9 @@ def team_location_details(request, id):
     can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
     #print(can_deploy)
 
-    #count deployed dogs
-    edd_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='EDD').count()
-    ndd_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='NDD').count()
-    sar_count = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(k9__capability='SAR').count()
-
-    #save count
-    data.EDD_deployed = edd_count
-    data.NDD_deployed = ndd_count
-    data.SAR_deployed = sar_count
-    data.save()
-
     #dogs deployed
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data)
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+    dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
 
     if request.method == 'POST':
         checks =  request.POST.getlist('checks') # get the id of all the dogs checked
@@ -191,9 +182,37 @@ def team_location_details(request, id):
         'can_deploy':can_deploy,
         'style': style,
         'dogs_deployed':dogs_deployed,
+        'dogs_pulled': dogs_pulled,
     }
 
     return render(request, 'deployment/team_location_details.html', context)
+
+def remove_dog_deployed(request, id):
+    pull_k9 = Team_Dog_Deployed.objects.get(id=id)
+    k9 = K9.objects.get(id=pull_k9.k9.id)
+    team_assignment = Team_Assignment.objects.get(id=pull_k9.team_assignment.id)
+
+    #change Team_Dog_Deployed model
+    pull_k9.status = 'Pulled-Out'
+    pull_k9.date_pulled = datetime.date.today()
+    pull_k9.save()
+
+    #change K9 model
+    k9.assignment = 'None'
+    k9.save()
+
+    #change Team_Assignment model
+    if pull_k9.k9.capability == 'EDD':
+         team_assignment.EDD_deployed  = team_assignment.EDD_deployed - 1
+    elif pull_k9.k9.capability == 'NDD':
+        team_assignment.NDD_deployed = team_assignment.NDD_deployed - 1
+    elif pull_k9.k9.capability == 'SAR':
+        team_assignment.SAR_deployed = team_assignment.SAR_deployed - 1
+    else:
+        pass
+    team_assignment.save()
+
+    return redirect('deployment:team_location_details', id=pull_k9.team_assignment.id)
 
 def dog_request(request):
     form = RequestForm(request.POST or None)
