@@ -1,0 +1,11 @@
+{% extends "profiles/sidebar_training.html" %}
+
+{% block content %}
+
+<div class="ui huge header">{{title}}</div>
+
+{% for graph in graphs %}
+{{ graph|safe }}
+{% endfor %}
+
+{% endblock %}

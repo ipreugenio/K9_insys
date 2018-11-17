@@ -47,15 +47,145 @@ def classify_k9_list(request):
     }
     return render (request, 'training/classify_k9_list.html', context)
 
-#TODO Should be radio buttons
+def view_graphs(request, id):
+    k9_id = request.session['k9_id']
+
+    method_arrays = []
+
+    method_arrays.append(skill_count_between_breeds(k9_id))
+    method_arrays.append(skill_percentage_between_sexes(k9_id))
+    method_arrays.append(skill_count_ratio())
+
+    tree = genealogy(k9_id)
+    genes = K9_Genealogy.objects.filter(zero=k9_id)
+    if genes:
+        method_arrays.append(skills_from_gender(k9_id))
+        method_arrays.append(skill_in_general(k9_id))
+
+    SAR_graph = []
+    NDD_graph = []
+    EDD_graph = []
+
+    ctr = 0
+    for array in method_arrays:
+
+        #Check if atleast one of the data has a score
+        if method_arrays[ctr][1] == 1 or method_arrays[ctr][2] == 1 or method_arrays[ctr][3] == 1:
+            #Save graph to the corresponding skill array
+            if method_arrays[ctr][1] == 1:
+                SAR_graph.append(method_arrays[ctr][0])
+            if method_arrays[ctr][2] == 1:
+                NDD_graph.append(method_arrays[ctr][0])
+            if method_arrays[ctr][3] == 1:
+                EDD_graph.append(method_arrays[ctr][0])
+
+        ctr += 1
+
+    #Check if skills are supported data, otherwise all of them are recommended
+    graphs = ""
+    title = ""
+    if SAR_graph is not None or NDD_graph is not None or EDD_graph is not None:
+        if id == 0:
+            if SAR_graph:
+                graphs = SAR_graph
+            else:
+                graphs = ["There is no available data to support this skill!"]
+            title = "Search and Rescue"
+        elif id == 1:
+            if NDD_graph:
+                graphs = NDD_graph
+            else:
+                graphs = ["There is no available data to support this skill!"]
+            title = "Narcotics Detection Dogs"
+        elif id == 2:
+            if EDD_graph:
+                graphs = EDD_graph
+            else:
+                graphs = ["There is no available data to support this skill!"]
+            title = "Explosives Detection Dogs"
+    else:
+        graphs = ["All skills have no supporting data, pick any of the skills provided"]
+        if id == 0:
+            title = "Search and Rescue"
+        elif id == 1:
+            title = "Narcotics Detection Dogs"
+        elif id == 2:
+            title = "Explosives Detection Dogs"
+
+
+
+
+    context = {'graphs': graphs,
+               'title': title}
+
+    return render(request, 'training/view_graph.html', context)
+
+
 #TODO Restrict Viable dogs to be trained for those who are 6 months old
 #TODO Add additional age for months
-#TODO Call methods that returns graphs and skill scores then compare
+#TODO Add Descriptions per graph
 def classify_k9_select(request, id):
+    request.session['k9_id'] = id
     data = K9.objects.get(id=id)
     form_skill = ClassifySkillForm(request.POST)
     title = data.name
     style = ""
+
+    method_arrays = []
+
+
+    #skill_demand() TODO Add demand score
+    method_arrays.append(skill_count_between_breeds(id))
+    method_arrays.append(skill_percentage_between_sexes(id))
+    method_arrays.append(skill_count_ratio())
+
+    tree = genealogy(id)
+    genes = K9_Genealogy.objects.filter(zero = id)
+    if genes:
+        method_arrays.append(skills_from_gender(id))
+        method_arrays.append(skill_in_general(id))
+
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
+
+    #Save skills scores from methods then add all scores
+    ctr = 0
+    for array in method_arrays:
+        SAR_score += method_arrays[ctr][1]
+        NDD_score += method_arrays[ctr][2]
+        EDD_score += method_arrays[ctr][3]
+
+        ctr += 1
+
+
+    print("SAR SCORE")
+    print(SAR_score)
+    print("NDD SCORE")
+    print(NDD_score)
+    print("EDD SCORE")
+    print(EDD_score)
+
+    #Save all aggregated skill scores in one array
+    compact_score = []
+    compact_score.append(SAR_score)
+    compact_score.append(NDD_score)
+    compact_score.append(EDD_score)
+
+    recommended = [0, 0, 0]
+
+    #Check which one has the highest score (regardless if all scores are 0)
+    ctr = 0
+    for x in compact_score:
+        if x == max(compact_score):
+            recommended[ctr] = 1
+        ctr += 1
+
+    #Mark as recommended those skills that are equal to the highest score
+    max_score = max(recommended)
+    recommended.append(max_score)
+    print("RECOMMENDED")
+    print(recommended)
 
     if request.method == 'POST':
         if form_skill.is_valid():
@@ -75,7 +205,9 @@ def classify_k9_select(request, id):
             'data': data,
             'form': form_skill,
             'title': title,
-            'style': style
+            'style': style,
+            'recommended': recommended,
+            'tree': tree
         }
     else:
         parent_exist = 1
@@ -85,7 +217,9 @@ def classify_k9_select(request, id):
             'parent_exist': parent_exist,
             'form': form_skill,
             'title': title,
-            'style': style
+            'style': style,
+            'recommended': recommended,
+            'tree': tree
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -311,58 +445,70 @@ def gender_count_between_breeds():
 
     return graph
 
+
 def skill_count_between_breeds(id):
     k9_set = K9.objects.exclude(capability="None")
 
-    breed = []
+    breeds = []
     sar_count = []
     ndd_count = []
     edd_count = []
 
-    loop = 0
     for k9 in k9_set:
-        breed.append(k9.breed)
-        S = K9.objects.filter(capability='SAR', breed=breed[loop])
-        N = K9.objects.filter(capability='NDD', breed=breed[loop])
-        E = K9.objects.filter(capability='EDD', breed=breed[loop])
+        breeds.append(k9.breed)
+
+    breeds = list(set(breeds))
+
+    print("BREEDS")
+    print(breeds)
+
+    for breed in breeds:
+        S = K9.objects.filter(capability='SAR', breed=str(breed))
+        N = K9.objects.filter(capability='NDD', breed=str(breed))
+        E = K9.objects.filter(capability='EDD', breed=str(breed))
         sar_count.append(S.count())
         ndd_count.append(N.count())
         edd_count.append(E.count())
-        loop += 1
+
+
+    skill_total = 0
+    for count in sar_count:
+        skill_total += count
+    for count in ndd_count:
+        skill_total += count
+    for count in edd_count:
+        skill_total += count
+
 
     SAR = go.Bar(
-        x=breed,
+        x=breeds,
         y=sar_count,
         name="SAR",
-        text=sar_count
     )
 
     NDD = go.Bar(
-        x=breed,
+        x=breeds,
         y=ndd_count,
         name="NDD",
-        text=ndd_count
     )
 
     EDD = go.Bar(
-        x=breed,
+        x=breeds,
         y=edd_count,
         name="EDD",
-        text=edd_count
     )
 
     data = [SAR, NDD, EDD]
 
+
     layout = go.Layout(
-        title="Skill Count for " + str(k9_set.count()) + " Assigned Dogs Based on Breed",
-        barmode='group'
+        title="Skill Count for " + str(skill_total) + " Assigned Dogs Based on Breed",
+        xaxis =  {'title': 'Breeds'},
+        yaxis =  {'title': 'Skill Count'},
     )
 
     fig = go.Figure(data=data, layout=layout)
     graph = opy.plot(fig, auto_open=False, output_type='div')
-
-    k9 = K9.objects.get(id = id)
-    k9_set = K9.filter.get(breed = k9.breed)
 
     sar = 0
     ndd = 0
@@ -371,29 +517,40 @@ def skill_count_between_breeds(id):
     skill_count = []
 
     for dog in k9_set:
-        if dog.capability == "SAR":
+        if dog.capability == "SAR" and dog.id == id:
             sar += 1
-        elif dog.capability == "NDD":
+        if dog.capability == "NDD" and dog.id == id:
             ndd += 1
-        else:
+        if dog.capability == "EDD" and dog.id == id:
             edd += 1
 
     skill_count.append(sar)
     skill_count.append(ndd)
     skill_count.append(edd)
 
-    sar_score = 0
-    ndd_score = 0
-    edd_score = 0
+    print("SKILL COUNT")
+    print(skill_count)
 
-    if max(skill_count) == sar:
-        sar_score = 1
-    elif max(skill_count) == ndd:
-        ndd_score = 1
-    else:
-        edd_score = 1
+    SAR_score = 0
+    NDD_score = 0
+    EDD_score = 0
 
-    return graph
+    if max(skill_count) == sar and max(skill_count) != 0:
+        SAR_score = 1
+    if max(skill_count) == ndd and max(skill_count) != 0:
+        NDD_score = 1
+    if max(skill_count) == edd and max(skill_count) != 0:
+        EDD_score = 1
+
+    classifier = []
+    classifier.append(graph)
+    classifier.append(SAR_score)
+    classifier.append(NDD_score)
+    classifier.append(EDD_score)
+
+
+    return classifier
+
 
 def skill_percentage_between_sexes(id):
     k9_set = K9.objects.exclude(capability="None")
@@ -481,16 +638,16 @@ def skill_percentage_between_sexes(id):
     skill_count = []
 
     if k9_gender == "Male":
-        skill_count.append(m_sar_count.count())
-        skill_count.append(m_ndd_count.count())
-        skill_count.append(m_edd_count.count())
+        skill_count.append(len(m_sar_count))
+        skill_count.append(len(m_ndd_count))
+        skill_count.append(len(m_edd_count))
         SAR = skill_count[0]
         NDD = skill_count[1]
         EDD = skill_count[2]
     else:
-        skill_count.append(f_sar_count.count())
-        skill_count.append(f_ndd_count.count())
-        skill_count.append(f_edd_count.count())
+        skill_count.append(len(f_sar_count))
+        skill_count.append(len(f_ndd_count))
+        skill_count.append(len(f_edd_count))
         SAR = skill_count[0]
         NDD = skill_count[1]
         EDD = skill_count[2]
@@ -501,14 +658,20 @@ def skill_percentage_between_sexes(id):
 
     if max(skill_count) == SAR:
         SAR_score = 1
-    elif max(skill_count) == NDD:
+    if max(skill_count) == NDD:
         NDD_score = 1
-    else:
+    if max(skill_count) == EDD:
         EDD_score = 1
 
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
-    return graph
+    classifier = []
+    classifier.append(graph)
+    classifier.append(SAR_score)
+    classifier.append(NDD_score)
+    classifier.append(EDD_score)
+
+    return classifier
 
 #TODO check if ratio ba talaga tawag dito just in case
 def skill_count_ratio():
@@ -537,30 +700,21 @@ def skill_count_ratio():
     NDD_score = 0
     EDD_score = 0
 
-    if max(values) == SAR.count():
+    if min(values) == SAR.count():
         SAR_score = 1
-    elif max(values) == NDD.count():
+    if min(values) == NDD.count():
         NDD_score = 1
-    else:
+    if min(values) == EDD.count():
         EDD_score = 1
 
-    return graph
+    classifier = []
+    classifier.append(graph)
+    classifier.append(SAR_score)
+    classifier.append(NDD_score)
+    classifier.append(EDD_score)
 
-def K9_skill_classifier(request):
+    return classifier
 
-    bar_gender_count = gender_count_between_breeds()
-    pie_skill_ratio = skill_count_ratio()
-    bar_skill_count_from_breed = skill_count_between_breeds()
-    pie_skill_percentage_from_sexes = skill_percentage_between_sexes()
-
-    context = {
-        'bar_gender_count': bar_gender_count,
-        'pie_skill_ratio' : pie_skill_ratio,
-        'bar_skill_count_from_breed': bar_skill_count_from_breed,
-        'pie_skill_percentage_from_sexes': pie_skill_percentage_from_sexes
-    }
-
-    return render(request, 'training/k9_skill_classifier.html', context)
 
 def make_annotations(pos, labels, M):
     #test = list(map(str, range(7)))
@@ -859,16 +1013,16 @@ def skills_from_gender(id):
 
 
     if k9_gender == "Male":
-        skill_count.append(m_sar_count.count())
-        skill_count.append(m_ndd_count.count())
-        skill_count.append(m_edd_count.count())
+        skill_count.append(len(m_sar_count))
+        skill_count.append(len(m_ndd_count))
+        skill_count.append(len(m_edd_count))
         SAR = skill_count[0]
         NDD = skill_count[1]
         EDD = skill_count[2]
     else:
-        skill_count.append(f_sar_count.count())
-        skill_count.append(f_ndd_count.count())
-        skill_count.append(f_edd_count.count())
+        skill_count.append(len(f_sar_count))
+        skill_count.append(len(f_ndd_count))
+        skill_count.append(len(f_edd_count))
         SAR = skill_count[0]
         NDD = skill_count[1]
         EDD = skill_count[2]
@@ -879,12 +1033,18 @@ def skills_from_gender(id):
 
     if max(skill_count) == SAR:
         SAR_score = 1
-    elif max(skill_count) == NDD:
+    if max(skill_count) == NDD:
         NDD_score = 1
-    else:
+    if max(skill_count) == EDD:
         EDD_score = 1
 
-    return graph
+    classifier = []
+    classifier.append(graph)
+    classifier.append(SAR_score)
+    classifier.append(NDD_score)
+    classifier.append(EDD_score)
+
+    return classifier
 
 
 def skill_in_general(id):
@@ -931,87 +1091,78 @@ def skill_in_general(id):
 
     if max(values) == SAR.count():
         SAR_score = 1
-    elif max(values) == NDD.count():
+    if max(values) == NDD.count():
         NDD_score = 1
-    else:
+    if max(values) == EDD.count():
         EDD_score = 1
 
-    return graph
+
+    classifier = []
+    classifier.append(graph)
+    classifier.append(SAR_score)
+    classifier.append(NDD_score)
+    classifier.append(EDD_score)
+
+    return classifier
 
 
-def genealogy(request):
-
-    form = TestForm
+def genealogy(id):
 
     tree = ""
     general = ""
     gender = ""
 
-    if request.method == 'POST':
+    cancel = 0
+    #data = K9_Genealogy.objects.filter(zero=k9)
+    #data.delete()
+    K9_Genealogy.objects.all().delete()
 
-        form = TestForm(request.POST)
-        cancel = 0
-        k9 = form.data['k9']
-        #data = K9_Genealogy.objects.filter(zero=k9)
-        #data.delete()
-        K9_Genealogy.objects.all().delete()
+    target = K9.objects.get(id=id)
+    flag = 0 #SET FLAG FOR WHEN END OF TREE IS REACHED
+    counter = 1  # SET INITIAL DEPTH
 
-        target = K9.objects.get(id=k9)
-        flag = 0 #SET FLAG FOR WHEN END OF TREE IS REACHED
-        counter = 1  # SET INITIAL DEPTH
+    k9s = [target]  # INITIAL: TARGET K9 per depth
 
-        k9s = [target]  # INITIAL: TARGET K9 per depth
+    while flag == 0: #CONTINUE TREE GENERATION
+        for k9 in k9s:# FOR EVERY K9 IN CURRENT DEPTH
+            if k9:
+                try:
+                    k9_parents = K9_Parent.objects.get(offspring=k9)  # FIND TARGET'S PARENTS
+                except K9_Parent.DoesNotExist:
+                    pass
+                else:
+                    cancel = 1
+                    mother = k9_parents.mother #SET MOTHER
+                    father = k9_parents.father #SET FATHER
 
-        while flag == 0: #CONTINUE TREE GENERATION
-            for k9 in k9s:# FOR EVERY K9 IN CURRENT DEPTH
-                if k9:
-                    try:
-                        k9_parents = K9_Parent.objects.get(offspring=k9)  # FIND TARGET'S PARENTS
-                    except K9_Parent.DoesNotExist:
-                        pass
-                    else:
-                        cancel = 1
-                        mother = k9_parents.mother #SET MOTHER
-                        father = k9_parents.father #SET FATHER
-
-                        tree = K9_Genealogy(o = k9, m = mother, f = father, depth = counter, zero = target)
-                        tree.save()
+                    tree = K9_Genealogy(o = k9, m = mother, f = father, depth = counter, zero = target)
+                    tree.save()
 
 
-            nodes = K9_Genealogy.objects.filter(depth = counter)
+        nodes = K9_Genealogy.objects.filter(depth = counter)
 
-            k9s = []
+        k9s = []
 
-            if nodes:
-                for node in nodes:
-                    m = node.m
-                    f = node.f
-                    k9s.append(m)# GET TARGET K9s for next depth (mothers)
-                    k9s.append(f) # GET TARGET K9s for next depth (fathers)
+        if nodes:
+            for node in nodes:
+                m = node.m
+                f = node.f
+                k9s.append(m)# GET TARGET K9s for next depth (mothers)
+                k9s.append(f) # GET TARGET K9s for next depth (fathers)
 
-            counter += 1 #INCREASE DEPTH
+        counter += 1 #INCREASE DEPTH
 
-            if not k9s: #IF FINAL NODES HAVE NO PARENTS, EXIT TREE GENERATION
-                flag = 1
+        if not k9s: #IF FINAL NODES HAVE NO PARENTS, EXIT TREE GENERATION
+            flag = 1
 
-            if cancel == 1:
-                print("STR ID = " + str(target.id))
-                tree = generate_family_tree(target.id)
-                general = skill_in_general(target.id)
-                gender = skills_from_gender(target.id)
-                #TODO Put other family related graphs here
+        if cancel == 1:
+            print("STR ID = " + str(target.id))
+            tree = generate_family_tree(target.id)
+            #general = skill_in_general(target.id)
+            #gender = skills_from_gender(target.id)
+            #TODO Put other family related graphs here
+        else:
+            tree = None
 
-            else:
-                tree = "K9 has no descendants!"
-
-
-    context = {
-            'form': form,
-            'tree': tree,
-            'skill_in_general': general,
-            'skill_by_gender': gender
-            }
-
-
-    return render(request, 'training/genealogy.html', context)
+    return tree
 

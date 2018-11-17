@@ -10,9 +10,9 @@ class DateInput(forms.DateInput):
 
 class ClassifySkillForm(forms.Form):
     CHOICES = (
-        ('EDD', 'EDD'),
-        ('NDD', 'NDD'),
         ('SAR', 'SAR'),
+        ('NDD', 'NDD'),
+        ('EDD', 'EDD'),
     )
 
     skill = forms.ChoiceField(choices=CHOICES,

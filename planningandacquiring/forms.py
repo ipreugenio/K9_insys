@@ -42,17 +42,17 @@ class add_donator_form(forms.ModelForm):
 class add_K9_parents_form(forms.Form):
 
     females = K9.objects.filter(sex = "Female")
-    males = K9.objects.filter(sex="Male")
+    males = K9.objects.filter(sex = "Male")
 
     mother_list = []
     father_list = []
 
     for female in females:
-        data= (female.id, female.name)
+        data = (female.id, female.name)
         mother_list.append(data)
 
     for male in males:
-        data = (male.id, male.name)
+        data  = (male.id, male.name)
         father_list.append(data)
 
     mother = forms.ChoiceField(choices = mother_list,

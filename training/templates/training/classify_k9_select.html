@@ -1,4 +1,5 @@
-{% extends "profiles/sidebar_training.html" %}  
+{% extends "profiles/sidebar_training.html" %}
+{% load training_tags %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -62,59 +63,37 @@
   </div>
   <ul class="list">
     <li>Below this is a list of suggested skill assignment based from current data.</li>
-      <li>Click on a category to view corresponding data diagram.</li>
+      <li>Click on the link beside a skill to view corresponding data diagram.</li>
   </ul>
-</div>
-
-<div class = "ui segment">
-    <table class="ui four column celled table">
-        <thead>
-            <tr>
-                <th>Categories</th>
-                <th>Skills</th>
-                <th>Categories</th>
-                <th>Skills</th>
-            </tr>
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on currently demanded skill">Demand</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on fraction of all skills">Ratio</th>
-                <td>Somthing</td>
-            </tr>
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on hereditary skills (all members)">Family History (General)</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on hereditary skills (members with the same breed)">Family History (Gender)</th>
-                <td>Somthing</td>
-            </tr>
-
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on skill count on current breed">Breed</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on skill count on current sex">Sex</th>
-                <td>Somthing</td>
-            </tr>
-                        
-        </thead>
-    </table>
 </div>
 
 <form class="ui form" action="" method="POST">
     {% csrf_token %}
-    <div class="six fields">
-        <div class="field"></div>
-        <div class="field"></div>
-        <div class="field">
+<div class = "ui segment">
+    <table class="ui two column celled table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>View Charts/Graphs</th>
+                <th></th>
+            </tr>
+        </thead>
+
             {% for radio in form.skill %}
-            {{ radio }}
+           <tr>
+
+               <td>{{ radio }}</td>
+               <td><a href="{% url 'training:view_graph' forloop.counter0 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+               <td>{{recommended|skill_score:forloop.counter0 }}</td>
+           </tr>
             {% endfor %}
-        </div>
+
+    </table>
+</div>
+
         <div class="field">
             <button class="ui green button">Submit</button>
         </div>
-        <div class="field"></div>
-        <div class="field"></div>
-    </div>
 </form>
 
 <script type="text/javascript">
@@ -123,6 +102,10 @@
         $('#tabledata').DataTable();
     
     } );
-    
+
+    $('.ui.basic.modal')
+    .modal('show')
+    ;
+
 </script>
  {% endblock %}
