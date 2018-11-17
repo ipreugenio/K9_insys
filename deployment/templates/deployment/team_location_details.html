@@ -153,13 +153,12 @@
           <div class="{{ style }} row"> {{ message }}</div>
       {% endfor %}
   {% endif %}
-  <table id="tabledata3" class="ui six column celled table">
+  <table id="tabledata3" class="ui five column celled table">
         <thead>
           <tr>
             <th>Name</th>
             <th>Serial Number</th>
             <th>Capability</th>
-            <th>Handler</th>
             <th>Date Assigned</th>
             <th>Date Pulled</th>
           </tr>
@@ -170,7 +169,6 @@
             <td>{{dogs_pulled.k9.name}}</td>
             <td>{{dogs_pulled.k9.serial_number}}</td>
             <td>{{dogs_pulled.k9.capability}}</td>
-            <td>{{dogs_pulled.k9.handler}}</td>
             <td>{{dogs_pulled.date_added}}</td>
             <td>{{dogs_pulled.date_pulled}}</td>
           </tr>
@@ -184,7 +182,7 @@
         $('#tabledata1').DataTable();
         $('#tabledata2').DataTable();
         $('#tabledata3').DataTable({
-              "order": [[ 5, "desc" ]]
+              "order": [[ 4, "desc" ]]
         });
         $('.menu .item').tab();
     });

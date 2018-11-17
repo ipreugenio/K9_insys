@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from planningandacquiring.models import K9
-from training.models import K9_Handler, Training
+from training.models import K9_Handler, Training, K9_Adopted_Owner
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -62,3 +62,13 @@ class SerialNumberForm(forms.Form):
     )
     microchip = forms.CharField(max_length=200)
     dog_type = forms.CharField(max_length=200, widget = forms.Select(choices=DOG_TYPE))
+
+class AdoptionForms(forms.ModelForm):
+    address = forms.CharField(widget=forms.Textarea(attrs={'rows':'2', 'style':'resize:none;'}))
+
+    class Meta:
+        model = K9_Adopted_Owner
+        fields = ('first_name', 'middle_name', 'last_name', 'sex', 'birth_date','email', 'contact_no', 'address')
+        widgets = {
+            'birth_date': DateInput(),
+        }

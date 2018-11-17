@@ -6,11 +6,10 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
-from planningandacquiring.models import K9_New_Owner, K9_Adopted
-from training.models import Training
+from training.models import Training, K9_Adopted_Owner
 from .forms import TestForm, add_handler_form
-from planningandacquiring.forms import add_donator_form, AdoptionForms
-from training.forms import TrainingUpdateForm, SerialNumberForm
+from planningandacquiring.forms import add_donator_form
+from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms
 import datetime
 
 # from collections import OrderedDict
@@ -34,6 +33,53 @@ import plotly.graph_objs.layout as lout'''
 def index(request):
     return render (request, 'training/index.html')
 
+def adoption_form(request, id):
+    data = K9.objects.get(id=id) # get k9
+    form = AdoptionForms(request.POST or None)
+    form.fields['email'].initial = ''
+    form.fields['contact_no'].initial = ''
+    #form.fields['k9'].initial = data
+    #form.fields['k9'].initial = form.cleaned_data['data']
+    #print(form.fields['k9'])
+
+    if request.method == "POST":
+        print(form.errors)
+        if form.is_valid():
+            print('valid')
+            #form.save()
+            no_id = form.save()
+            no_id.k9 = data
+            no_id.save()
+            #print(no_id.k9)
+            request.session['no_id'] = no_id.id
+            return redirect('training:confirm_adoption', id = data.id)
+
+    context = {
+        'title': data,
+        'form': form,
+    }
+    return render (request, 'training/adoption_form.html', context)
+
+def confirm_adoption(request, id):
+    data = K9.objects.get(id=id) # get k9
+    no = request.session['no_id']
+    new_owner = K9_Adopted_Owner.objects.get(id=no)
+    if request.method == "POST":
+        if 'ok' in request.POST:
+            print('ok')
+            data.training_status = 'Adopted'
+            data.save()
+            return redirect('training:adoption_confirmed')
+        else:
+            print('not ok')
+            new_owner.delete()
+            return redirect('training:adoption_form', id = data.id)
+    context = {
+        'title': data,
+        'data': data,
+    }
+    return render (request, 'training/confirm_adoption.html', context)
+
 def adoption_list(request):
     for_adoption = K9.objects.filter(training_status='For-Adoption')
     adopted = K9.objects.filter(training_status='Adopted')
@@ -45,15 +91,12 @@ def adoption_list(request):
 
     return render (request, 'training/for_adoption_list.html', context)
 
-
 def adoption_details(request, id):
     k9 = K9.objects.get(id=id)
-    owner = K9_New_Owner.objects.all()
-    data =K9_Adopted.objects.filter(k9=k9).get(owner__id__in=owner)
-
+    data = K9_Adopted_Owner.objects.get(k9=k9)
 
     context = {
-        'title': data,
+        'title': data.k9,
         'data': data,
     }
 
@@ -338,49 +381,6 @@ def training_details(request, id):
         'sar':sar,
     }
     return render (request, 'training/training_details.html', context)
-
-def adoption_form(request, id):
-    data = K9.objects.get(id=id) # get k9
-    form = AdoptionForms(request.POST or None)
-    form.fields['email'].initial = ''
-    form.fields['contact_no'].initial = ''
-
-    if request.method == "POST":
-        if form.is_valid():
-            print('valid')
-            form.k9 = data
-            form.save()
-            no_id = form.save()
-            request.session['no_id'] = no_id.id
-        return redirect('training:confirm_adoption', id = data.id)
-
-    context = {
-        'title': data,
-        'form': form,
-    }
-    return render (request, 'training/adoption_form.html', context)
-
-def confirm_adoption(request, id):
-    data = K9.objects.get(id=id) # get k9
-    no = request.session['no_id']
-    new_owner = K9_New_Owner.objects.get(id=no)
-    print(new_owner)
-    if request.method == "POST":
-        if 'ok' in request.POST:
-            print('ok')
-            K9_Adopted.objects.create(k9=data,owner=new_owner)
-            data.training_status = 'Adopted'
-            data.save()
-            return redirect('training:adoption_confirmed')
-        else:
-            print('not ok')
-            new_owner.delete()
-            return redirect('training:adoption_form', id = data.id)
-    context = {
-        'title': data,
-        'data': data,
-    }
-    return render (request, 'training/confirm_adoption.html', context)
 
 def adoption_confirmed(request):
     return render (request, 'training/adoption_confirmed.html')
