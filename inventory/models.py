@@ -21,7 +21,7 @@ class Medicine(models.Model):
     medicine = models.CharField(max_length=100)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
-    uom = models.CharField('uom', choices=UOM, max_length=10, default='none')
+    uom = models.CharField('uom', choices=UOM, max_length=10, default='None')
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
     used_yearly = models.IntegerField('used_yearly', default=0)
