@@ -33,18 +33,21 @@
                             <div class="six wide column">               
                                 <div class="ui inverted segment">
                                     <div class="ui left aligned inverted form">
+                                        <form class="ui inverted equal width form" action="{% url 'profiles:login' %}" method="POST">
+                                            {% csrf_token %}
                                         <div class="field">
                                             <label>Serial Number</label>
-                                            <input placeholder="Serial Number" type="text">
+                                            <input name="serial_number" placeholder="Serial Number" type="text">
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input placeholder="Password" type="password">
+                                            <input name="password" placeholder="Password" type="password">
                                         </div>
                                      
                                         <div class="ui inverted center aligned segment" style="padding: 0px;">
-                                            <div class="ui center aligned orange button">Submit</div>
+                                            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Login</button>
                                         </div>
+                                        </form>
                                     </div>
                                 </div>           
                             </div>
@@ -62,7 +65,6 @@
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script src="{% static 'semantic/semantic.min.js' %}"></script>
     <script src="{% static 'custome/custom_jquery.js' %}"></script>
-
       
     {% block script%}
     {% endblock%}

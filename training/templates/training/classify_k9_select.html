@@ -6,7 +6,7 @@
     <h3 class="ui header">Classify {{ title }}</h3>
     {% if messages %}
         {% for message in messages %}
-            <div class={{style}} > {{ message }}</div>
+            <div class='{{style}}'> {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
@@ -67,9 +67,9 @@
   </ul>
 </div>
 
-<form class="ui form" action="" method="POST">
+<form class="ui form" method="POST">
     {% csrf_token %}
-<div class = "ui segment">
+  <div class = "ui segment">
     <table class="ui two column celled table">
         <thead>
             <tr>
@@ -77,35 +77,76 @@
                 <th>View Charts/Graphs</th>
                 <th></th>
             </tr>
+
         </thead>
 
-            {% for radio in form.skill %}
-           <tr>
+             <tr>
+            {% if sar.grade == '0' or data.capability == 'SAR' %}
+            <td>
+              <input type="radio" name="radio" value="SAR" disabled>SAR
+                </td>
+            {%else%}
+        <td>
+              <input type="radio" name="radio" value="SAR">SAR
+        </td>
+            {%endif%}
+                 <td><a href="{% url 'training:view_graph' 0 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                 <td>{{sar_recommended}}</td>
+        </tr>
 
-               <td>{{ radio }}</td>
-               <td><a href="{% url 'training:view_graph' forloop.counter0 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
-               <td>{{recommended|skill_score:forloop.counter0 }}</td>
-           </tr>
-            {% endfor %}
+
+            <tr>
+            {% if ndd.grade == '0' or data.capability == 'NDD'%}
+            <td>
+              <input type="radio" name="radio" value="NDD" disabled>NDD
+                </td>
+            {%else%}
+            <td>
+              <input type="radio" name="radio" value="NDD">NDD
+            </td>
+            {%endif%}
+                <td><a href="{% url 'training:view_graph' 1 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                <td>{{ndd_recommended}}</td>
+            </tr>
+
+
+
+             <tr>
+            {% if edd.grade == '0' or data.capability == 'EDD' %}
+            <td>
+              <input type="radio" name="radio" value="EDD" disabled>EDD
+            </td>
+            {%else%}
+            <td>
+              <input type="radio" name="radio" value="EDD">EDD
+            </td>
+            {%endif%}
+                 <td><a href="{% url 'training:view_graph' 2 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                <td>{{edd_recommended}}</td>
+             </tr>
 
     </table>
-</div>
-
-        <div class="field">
-            <button class="ui green button">Submit</button>
-        </div>
+          <button class="ui green button" type="Submit">Submit</button>
+  </div>
 </form>
 
 <script type="text/javascript">
-        
+
     $(document).ready(function() {
         $('#tabledata').DataTable();
+
     
     } );
 
     $('.ui.basic.modal')
     .modal('show')
     ;
+
+
+        var selected = $("input[name='radio']");
+        alert(select.val)
+    });
+
 
 </script>
  {% endblock %}

@@ -3,10 +3,16 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Location, Team_Assignment, Area, Team
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request
+from planningandacquiring.models import K9
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class AreaForm(forms.ModelForm):
+    class Meta:
+        model = Area
+        fields = ('name',)
 
 class LocationForm(forms.ModelForm):
     CITY = (
@@ -157,22 +163,24 @@ class LocationForm(forms.ModelForm):
         ('Zamboanga', 'Zamboanga'),
     )
     city = forms.CharField(max_length=50, label = 'city', widget = forms.Select(choices=CITY))
-    address = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
 
     class Meta:
         model = Location
-        fields = ('city', 'zip_code', 'address')
+        fields = ('area', 'city', 'place')
 
-class AreaForm(forms.ModelForm):
+class AssignTeamForm(forms.ModelForm):
+    '''location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))'''
+
     class Meta:
-        model = Area
-        fields = ('name',)
+        model = Team_Assignment
+        fields = ('location', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
-class TeamForm(forms.ModelForm):
+class EditTeamForm(forms.ModelForm):
     class Meta:
-        model = Team
-        fields = ('area', 'name')
+        model = Team_Assignment
+        fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
+'''
 class assign_team_form(forms.ModelForm):
     class Meta:
         model = Team_Assignment
@@ -190,5 +198,14 @@ class assign_team_form(forms.ModelForm):
                     pass  # invalid input from the client; ignore and fallback to empty City queryset
             elif self.instance.pk:
                 self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
+'''
 
+class RequestForm(forms.ModelForm):
+    class Meta:
+        model = Dog_Request
+        fields = ('requester', 'location', 'area', 'EDD_needed', 'NDD_needed', 'SAR_needed', 'start_date', 'end_date')
 
+        widgets = {
+            'start_date': DateInput(),
+            'end_date': DateInput()
+        }

@@ -44,11 +44,13 @@
     </table>
 </div>
 <script type="text/javascript">
-	
+
 	$(document).ready(function() {
-		$('#tabledata').DataTable();
+		$('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ]]
+    });
 		$('.menu .item').tab();
 	});
-	
+
 </script>
 {% endblock %}

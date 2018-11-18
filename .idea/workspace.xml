@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/training/templatetags/__init__.py" afterDir="false" />
+    <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py">
+      <change afterPath="$PROJECT_DIR$/deployment/migrations/0002_auto_20181025_1835.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/migrations/0003_auto_20181027_1932.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/add_area.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/assign_team_location.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/assigned_location_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/edit_team.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templatetags/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templatetags/index.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/inventory/migrations/0002_auto_20181025_1835.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planningandacquiring/migrations/0002_auto_20181025_1835.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles/templates/profiles/add_user_account.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_adoption.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/migrations/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/adoption_confirmed.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/adoption_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/adoption_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/confirm_adoption.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/for_adoption_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/training_update_edd.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/K9_insys/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/add_location.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/add_location.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/add_team.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/area_detail.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/area_list.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/deploy_number_dogs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/deployed_dogs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/location_form.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/requested_dogs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/medicine_add.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/medicine_add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_donator.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_donator.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/add_User.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/add_User.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/add_education.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/add_education.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/add_personal_info.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/add_personal_info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/sidebar_menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/sidebar_menu.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_training.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_training.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/user_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/user_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/user_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/user_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/views.py___jb_tmp___" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/assign_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/assign_k9_select.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/serial_number_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/serial_number_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_records.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_records.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_sar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/migrations/0001_initial.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,33 +95,67 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="classify_k9_select.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/training/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-155">
-              <caret line="71" column="10" selection-start-line="71" selection-start-column="10" selection-end-line="71" selection-end-column="10" />
+            <state relative-caret-position="-1719">
+              <caret line="175" column="28" selection-start-line="175" selection-start-column="28" selection-end-line="175" selection-end-column="28" />
               <folding>
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="e#0#58#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="add_K9_parents.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1088">
+              <caret line="1" column="15" selection-start-line="1" selection-start-column="15" selection-end-line="1" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="823">
+              <caret line="381" column="35" selection-start-line="381" selection-start-column="35" selection-end-line="381" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#35#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/training/forms.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="15" column="18" lean-forward="true" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="classify_k9_select.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="131">
+              <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/training/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>labels</find>
-      <find>text</find>
-      <find>model_fit</find>
-      <find>list_train</find>
-      <find>skill_count_ratio</find>
-      <find>.60</find>
-      <find>.70</find>
-      <find>skill_count_be</find>
-      <find>email</find>
-      <find>k9_skill</find>
-    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,64 +163,14 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/profiles/views.py" />
-        <option value="$PROJECT_DIR$/../bigapple-insys/bigapple/production/views.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_detail.html" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/python-igraph-master/setup.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/k9_skill_classifier.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/genealogy.html" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/distutils/version.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/scipy/_lib/_version.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/numpy/lib/_version.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/statsmodels/tsa/base/tsa_model.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pandas/_version.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/statsmodels/compat/pandas.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/training_records.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/urls.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/ajax_test.html" />
-        <option value="$PROJECT_DIR$/deployment/admin.py" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_teams.html" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/area_list.html" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" />
-        <option value="$PROJECT_DIR$/deployment/forms.py" />
-        <option value="$PROJECT_DIR$/deployment/urls.py" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/assign_team.html" />
-        <option value="$PROJECT_DIR$/deployment/views.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/confirm_K9_parents.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/admin.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/forecast_k9_required.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" />
-        <option value="$PROJECT_DIR$/inventory/models.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/statsmodels/tsa/holtwinters.py" />
-        <option value="$PROJECT_DIR$/deployment/models.py" />
-        <option value="$PROJECT_DIR$/profiles/urls.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/models.py" />
-        <option value="$PROJECT_DIR$/training/models.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_donated_K9.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/confirm_K9_donation.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templatetags/index.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
-        <option value="$PROJECT_DIR$/training/templatetags/__init__.py" />
-        <option value="$PROJECT_DIR$/training/templatetags/index.py" />
-        <option value="$PROJECT_DIR$/K9_insys/settings.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_list.html" />
-        <option value="$PROJECT_DIR$/training/templatetags/training_tags.py" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" />
         <option value="$PROJECT_DIR$/training/forms.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
         <option value="$PROJECT_DIR$/training/urls.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/view_graph.html" />
         <option value="$PROJECT_DIR$/training/views.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
+        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
       </list>
     </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="172" />
-    <option name="width" value="606" />
-    <option name="height" value="682" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -122,6 +184,24 @@
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
@@ -172,6 +252,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -200,11 +281,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22108346" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" visible="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3288889" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -218,7 +299,6 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3288889" />
     </layout>
     <layout-to-restore>
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -240,8 +320,9 @@
       <window_info id="Favorites" order="2" side_tool="true" />
     </layout-to-restore>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -340,13 +421,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="8" column="48" selection-start-line="8" selection-start-column="48" selection-end-line="8" selection-end-column="48" />
         </state>
       </provider>
     </entry>
@@ -453,13 +527,6 @@
     <entry file="file://$PROJECT_DIR$/training/models.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="15" selection-start-line="1" selection-start-column="15" selection-end-line="1" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/training/templatetags/training_tags.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -498,48 +565,68 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
+    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="78" column="45" selection-start-line="78" selection-start-column="45" selection-end-line="78" selection-end-column="45" />
+        <state relative-caret-position="136">
+          <caret line="8" column="48" selection-start-line="8" selection-start-column="48" selection-end-line="8" selection-end-column="48" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/forms.py">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
+        <state relative-caret-position="471">
+          <caret line="84" column="51" lean-forward="true" selection-start-line="84" selection-start-column="51" selection-end-line="84" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/training/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="16" column="41" selection-start-line="16" selection-start-column="41" selection-end-line="16" selection-end-column="41" />
+        <state relative-caret-position="85">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="15" column="18" lean-forward="true" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-119">
-          <caret line="343" column="61" lean-forward="true" selection-start-line="343" selection-start-column="61" selection-end-line="343" selection-end-column="61" />
+        <state relative-caret-position="823">
+          <caret line="381" column="35" selection-start-line="381" selection-start-column="35" selection-end-line="381" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/training/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-975">
-          <caret line="126" column="17" selection-start-line="126" selection-start-column="17" selection-end-line="126" selection-end-column="17" />
+        <state relative-caret-position="-1719">
+          <caret line="175" column="28" selection-start-line="175" selection-start-column="28" selection-end-line="175" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1088">
+          <caret line="1" column="15" selection-start-line="1" selection-start-column="15" selection-end-line="1" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-155">
-          <caret line="71" column="10" selection-start-line="71" selection-start-column="10" selection-end-line="71" selection-end-column="10" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
+        <state relative-caret-position="131">
+          <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
         </state>
       </provider>
     </entry>

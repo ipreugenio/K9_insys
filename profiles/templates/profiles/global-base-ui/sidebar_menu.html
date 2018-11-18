@@ -1,4 +1,4 @@
-{% extends "profiles/global-base-ui/global_base_ui.html" %}  
+{% extends "profiles/global-base-ui/global_base_ui.html" %}
 
 {% block sidebar%}
     <div class="ui inverted bottom attached segment pushable">
@@ -10,9 +10,10 @@
             <a class="item" href="{% url 'deployment:index'%}"><i class="road icon"></i>Deployment</a>
             <a class="item" href="{% url 'inventory:medicine_add'%}"><i class="warehouse icon"></i>Inventory</a>
             <a class="item" href="{% url 'profiles:add_User_form'%}"><i class="folder open icon"></i>Unit Management</a>
+            <a class="item" href="{% url 'training:adoption_list'%}"><i class="handshake icon"></i>Adoption</a>
             <a class="item" href="{% url 'profiles:login'%}">Logout</a>
         </div>
-    
+        
         <!--html pages-->
         {% block sidebar_module %}
         {% endblock%}
@@ -20,7 +21,7 @@
         <!--DASHBOARD-->
         {% block dashboard %}
         {% endblock%}
-        
+
     </div>
 {% endblock%}
 
@@ -28,7 +29,7 @@
 {% block script%}
 <script>
     $(document).ready(function(){
-        
+
         $( "#menu" ).on("click", function() {
             $('#sidebar').sidebar({
                 context: $('.bottom.segment')
@@ -40,11 +41,11 @@
             on: 'hover'
         });
 
-        $('.ui.menu .item').on('click', function() {   
+        $('.ui.menu .item').on('click', function() {
             $(this)
             .addClass('active')
             .siblings()
-            .removeClass('active'); 
+            .removeClass('active');
         })
     });
 </script>
