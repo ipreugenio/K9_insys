@@ -6,7 +6,11 @@
     {{data.team}}
     <div class="sub header">Team details for {{data.team}}</div>
 </h1>
-
+{% if messages %}
+    {% for message in messages %}
+        <div class="ui green message"> {{ message }}</div>
+    {% endfor %}
+{% endif %}
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Details</a>
     <a class="item" data-tab="second">Deploy K9's</a>
@@ -110,11 +114,6 @@
 </div>
 
 <div class="ui tab segment" data-tab="second">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="{{ style }} row"> {{ message }}</div>
-      {% endfor %}
-  {% endif %}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata2" class="ui four column celled table">
@@ -148,11 +147,6 @@
   </form>
 </div>
 <div class="ui tab segment" data-tab="third">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="{{ style }} row"> {{ message }}</div>
-      {% endfor %}
-  {% endif %}
   <table id="tabledata3" class="ui five column celled table">
         <thead>
           <tr>

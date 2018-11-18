@@ -166,11 +166,19 @@ def team_location_details(request, id):
 
         for checked_dogs in checked_dogs:
             Team_Dog_Deployed.objects.create(team_assignment=data, k9=checked_dogs)
+            # TODO: if dog is equal capability increment
+            if checked_dogs.capability == 'EDD':
+                data.EDD_deployed = data.EDD_deployed + 1
+            elif checked_dogs.capability == 'NDD':
+                data.NDD_deployed = data.NDD_deployed + 1
+            else:
+                data.SAR_deployed = data.SAR_deployed + 1
+
+            data.save()
             dog = K9.objects.get(id=checked_dogs.id)
             dog.assignment = str(data)
             dog.save()
 
-        style = "ui green message"
         messages.success(request, 'Dogs has been successfully Deployed!')
 
         return redirect('deployment:team_location_details', id = id)
@@ -211,6 +219,8 @@ def remove_dog_deployed(request, id):
     else:
         pass
     team_assignment.save()
+
+    messages.success(request, 'Dogs has been successfully Pulled!')
 
     return redirect('deployment:team_location_details', id=pull_k9.team_assignment.id)
 
