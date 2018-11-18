@@ -648,13 +648,13 @@ def skill_count_between_breeds(id):
     edd = 0
 
     skill_count = []
-
+    target_k9 = K9.objects.get(id = id)
     for dog in k9_set:
-        if dog.capability == "SAR" and dog.id == id:
+        if dog.capability == "SAR" and dog.breed == target_k9.breed:
             sar += 1
-        if dog.capability == "NDD" and dog.id == id:
+        if dog.capability == "NDD" and dog.breed == target_k9.breed:
             ndd += 1
-        if dog.capability == "EDD" and dog.id == id:
+        if dog.capability == "EDD" and dog.breed == target_k9.breed:
             edd += 1
 
     skill_count.append(sar)
