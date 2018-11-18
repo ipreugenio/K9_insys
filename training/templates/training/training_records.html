@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_training.html" %}  
+{% extends "profiles/sidebar_training.html" %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -17,7 +17,6 @@
             <th>Sex</th>
             <th>Age</th>
             <th>Status</th>
-            <th>Training Level</th>
         </tr>
     </thead>
     <tbody>
@@ -30,16 +29,15 @@
             <td>{{data.sex}}</td>
             <td>{{data.age}}</td>
             <td>{{data.training_status}}</td>
-            <td>{{data.training_level}}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 <script type="text/javascript">
-        
+
     $(document).ready(function() {
         $('#tabledata').DataTable();
     } );
-    
+
 </script>
  {% endblock %}

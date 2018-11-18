@@ -1,0 +1,241 @@
+{% extends "profiles/sidebar_training.html" %}
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }} Training Status</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<table class="ui very basic four column table">
+    <thead>
+        <tr>
+            <th>Status: {{data.training_status}}</th>
+            <th>Type: {{data.status}}</th>
+            <th>Capability: {{data.capability}}</th>
+            <th>Level: {{data.training_level}}</th>
+        </tr>
+    </thead>
+</table>
+
+<form class="ui form" action="" method="POST">
+    {% csrf_token %}
+    <table class="ui celled table">
+        <thead>
+            <!--Stage 1-->
+            <tr>
+                <th>Stage 1.1</th>
+                <td>This is Stage 1.1 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage1_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 1.2</th>
+                <td>This is Stage 1.2 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage1_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 1.3</th>
+                <td>This is Stage 1.3 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage1_3}}</td>
+            </tr>
+            <!--Stage 2-->
+            <tr>
+                <th>Stage 2.1</th>
+                <td>This is Stage 2.1 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage2_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 2.2</th>
+                <td>This is Stage 2.2 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage2_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 2.3</th>
+                <td>This is Stage 2.3 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage2_3}}</td>
+            </tr>
+             <!--Stage 3-->
+            <tr>
+                <th>Stage 3.1</th>
+                <td>This is Stage 3.1 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage3_1}}</td>
+            </tr>
+            <tr>
+                <th>Stage 3.2</th>
+                <td>This is Stage 3.2 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage3_2}}</td>
+            </tr>
+            <tr>
+                <th>Stage 3.3</th>
+                <td>This is Stage 3.3 Training of SAR</td>
+                <td class="ui center aligned">{{form.stage3_3}}</td>
+            </tr>
+        </thead>
+    </table>
+    <div class="fields">
+        <div class="six wide field">
+            <div class="ui labeled input">
+                <div class="ui teal label" style="width:80px;">
+                    Grade
+                </div>
+                {{form.grade}}
+            </div>
+        </div>
+        <div class="field"></div>
+        <div class="field"></div>
+    </div>
+    <div class="field">
+        <div class="ui labeled input">
+            <div class="ui teal label">
+                Remarks
+            </div>
+            {{form.remarks}}
+        </div>
+    </div>
+    <div class="ui basic center aligned segment">
+        <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>
+    </div>
+</form>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+
+        if($("input[name='stage1_1']").is(':checked')){
+            $("input[name='stage1_1']").prop('disabled', true)
+        }
+        if($("input[name='stage1_2']").is(':checked')){
+          $("input[name='stage1_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage1_3']").is(':checked')){
+            $("input[name='stage1_3']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_1']").is(':checked')){
+            $("input[name='stage2_1']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_2']").is(':checked')){
+            $("input[name='stage2_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage2_3']").is(':checked')){
+            $("input[name='stage2_3']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_1']").is(':checked')){
+            $("input[name='stage3_1']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_2']").is(':checked')){
+            $("input[name='stage3_2']").prop('disabled', true)
+        }
+        if ($("input[name='stage3_3']").is(':checked')){
+            $("input[name='stage3_3']").prop('disabled', true)
+            $("#btn").prop('disabled', true)
+            $("textarea[name='remarks']").prop('disabled', true)
+            $("select[name='grade']").prop('disabled', true)
+        }
+
+        $("select[name='grade']").prop('disabled', true)
+
+        //Stage3_3
+        $("input[name='stage3_3']").change(function() {
+            if ($("input[name='stage3_2']").is(':checked')){
+                $("select[name='grade']").prop('disabled', false)
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_3']").prop('checked', false)
+                $("select[name='grade']").prop('disabled', true)
+            }
+        });
+        //Stage3_2
+        $("input[name='stage3_2']").change(function() {
+            if ($("input[name='stage3_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage3_1
+        $("input[name='stage3_1']").change(function() {
+            if ($("input[name='stage2_3']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+
+        //Stage2_3
+        $("input[name='stage2_3']").change(function() {
+            if ($("input[name='stage2_2']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage2_2
+        $("input[name='stage2_2']").change(function() {
+            if ($("input[name='stage2_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage2_2']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage2_1
+        $("input[name='stage2_1']").change(function() {
+            if ($("input[name='stage1_3']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+
+        //Stage1_3
+        $("input[name='stage1_3']").change(function() {
+            if ($("input[name='stage1_2']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_2']").prop('checked', false)
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+        //Stage1_2
+        $("input[name='stage1_2']").change(function() {
+            if ($("input[name='stage1_1']").is(':checked')){
+            }else{
+                alert('Previous stage must be checked')
+                $("input[name='stage1_1']").prop('checked', false)
+                $("input[name='stage1_2']").prop('checked', false)
+                $("input[name='stage1_3']").prop('checked', false)
+                $("input[name='stage2_1']").prop('checked', false)
+                $("input[name='stage2_3']").prop('checked', false)
+                $("input[name='stage3_1']").prop('checked', false)
+                $("input[name='stage3_2']").prop('checked', false)
+                $("input[name='stage3_3']").prop('checked', false)
+            }
+        });
+
+    } );
+
+</script>
+ {% endblock %}

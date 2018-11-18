@@ -2,8 +2,8 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
-from .models import User, Personal_Info, Education
-
+from .models import User, Personal_Info, Education, Account
+from deployment.models import Location 
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -36,7 +36,7 @@ class add_User_form(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('serial_number', 'firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
+        fields = ('firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
                   'gender', 'birthdate', 'birthplace', 'civilstatus', 'citizenship', 'religion', 'bloodtype',
                   'distinct_feature', 'haircolor', 'eyecolor', 'skincolor', 'height', 'weight',
                   'headsize', 'footsize', 'bodybuild')
@@ -51,7 +51,7 @@ class add_User_form(forms.ModelForm):
 class add_personal_form(forms.ModelForm):
     class Meta:
         model = Personal_Info
-        fields = ('mobile_number', 'email_address', 'tel_number', 'street',
+        fields = ('mobile_number', 'tel_number', 'street',
                   'barangay', 'city', 'province', 'mother_name', 'mother_birthdate',
                   'father_name', 'father_birthdate', 'tin', 'philhealth')
         widgets = {
@@ -64,3 +64,12 @@ class add_education_form(forms.ModelForm):
         model = Education
         fields = ('primary_education', 'secondary_education', 'tertiary_education', 'pe_schoolyear', 'se_schoolyear',
                   'te_schoolyear', 'pe_degree', 'se_degree', 'te_degree')
+
+class add_user_account(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ('serial_number', 'email_address', 'password')
+
+        widgets = {
+            'password': forms.PasswordInput(),
+        }

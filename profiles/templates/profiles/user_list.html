@@ -11,7 +11,6 @@
         	<thead>
           	<tr>
               <th>Name</th>
-              <th>Serial Number</th>
               <th>Position</th>
               <th>Rank</th>
           	</tr>
@@ -20,7 +19,6 @@
 				{% for User in user %}
     				<tr>
     					<td><a  href="{% url 'profiles:user_detail' User.id %}">{{User}}</a></td>
-                        <td>{{ User.serial_number }}</td>
     					<td>{{ User.position }}</td>
     					<td>{{ User.rank}}</td>
     				</tr>
