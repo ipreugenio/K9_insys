@@ -12,7 +12,6 @@ urlpatterns = [
     path('add_User_form/', views.add_User, name='add_User_form'),
     path('add_User_form/add_personal_form/', views.add_personal_info, name='add_personal_form'),
     path('add_User_form/add_personal_form/add_education/', views.add_education, name='add_education'),
-    path('add_User_form/add_personal_form/add_education/add_user_account/', views.add_account, name='add_user_account'),
     path('user_list/', views.user_listview, name='user_list'),
     path('user_detail/<int:id>', views.user_detailview, name='user_detail'),
     path('user_add_confirmed/', views.user_add_confirmed, name='user_add_confirmed'),

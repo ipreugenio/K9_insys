@@ -11,37 +11,35 @@ class DateInput(forms.DateInput):
 
 #Medicine
 class MedicineForm(forms.ModelForm):
-
+    
     UOM = (
         ('mg', 'mg'),
         ('mL', 'mL'),
     )
-
+    
     uom = forms.CharField(max_length=10, label = 'uom', widget = forms.Select(choices=UOM))
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
     dose = forms.DecimalField(widget = forms.NumberInput())
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'used_yearly')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
-        self.fields['used_yearly'].required = False
-        self.fields['uom'].required = False
-
+       
 class MedicineCountForm(forms.ModelForm):
     class Meta:
         model = Medicine_Inventory
         fields = ('medicine', 'quantity')
-
+    
     def __init__(self, *args, **kwargs):
         super(MedicineCountForm, self).__init__(*args, **kwargs)
         self.fields['medicine'].required = False
 #Food
 class FoodForm(forms.ModelForm):
-
+    
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
@@ -63,14 +61,14 @@ class FoodCountForm(forms.ModelForm):
     class Meta:
         model = Food_Inventory
         fields = ('food', 'quantity')
-
+    
     def __init__(self, *args, **kwargs):
         super(FoodCountForm, self).__init__(*args, **kwargs)
         self.fields['food'].required = False
 
 #Miscellaneous
 class MiscellaneousForm(forms.ModelForm):
-
+    
     UOM = (
         ('pc', 'pc'),
         ('pack', 'pack'),
@@ -103,7 +101,7 @@ class MiscellaneousCountForm(forms.ModelForm):
     class Meta:
         model = Miscellaneous_Inventory
         fields = ('miscellaneous', 'quantity')
-
+    
     def __init__(self, *args, **kwargs):
         super(MiscellaneousCountForm, self).__init__(*args, **kwargs)
         self.fields['miscellaneous'].required = False
@@ -112,7 +110,7 @@ class DamagedEquipmentForm(forms.ModelForm):
     CONCERN = (
         ('Broken', 'Broken'),
         ('Lost', 'Lost'),
-        ('Stolen', 'Stolen'),
+        ('Stolen', 'Stolen'),   
     )
 
     concern = forms.CharField(max_length=10, label = 'concern', widget = forms.Select(choices=CONCERN))
@@ -121,3 +119,5 @@ class DamagedEquipmentForm(forms.ModelForm):
     class Meta:
         model = DamagedEquipemnt
         fields = ('inventory', 'quantity', 'concern')
+
+

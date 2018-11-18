@@ -6,13 +6,10 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
-from training.models import Training, K9_Adopted_Owner
+from training.models import Training
 from .forms import TestForm, add_handler_form
-from planningandacquiring.forms import add_donator_form
-from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm
-import datetime
-
-# from collections import OrderedDict
+from training.forms import TrainingUpdateForm, SerialNumberForm, ClassifySkillForm
+from collections import OrderedDict
 
 #graphing imports
 import igraph
@@ -27,92 +24,26 @@ import plotly.graph_objs.layout as lout
 def index(request):
     return render (request, 'training/index.html')
 
-def adoption_form(request, id):
-    data = K9.objects.get(id=id) # get k9
-    form = AdoptionForms(request.POST or None)
-    form.fields['email'].initial = ''
-    form.fields['contact_no'].initial = ''
-    #form.fields['k9'].initial = data
-    #form.fields['k9'].initial = form.cleaned_data['data']
-    #print(form.fields['k9'])
 
-    if request.method == "POST":
-        print(form.errors)
-        if form.is_valid():
-            print('valid')
-            #form.save()
-            no_id = form.save()
-            no_id.k9 = data
-            no_id.save()
-            #print(no_id.k9)
-            request.session['no_id'] = no_id.id
-            return redirect('training:confirm_adoption', id = data.id)
-
-    context = {
-        'title': data,
-        'form': form,
-    }
-    return render (request, 'training/adoption_form.html', context)
-
-def confirm_adoption(request, id):
-    data = K9.objects.get(id=id) # get k9
-    no = request.session['no_id']
-    new_owner = K9_Adopted_Owner.objects.get(id=no)
-    if request.method == "POST":
-        if 'ok' in request.POST:
-            print('ok')
-            data.training_status = 'Adopted'
-            data.save()
-            return redirect('training:adoption_confirmed')
-        else:
-            print('not ok')
-            new_owner.delete()
-            return redirect('training:adoption_form', id = data.id)
-    context = {
-        'title': data,
-        'data': data,
-    }
-    return render (request, 'training/confirm_adoption.html', context)
-
-def adoption_list(request):
-    for_adoption = K9.objects.filter(training_status='For-Adoption')
-    adopted = K9.objects.filter(training_status='Adopted')
-    context = {
-        'title': 'Adoption List',
-        'for_adoption': for_adoption,
-        'adopted': adopted,
-    }
-
-    return render (request, 'training/for_adoption_list.html', context)
-
-def adoption_details(request, id):
-    k9 = K9.objects.get(id=id)
-    data = K9_Adopted_Owner.objects.get(k9=k9)
-
-    context = {
-        'title': data.k9,
-        'data': data,
-    }
-
-    return render (request, 'training/adoption_details.html', context)
 
 def classify_k9_list(request):
     data_unclassified = K9.objects.filter(training_status="Unclassified")
     data_classified = K9.objects.filter(training_status="Classified")
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
-
-    # TODO:
-    '''
-    if k9 has failed 2 trainign records, disable reasign button
-    '''
-
+    data_breeeding = K9.objects.filter(training_status="For-Breeding")
+    data_adoption = K9.objects.filter(training_status="For-Adoption")
+    data_deployment = K9.objects.filter(training_status="For-Deployment")
+    
     context = {
         'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
+        'data_breeeding': data_breeeding,
+        'data_adoption': data_adoption,
+        'data_deployment': data_deployment,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -153,7 +84,7 @@ def view_graphs(request, id):
     #Check if skills are supported data, otherwise all of them are recommended
     graphs = ""
     title = ""
-    if SAR_graph or NDD_graph or EDD_graph:
+    if SAR_graph is not None or NDD_graph is not None or EDD_graph is not None:
         if id == 0:
             if SAR_graph:
                 graphs = SAR_graph
@@ -172,7 +103,7 @@ def view_graphs(request, id):
             else:
                 graphs = ["There is no available data to support this skill!"]
             title = "Explosives Detection Dogs"
-    elif not SAR_graph and not NDD_graph and not EDD_graph:
+    else:
         graphs = ["All skills have no supporting data, pick any of the skills provided"]
         if id == 0:
             title = "Search and Rescue"
@@ -194,12 +125,11 @@ def view_graphs(request, id):
 #TODO Add additional age for months
 #TODO Add Descriptions per graph
 def classify_k9_select(request, id):
-    form = ClassifySkillForm(request.POST)
     request.session['k9_id'] = id
     data = K9.objects.get(id=id)
+    form_skill = ClassifySkillForm(request.POST)
     title = data.name
     style = ""
-
 
     method_arrays = []
 
@@ -257,67 +187,27 @@ def classify_k9_select(request, id):
     print("RECOMMENDED")
     print(recommended)
 
-    sar_recommended = ""
-    ndd_recommended = ""
-    edd_recommended = ""
-
-    if recommended[0] == 1:
-        sar_recommended = "Recommended!"
-    if recommended[1] == 1:
-        ndd_recommended = "Recommended!"
-    if recommended[2] == 1:
-        edd_recommended = "Recommended!"
-
-    edd = Training.objects.filter(k9=data).get(training='EDD')
-    ndd = Training.objects.filter(k9=data).get(training='NDD')
-    sar = Training.objects.filter(k9=data).get(training='SAR')
-    # TODO:
-	#if already has capability and on training from other records,
-	#previous record training will result to grade 0
-
-
     if request.method == 'POST':
-        print(data.capability)
-
-        if data.capability == 'EDD':
-            edd.grade = '0'
-            edd.save()
-        elif data.capability == 'NDD':
-            ndd.grade = '0'
-            ndd.save()
-        elif data.capability == 'SAR':
-            sar.grade = '0'
-            sar.save()
-        else:
-            pass
-
-        if data.training_status == 'On-Training':
-            ...
-        else:
+        if form_skill.is_valid():
+            data.capability = form_skill.cleaned_data['skill']
             data.training_status = "Classified"
-
-        data.capability = request.POST.get('radio')
-        data.save()
-
-        style = "ui green message"
-        messages.success(request, 'K9 has been successfully Classified!')
+            data.save()
+            style = "ui green message"
+            messages.success(request, 'K9 has been successfully Classified!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Please select skill')
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
     except K9_Parent.DoesNotExist:
         context = {
             'data': data,
+            'form': form_skill,
             'title': title,
             'style': style,
             'recommended': recommended,
-            'tree': tree,
-            'edd': edd,
-            'ndd': ndd,
-            'sar': sar,
-            'sar_recommended': sar_recommended,
-            'ndd_recommended': ndd_recommended,
-            'edd_recommended': edd_recommended,
-            'form': form
+            'tree': tree
         }
     else:
         parent_exist = 1
@@ -325,17 +215,11 @@ def classify_k9_select(request, id):
             'data': data,
             'parent': parent,
             'parent_exist': parent_exist,
+            'form': form_skill,
             'title': title,
             'style': style,
             'recommended': recommended,
-            'tree': tree,
-            'edd': edd,
-            'ndd': ndd,
-            'sar': sar,
-            'sar_recommended': sar_recommended,
-            'ndd_recommended': ndd_recommended,
-            'edd_recommended': edd_recommended,
-            'form': form
+            'tree': tree
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -353,7 +237,6 @@ def assign_k9_select(request, id):
             handler = User.objects.get(id=handler_id)
             K9_Handler.objects.create(k9 = k9, handler = handler)
             k9.training_status = "On-Training"
-            k9.handler = handler
             k9.save()
             messages.success(request, 'K9 has been assigned to a handler!')
         else:
@@ -380,10 +263,10 @@ def training_records(request):
 
 def training_update_form(request, id):
     data = K9.objects.get(id=id) # get k9
-    training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
+    training = Training.objects.get(k9=data) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
 
-    if request.method == 'POST':
+    if request.method == 'POST': 
         #save training status
         if training.stage1_1 == True:
             training.stage1_1 = training.stage1_1
@@ -421,14 +304,14 @@ def training_update_form(request, id):
             training.stage3_3 = training.stage3_3
         else:
             training.stage3_3 = bool(request.POST.get('stage3_3'))
-
+          
         training.remarks = request.POST.get('remarks')
         training.grade = request.POST.get('grade')
         training.save()
         data.save()
-
+        
         stage = "Stage 0"
-
+     
         if training.stage3_3 == True:
             stage = "Finished Training"
         elif training.stage3_2 == True:
@@ -455,7 +338,7 @@ def training_update_form(request, id):
             data.training_status = "Trained"
         else:
             data.training_status = "On-Training"
-
+        
         data.training_level = stage
         data.save()
         messages.success(request, 'Training Progress has been successfully Updated!')
@@ -466,32 +349,26 @@ def training_update_form(request, id):
         'data': data,
         'form': form,
     }
-
-    if data.capability == 'EDD':
-        return render(request, 'training/training_update_edd.html', context)
-    elif data.capability == 'NDD':
-        return render(request, 'training/training_update_ndd.html', context)
-    else:
-        return render(request, 'training/training_update_sar.html', context)
-
+    
+    return render(request, 'training/training_update_form.html', context)
 
 #Trained Dog - Assign serial number Form
 def serial_number_form(request, id):
     form = SerialNumberForm(request.POST or None)
     style = "ui teal message"
     data = K9.objects.get(id=id) # get k9
-
+	
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
-            data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
+            data.serial_number = request.POST.get('serial_number')
             data.microchip = request.POST.get('microchip')
             data.training_status = request.POST.get('dog_type')
             data.save()
-
+          
             style = "ui green message"
             messages.success(request, 'K9 has been finalized!')
-
+          
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -509,31 +386,21 @@ def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
     data.training_status = "For-Adoption"
     data.save()
-    training = Training.objects.filter(k9=data)
-
-    for training in training:
-        training.grade = '0'
-        training.save()
+    training = Training.objects.get(k9=data)
+    training.grade = '0'
+    training.save()
     return redirect('training:classify_k9_list')
 
 def training_details(request, id):
     data = K9.objects.get(id=id) # get k9
-    edd = Training.objects.filter(k9=data).get(training='EDD') # get training record
-    ndd = Training.objects.filter(k9=data).get(training='NDD')
-    sar = Training.objects.filter(k9=data).get(training='SAR')
+    training = Training.objects.get(k9=data) # get training record
 
-    print(edd.grade)
     context = {
         'title': str(data),
         'data': data,
-        'edd':edd,
-        'ndd':ndd,
-        'sar':sar,
+        'training':training,
     }
     return render (request, 'training/training_details.html', context)
-
-def adoption_confirmed(request):
-    return render (request, 'training/adoption_confirmed.html')
 
 def gender_count_between_breeds():
     k9_set = K9.objects.all()
@@ -789,11 +656,11 @@ def skill_percentage_between_sexes(id):
     NDD_score = 0
     EDD_score = 0
 
-    if max(skill_count) == SAR and max(skill_count) != 0:
+    if max(skill_count) == SAR:
         SAR_score = 1
-    if max(skill_count) == NDD and max(skill_count) != 0:
+    if max(skill_count) == NDD:
         NDD_score = 1
-    if max(skill_count) == EDD and max(skill_count) != 0:
+    if max(skill_count) == EDD:
         EDD_score = 1
 
     graph = opy.plot(fig, auto_open=False, output_type='div')
@@ -833,13 +700,12 @@ def skill_count_ratio():
     NDD_score = 0
     EDD_score = 0
 
-    if k9_set:
-        if min(values) == SAR.count():
-            SAR_score = 1
-        if min(values) == NDD.count():
-            NDD_score = 1
-        if min(values) == EDD.count():
-            EDD_score = 1
+    if min(values) == SAR.count():
+        SAR_score = 1
+    if min(values) == NDD.count():
+        NDD_score = 1
+    if min(values) == EDD.count():
+        EDD_score = 1
 
     classifier = []
     classifier.append(graph)
@@ -1165,11 +1031,11 @@ def skills_from_gender(id):
     NDD_score = 0
     EDD_score = 0
 
-    if max(skill_count) == SAR and max(skill_count) != 0:
+    if max(skill_count) == SAR:
         SAR_score = 1
-    if max(skill_count) == NDD and max(skill_count) != 0:
+    if max(skill_count) == NDD:
         NDD_score = 1
-    if max(skill_count) == EDD and max(skill_count) != 0:
+    if max(skill_count) == EDD:
         EDD_score = 1
 
     classifier = []
@@ -1223,11 +1089,11 @@ def skill_in_general(id):
     NDD_score = 0
     EDD_score = 0
 
-    if max(values) == SAR.count() and max(values) != 0 :
+    if max(values) == SAR.count():
         SAR_score = 1
-    if max(values) == NDD.count() and max(values) != 0:
+    if max(values) == NDD.count():
         NDD_score = 1
-    if max(values) == EDD.count() and max(values) != 0:
+    if max(values) == EDD.count():
         EDD_score = 1
 
 

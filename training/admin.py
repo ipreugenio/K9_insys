@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Training, K9_Handler
+from .models import Training
 # Register your models here.
 
 admin.site.register(Training)
-admin.site.register(K9_Handler)

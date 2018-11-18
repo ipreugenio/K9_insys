@@ -21,16 +21,6 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 import numpy as np
 
-
-from faker import Faker
-
-#statistical imports
-from math import *
-from decimal import Decimal
-from sklearn.metrics import mean_squared_error
-import pandas as pd
-import numpy as np
-
 #graphing imports
 from igraph import *
 import plotly.offline as opy
@@ -61,7 +51,7 @@ def index(request):
         print(request.POST.get('date_to'))
         date_from = request.POST.get('date_from')
         date_to = request.POST.get('date_to')
-
+      
         i = Medicine_Subtracted_Trail.objects.values('name').distinct().filter(date_subtracted__range=[date_from, date_to])
         count=0
 
@@ -73,7 +63,7 @@ def index(request):
             q = Medicine_Subtracted_Trail.objects.filter(name=x['name']).aggregate(sum=Sum('quantity'))['sum']
             c.append(q)
 
-        #get price
+        #get price 
         #k=Medicine_Subtracted_Trail.objects.all()
         for x in i:
             p=Medicine.objects.get(medicine_fullname=x['name'])
@@ -115,11 +105,9 @@ def add_donated_K9(request):
             k9.save()
 
             request.session['k9_id'] = k9.id
-
+            
             #create Training object when k9 is created, self.id of k9 will be the value of training_id
-            Training.objects.create(k9=k9, training='EDD')
-            Training.objects.create(k9=k9, training='NDD')
-            Training.objects.create(k9=k9, training='SAR')
+            Training.objects.create(k9=k9)
 
             return HttpResponseRedirect('confirm_donation/')
 
@@ -182,7 +170,7 @@ def donation_confirmed(request):
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
         #delete training record
-        training = Training.objects.filter(k9=k9)
+        training = Training.objects.get(k9=k9)
         training.delete()
         #delete k9
         k9.delete()
@@ -352,36 +340,20 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
-        Training.objects.create(k9=offspring, training='EDD')
-        Training.objects.create(k9=offspring, training='NDD')
-        Training.objects.create(k9=offspring, training='SAR')
+        Training.objects.create(k9=offspring)
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
         #delete training record
-        training = Training.objects.filter(k9=offspring)
+        training = Training.objects.get(k9=offspring)
         training.delete()
         #delete offspring
         offspring.delete()
 
-        mothers = K9.objects.filter(sex="Female")
-        fathers = K9.objects.filter(sex="Male")
-
-        mother_list = []
-        father_list = []
-
-        for mother in mothers:
-            mother_list.append(mother)
-
-        for father in fathers:
-            father_list.append(father)
-
         context = {
             'Title': "Receive Donated K9",
-            'form': add_K9_parents_form,
-            'mothers': mother_list,
-            'fathers': father_list,
+            'form': add_K9_parents_form
         }
-        return render(request, 'planningandacquiring/add_K9_parents.html', context)
+        return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
 
 #Listview format
@@ -791,7 +763,6 @@ def K9_forecast(request):
         df = pd.DataFrame({'Date': list(date),
                        'Quantity': list(quantity),
                        })
-
 
         ts = df.set_index('Date')
 

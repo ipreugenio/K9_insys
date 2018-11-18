@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_training.html" %}
+{% extends "profiles/sidebar_training.html" %}  
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -69,51 +69,33 @@
         <li>A pending status indicates that the K9 has yet to complete the stage.</li>
     </ul>
 </div>
-<div class="ui top attached tabular menu">
-    {% if data.capability == 'EDD' %}
-    <a class="item active" data-tab="first">EDD</a>
-    {%else%}
-    <a class="item" data-tab="first">EDD</a>
-    {%endif%}
-    {% if data.capability == 'NDD' %}
-    <a class="item active" data-tab="second">NDD</a>
-    {%else%}
-    <a class="item" data-tab="second">NDD</a>
-    {%endif%}
-    {% if data.capability == 'SAR' %}
-    <a class="item active" data-tab="third">SAR</a>
-    {%else%}
-    <a class="item" data-tab="third">SAR</a>
-    {%endif%}
-</div>
-{% if data.capability == 'EDD' %}
-<div class="ui tab segment active" data-tab="first">
-{%else%}
-<div class="ui tab segment" data-tab="first">
-{%endif%}
+<div class="ui segment">
     <div class="ui raised segment ">
         <div class="paragraph">
             <div class="medium line">
                <h4>Grade:
-                   {% if edd.grade == '0' %}
-                   <label class="ui big red circular label">{{edd.grade}}</label>
-                   {% elif edd.grade == 'No Grade Yet' or edd.grade == '' %}
-                   <label class="ui big orange circular label">No Grade Yet</label>
-                   {%else%}
-                   <label class="ui big green circular label">{{edd.grade}}</label>
-                   {% endif %}
+                    {% if training.grade == '0' %}
+                    <label class="ui big red circular label">{{training.grade}}</label>
+                    {% elif training.grade == 'No Grade Yet' %}
+                    <label class="ui big orange circular label">{{training.grade}}</label>
+                    {%else%}
+                    <label class="ui big green circular label">{{training.grade}}</label>
+                    {% endif %}
                </h4>
             </div>
-        </div>
+            <div class="short line">
+                
+            </div>
+          </div>
     </div>
     <table class="ui three column celled table">
         <thead>
             <tr>
                 <th>Stage 1.1</th>
                 <th>Description of Stage</th>
-                {% if edd.stage1_1 == True %}
+                {% if training.stage1_1 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -122,9 +104,9 @@
             <tr>
                 <th>Stage 1.2</th>
                 <th>Description of Stage</th>
-                {% if edd.stage1_2 == True %}
+                {% if training.stage1_2 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -133,9 +115,9 @@
             <tr>
                 <th>Stage 1.3</th>
                 <th>Description of Stage</th>
-                {% if edd.stage1_3 == True %}
+                {% if training.stage1_3 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -144,9 +126,9 @@
             <tr>
                 <th>Stage 2.1</th>
                 <th>Description of Stage</th>
-                {% if edd.stage2_1 == True %}
+                {% if training.stage2_1 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -155,9 +137,9 @@
             <tr>
                 <th>Stage 2.2</th>
                 <th>Description of Stage</th>
-                {% if edd.stage2_2 == True %}
+                {% if training.stage2_2 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -166,9 +148,9 @@
             <tr>
                 <th>Stage 2.3</th>
                 <th>Description of Stage</th>
-                {% if edd.stage1_3 == True %}
+                {% if training.stage1_3 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -177,9 +159,9 @@
             <tr>
                 <th>Stage 3.1</th>
                 <th>Description of Stage</th>
-                {% if edd.stage3_1 == True %}
+                {% if training.stage3_1 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -188,9 +170,9 @@
             <tr>
                 <th>Stage 3.2</th>
                 <th>Description of Stage</th>
-                {% if edd.stage3_2 == True %}
+                {% if training.stage3_2 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -199,9 +181,9 @@
             <tr>
                 <th>Stage 3.3</th>
                 <th>Description of Stage</th>
-                {% if edd.stage3_3 == True %}
+                {% if training.stage3_3 == True %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif training.grade == '0'%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -211,275 +193,18 @@
     </table>
     <label class="ui large teal circular label">Remarks</label>
     <div class="ui basic segment" style="padding:5px;margin-top: 0px;">
-        <p style="padding:2px;">{{edd.remarks}}</p>
+        <p style="padding:2px;">{{training.remarks}}</p>
     </div>
-</div>
-{% if data.capability == 'NDD' %}
-<div class="ui tab segment active" data-tab="second">
-{%else%}
-<div class="ui tab segment" data-tab="second">
-{%endif%}
-  <div class="ui raised segment ">
-      <div class="paragraph">
-          <div class="medium line">
-             <h4>Grade:
-                 {% if ndd.grade == '0' %}
-                 <label class="ui big red circular label">{{ndd.grade}}</label>
-                 {% elif ndd.grade == 'No Grade Yet' or ndd.grade == ''%}
-                 <label class="ui big orange circular label">No Grade Yet</label>
-                 {%else%}
-                 <label class="ui big green circular label">{{ndd.grade}}</label>
-                 {% endif %}
-             </h4>
-          </div>
-        </div>
-  </div>
-  <table class="ui three column celled table">
-      <thead>
-          <tr>
-              <th>Stage 1.1</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage1_1 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 1.2</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage1_2 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 1.3</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage1_3 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.1</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage2_1 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.2</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage2_2 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.3</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage1_3 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.1</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage3_1 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.2</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage3_2 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.3</th>
-              <th>Description of Stage</th>
-              {% if ndd.stage3_3 == True %}
-              <td>Passed</td>
-              {%elif ndd.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-      </thead>
-  </table>
-  <label class="ui large teal circular label">Remarks</label>
-  <div class="ui basic segment" style="padding:5px;margin-top: 0px;">
-      <p style="padding:2px;">{{ndd.remarks}}</p>
-  </div>
-</div>
-{% if data.capability == 'SAR' %}
-<div class="ui tab segment active" data-tab="third">
-{%else%}
-<div class="ui tab segment" data-tab="third">
-{%endif%}
-  <div class="ui raised segment ">
-      <div class="paragraph">
-          <div class="medium line">
-             <h4>Grade:
-                 {% if sar.grade == '0' %}
-                 <label class="ui big red circular label">{{sar.grade}}</label>
-                 {% elif sar.grade == 'No Grade Yet' or sar.grade == ''%}
-                 <label class="ui big orange circular label">No Grade Yet</label>
-                 {%else%}
-                 <label class="ui big green circular label">{{sar.grade}}</label>
-                 {% endif %}
-             </h4>
-          </div>
-        </div>
-  </div>
-  <table class="ui three column celled table">
-      <thead>
-          <tr>
-              <th>Stage 1.1</th>
-              <th>Description of Stage</th>
-              {% if sar.stage1_1 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 1.2</th>
-              <th>Description of Stage</th>
-              {% if sar.stage1_2 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 1.3</th>
-              <th>Description of Stage</th>
-              {% if sar.stage1_3 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.1</th>
-              <th>Description of Stage</th>
-              {% if sar.stage2_1 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.2</th>
-              <th>Description of Stage</th>
-              {% if sar.stage2_2 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 2.3</th>
-              <th>Description of Stage</th>
-              {% if sar.stage1_3 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.1</th>
-              <th>Description of Stage</th>
-              {% if sar.stage3_1 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.2</th>
-              <th>Description of Stage</th>
-              {% if sar.stage3_2 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-          <tr>
-              <th>Stage 3.3</th>
-              <th>Description of Stage</th>
-              {% if sar.stage3_3 == True %}
-              <td>Passed</td>
-              {%elif sar.grade == '0'%}
-              <td>Failed</td>
-              {%else%}
-              <td>Pending</td>
-              {% endif %}
-          </tr>
-      </thead>
-  </table>
-  <label class="ui large teal circular label">Remarks</label>
-  <div class="ui basic segment" style="padding:5px;margin-top: 0px;">
-      <p style="padding:2px;">{{sar.remarks}}</p>
-  </div>
 </div>
 
 <div class="ui basic segment">
     <a href="{% url 'training:training_records'%}" class="ui blue button">Back</a>
 </div>
 <script type="text/javascript">
-
+        
     $(document).ready(function() {
         $('#tabledata').DataTable();
-        $('.menu .item').tab();
-    });
-
+    } );
+    
 </script>
 {% endblock %}

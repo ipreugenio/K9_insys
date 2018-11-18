@@ -8,7 +8,7 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 class ReportDateForm(forms.ModelForm):
-    class Meta:
+   class Meta:
         model = Date
         fields = ('date_from', 'date_to')
         widgets = {
@@ -33,14 +33,11 @@ class add_donated_K9_form(forms.ModelForm):
         }
 
 class add_donator_form(forms.ModelForm):
-    address = forms.CharField(widget=forms.Textarea(attrs={'rows':'2', 'style':'resize:none;'}))
+    address = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = K9_Past_Owner
-        fields = ('first_name', 'middle_name', 'last_name', 'sex', 'birth_date','email', 'contact_no', 'address')
-        widgets = {
-            'birth_date': DateInput(),
-        }
+        fields = ('first_name', 'middle_name', 'last_name', 'email', 'contact_no', 'address')
 
 class add_K9_parents_form(forms.Form):
 
@@ -58,31 +55,25 @@ class add_K9_parents_form(forms.Form):
         data  = (male.id, male.name)
         father_list.append(data)
 
-    mother = forms.ChoiceField(choices=mother_list,
-                              widget=forms.RadioSelect)
-    father = forms.ChoiceField(choices=father_list,
-                              widget=forms.RadioSelect)
+    mother = forms.ChoiceField(choices = mother_list,
+                               widget=forms.RadioSelect)
+    father = forms.ChoiceField(choices = father_list,
+                               widget=forms.RadioSelect)
 
+    '''
+    class Meta:
+        model = K9_Parent
+        fields = ('mother', 'father')
+    
 
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
+        #self.fields['mother'].queryset = self.fields['mother'].queryset.filter(sex="Female")
+        #self.fields['father'].queryset = self.fields['father'].queryset.filter(sex="Male")
+        #self.fields['mother'].widget = forms.RadioSelect
+        #self.fields['father'].widget = forms.RadioSelect
+    '''
 
-        females = K9.objects.filter(sex="Female")
-        males = K9.objects.filter(sex="Male")
-
-        mother_list = []
-        father_list = []
-
-        for female in females:
-            data = (female.id, female.name)
-            mother_list.append(data)
-
-        for male in males:
-            data = (male.id, male.name)
-            father_list.append(data)
-
-        self.fields['mother'].choices = mother_list
-        self.fields['father'].choices = father_list
 
 
 class add_offspring_K9_form(forms.ModelForm):

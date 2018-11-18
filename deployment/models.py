@@ -1,12 +1,6 @@
 from django.db import models
-from planningandacquiring.models import K9
+
 # Create your models here.
-
-class Area(models.Model):
-    name = models.CharField('name', max_length=100, default='')
-
-    def __str__(self):
-        return self.name
 
 class Location(models.Model):
 
@@ -157,67 +151,35 @@ class Location(models.Model):
         ('Vigan', 'Vigan'),
         ('Zamboanga', 'Zamboanga'),
     )
-
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
-    place = models.CharField('place', max_length=100)
-    '''status = models.CharField('status', max_length=100, default="unassigned")'''
+    zip_code = models.IntegerField('zip_code')
+    address = models.CharField('address', max_length=500, default='None')
+
+
+class Area(models.Model):
+    name = models.CharField('name', max_length=100, default='')
 
     def __str__(self):
-        return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
+        return self.name
+
+class Team(models.Model):
+    area = models.ForeignKey('area', on_delete=models.CASCADE)
+    name = models.CharField('name', max_length=500, default="")
+
+    def __str__(self):
+        return self.name
 
 class Team_Assignment(models.Model):
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    team = models.CharField('team', max_length=100)
-    EDD_demand = models.IntegerField('EDD_demand')
-    NDD_demand = models.IntegerField('NDD_demand')
-    SAR_demand = models.IntegerField('SAR_demand')
-    EDD_deployed = models.IntegerField('EDD_deployed', default=0)
-    NDD_deployed = models.IntegerField('NDD_deployed', default=0)
-    SAR_deployed = models.IntegerField('SAR_deployed', default=0)
-    total_dogs_demand = models.IntegerField('total_dogs_demand', default=0)
-    total_dogs_deployed = models.IntegerField('total_dogs_deployed', default=0)
-    date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    handlers = models.IntegerField('handlers', default=0)
+    EDD = models.IntegerField('EDD', default=0)
+    NDD = models.IntegerField('NDD', default=0)
+    SAR = models.IntegerField('SAR', default=0)
 
     def __str__(self):
-        return str(self.team) + ' - ' + str(self.location)
-
-    def save(self, *args, **kwargs):
-        self.total_dogs_demand = int(self.EDD_demand) + int(self.NDD_demand) + int(self.SAR_demand)
-        self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
-        super(Team_Assignment, self).save(*args, **kwargs)
-
-class Dog_Request(models.Model):
-    requester = models.CharField('requester', max_length=100)
-    location = models.CharField('location', max_length=100)
-    area = models.ForeignKey(Location, on_delete=models.CASCADE)
-    EDD_needed = models.IntegerField('EDD_needed')
-    NDD_needed = models.IntegerField('NDD_needed')
-    SAR_needed = models.IntegerField('SAR_needed')
-    EDD_deployed = models.IntegerField('EDD_deployed', default=0)
-    NDD_deployed = models.IntegerField('NDD_deployed', default=0)
-    SAR_deployed = models.IntegerField('SAR_deployed', default=0)
-    total_dogs_demand = models.IntegerField('total_dogs_demand', default=0)
-    total_dogs_deployed = models.IntegerField('total_dogs_deployed', default=0)
-    start_date = models.DateField('start_date', null=True, blank=True)
-    end_date = models.DateField('end_date', null=True, blank=True)
-    status = models.CharField('status', max_length=100, default="Pending")
-
-    def __str__(self):
-        return str(self.requester) + ' - ' + str(self.location)
-
-    def save(self, *args, **kwargs):
-        self.total_dogs_demand = int(self.EDD_needed) + int(self.NDD_needed) + int(self.SAR_needed)
-        self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
-        super(Dog_Request, self).save(*args, **kwargs)
-
-class Team_Dog_Deployed(models.Model):
-    team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
-    team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True)
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
-    status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
-    date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
-    date_pulled = models.DateField('date_pulled' , null=True, blank=True)
-
-    def __str__(self):
-        return str(self.k9) + ' - ' + str(self.team_assignment)
+        area = Area.objects.get(id=self.area)
+        team = Team.objects.get(id=self.team)
+        area_name = area.name
+        team_name = team.name
+        return str(area_name + " : " + team_name)

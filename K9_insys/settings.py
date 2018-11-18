@@ -73,10 +73,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.app_directories.load_template_source',
-)
-
 WSGI_APPLICATION = 'K9_insys.wsgi.application'
 
 
@@ -90,7 +86,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '8888',
+        'PORT': '',
     }
 }
 

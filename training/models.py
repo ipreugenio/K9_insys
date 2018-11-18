@@ -1,12 +1,9 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from deployment.models import Location
 
-from datetime import datetime as dt
-from datetime import timedelta as td
-from datetime import date as d
 # Create your models here.
+
 
 class K9_Genealogy(models.Model):
     o = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
@@ -17,19 +14,10 @@ class K9_Genealogy(models.Model):
 
 class K9_Handler(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "handler", blank=True, null=True)
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="k9", blank=True, null=True)
-    deployment_area = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="deployment_area", blank=True, null=True)
-
-    def __str__(self):
-        handler = User.objects.get(id=self.handler)
-        k9 = K9.objects.get(id=self.k9)
-        handler_name = handler.name
-        k9_name = k9.name
-        return str(handler_name + " : " + k9_name)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
-    training = models.CharField('training', max_length=50, default="None")
     stage = models.CharField('stage', max_length=200, default="Stage 0")
     stage1_1 = models.BooleanField(default=False)
     stage1_2 = models.BooleanField(default=False)
@@ -44,36 +32,4 @@ class Training(models.Model):
     remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return str(self.k9) +' - ' + str(self.training) +' : ' + str(self.stage)
-
-class K9_Adopted_Owner(models.Model):
-    SEX = (
-        ('Male', 'Male'),
-        ('Female', 'Female')
-    )
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
-    first_name = models.CharField('first_name', max_length=200)
-    middle_name = models.CharField('middle_name', max_length=200)
-    last_name = models.CharField('last_name', max_length=200)
-    address = models.CharField('address', max_length=200)
-    sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
-    age = models.IntegerField('age', default = 0)
-    birth_date = models.DateField('birth_date')
-    email = models.EmailField('email', max_length=200)
-    contact_no = models.CharField('contact_no', max_length=200)
-    date_adopted = models.DateField('date_adopted', auto_now_add=True)
-
-    def calculate_age(self):
-        today = d.today()
-        birthdate = self.birth_date
-        bday = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        if bday < 1:
-            bday = 0
-        return bday
-
-    def save(self, *args, **kwargs):
-        self.age = self.calculate_age()
-        super(K9_Adopted_Owner, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return str(self.first_name) + ' ' + str(self.middle_name) + ' ' + str(self.last_name)
+        return str(self.k9) +' - ' + str(self.stage)
