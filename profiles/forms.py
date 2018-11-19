@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from .models import User, Personal_Info, Education, Account
-from deployment.models import Location 
+from deployment.models import Location
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -32,7 +32,20 @@ class add_User_form(forms.ModelForm):
         ('ENS', 'ENS'),
         ('P/ENS', 'P/ENS')
     )
+
+    RELIGION = (
+        ('Roman Catholic','Roman Catholic'),
+        ('Christianity','Christianity'),
+        ('Islam','Islam'),
+        ('Iglesia ni Cristo','Iglesia ni Cristo'),
+        ('Buddhists','Buddhists'),
+    )
+    CITIZENSHIP = (
+        ('FILIPINO','FILIPINO'),
+    )
     rank = forms.CharField(max_length=50, label='rank', widget=forms.Select(choices=RANK))
+    religion = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=RELIGION))
+    citizenship = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=CITIZENSHIP))
 
     class Meta:
         model = User

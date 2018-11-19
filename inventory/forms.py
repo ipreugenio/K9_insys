@@ -73,8 +73,6 @@ class MiscellaneousForm(forms.ModelForm):
 
     UOM = (
         ('pc', 'pc'),
-        ('pack', 'pack'),
-        ('box', 'box'),
         ('roll', 'roll'),
         ('can', 'can'),
         ('bottle', 'bottle'),
