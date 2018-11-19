@@ -190,6 +190,9 @@ class Team_Assignment(models.Model):
 class Dog_Request(models.Model):
     requester = models.CharField('requester', max_length=100)
     location = models.CharField('location', max_length=100)
+    phone_number = models.IntegerField('phone_number', blank=True, null=True)
+    email_address = models.CharField('email', max_length=100, blank=True, null=True)
+    remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
     area = models.ForeignKey(Location, on_delete=models.CASCADE)
     EDD_needed = models.IntegerField('EDD_needed')
     NDD_needed = models.IntegerField('NDD_needed')

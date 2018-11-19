@@ -203,7 +203,8 @@ class assign_team_form(forms.ModelForm):
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Dog_Request
-        fields = ('requester', 'location', 'area', 'EDD_needed', 'NDD_needed', 'SAR_needed', 'start_date', 'end_date')
+        fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'EDD_needed',
+                  'NDD_needed', 'SAR_needed', 'start_date', 'end_date')
 
         widgets = {
             'start_date': DateInput(),

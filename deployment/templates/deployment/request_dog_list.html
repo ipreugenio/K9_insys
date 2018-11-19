@@ -11,6 +11,7 @@
                 <th>Requester</th>
                 <th>Place</th>
                 <th>Total Dogs Requested</th>
+                <th>Remarks</th>
                 <th>Status</th>
                 <th></th>
             </tr>
@@ -23,6 +24,7 @@
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+                        <td>{{Data.remarks}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
@@ -34,10 +36,11 @@
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+                        <td>{{Data.remarks}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
-                         <td style="text-align:center;">
-                            <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "ui disabled button">Select</a>
-                         </td>
+                        <td style="text-align:center;">
+                            <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
+                        </td>
                     </tr>
                 {% elif Data.status == "Denied" %}
                     <tr class = "error">
@@ -45,10 +48,11 @@
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+                        <td>{{Data.remarks}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
-                         <td style="text-align:center;">
+                        <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "ui disabled button">Select</a>
-                         </td>
+                        </td>
                     </tr>
                 {%else%}
                 <tr class = "negative">
