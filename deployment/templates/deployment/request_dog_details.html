@@ -2,7 +2,11 @@
 {% load index %}
 
 {% block content %}
-
+{% if messages %}
+    {% for message in messages %}
+        <div class="ui green message"> {{ message }}</div>
+    {% endfor %}
+{% endif %}
 
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Details</a>
@@ -25,8 +29,12 @@
     <div class="column">
       <div class="ui basic horizontal segments" style="border-style: none;">
        <div class="ui basic segment" style="border-style: none;">
-         <label>No. of Dog Demand: </label>
-         <span class="ui red circular label">{{data2.total_dogs_demand}}</span>
+         <label>No. of K9 Demand: </label>
+         {% if data2.total_dogs_deployed >= data.total_dogs_demand %}
+             <span class="ui green circular label">{{data2.total_dogs_demand}}</span>
+         {%else%}
+             <span class="ui red circular label">{{data2.total_dogs_demand}}</span>
+         {% endif %}
          <table class="ui three column celled red table">
            <thead>
              <tr>
@@ -45,8 +53,12 @@
          </table>
        </div>
        <div class="ui basic segment" style="border-style: none;">
-         <label>No. of Dog Deployed: </label>
-         <span class="ui orange circular label">{{data2.total_dogs_deployed}}</span>
+         <label>No. of K9 Deployed: </label>
+         {% if data2.total_dogs_deployed >= data2.total_dogs_demand %}
+             <span class="ui green circular label">{{data2.total_dogs_deployed}}</span>
+         {%else%}
+             <span class="ui orange circular label">{{data2.total_dogs_deployed}}</span>
+         {% endif %}
          <table class="ui three column celled orange table">
            <thead>
              <tr>
@@ -68,6 +80,14 @@
     </div>
   </div>
 
+
+    <h2 class="ui header">
+    <i class="paw icon"></i>
+    <div class="content">
+      K9's Deployed
+    </div>
+  </h2>
+
  <table id="tabledata1" class="ui four column celled table">
        <thead>
          <tr>
@@ -75,6 +95,7 @@
            <th>Serial Number</th>
            <th>Capability</th>
            <th>Handler</th>
+             <th></th>
          </tr>
      </thead>
      <tbody>
@@ -84,13 +105,16 @@
            <td>{{dogs_deployed.k9.serial_number}}</td>
            <td>{{dogs_deployed.k9.capability}}</td>
            <td>{{dogs_deployed.k9.handler}}</td>
+             <td class="ui center aligned" style="width:15%;">
+              <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
+            </td>
          </tr>
          	{% endfor %}
      </tbody>
+
  </table>
 
-
-        <form action="" method="post">
+ <form action="" method="post">
         {% csrf_token %}
         <div class="ui very padded segment">
             <center>
@@ -105,16 +129,11 @@
            <div class="or"></div>
            <button class="ui positive button" name="approve" onclick="return confirm('Are you sure?')">Approve</button>
            </div></center>
-        </form>
-        </div>
+    </form>
+
 </div>
 
 <div class="ui tab segment" data-tab="second">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="{{ style }} row"> {{ message }}</div>
-      {% endfor %}
-  {% endif %}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata2" class="ui four column celled table">

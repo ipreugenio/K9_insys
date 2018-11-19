@@ -15,6 +15,7 @@ urlpatterns = [
     path('request_form/', views.dog_request, name='request_form'),
     path('request_dog_list/', views.request_dog_list, name='request_dog_list'),
     path('request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),
+    path('remove-dog-request/<int:id>', views.remove_dog_request, name='remove_dog_request'),
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),
