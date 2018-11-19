@@ -269,10 +269,12 @@ def request_dog_details(request, id):
 
     if request.method == 'POST':
         if 'approve' in request.POST:
+            data2.remarks = request.POST.get('remarks')
             data2.status = "Approved"
             data2.save()
             return HttpResponseRedirect('../request_dog_list/')
         elif 'deny' in request.POST:
+            data2.remarks = request.POST.get('remarks')
             data2.status = "Denied"
             data2.save()
             return HttpResponseRedirect('../request_dog_list/')

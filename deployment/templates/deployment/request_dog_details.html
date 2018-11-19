@@ -2,10 +2,7 @@
 {% load index %}
 
 {% block content %}
-<h1 class="ui header">
-    {{data.team}}
-    <div class="sub header">Team details for {{data.team}}</div>
-</h1>
+
 
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Details</a>
@@ -14,11 +11,13 @@
 
 <div class="ui tab segment active" data-tab="first">
   <div class="ui raised segment">
-    <table class="ui three column very basic table" style="width:50%;">
+    <table class="" style="width:100%;">
       <tr>
         <td><strong>Location: </strong>{{data2.location}}</td>
         <td><strong>Start date: </strong>{{data2.start_date}}</td>
         <td><strong>End date: </strong>{{data2.end_date}}</td>
+        <td><strong>Contact number: </strong>{{data2.phone_number}}</td>
+        <td><strong>Email Address: </strong>{{data2.email_address}}</td>
       </tr>
     </table>
   </div>
@@ -90,14 +89,22 @@
      </tbody>
  </table>
 
-        <div class="ui center aligned segment" style="padding: 0px;">
+
         <form action="" method="post">
         {% csrf_token %}
+        <div class="ui very padded segment">
+            <center>
+                <strong><label>Remarks: </label></strong>
+            <div class="ui input">
+            <input type="text" name="remarks" style="width:500px">
+            </div></center>
+        </div>
+            <center>
         <div class="ui buttons">
            <button class="negative ui button" name="deny" onclick="return confirm('Are you sure?')">Deny</button>
            <div class="or"></div>
            <button class="ui positive button" name="approve" onclick="return confirm('Are you sure?')">Approve</button>
-           </div>
+           </div></center>
         </form>
         </div>
 </div>

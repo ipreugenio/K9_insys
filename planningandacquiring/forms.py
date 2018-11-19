@@ -54,19 +54,25 @@ class AdoptionForms(forms.ModelForm):
 
 class add_K9_parents_form(forms.Form):
 
-    females = K9.objects.filter(sex = "Female")
-    males = K9.objects.filter(sex="Male")
+    try:
 
-    mother_list = []
-    father_list = []
+        females = K9.objects.filter(sex = "Female")
+        males = K9.objects.filter(sex="Male")
 
-    for female in females:
-        data = (female.id, female.name)
-        mother_list.append(data)
+        mother_list = []
+        father_list = []
 
-    for male in males:
-        data = (male.id, male.name)
-        father_list.append(data)
+        for female in females:
+            data = (female.id, female.name)
+            mother_list.append(data)
+
+        for male in males:
+            data = (male.id, male.name)
+            father_list.append(data)
+
+    except:
+        mother_list = []
+        father_list = []
 
     '''
     class Meta:
