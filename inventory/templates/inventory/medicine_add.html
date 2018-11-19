@@ -1,15 +1,15 @@
-{% extends "profiles/sidebar_inventory.html" %}  
+{% extends "profiles/sidebar_inventory.html" %}
 
 {% block content %}
 <div class="ui fluid container">
     <div class="ui grid">
         <div class="three column row">
-            <div class="four wide column"></div>
-            <div class="eight wide column">
+            <div class="three wide column"></div>
+            <div class="ten wide column">
                     <h1 class="ui header">{{ title }}
                             <div class="sub header">{{ texthelp }}</div>
                         </h1>
-                    
+
                         <div class="ui inverted segment">
                             {% if messages %}
                                 {% for message in messages %}
@@ -28,7 +28,7 @@
                                         {{form.med_type}}
                                     </div>
                                 </div>
-                              
+
 
                                 <div class="four fields">
                                     <div class="field">
@@ -60,27 +60,27 @@
                             </form>
                         </div>
             </div>
-            <div class="four wide column"></div>
+            <div class="three wide column"></div>
         </div>
-    </div>                    
+    </div>
 </div>
 
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata').DataTable();
-        
+
         $("input[name='used_yearly']").prop('disabled', true);
-        
+
         $("select[name='med_type']").change(function() {
             if ($("select[name='med_type']").val() == 'Vaccine'){
                 $("input[name='used_yearly']").prop('disabled', false);
                 $("input[name='dose']").val(1).prop('readonly', true);
-                $("select[name='uom']").prop('readonly', true);
+                $("select[name='uom']").prop('disabled', true);
             }else{
                 $("input[name='used_yearly']").prop('disabled', true);
-                $("input[name='dose']").val(0).prop('readonly', false);
-                $("select[name='uom']").prop('readonly', false);
+                $("input[name='dose']").val('').prop('readonly', false);
+                $("select[name='uom']").prop('disabled', false);
             }
         });
     });

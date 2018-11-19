@@ -132,6 +132,8 @@
         if ($("input[name='stage3_3']").is(':checked')){
             $("input[name='stage3_3']").prop('disabled', true)
             $("#btn").prop('disabled', true)
+            $("textarea[name='remarks']").prop('disabled', true)
+            $("select[name='grade']").prop('disabled', true)
         }
 
         $("select[name='grade']").prop('disabled', true)

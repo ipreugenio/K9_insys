@@ -20,7 +20,7 @@
 			  <th>Color</th>
               <th>Birthdate</th>
               <th>Age</th>
-              <th>Year Retired</th>
+              <th>Skill</th>
               <th>Assignment</th>
 			  <th>Microchip</th>
           	</tr>
@@ -35,7 +35,7 @@
 						<td>{{ K9.color}}</td>
                         <td>{{ K9.birth_date}}</td>
                         <td>{{ K9.age}}</td>
-                        <td>{{ K9.year_retired}}</td>
+                        <td>{{ K9.capability}}</td>
                         <td>{{ K9.assignment}}</td>
 						<td>{{ K9.microchip}}</td>
     				</tr>
@@ -44,11 +44,13 @@
     </table>
 </div>
 <script type="text/javascript">
-	
+
 	$(document).ready(function() {
-		$('#tabledata').DataTable();
+		$('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ]]
+    });
 		$('.menu .item').tab();
 	});
-	
+
 </script>
 {% endblock %}

@@ -9,60 +9,61 @@
         {% endfor %}
     {% endif %}
 </div>
+<div class="ui segment">
+    <table class="ui four column celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <td>{{data.k9.name}}</td>
+                <th>Breed</th>
+                <td>{{data.k9.breed}}</td>
+            </tr>
+            <tr>
+                <th>Sex</th>
+                <td>{{data.k9.sex}}</td>
+                <th>Color</th>
+                <td>{{data.k9.color}}</td>
+            </tr>
+            <tr>
+                <th>Birthday</th>
+                <td>{{data.k9.birth_date}}</td>
+                <th>Age</th>
+                <td>{{data.k9.age}}</td>
+            </tr>
+        </thead>
+    </table>
+</div>
 
 <div class="ui segment">
-    <div class="ui segment">
-        <table class="ui four column celled table"> 
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <td>{{data.k9.name}}</td>
-                    <th>Breed</th>
-                    <td>{{data.k9.breed}}</td>
-                </tr>
-                <tr>
-                    <th>Sex</th>
-                    <td>{{data.k9.sex}}</td>
-                    <th>Color</th>
-                    <td>{{data.k9.color}}</td>
-                </tr>
-                <tr>
-                    <th>Birthday</th>
-                    <td>{{data.k9.birth_date}}</td>
-                    <th>Age</th>
-                    <td>{{data.k9.age}}</td>
-                </tr>
-            </thead>
-        </table>
+  <h2 class="ui header">
+    <i class="user icon"></i>
+    <div class="content">
+      Adopted By:{{data}}
+       <div class="sub header">Date Adopted: {{data.date_adopted}}</div>
     </div>
-    <div class="ui segment">
-        <h3>Adopted By: {{data.owner}}</h3>
-        <p>Date Adopted: {{data.date_adopted}}</p>
-    </div>
-    <div class="ui segment">
-        <table class="ui four column celled table"> 
-            <thead>
-                <tr>
-                    <th>Age</th>
-                    <td>{{data.owner.age}}</td>
-                    <th>Birthday</th>
-                    <td>{{data.owner.birth_date}}</td>
-                </tr>
-                <tr>
-                    <th>Sex</th>
-                    <td>{{data.owner.sex}}</td>
-                    <th>Contact #</th>
-                    <td>{{data.owner.contact_no}}</td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td>{{data.owner.email}}</td>
-                    <th>Address</th>
-                    <td>{{data.owner.address}}</td>
-                </tr>
-            </thead>
-        </table>
-    </div>
+  </h2>
+    <table class="ui four column celled table">
+        <thead>
+            <tr>
+                <th>Age</th>
+                <td>{{data.age}}</td>
+                <th>Birthday</th>
+                <td>{{data.birth_date}}</td>
+            </tr>
+            <tr>
+                <th>Sex</th>
+                <td>{{data.sex}}</td>
+                <th>Contact #</th>
+                <td>{{data.contact_no}}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{data.email}}</td>
+                <th>Address</th>
+                <td>{{data.address}}</td>
+            </tr>
+        </thead>
+    </table>
 </div>
 <script type="text/javascript">
 

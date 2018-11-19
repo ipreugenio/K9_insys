@@ -21,8 +21,18 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 import numpy as np
 
+
+from faker import Faker
+
+#statistical imports
+from math import *
+from decimal import Decimal
+from sklearn.metrics import mean_squared_error
+import pandas as pd
+import numpy as np
+
 #graphing imports
-'''from igraph import *
+from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
@@ -36,32 +46,7 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm'''
-# from faker import Faker
-
-# statistical imports
-# from math import *
-# from decimal import Decimal
-# from sklearn.metrics import mean_squared_error
-# import pandas as pd
-# import numpy as np
-
-# graphing imports
-# from igraph import *
-# import plotly.offline as opy
-# import plotly.graph_objs as go
-# import plotly.graph_objs.layout as lout
-
-# forecasting imports
-# from statsmodels.tsa.ar_model import AR
-# from statsmodels.tsa.arima_model import ARMA
-# from statsmodels.tsa.arima_model import ARIMA
-# from statsmodels.tsa.statespace.sarimax import SARIMAX
-# from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-# from statsmodels.tsa.holtwinters import ExponentialSmoothing
-# from random import random, randint
-# from statsmodels.tsa.stattools import adfuller, kpss
-# import statsmodels.api as sm
+import statsmodels.api as sm
 
 
 # Create your views here.
@@ -208,7 +193,10 @@ def donation_confirmed(request):
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
-def add_K9_parents(request): #TODO Add capability to add a single parent
+#TODO Add capability to add a single parent
+#TODO Added k9s not immediately showing up in breeding form
+
+def add_K9_parents(request):
 
     form = add_K9_parents_form(request.POST)
     style = "ui teal message"
@@ -366,7 +354,7 @@ def breeding_confirmed(request):
         k9_parent.save()
         Training.objects.create(k9=offspring, training='EDD')
         Training.objects.create(k9=offspring, training='NDD')
-        Training.objects.create(k9=offspring, training='NDD')
+        Training.objects.create(k9=offspring, training='SAR')
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
         #delete training record
@@ -375,20 +363,29 @@ def breeding_confirmed(request):
         #delete offspring
         offspring.delete()
 
+        mothers = K9.objects.filter(sex="Female")
+        fathers = K9.objects.filter(sex="Male")
+
+        mother_list = []
+        father_list = []
+
+        for mother in mothers:
+            mother_list.append(mother)
+
+        for father in fathers:
+            father_list.append(father)
+
         context = {
             'Title': "Receive Donated K9",
-            'form': add_K9_parents_form
+            'form': add_K9_parents_form,
+            'mothers': mother_list,
+            'fathers': father_list,
         }
-        return render(request, 'planningandacquiring/add_donated_K9.html', context)
+        return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
 
 #Listview format
 def K9_listview(request):
-
-    '''
-
-
-    '''
 
     k9 = K9.objects.all()
 
@@ -463,7 +460,7 @@ def predict(coef, history):
 def Autoregression(data):
     X = difference(data.values)
     X = difference(X)
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data = X[0:size]
     model = AR(data)
     model = model.fit(transparams=True)
@@ -474,7 +471,7 @@ def Autoregression(data):
 def Moving_Average(data):
     X = difference(data.values)
     X = difference(X)
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data = X[0:size]
     model = ARMA(data, order=(0, 1))
     model = model.fit(transparams=True)
@@ -484,7 +481,7 @@ def Autoregressive_Moving_Average(data):
     X = difference(data.values)
     X = difference(X)
 
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data = X[0:size]
 
     print("ARMA DATA")
@@ -498,7 +495,7 @@ def Autoregressive_Moving_Average(data):
 def Autoregressive_Integrated_Moving_Average(data):
     X = difference(data.values)
     X = difference(X)
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data = X[0:size]
     print("ARIMA DATA")
     print(data)
@@ -511,7 +508,7 @@ def Autoregressive_Integrated_Moving_Average(data):
 
 def Simple_Exponential_Smoothing(data):
     X = difference(data.values)
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data, datax =  data[0:size], data[-size:]
     test, train = X[0:size], X[size:]
     model = SimpleExpSmoothing(data)
@@ -549,9 +546,9 @@ def Simple_Exponential_Smoothing(data):
 
 def Holt_Exponential_Smoothing(data):
     X = difference(data.values)
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     data, datax = data[0:size], data[-size:]
-    model = ExponentialSmoothing(data, trend='additive')
+    model = ExponentialSmoothing(data, trend="add")
 
     model_fit = model.fit()
 
@@ -593,7 +590,7 @@ def forecast(timeseries, model):
     print(X)
 
     #Use 66% of data for training
-    size = int(len(X) * 0.66)
+    size = int(len(X) * 0.70)
     train, test = X[0:size], X[size:]
     traind, testd = timeseries.values[0:size], timeseries.values[size+2:]
 
@@ -665,7 +662,7 @@ def graph_forecast(timeseries, models, title):
     original_quantity = []
 
     #test data is 66% of all data
-    test_index = len(timeseries) * 0.66
+    test_index = len(timeseries) * 0.70
 
     for index, row in timeseries.iterrows():
         original_quantity.append(row["Quantity"])
@@ -700,7 +697,7 @@ def scatter_model(timeseries, prediction, title):
     predicted_date = []
 
     # test data is 66% of all data
-    test_index = len(timeseries) * 0.66
+    test_index = len(timeseries) * 0.70
 
     ctr = 0
     for index, row in timeseries.iterrows():
@@ -736,7 +733,7 @@ def scatter_model_float(timeseries, prediction, title):
     predicted_date = []
 
     # test data is 66% of all data
-    test_index = len(timeseries) * 0.66
+    test_index = len(timeseries) * 0.70
 
     ctr = 0
     for index, row in timeseries.iterrows():
@@ -772,134 +769,113 @@ def Average(lst):
 def K9_forecast(request):
     quantity_set = K9_Quantity.objects.all().order_by('date_bought')
 
-    quantity = []
-    date = []
+    context = {
+        'title': 'Forecasting',
+        'graph': "",
+        'models': "",
+        'errors': "",
+        'predictions': ""
+    }
 
-    for data in quantity_set:
-        date_object = data.date_bought
-        dt64 = np.datetime64(str(date_object))
+    if quantity_set:
+        quantity = []
+        date = []
 
-        date.append(dt64)
-        quantity.append(data.quantity)
+        for data in quantity_set:
+            date_object = data.date_bought
+            dt64 = np.datetime64(str(date_object))
 
-    df = pd.DataFrame({'Date': list(date),
+            date.append(dt64)
+            quantity.append(data.quantity)
+
+        df = pd.DataFrame({'Date': list(date),
                        'Quantity': list(quantity),
                        })
 
-    ts = df.set_index('Date')
+
+        ts = df.set_index('Date')
+
+        models = []
+        errors = []
+        predictions = []
+
+        AR_model = Autoregression(ts)
+        AR_forecast = forecast(ts, AR_model)
+        AR = AR_forecast[0]
+        AR_predict = AR_forecast[1]
+        AR_scatter = scatter_model(ts, AR, "Autoregression (AR)")
+        AR_error = AR_forecast[2]
+        models.append("AR")
+        errors.append(AR_error)
+        predictions.append(AR_predict)
+
+        MA_model = Moving_Average(ts)
+        MA_forecast = forecast(ts, MA_model)
+        MA = MA_forecast[0]
+        MA_predict = MA_forecast[1]
+        MA_scatter = scatter_model(ts, MA, "Moving Average (MA)")
+        MA_error = MA_forecast[2]
+        models.append("MA")
+        errors.append(MA_error)
+        predictions.append(MA_predict)
 
 
-    # error = mean_squared_error(list_train, A_model)
-    # root_error = sqrt(error)
-    # mean_root_error = int(root_error * 10 ** 2) / 10.0 ** 2
+        ARMA_model = Autoregressive_Moving_Average(ts)
+        ARMA_forecast = forecast(ts, ARMA_model)
+        ARMA = ARMA_forecast[0]
+        ARMA_predict = ARMA_forecast[1]
+        ARMA_scatter = scatter_model(ts, ARMA, "Autoregressive Moving Average (ARMA)")
+        ARMA_error = ARMA_forecast[2]
+        models.append("ARMA")
+        errors.append(ARMA_error)
+        predictions.append(ARMA_predict)
 
-    # mean_d = []
-    # mean_q = []
-    #
-    # for index, row in A_model.iterrows():
-    #     mean_q.append(row["Quantity"])
-    #     mean_d.append(index)
-    #
-    #
-    # A_Scatter = go.Scatter(
-    #     x=list(mean_d),
-    #     y=list(mean_q),
-    #     name="Mean"
-    # )
-
-
-    models = []
-    errors = []
-    predictions = []
-
-    # models.append("Mean")
-    # errors.append("")
-    # predictions.append(mean)
-
-    AR_model = Autoregression(ts)
-    AR_forecast = forecast(ts, AR_model)
-    AR = AR_forecast[0]
-    AR_predict = AR_forecast[1]
-    AR_scatter = scatter_model(ts, AR, "Autoregression (AR)")
-    AR_error = AR_forecast[2]
-    models.append("AR")
-    errors.append(AR_error)
-    predictions.append(AR_predict)
-
-    MA_model = Moving_Average(ts)
-    MA_forecast = forecast(ts, MA_model)
-    MA = MA_forecast[0]
-    MA_predict = MA_forecast[1]
-    MA_scatter = scatter_model(ts, MA, "Moving Average (MA)")
-    MA_error = MA_forecast[2]
-    models.append("MA")
-    errors.append(MA_error)
-    predictions.append(MA_predict)
+        ARIMA_model = Autoregressive_Integrated_Moving_Average(ts)
+        ARIMA_forecast = forecast(ts, ARIMA_model)
+        ARIMA = ARIMA_forecast[0]
+        ARIMA_predict = ARIMA_forecast[1]
+        ARIMA_scatter = scatter_model(ts, ARIMA, "Autoregressive Integrated Moving Average (ARIMA)")
+        ARIMA_error = ARIMA_forecast[2]
+        models.append("ARIMA")
+        errors.append(ARIMA_error)
+        predictions.append(ARIMA_predict)
 
 
-    ARMA_model = Autoregressive_Moving_Average(ts)
-    ARMA_forecast = forecast(ts, ARMA_model)
-    ARMA = ARMA_forecast[0]
-    ARMA_predict = ARMA_forecast[1]
-    ARMA_scatter = scatter_model(ts, ARMA, "Autoregressive Moving Average (ARMA)")
-    ARMA_error = ARMA_forecast[2]
-    models.append("ARMA")
-    errors.append(ARMA_error)
-    predictions.append(ARMA_predict)
+        SES_model = Simple_Exponential_Smoothing(ts)
+        SES_forecasts = SES_model[0]
+        SES_forecasts = SES_forecasts.tolist()
+        SES_predict = SES_model[1]
+        SES_error = SES_model[2]
+        SES_scatter = scatter_model_float(ts, SES_forecasts, "Single Exponential Smoothing (SES)")
+        models.append("SES")
+        errors.append(str(SES_error))
+        predictions.append(str(SES_predict))
 
-    ARIMA_model = Autoregressive_Integrated_Moving_Average(ts)
-    ARIMA_forecast = forecast(ts, ARIMA_model)
-    ARIMA = ARIMA_forecast[0]
-    ARIMA_predict = ARIMA_forecast[1]
-    ARIMA_scatter = scatter_model(ts, ARIMA, "Autoregressive Integrated Moving Average (ARIMA)")
-    ARIMA_error = ARIMA_forecast[2]
-    models.append("ARIMA")
-    errors.append(ARIMA_error)
-    predictions.append(ARIMA_predict)
+        '''
+        HES_model = Holt_Exponential_Smoothing(ts)
+        HES_forecasts = HES_model[0]
+        HES_forecasts = HES_forecasts.tolist()
+        HES_predict = HES_model[1]
+        HES_error = HES_model[2]
+        HES_scatter = scatter_model_float(ts, HES_forecasts, "Holt's Exponential Smoothing (HES)")
+        models.append("HES")
+        errors.append(str(HES_error))
+        predictions.append(str(HES_predict))
+        '''
 
+        Scatter_Models = [AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter,]
 
-    # SARMA_model = Seasonal_Autoregressive_Moving_Average(ts)
-    # SARMA = forecast(ts, SARMA_model)
-    # SARMA_scatter = scatter_model(ts, SARMA, "Seasonal Autoregressive Integrated Moving Average (SARIMA)")
-
-
-    SES_model = Simple_Exponential_Smoothing(ts)
-    SES_forecasts = SES_model[0]
-    SES_forecasts = SES_forecasts.tolist()
-    print("SES FIITED FCAST")
-    print(SES_forecasts)
-    SES_predict = SES_model[1]
-    SES_error = SES_model[2]
-    SES_scatter = scatter_model_float(ts, SES_forecasts, "Single Exponential Smoothing (SES)")
-    models.append("SES")
-    errors.append(str(SES_error))
-    predictions.append(str(SES_predict))
+        graph_title = "Forecasting K9s Demand Using Various Models"
+        graph = graph_forecast(ts, Scatter_Models, graph_title)
 
 
-    HES_model = Holt_Exponential_Smoothing(ts)
-    HES_forecasts = HES_model[0]
-    HES_forecasts = HES_forecasts.tolist()
-    HES_predict = HES_model[1]
-    HES_error = HES_model[2]
-    HES_scatter = scatter_model_float(ts, HES_forecasts, "Holt's Exponential Smoothing (HES)")
-    models.append("HES")
-    errors.append(str(HES_error))
-    predictions.append(str(HES_predict))
-
-
-    Scatter_Models = [AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter, HES_scatter]
-
-    graph_title = "Forecasting K9s Demand Using Various Models"
-    graph = graph_forecast(ts, Scatter_Models, graph_title)
-
-
-    context = {
-        'title': 'Forecasting',
-        'graph': graph,
-        'models': models,
-        'errors': errors,
-        'predictions': predictions
-    }
+        context = {
+            'title': 'Forecasting',
+            'graph': graph,
+            'models': models,
+            'errors': errors,
+            'predictions': predictions
+        }
 
     return render(request, 'planningandacquiring/forecast_k9_required.html', context)
 

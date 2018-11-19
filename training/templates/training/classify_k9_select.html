@@ -1,11 +1,12 @@
 {% extends "profiles/sidebar_training.html" %}
+{% load training_tags %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
     <h3 class="ui header">Classify {{ title }}</h3>
     {% if messages %}
         {% for message in messages %}
-            <div class={{style}}> {{ message }}</div>
+            <div class='{{style}}'> {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
@@ -62,77 +63,71 @@
   </div>
   <ul class="list">
     <li>Below this is a list of suggested skill assignment based from current data.</li>
-      <li>Click on a category to view corresponding data diagram.</li>
+      <li>Click on the link beside a skill to view corresponding data diagram.</li>
   </ul>
-</div>
-
-<div class = "ui segment">
-    <table class="ui four column celled table">
-        <thead>
-            <tr>
-                <th>Categories</th>
-                <th>Skills</th>
-                <th>Categories</th>
-                <th>Skills</th>
-            </tr>
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on currently demanded skill">Demand</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on fraction of all skills">Ratio</th>
-                <td>Somthing</td>
-            </tr>
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on hereditary skills (all members)">Family History (General)</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on hereditary skills (members with the same breed)">Family History (Gender)</th>
-                <td>Somthing</td>
-            </tr>
-
-            <tr>
-                <th data-tooltip= "Click here to view data diagram on skill count on current breed">Breed</th>
-                <td>Somthing</td>
-                <th data-tooltip= "Click here to view data diagram on skill count on current sex">Sex</th>
-                <td>Somthing</td>
-            </tr>
-
-        </thead>
-    </table>
 </div>
 
 <form class="ui form" method="POST">
     {% csrf_token %}
-    <div class="six fields">
-        <div class="field"></div>
-        <div class="field"></div>
-        <div class="inline fields" style="margin-top:10px;">
-          <div class="field">
-            {% if edd.grade == '0' or data.capability == 'EDD' %}
-              <input type="radio" name="radio" value="EDD" disabled>EDD
-            {%else%}
-              <input type="radio" name="radio" value="EDD">EDD
-            {%endif%}
-          </div>
-          <div class="field">
-            {% if ndd.grade == '0' or data.capability == 'NDD'%}
-              <input type="radio" name="radio" value="NDD" disabled>NDD
-            {%else%}
-              <input type="radio" name="radio" value="NDD">NDD
-            {%endif%}
-          </div>
-          <div class="field">
+  <div class = "ui segment">
+    <table class="ui two column celled table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>View Charts/Graphs</th>
+                <th></th>
+            </tr>
+
+        </thead>
+
+             <tr>
             {% if sar.grade == '0' or data.capability == 'SAR' %}
+            <td>
               <input type="radio" name="radio" value="SAR" disabled>SAR
+                </td>
             {%else%}
+        <td>
               <input type="radio" name="radio" value="SAR">SAR
+        </td>
             {%endif%}
-          </div>
-        </div>
-        <div class="field">
-            <button class="ui green button">Submit</button>
-        </div>
-        <div class="field"></div>
-        <div class="field"></div>
-    </div>
+                 <td><a href="{% url 'training:view_graph' 0 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                 <td>{{sar_recommended}}</td>
+        </tr>
+
+
+            <tr>
+            {% if ndd.grade == '0' or data.capability == 'NDD'%}
+            <td>
+              <input type="radio" name="radio" value="NDD" disabled>NDD
+                </td>
+            {%else%}
+            <td>
+              <input type="radio" name="radio" value="NDD">NDD
+            </td>
+            {%endif%}
+                <td><a href="{% url 'training:view_graph' 1 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                <td>{{ndd_recommended}}</td>
+            </tr>
+
+
+
+             <tr>
+            {% if edd.grade == '0' or data.capability == 'EDD' %}
+            <td>
+              <input type="radio" name="radio" value="EDD" disabled>EDD
+            </td>
+            {%else%}
+            <td>
+              <input type="radio" name="radio" value="EDD">EDD
+            </td>
+            {%endif%}
+                 <td><a href="{% url 'training:view_graph' 2 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
+                <td>{{edd_recommended}}</td>
+             </tr>
+
+    </table>
+          <button class="ui green button" type="Submit">Submit</button>
+  </div>
 </form>
 
 <script type="text/javascript">
@@ -140,9 +135,18 @@
     $(document).ready(function() {
         $('#tabledata').DataTable();
 
+    
+    } );
+
+    $('.ui.basic.modal')
+    .modal('show')
+    ;
+
+
         var selected = $("input[name='radio']");
         alert(select.val)
     });
+
 
 </script>
  {% endblock %}

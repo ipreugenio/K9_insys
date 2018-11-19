@@ -6,10 +6,15 @@
     {{data.team}}
     <div class="sub header">Team details for {{data.team}}</div>
 </h1>
-
+{% if messages %}
+    {% for message in messages %}
+        <div class="ui green message"> {{ message }}</div>
+    {% endfor %}
+{% endif %}
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Details</a>
-    <a class="item" data-tab="second">Deploy Dogs</a>
+    <a class="item" data-tab="second">Deploy K9's</a>
+    <a class="item" data-tab="third">History</a>
 </div>
 
 <div class="ui tab segment active" data-tab="first">
@@ -26,8 +31,12 @@
     <div class="column">
       <div class="ui basic horizontal segments" style="border-style: none;">
        <div class="ui basic segment" style="border-style: none;">
-         <label>No. of Dog Demand: </label>
-         <span class="ui red circular label">{{data.total_dogs_demand}}</span>
+         <label>No. of K9 Demand: </label>
+         {% if data.total_dogs_deployed >= data.total_dogs_demand %}
+             <span class="ui green circular label">{{data.total_dogs_demand}}</span>
+         {%else%}
+             <span class="ui red circular label">{{data.total_dogs_demand}}</span>
+         {% endif %}
          <table class="ui three column celled red table">
            <thead>
              <tr>
@@ -46,8 +55,12 @@
          </table>
        </div>
        <div class="ui basic segment" style="border-style: none;">
-         <label>No. of Dog Deployed: </label>
-         <span class="ui orange circular label">{{data.total_dogs_deployed}}</span>
+         <label>No. of K9 Deployed: </label>
+         {% if data.total_dogs_deployed >= data.total_dogs_demand %}
+             <span class="ui green circular label">{{data.total_dogs_deployed}}</span>
+         {%else%}
+             <span class="ui orange circular label">{{data.total_dogs_deployed}}</span>
+         {% endif %}
          <table class="ui three column celled orange table">
            <thead>
              <tr>
@@ -68,14 +81,20 @@
       </div>
     </div>
   </div>
-
- <table id="tabledata1" class="ui four column celled table">
+<h2 class="ui header">
+    <i class="paw icon"></i>
+    <div class="content">
+      K9's Deployed
+    </div>
+  </h2>
+ <table id="tabledata1" class="ui five column celled table">
        <thead>
          <tr>
            <th>Name</th>
            <th>Serial Number</th>
            <th>Capability</th>
            <th>Handler</th>
+           <th></th>
          </tr>
      </thead>
      <tbody>
@@ -85,6 +104,9 @@
            <td>{{dogs_deployed.k9.serial_number}}</td>
            <td>{{dogs_deployed.k9.capability}}</td>
            <td>{{dogs_deployed.k9.handler}}</td>
+           <td class="ui center aligned" style="width:15%;">
+              <a href="{% url 'deployment:remove_dog_deployed' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
+            </td>
          </tr>
          	{% endfor %}
      </tbody>
@@ -92,11 +114,6 @@
 </div>
 
 <div class="ui tab segment" data-tab="second">
-  {% if messages %}
-      {% for message in messages %}
-          <div class="{{ style }} row"> {{ message }}</div>
-      {% endfor %}
-  {% endif %}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata2" class="ui four column celled table">
@@ -129,12 +146,38 @@
     </div>
   </form>
 </div>
-
+<div class="ui tab segment" data-tab="third">
+  <table id="tabledata3" class="ui five column celled table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Serial Number</th>
+            <th>Capability</th>
+            <th>Date Assigned</th>
+            <th>Date Pulled</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for dogs_pulled in dogs_pulled %}
+          <tr class="ui center aligned">
+            <td>{{dogs_pulled.k9.name}}</td>
+            <td>{{dogs_pulled.k9.serial_number}}</td>
+            <td>{{dogs_pulled.k9.capability}}</td>
+            <td>{{dogs_pulled.date_added}}</td>
+            <td>{{dogs_pulled.date_pulled}}</td>
+          </tr>
+            {% endfor %}
+      </tbody>
+  </table>
+</div>
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata1').DataTable();
         $('#tabledata2').DataTable();
+        $('#tabledata3').DataTable({
+              "order": [[ 4, "desc" ]]
+        });
         $('.menu .item').tab();
     });
 

@@ -9,7 +9,6 @@ def index(List, i):
 
 @register.filter
 def name(List, i):
-
     item = List[int(i)]
     name = item.name
 

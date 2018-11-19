@@ -1,5 +1,5 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
-{% load index %}
+{% load pa_tags %}
 
 <h2 class="ui header">
  {{Title}}
@@ -63,7 +63,7 @@
 
               {% for radio in form.mother %}
             <tr>
-                <td>  <div class="ui radio checkbox"> {{radio.tag}} </div> </td>
+                <td> {{radio.tag}} </td>
                 <td>{{mothers|name:forloop.counter0 }}</td>
                 <td>{{mothers|breed:forloop.counter0 }}</td>
                 <td>{{mothers|color:forloop.counter0 }}</td>
@@ -91,7 +91,7 @@
 
               {% for radio in form.father %}
             <tr>
-                <td> <div class="ui radio checkbox">{{radio.tag}}</div> </td>
+                <td>{{radio.tag}}</td>
                 <td>{{fathers|name:forloop.counter0 }}</td>
                 <td>{{fathers|breed:forloop.counter0 }}</td>
                 <td>{{fathers|color:forloop.counter0 }}</td>
@@ -104,7 +104,7 @@
     </div>
 
 
-  <div class="ui center aligned segment" style="padding: 0px;">
+  <div class="ui center aligned basic segment" style="padding: 0px;">
         <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
     </div>
 

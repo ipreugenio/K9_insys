@@ -11,6 +11,7 @@ urlpatterns = [
     path('assigned-location-list/', views.assigned_location_list, name='assigned_location_list'),
     path('team-location-details/<int:id>', views.team_location_details, name='team_location_details'),
     path('edit-team/<int:id>', views.edit_team, name='edit_team'),
+    path('remove-dog-deployed/<int:id>', views.remove_dog_deployed, name='remove_dog_deployed'),
     path('request_form/', views.dog_request, name='request_form'),
     path('request_dog_list/', views.request_dog_list, name='request_dog_list'),
     path('request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),

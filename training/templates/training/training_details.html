@@ -70,11 +70,27 @@
     </ul>
 </div>
 <div class="ui top attached tabular menu">
+    {% if data.capability == 'EDD' %}
     <a class="item active" data-tab="first">EDD</a>
+    {%else%}
+    <a class="item" data-tab="first">EDD</a>
+    {%endif%}
+    {% if data.capability == 'NDD' %}
+    <a class="item active" data-tab="second">NDD</a>
+    {%else%}
     <a class="item" data-tab="second">NDD</a>
+    {%endif%}
+    {% if data.capability == 'SAR' %}
+    <a class="item active" data-tab="third">SAR</a>
+    {%else%}
     <a class="item" data-tab="third">SAR</a>
+    {%endif%}
 </div>
+{% if data.capability == 'EDD' %}
 <div class="ui tab segment active" data-tab="first">
+{%else%}
+<div class="ui tab segment" data-tab="first">
+{%endif%}
     <div class="ui raised segment ">
         <div class="paragraph">
             <div class="medium line">
@@ -198,7 +214,11 @@
         <p style="padding:2px;">{{edd.remarks}}</p>
     </div>
 </div>
+{% if data.capability == 'NDD' %}
+<div class="ui tab segment active" data-tab="second">
+{%else%}
 <div class="ui tab segment" data-tab="second">
+{%endif%}
   <div class="ui raised segment ">
       <div class="paragraph">
           <div class="medium line">
@@ -322,7 +342,11 @@
       <p style="padding:2px;">{{ndd.remarks}}</p>
   </div>
 </div>
+{% if data.capability == 'SAR' %}
+<div class="ui tab segment active" data-tab="third">
+{%else%}
 <div class="ui tab segment" data-tab="third">
+{%endif%}
   <div class="ui raised segment ">
       <div class="paragraph">
           <div class="medium line">

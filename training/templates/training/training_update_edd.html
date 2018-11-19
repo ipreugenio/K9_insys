@@ -132,9 +132,11 @@
         if ($("input[name='stage3_3']").is(':checked')){
             $("input[name='stage3_3']").prop('disabled', true)
             $("#btn").prop('disabled', true)
+            $("textarea[name='remarks']").prop('disabled', true)
+            $("select[name='grade']").prop('disabled', true)
         }
 
-      
+
         $("select[name='grade']").prop('disabled', true)
 
         //Stage3_3
@@ -147,7 +149,7 @@
                 $("select[name='grade']").prop('disabled', true)
             }
         });
-        
+
         //Stage3_2
         $("input[name='stage3_2']").change(function() {
             if ($("input[name='stage3_1']").is(':checked')){
