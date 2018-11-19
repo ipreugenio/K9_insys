@@ -296,6 +296,7 @@ def classify_k9_select(request, id):
         else:
             data.training_status = "Classified"
 
+        data.training_count = data.training_count+1 
         data.capability = request.POST.get('radio')
         data.save()
 
@@ -1299,4 +1300,3 @@ def genealogy(id):
             tree = None
 
     return tree
-

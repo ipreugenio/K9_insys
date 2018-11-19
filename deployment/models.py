@@ -161,7 +161,7 @@ class Location(models.Model):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     place = models.CharField('place', max_length=100)
-    '''status = models.CharField('status', max_length=100, default="unassigned")'''
+    status = models.CharField('status', max_length=100, default="unassigned")
 
     def __str__(self):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
