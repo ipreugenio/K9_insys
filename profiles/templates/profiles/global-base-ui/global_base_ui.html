@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load profile_tags %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,6 +25,7 @@
     <!--START OF TOP MENU-->
     <div class="ui inverted top attached demo menu" style="height:30px;">
         <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
+        <p class="item" style="width: 175px; padding: 20px;">Welcome, {{request.session.session_username}}</p>
         <div class="right menu">
              
             <div class="topdiv">

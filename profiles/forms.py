@@ -81,7 +81,7 @@ class add_education_form(forms.ModelForm):
 class add_user_account(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ('serial_number', 'email_address', 'password')
+        fields = ('email_address', 'password')
 
         widgets = {
             'password': forms.PasswordInput(),

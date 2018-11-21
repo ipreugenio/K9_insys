@@ -10,14 +10,41 @@ from django.contrib.auth import authenticate, login
 from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
+from planningandacquiring.models import K9
 
 # Create your views here.
 
 def dashboard(request):
-    return render (request, 'profiles/dashboard.html')
+
+    can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
+
+    context = {
+        'can_deploy': can_deploy
+    }
+
+    return render (request, 'profiles/dashboard.html', context)
 
 def profile(request):
-    return render (request, 'profiles/profile.html')
+    username = request.session["session_username"]
+    serial = request.session["session_serial"]
+
+    account = Account.objects.get(serial_number=serial)
+
+    user = User.objects.get(id=account.UserID.id)
+    personal_info = Personal_Info.objects.get(UserID=account.UserID.id)
+    education = Education.objects.get(UserID=account.UserID.id)
+    account = Account.objects.get(UserID=account.UserID.id)
+
+    context = {
+        'Title': 'User Details',
+        'user': user,
+        'personal_info': personal_info,
+        'education': education,
+        'account': account,
+        'username': username
+    }
+
+    return render (request, 'profiles/profile.html', context)
 
 def register(request):
     return render (request, 'profiles/register.html')
@@ -31,10 +58,19 @@ def login(request):
 
         if Account.objects.filter(serial_number=serial).exists():
             if Account.objects.filter(password=password).exists():
+                request.session["session_serial"] = serial
+                account = Account.objects.get(serial_number = serial)
+
+                user = User.objects.get(id = account.UserID.id)
+
+
+                request.session["session_user_position"] = user.position
+                request.session["session_username"] = str(user)
                 return HttpResponseRedirect('../dashboard')
-    else:
+
+    '''else:
         style = "ui red message"
-        messages.warning(request, 'Wrong serial number or password!')
+        messages.warning(request, 'Wrong serial number or password!')'''
 
     context = {
         'title': "Add User Form",
@@ -143,6 +179,8 @@ def add_account(request):
         if form.is_valid():
             account_info = form.save(commit=False)
             UserID = request.session["session_userid"]
+            data = User.objects.get(id = UserID)
+            account_info.serial_number = 'O-' + str(data.id)
             user = User.objects.get(id=UserID)
             account_info.UserID = user
             account_info.save()

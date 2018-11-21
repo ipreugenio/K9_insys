@@ -11,15 +11,17 @@ from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm
 import datetime
+from deployment.models import Team_Assignment
+from django.db.models import Sum
 
 # from collections import OrderedDict
 
 #graphing imports
-import igraph
+'''import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+import plotly.graph_objs.layout as lout'''
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -102,6 +104,16 @@ def classify_k9_list(request):
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
 
+    NDD_count = K9.objects.filter(capability='NDD').count()
+    EDD_count = K9.objects.filter(capability='EDD').count()
+    SAR_count = K9.objects.filter(capability='SAR').count()
+
+    NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+    EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+    SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+
+
     # TODO:
     '''
     if k9 has failed 2 trainign records, disable reasign button
@@ -113,6 +125,12 @@ def classify_k9_list(request):
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
+        'EDD_count': EDD_count,
+        'NDD_count': NDD_count,
+        'SAR_count': SAR_count,
+        'NDD_demand': NDD_demand,
+        'EDD_demand': EDD_demand,
+        'SAR_demand': SAR_demand
     }
     return render (request, 'training/classify_k9_list.html', context)
 

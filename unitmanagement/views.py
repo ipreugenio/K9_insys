@@ -11,6 +11,8 @@ from unitmanagement.models import PhysicalExam, Health, HealthMedicine
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm, RequestForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests
+from profiles.models import User, Account
+from training.models import K9_Handler
 # Create your views here.
 
 def index(request):
@@ -90,7 +92,19 @@ def physical_exam_form(request):
     return render (request, 'unitmanagement/physical_exam_form.html', context)
 
 def health_record(request):
-    data = K9.objects.all()
+    position = request.session["session_user_position"]
+
+    if position == "Handler":
+        serial = request.session["session_serial"]
+
+        number = Account.objects.get(serial_number=serial)
+        handler = User.objects.get(id=number.UserID.id)
+        k9 = K9_Handler.objects.get(handler_id=handler.id)
+        data = K9.objects.get(id = int(k9.id))
+
+    elif position == "Veterinarian":
+        data = K9.objects.all()
+
     context = {
         'title': "Health Record",
         'actiontype': "Submit",
