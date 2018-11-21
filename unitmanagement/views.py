@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-import datetime as dt
+import datetime
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
@@ -76,6 +76,10 @@ def physical_exam_form(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            new_form = form.save()
+            new_form.date_next_exam = datetime.date.today() + datetime.timedelta(days=365)
+            new_form.save()
+
             style = "ui green message"
             messages.success(request, 'Physical Exam has been successfully recorded!')
             form = PhysicalExamForm()
@@ -116,7 +120,15 @@ def health_history(request, id):
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data)
     phyexam_data = PhysicalExam.objects.filter(dog = data)
-    vaccine_data = VaccinceRecord.objects.filter(dog = data)
+    vd = VaccinceRecord.objects.filter(dog = data).values_list('disease', flat=True).distinct().order_by()
+
+    vaccine_data = []
+    for vd in vd:
+        v = VaccinceRecord.objects.filter(dog = data).filter(disease=vd).latest('date_validity')
+        vaccine_data.append(v)
+
+    dtoday = datetime.date.today()
+
     context = {
         'title': "Health History of ",
         'name': data.name,
@@ -125,6 +137,7 @@ def health_history(request, id):
         'health_data': health_data,
         'phyexam_data': phyexam_data,
         'vaccine_data': vaccine_data,
+        'dtoday':dtoday,
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -206,17 +219,30 @@ def vaccination_form(request):
     style=""
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            style = "ui green message"
-            messages.success(request, 'Vaccination has been successfully recorded!')
-            form = VaccinationForm()
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
+            v = request.POST.get('vaccine')
+            med = Medicine_Inventory.objects.get(medicine=v)
+            if med.quantity != 0:
+                form.save()
+                new_form = form.save()
+                #get vaccine yearly-Used
+                vaccine = Medicine.objects.get(id=new_form.vaccine.id)
+                duration = 365 / vaccine.used_yearly
+                new_form.date_validity = datetime.date.today() + datetime.timedelta(days=duration)
+                new_form.save()
+
+                q = med.quantity-1
+                Medicine_Subtracted_Trail.objects.create(inventory = med, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                style = "ui green message"
+                messages.success(request, 'Vaccination has been successfully recorded!')
+                form = VaccinationForm()
+            else:
+                style = "ui red message"
+                messages.warning(request, 'Insufficient Inventory Quantity!')
     context = {
         'title': "Vaccination",
         'actiontype': "Submit",
         'form': form,
+        'style': style,
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 

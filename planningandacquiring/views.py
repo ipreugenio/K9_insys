@@ -406,6 +406,11 @@ def K9_listview(request):
 def K9_detailview(request, id):
     k9 = K9.objects.get(id = id)
 
+    if request.method == "POST":
+        print(request.POST.get('radio'))
+        k9.training_status = request.POST.get('radio')
+        k9.save()
+        messages.success(request, 'K9 is now ' + k9.training_status + '!')
 
     try:
         parent = K9_Parent.objects.get(offspring=k9)
@@ -424,7 +429,6 @@ def K9_detailview(request, id):
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
-
 
 # create a difference transform of the dataset
 def difference(dataset):

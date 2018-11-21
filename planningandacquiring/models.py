@@ -66,6 +66,15 @@ class K9(models.Model):
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         self.training_id = self.id
+        if self.age == 9:
+            self.training_status = 'Due-For-Retirement'
+            self.status = 'Light Duty'
+        elif self.age == 10:
+            self.training_status = 'Retired'
+            self.year_retired = self.birth_date + td(days=(10*365))
+            self.status = 'Retired'
+        else:
+            pass
         # Serial Numbers and Microchips are given after training
         # lead_zero = str(self.id).zfill(5)
         # serial_number = '#%s' % (lead_zero)
