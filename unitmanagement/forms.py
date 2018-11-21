@@ -31,7 +31,7 @@ class PhysicalExamForm(forms.ModelForm):
     eyes = forms.CharField(label = 'eyes', widget = forms.Select(choices=EXAMSTATUS))
     ears = forms.CharField(label = 'ears', widget = forms.Select(choices=EXAMSTATUS))
     remarks = forms.CharField(label = 'remarks', widget = forms.Textarea(attrs={'rows':'4'}))
-    
+
     class Meta:
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
@@ -82,13 +82,11 @@ class VaccinationForm(forms.ModelForm):
     dog = forms.ModelChoiceField(queryset = K9.objects.all().order_by('name'))
     disease = forms.CharField(widget = forms.Select(choices=DISEASE))
     vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
-    
+
     class Meta:
         model = VaccinceRecord
-        fields = ('dog', 'vaccine', 'disease', 'date_validity')
-        widgets = {
-            'date_validity': DateInput(),
-        }
+        fields = ('dog', 'vaccine', 'disease')
+
 
 class RequestForm(forms.ModelForm):
     CONCERN = (
@@ -99,7 +97,7 @@ class RequestForm(forms.ModelForm):
     concern = forms.CharField(max_length=10, label='concern', widget=forms.Select(choices=CONCERN))
     equipment = forms.ModelChoiceField(queryset=Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
-    
+
     class Meta:
         model = Requests
         fields = ('handler', 'equipment', 'remarks', 'concern')

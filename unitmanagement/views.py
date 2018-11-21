@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-import datetime as dt
+import datetime 
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
@@ -192,17 +192,23 @@ def vaccination_form(request):
     style=""
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            style = "ui green message"
-            messages.success(request, 'Vaccination has been successfully recorded!')
-            form = VaccinationForm()
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
+            v = request.POST.get('vaccine')
+            med = Medicine_Inventory.objects.get(medicine=v)
+            if med.quantity != 0:
+                form.save()
+                q = med.quantity-1
+                Medicine_Subtracted_Trail.objects.create(inventory = med, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                style = "ui green message"
+                messages.success(request, 'Vaccination has been successfully recorded!')
+                form = VaccinationForm()
+            else:
+                style = "ui red message"
+                messages.warning(request, 'Insufficient Inventory Quantity!')
     context = {
         'title': "Vaccination",
         'actiontype': "Submit",
         'form': form,
+        'style': style,
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 

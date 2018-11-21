@@ -1,8 +1,10 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from inventory.models import Medicine, Miscellaneous
+from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import User
+
+import datetime as dt
 # Create your models here.
 
 class Health(models.Model):
@@ -20,7 +22,7 @@ class HealthMedicine(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
     dosage = models.CharField('dosage', max_length=200, default="")
-    
+
     def __str__(self):
         return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog.name)
 
@@ -75,9 +77,13 @@ class VaccinceRecord(models.Model):
     date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
     date_validity = models.DateField('date_validity', blank=True,)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)
+
+    def save(self, *args, **kwargs):
+        self.date_validity = dt.date.today() + dt.timedelta(days=int(self.vaccine.duration))
+        super(VaccinceRecord, self).save(*args, **kwargs)
 
 class Requests(models.Model):
     CONCERN = (
