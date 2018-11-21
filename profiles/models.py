@@ -76,7 +76,7 @@ class User(models.Model):
     headsize = models.IntegerField('headsize')
     footsize = models.IntegerField('footsize')
     bodybuild = models.CharField('bodybuild', max_length=200)
-    status = models.CharField('status', choices=STATUS, max_length=200)
+    status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
 
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date
