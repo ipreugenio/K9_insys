@@ -4,7 +4,7 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import User
 
-import datetime as dt
+import datetime
 # Create your models here.
 
 class Health(models.Model):
@@ -34,7 +34,6 @@ class PhysicalExam(models.Model):
     )
 
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
-    date = models.DateField('date', auto_now_add=True)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cage_number = models.IntegerField('dog', default = "0")
     general_appearance = models.CharField('general_appearance', choices=EXAMSTATUS, max_length=200)
@@ -50,6 +49,8 @@ class PhysicalExam(models.Model):
     eyes = models.CharField('eyes', choices=EXAMSTATUS, max_length=200)
     ears = models.CharField('ears', choices=EXAMSTATUS, max_length=200)
     remarks = models.TextField('remarks', max_length=200)
+    date = models.DateField('date', auto_now_add=True)
+    date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
 
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
@@ -75,15 +76,11 @@ class VaccinceRecord(models.Model):
     vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     disease = models.CharField('disease', choices=DISEASE, max_length=200)
     date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
-    date_validity = models.DateField('date_validity', blank=True,)
+    date_validity = models.DateField('date_validity', null=True, blank=True)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)
-
-    def save(self, *args, **kwargs):
-        self.date_validity = dt.date.today() + dt.timedelta(days=int(self.vaccine.duration))
-        super(VaccinceRecord, self).save(*args, **kwargs)
 
 class Requests(models.Model):
     CONCERN = (

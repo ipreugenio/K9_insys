@@ -36,12 +36,13 @@ class PhysicalExamForm(forms.ModelForm):
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
         'musculo_skeletal', 'respiratory', 'genito_urinary', 'nervous', 'circulatory', 'digestive',
-        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks')
+        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam')
 
     def __init__(self, *args, **kwargs):
         super(PhysicalExamForm, self).__init__(*args, **kwargs)
         self.fields['cage_number'].required = False
         self.fields['remarks'].required = False
+        self.fields['date_next_exam'].required = False
 
 class HealthForm(forms.ModelForm):
 
@@ -85,8 +86,11 @@ class VaccinationForm(forms.ModelForm):
 
     class Meta:
         model = VaccinceRecord
-        fields = ('dog', 'vaccine', 'disease')
+        fields = ('dog', 'vaccine', 'disease', 'date_validity')
 
+    def __init__(self, *args, **kwargs):
+        super(VaccinationForm, self).__init__(*args, **kwargs)
+        self.fields['date_validity'].required = False
 
 class RequestForm(forms.ModelForm):
     CONCERN = (
