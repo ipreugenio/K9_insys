@@ -60,7 +60,7 @@ class HealthMedicineForm(forms.ModelForm):
         model = HealthMedicine
         fields = ('medicine', 'quantity', 'dosage')
 
-    medicine = forms.ModelChoiceField(queryset = Medicine.objects.all())
+    medicine = forms.ModelChoiceField(queryset = Medicine.objects.exclude(med_type='Vaccine'))
 
     def __init__(self, *args, **kwargs):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
