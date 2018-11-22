@@ -8,4 +8,19 @@
 {{ graph|safe }}
 {% endfor %}
 
+<table class="ui inverted celled table">
+     <tr>
+    <th>
+        Summary:
+    </th>
+         </tr>
+{% for description in descriptions %}
+
+    <tr>
+        <td>{{ description }}</td>
+        </tr>
+{% endfor %}
+    </table>
+
+
 {% endblock %}

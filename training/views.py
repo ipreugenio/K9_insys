@@ -14,14 +14,15 @@ import datetime
 from deployment.models import Team_Assignment
 from django.db.models import Sum
 
+
 # from collections import OrderedDict
 
 #graphing imports
-'''import igraph
+import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout'''
+import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -116,7 +117,7 @@ def classify_k9_list(request):
 
     # TODO:
     '''
-    if k9 has failed 2 trainign records, disable reasign button
+    if k9 has failed 2 training records, disable reasign button
     '''
 
     context = {
@@ -139,6 +140,12 @@ def view_graphs(request, id):
 
     method_arrays = []
 
+    skill_count_between_breeds_desc = ""
+    skill_percentage_between_sexes_desc = ""
+    skill_count_ratio_desc = ""
+    skills_from_gender_desc = ""
+    skills_in_general = ""
+
     method_arrays.append(skill_count_between_breeds(k9_id))
     method_arrays.append(skill_percentage_between_sexes(k9_id))
     method_arrays.append(skill_count_ratio())
@@ -153,40 +160,53 @@ def view_graphs(request, id):
     NDD_graph = []
     EDD_graph = []
 
+    sar_description = []
+    ndd_description = []
+    edd_description = []
+
     ctr = 0
     for array in method_arrays:
-
         #Check if atleast one of the data has a score
         if method_arrays[ctr][1] == 1 or method_arrays[ctr][2] == 1 or method_arrays[ctr][3] == 1:
             #Save graph to the corresponding skill array
             if method_arrays[ctr][1] == 1:
                 SAR_graph.append(method_arrays[ctr][0])
+                str = "SAR is recommended because "
+                sar_description.append(str + method_arrays[ctr][4])
             if method_arrays[ctr][2] == 1:
                 NDD_graph.append(method_arrays[ctr][0])
+                str = "NDD is recommended because "
+                ndd_description.append(str + method_arrays[ctr][4])
             if method_arrays[ctr][3] == 1:
                 EDD_graph.append(method_arrays[ctr][0])
+                str = "EDD is recommended because "
+                edd_description.append(str + method_arrays[ctr][4])
 
         ctr += 1
 
     #Check if skills are supported data, otherwise all of them are recommended
     graphs = ""
+    descriptions = ""
     title = ""
     if SAR_graph or NDD_graph or EDD_graph:
         if id == 0:
             if SAR_graph:
                 graphs = SAR_graph
+                descriptions = sar_description
             else:
                 graphs = ["There is no available data to support this skill!"]
             title = "Search and Rescue"
         elif id == 1:
             if NDD_graph:
                 graphs = NDD_graph
+                descriptions = ndd_description
             else:
                 graphs = ["There is no available data to support this skill!"]
             title = "Narcotics Detection Dogs"
         elif id == 2:
             if EDD_graph:
                 graphs = EDD_graph
+                descriptions = edd_description
             else:
                 graphs = ["There is no available data to support this skill!"]
             title = "Explosives Detection Dogs"
@@ -200,9 +220,8 @@ def view_graphs(request, id):
             title = "Explosives Detection Dogs"
 
 
-
-
     context = {'graphs': graphs,
+               'descriptions': descriptions,
                'title': title}
 
     return render(request, 'training/view_graph.html', context)
@@ -211,6 +230,7 @@ def view_graphs(request, id):
 #TODO Restrict Viable dogs to be trained for those who are 6 months old
 #TODO Add additional age for months
 #TODO Add Descriptions per graph
+#TODO Add additional score for demand and number of skills assigned
 def classify_k9_select(request, id):
     form = ClassifySkillForm(request.POST)
     request.session['k9_id'] = id
@@ -654,7 +674,7 @@ def skill_count_between_breeds(id):
 
 
     layout = go.Layout(
-        title="Skill Count for " + str(skill_total) + " Assigned Dogs Based on Breed",
+        title="Skill Count of Trained Dogs Categorized by Breed (" + str(skill_total) + " Dogs)",
         xaxis =  {'title': 'Breeds'},
         yaxis =  {'title': 'Skill Count'},
     )
@@ -687,19 +707,25 @@ def skill_count_between_breeds(id):
     NDD_score = 0
     EDD_score = 0
 
+    desc2 = ""
     if max(skill_count) == sar and max(skill_count) != 0:
         SAR_score = 1
+        desc2 = "SAR"
     if max(skill_count) == ndd and max(skill_count) != 0:
         NDD_score = 1
+        desc2 = "NDD"
     if max(skill_count) == edd and max(skill_count) != 0:
         EDD_score = 1
+        desc2 = "EDD"
+
+    desc = str(target_k9.name) + " is a " + str(target_k9.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed + "s."
 
     classifier = []
     classifier.append(graph)
     classifier.append(SAR_score)
     classifier.append(NDD_score)
     classifier.append(EDD_score)
-
+    classifier.append(desc)
 
     return classifier
 
@@ -760,7 +786,7 @@ def skill_percentage_between_sexes(id):
         }],
 
     layout =  {
-        "title": "Skill Percentage for " + str(k9_set.count()) + " Assigned Dogs Based on Sexes",
+        "title": "Skill Count of Trained Dogs Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
         "annotations": [
             {
                 "font": {
@@ -808,12 +834,18 @@ def skill_percentage_between_sexes(id):
     NDD_score = 0
     EDD_score = 0
 
+    desc2 = ""
     if max(skill_count) == SAR and max(skill_count) != 0:
         SAR_score = 1
+        desc2 = "SAR"
     if max(skill_count) == NDD and max(skill_count) != 0:
         NDD_score = 1
+        desc2 = "NDD"
     if max(skill_count) == EDD and max(skill_count) != 0:
         EDD_score = 1
+        desc2 = "EDD"
+
+    desc = str(k9.name) + " is a " + str(k9_gender) + " dog. " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " dogs are " + str(desc2) +". " + str(desc2) + " is the most recurring skill among trained " +  str(k9_gender) + " dogs."
 
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
@@ -822,10 +854,10 @@ def skill_percentage_between_sexes(id):
     classifier.append(SAR_score)
     classifier.append(NDD_score)
     classifier.append(EDD_score)
+    classifier.append(desc)
 
     return classifier
 
-#TODO check if ratio ba talaga tawag dito just in case
 def skill_count_ratio():
     k9_set = K9.objects.exclude(capability="None")
 
@@ -842,7 +874,7 @@ def skill_count_ratio():
     data = [trace]
 
     layout = go.Layout(
-        title="Skill Ratio for " + str(k9_set.count()) + " Assigned Dogs",
+        title="Skill Count of Trained Dogs (" + str(k9_set.count()) + " Dogs)",
     )
 
     fig = go.Figure(data=data, layout=layout)
@@ -852,19 +884,26 @@ def skill_count_ratio():
     NDD_score = 0
     EDD_score = 0
 
+    desc2 = ""
     if k9_set:
         if min(values) == SAR.count():
             SAR_score = 1
+            desc2 = "SAR"
         if min(values) == NDD.count():
             NDD_score = 1
+            desc2 = "NDD"
         if min(values) == EDD.count():
             EDD_score = 1
+            desc2 = "EDD"
+
+    desc = "only " + str(min(values)) + " out of " + str(k9_set.count()) + " K9s are assigned to " + str(desc2) + ". " + str(desc2) + " is currently the skill with the least amount of trained dogs."
 
     classifier = []
     classifier.append(graph)
     classifier.append(SAR_score)
     classifier.append(NDD_score)
     classifier.append(EDD_score)
+    classifier.append(desc)
 
     return classifier
 
@@ -1133,7 +1172,7 @@ def skills_from_gender(id):
             }],
 
         layout={
-            "title": "Skill Percentage for " + str(k9_set.count()) + " Assigned Dogs from Descendants Based on Sexes",
+            "title": "Skill Count of Trained Descendants Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
             "annotations": [
                 {
                     "font": {
@@ -1184,23 +1223,31 @@ def skills_from_gender(id):
     NDD_score = 0
     EDD_score = 0
 
+    desc2 = ""
     if max(skill_count) == SAR and max(skill_count) != 0:
         SAR_score = 1
+        desc2 = "SAR"
     if max(skill_count) == NDD and max(skill_count) != 0:
         NDD_score = 1
+        desc2 = "NDD"
     if max(skill_count) == EDD and max(skill_count) != 0:
         EDD_score = 1
+        desc2 = "EDD"
+
+    desc = str(k9.name) + " is a " + str(k9_gender) + " K9 and " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " descendants are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among trained " + str(k9_gender) + " descendants."
 
     classifier = []
     classifier.append(graph)
     classifier.append(SAR_score)
     classifier.append(NDD_score)
     classifier.append(EDD_score)
+    classifier.append(desc)
 
     return classifier
 
 
 def skill_in_general(id):
+    target_k9 = K9.objects.get(id = id)
     k9_family = K9_Genealogy.objects.filter(zero = id)
 
     k9_list = []
@@ -1217,7 +1264,12 @@ def skill_in_general(id):
 
     k9_list = remove_duplicates(k9_list)
 
-    k9_set = K9.objects.filter(pk__in=k9_list).exclude(capability="None")
+    k9_set = K9.objects.filter(pk__in=k9_list).exclude(capability="None").filter()
+
+
+    '''
+    unclassified, classified, on-training, trained, for-breeding, for-adoption, for-deployment, deployed, adopted, breeding, sick, recovery, dead, retired
+    '''
 
     SAR = K9.objects.filter(capability="SAR", pk__in=k9_list)
     NDD = K9.objects.filter(capability="NDD", pk__in=k9_list)
@@ -1232,7 +1284,7 @@ def skill_in_general(id):
     data = [trace]
 
     layout = go.Layout(
-        title="Skill Ratio for " + str(k9_set.count()) + " Assigned Dogs from Descendants",
+        title="Skill Count of Trained Descendants (" + str(k9_set.count()) + " dogs)",
     )
 
     fig = go.Figure(data=data, layout=layout)
@@ -1242,19 +1294,25 @@ def skill_in_general(id):
     NDD_score = 0
     EDD_score = 0
 
+    desc2 = ""
     if max(values) == SAR.count() and max(values) != 0 :
         SAR_score = 1
+        desc2 = "SAR"
     if max(values) == NDD.count() and max(values) != 0:
         NDD_score = 1
+        desc2 = "NDD"
     if max(values) == EDD.count() and max(values) != 0:
         EDD_score = 1
+        desc2 = "EDD"
 
+    desc = str(target_k9.name) + " has " + str(max(values)) + " out of " + str(k9_set.count()) + " descendants who are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among descendants."
 
     classifier = []
     classifier.append(graph)
     classifier.append(SAR_score)
     classifier.append(NDD_score)
     classifier.append(EDD_score)
+    classifier.append(desc)
 
     return classifier
 
@@ -1318,3 +1376,4 @@ def genealogy(id):
             tree = None
 
     return tree
+

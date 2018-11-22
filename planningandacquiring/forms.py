@@ -96,3 +96,6 @@ class add_offspring_K9_form(forms.ModelForm):
         widgets = {
             'birth_date': DateInput(),
         }
+
+class select_breeder(forms.Form):
+    k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
