@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py">
-      <change afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inventory/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/view_graph.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/view_graph.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,7 +15,7 @@
         <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="746">
-              <caret line="989" column="7" lean-forward="true" selection-start-line="986" selection-end-line="989" selection-end-column="7" />
+              <caret line="989" column="7" selection-start-line="986" selection-end-line="989" selection-end-column="7" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -50,11 +38,35 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/training/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="474" column="44" selection-start-line="474" selection-start-column="44" selection-end-line="474" selection-end-column="44" />
-              <folding>
-                <element signature="e#0#58#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="85">
+              <caret line="18" selection-start-line="18" selection-end-line="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/profiles/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="15" column="62" selection-start-line="15" selection-start-column="62" selection-end-line="15" selection-end-column="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planningandacquiring/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="374">
+              <caret line="24" column="2" selection-start-line="24" selection-start-column="2" selection-end-line="24" selection-end-column="2" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sidebar_pa.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="267">
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -134,39 +146,12 @@
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="inventory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-              <item name="templatetags" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="profiles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
@@ -184,44 +169,7 @@
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="global-base-ui" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templatetags" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="venv" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -293,12 +241,22 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26427525" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.037037037" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.037037037" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Python Console" order="7" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -345,8 +303,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/profiles/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="76" selection-start-line="15" selection-start-column="76" selection-end-line="15" selection-end-column="76" />
+        <state relative-caret-position="204">
+          <caret line="15" column="62" selection-start-line="15" selection-start-column="62" selection-end-line="15" selection-end-column="62" />
         </state>
       </provider>
     </entry>
@@ -480,8 +438,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
+        <state relative-caret-position="267">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
         </state>
       </provider>
     </entry>
@@ -562,8 +520,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/planningandacquiring/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="23" column="99" selection-start-line="23" selection-start-column="99" selection-end-line="23" selection-end-column="99" />
+        <state relative-caret-position="374">
+          <caret line="24" column="2" selection-start-line="24" selection-start-column="2" selection-end-line="24" selection-end-column="2" />
         </state>
       </provider>
     </entry>
@@ -596,7 +554,7 @@
     <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="746">
-          <caret line="989" column="7" lean-forward="true" selection-start-line="986" selection-end-line="989" selection-end-column="7" />
+          <caret line="989" column="7" selection-start-line="986" selection-end-line="989" selection-end-column="7" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
@@ -622,11 +580,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/training/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="474" column="44" selection-start-line="474" selection-start-column="44" selection-end-line="474" selection-end-column="44" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="85">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
         </state>
       </provider>
     </entry>
