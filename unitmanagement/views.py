@@ -78,6 +78,11 @@ def physical_exam_form(request):
             form.save()
             new_form = form.save()
             new_form.date_next_exam = datetime.date.today() + datetime.timedelta(days=365)
+            
+            user_id = request.session['session_userid']
+            current_user = User.objects.get(id=user_id)
+           
+            new_form.user = current_user
             new_form.save()
 
             style = "ui green message"
@@ -196,11 +201,15 @@ def medicine_approve(request, id):
 
     print(count)
 
+    user_id = request.session['session_userid']
+    current_user = User.objects.get(id=user_id)
+
+
     if medicine.count() == count:
         for med in medicine:
             i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items
             for x in i:
-                Medicine_Subtracted_Trail.objects.create(inventory = x, quantity = med.quantity, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                Medicine_Subtracted_Trail.objects.create(inventory = x, user = current_user, quantity = med.quantity, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
                 x.quantity = (x.quantity - med.quantity)
                 data.status = "Approved"
                 data.save()
@@ -230,8 +239,12 @@ def vaccination_form(request):
                 new_form.date_validity = datetime.date.today() + datetime.timedelta(days=duration)
                 new_form.save()
 
+                user_id = request.session['session_userid']
+                current_user = User.objects.get(id=user_id)
+
+
                 q = med.quantity-1
-                Medicine_Subtracted_Trail.objects.create(inventory = med, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
                 style = "ui green message"
                 messages.success(request, 'Vaccination has been successfully recorded!')
                 form = VaccinationForm()
