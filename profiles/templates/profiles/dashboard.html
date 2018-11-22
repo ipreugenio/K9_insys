@@ -1,167 +1,111 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
-{% block dashboard %}{% load static %}
-<!--DASHBOARD ASSETS-->
-<!-- Fontfaces CSS-->
-<link href="{% static 'Dashboard/css/font-face.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
-
-<!-- Bootstrap CSS-->
-<link href="{% static 'Dashboard/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
-
-<!-- Vendor CSS-->
-<link href="{% static 'Dashboard/vendor/animsition/animsition.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/wow/animate.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/slick/slick.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/select2/select2.min.css' %}" rel="stylesheet" media="all">
-<link href="{% static 'Dashboard/vendor/perfect-scrollbar/perfect-scrollbar.css' %}" rel="stylesheet" media="all">
-
-<!-- Main CSS-->
-<link href="{% static 'Dashboard/css/theme.css' %}" rel="stylesheet" media="all">
-
-<!--END DASHBOARD ASSETS-->
-<div class="pusher" style="background:white;">
-<div class="container-fluid">
-    <div class="row m-t-20">
-        <div class="col-sm-6 col-lg-3">
-            <div class="overview-item overview-item--c1">
-                <div class="overview__inner">
-                    <div class="overview-box clearfix">
-                        <div class="icon">
-                            <i class="zmdi zmdi-account-o"></i>
-                        </div>
-                        <div class="text">
-                            <h2>10368</h2>
-                            <span>members online</span>
-                        </div>
-                    </div>
-                    <div class="overview-chart">
-                        <canvas id="widgetChart1"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="overview-item overview-item--c2">
-                <div class="overview__inner">
-                    <div class="overview-box clearfix">
-                        <div class="icon">
-                            <i class="zmdi zmdi-shopping-cart"></i>
-                        </div>
-                        <div class="text">
-                            <h2>388,688</h2>
-                            <span>items solid</span>
-                        </div>
-                    </div>
-                    <div class="overview-chart">
-                        <canvas id="widgetChart2"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="overview-item overview-item--c3">
-                <div class="overview__inner">
-                    <div class="overview-box clearfix">
-                        <div class="icon">
-                            <i class="zmdi zmdi-calendar-note"></i>
-                        </div>
-                        <div class="text">
-                            <h2>1,086</h2>
-                            <span>this week</span>
-                        </div>
-                    </div>
-                    <div class="overview-chart">
-                        <canvas id="widgetChart3"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-            <div class="overview-item overview-item--c4">
-                <div class="overview__inner">
-                    <div class="overview-box clearfix">
-                        <div class="icon">
-                            <i class="zmdi zmdi-money"></i>
-                        </div>
-                        <div class="text">
-                            <h2>$1,060,386</h2>
-                            <span>total earnings</span>
-                        </div>
-                    </div>
-                    <div class="overview-chart">
-                        <canvas id="widgetChart4"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% block dashboard %}
+<div class = 'pusher' style="background:white;">
+<div class="ui segment" style="position:relative; margin-top: 10px;">
+<div class="ui three statistics">
+  <div class="ui red inverted statistic">
+    <div class="value">
+      <i class="paw icon"></i> {{can_deploy}}
     </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="au-card recent-report">
-                <div class="au-card-inner">
-                    <h3 class="title-2">recent reports</h3>
-                    <div class="chart-info">
-                        <div class="chart-info__left">
-                            <div class="chart-note">
-                                <span class="dot dot--blue"></span>
-                                <span>products</span>
-                            </div>
-                            <div class="chart-note mr-0">
-                                <span class="dot dot--green"></span>
-                                <span>services</span>
-                            </div>
-                        </div>
-                        <div class="chart-info__right">
-                            <div class="chart-statis">
-                                <span class="index incre">
-                                    <i class="zmdi zmdi-long-arrow-up"></i>25%</span>
-                                <span class="label">products</span>
-                            </div>
-                            <div class="chart-statis mr-0">
-                                <span class="index decre">
-                                    <i class="zmdi zmdi-long-arrow-down"></i>10%</span>
-                                <span class="label">services</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="recent-report__chart">
-                        <canvas id="recent-rep-chart"></canvas>
-                    </div>
-                </div>
-            </div>
+    <div class="label">
+      Dogs that can be deployed
+    </div>
+  </div>
+  <div class="ui orange statistic">
+    <div class="value">
+      <i class="paw icon"></i> {{k9_deployed}} / {{k9_demand}}
+    </div>
+    <div class="label">
+      Deployed Dogs over Demand
+    </div>
+  </div>
+  <div class="ui yellow statistic">
+    <div class="value">
+       <i class="paw icon"></i> {{k9_deployed_request}} / {{k9_demand_request}}
+    </div>
+    <div class="label">
+      Deployed Dogs over Requests
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="ui segment" style="width: 50%; margin-left: 50%; position: absolute;">
+    <div class="ui tiny statistic">
+        <div class="value">
+            <center>Training</center>
         </div>
-        <div class="col-lg-6">
-            <div class="au-card chart-percent-card">
-                <div class="au-card-inner">
-                    <h3 class="title-2 tm-b-5">char by %</h3>
-                    <div class="row no-gutters">
-                        <div class="col-xl-6">
-                            <div class="chart-note-wrap">
-                                <div class="chart-note mr-0 d-block">
-                                    <span class="dot dot--blue"></span>
-                                    <span>products</span>
-                                </div>
-                                <div class="chart-note mr-0 d-block">
-                                    <span class="dot dot--red"></span>
-                                    <span>services</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-6">
-                            <div class="percent-chart">
-                                <canvas id="percent-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    </div><br>
+    <div class="ui horizontal yellow statistic">
+    <div class="value">
+       <i class="paw icon"></i> {{untrained_k9}}
+    </div>
+    <div class="label">
+      Untrained K9
+    </div>
+  </div>
+     <div class="ui horizontal orange statistic">
+    <div class="value">
+       <i class="paw icon"></i> {{unclassified_k9}}
+    </div>
+    <div class="label">
+      Unclassified K9
+    </div>
+  </div><br>
+     <div class="ui horizontal green statistic">
+    <div class="value">
+       <i class="paw icon"></i> {{on_training}}
+    </div>
+    <div class="label">
+      On-training
+    </div>
+  </div>
+       <div class="ui horizontal blue statistic">
+    <div class="value">
+       <i class="paw icon"></i> {{trained}}
+    </div>
+    <div class="label">
+      Trained K9
+    </div>
+  </div>
+    <a href="{% url 'training:classify_k9_list' %}"><button class="fluid ui button">Go to training</button></a>
+</div>
+
+<div class="ui segment" style="width: 50%; position: absolute;">
+    <div class="ui tiny statistic">
+        <div class="value">
+            <center>Unit Management</center>
         </div>
-    </div> 
+    </div><br>
+<div class="ui horizontal red statistic">
+    <div class="value">
+       <i class="wrench icon"></i> {{equipment_requests}}
+    </div>
+    <div class="label">
+      Pending request of equipments
+    </div>
+  </div><br>
+<a href="{% url 'unitmanagement:request_list' %}"><button class="fluid ui button" style="position: relative; margin-top: 11%;">Go to Unit Management</button></a>
+</div>
+
+<div class="ui segment" style="width: 100%; margin-top: 22%; position: absolute;">
+    <hr style="border: 3px solid white;">
+    <div class="ui tiny statistic">
+        <div class="value">
+            <center>Planning and Acquiring</center>
+        </div>
+    </div><br>
+<div class="ui horizontal blue statistic">
+    <div class="value">
+       <i class="plus square icon"></i> {{for_breeding}}
+    </div>
+    <div class="label">
+        For breeding
+    </div>
+  </div><br>
+<a href="{% url 'planningandacquiring:K9_list' %}"><button class="fluid ui button">Go to Planning and Acquiring</button></a>
+</div>
 </div>
 </div>
 {% endblock%}
