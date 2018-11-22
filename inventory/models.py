@@ -88,7 +88,6 @@ class Food(models.Model):
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
-        ('Both', 'Both'),
     )
 
     food = models.CharField(max_length=100)
