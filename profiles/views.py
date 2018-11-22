@@ -12,6 +12,9 @@ from deployment.models import Location
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 
+from unitmanagement.models import PhysicalExam, VaccinceRecord
+import datetime
+import calendar
 # Create your views here.
 
 def dashboard(request):
@@ -25,25 +28,48 @@ def dashboard(request):
     return render (request, 'profiles/dashboard.html', context)
 
 def profile(request):
-    username = request.session["session_username"]
-    serial = request.session["session_serial"]
+   
+    first_day = datetime.date.today().replace(day=1)
+    last_day = datetime.date.today().replace(day=calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1])
 
+    print(first_day, last_day)
+    phex = PhysicalExam.objects.filter(date_next_exam__range=[first_day, last_day])
+    vac = VaccinceRecord.objects.filter(date_validity__range=[first_day, last_day])
+    list = zip(phex,vac)
+    today = datetime.date.today()
+
+    serial = request.session['session_serial']
+    print(serial)
+    
     account = Account.objects.get(serial_number=serial)
+    user = User.objects.get(id = account.UserID.id)
+    p_info = Personal_Info.objects.get(UserID=user) 
+    e_info = Education.objects.get(UserID=user)
 
-    user = User.objects.get(id=account.UserID.id)
-    personal_info = Personal_Info.objects.get(UserID=account.UserID.id)
-    education = Education.objects.get(UserID=account.UserID.id)
-    account = Account.objects.get(UserID=account.UserID.id)
+    print(account.UserID.position)
 
-    context = {
-        'Title': 'User Details',
-        'user': user,
-        'personal_info': personal_info,
-        'education': education,
-        'account': account,
-        'username': username
+    uform = add_User_form(request.POST or None, instance = user)
+    pform = add_personal_form(request.POST or None, instance = p_info)
+    eform = add_education_form(request.POST or None, instance = e_info)
+
+    if request.method == 'POST':
+        print(uform.errors)
+        if uform.is_valid():
+            print(pform.errors)
+            if pform.is_valid():
+                print(eform.errors)
+                if eform.is_valid():
+                    messages.success(request, 'Your Profile has been successfully Updated!')
+
+    context={
+        'phex': phex,
+        'vac': vac,
+        'list': list,
+        'today': today,
+        'uform':uform,
+        'pform': pform,
+        'eform': eform,
     }
-
     return render (request, 'profiles/profile.html', context)
 
 def register(request):
