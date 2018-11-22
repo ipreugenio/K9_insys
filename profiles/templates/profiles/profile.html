@@ -1,218 +1,246 @@
-{% extends "profiles/sidebar_profile.html" %}
+{% extends "profiles/global-base-ui/sidebar_menu.html" %}
 
-{% block content %}
-<div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">User Information</a>
-    <a class="item" data-tab="second">Personal Information</a>
-    <a class="item" data-tab="third">Education</a>
-    <a class="item" data-tab="fourth">Account</a>
+{% block dashboard %}
+<div class="pusher" style="background:white;">
+  <div class="ui container">
+    <div class="ui right aligned basic segment">
+        <div class="circular ui icon top left pointing dropdown black button">
+            <i class="orange bell icon"></i>
+            <div class="menu">
+                {% for phex,vac in list %}
+                    {% if today > phex.date_next_exam %}
+                    <a style='background:#e85140;color:white;' class="item" href="#">{{phex.dog.name}}: Next Physical Exam - {{phex.date_next_exam}}</a>
+                    {%else%}
+                    <a class="item" href="#">{{phex.dog.name}}: Next Physical Exam - {{phex.date_next_exam}}</a>
+                    {%endif%}
+                    {% if today > vac.date_validity %}
+                    <a style='background:#e85140;color:white;' class="item" href="#">{{vac.dog.name}}: Vaccine Expire Date - {{vac.date_validity}}</a>
+                    {%else%}
+                    <a class="item" href="#">{{vac.dog.name}}: Vaccine Expire Date - {{vac.date_validity}}</a>
+                    {%endif%}
+                {%endfor%}
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message">{{message}}</div>
+        {% endfor %}
+    {% endif %}
+      <div class="ui segment">
+        <form class ='ui form' method="POST">
+            {% csrf_token %}
+          <h3 class="ui dividing header">User Info</h3>
+          <div class="five fields">
+            <div class="field">
+                <label>Nickname</label>
+                {{uform.nickname}}
+            </div>
+            <div class="field">
+                <label>Firstname</label>
+                {{uform.firstname}}
+            </div>
+            <div class="field">
+                <label>Middlename</label>
+                {{uform.middlename}}
+            </div>
+            <div class="field">
+                <label>Lastname</label>
+                {{uform.lastname}}
+            </div>
+            <div class="field">
+                <label>Extension Name</label>
+                {{uform.extensionname}}
+            </div>
+        </div>
+        <div class="five fields">
+            <div class="field">
+                <label>Position</label>
+                {{uform.position}}
+            </div>
+            <div class="field">
+                <label>Rank</label>
+                {{uform.rank}}
+            </div>
+            <div class="field">
+                <label>Birthplace</label>
+                {{uform.birthplace}}
+            </div>
+            <div class="field">
+                <label>Birthday</label>
+                {{uform.birthdate}}
+            </div>
+            <div class="field">
+                <label>Blood Type</label>
+                {{uform.bloodtype}}
+            </div>
+        </div>
+        <div class="five fields">
+            <div class="field">
+                <label>Gender</label>
+                {{uform.gender}}
+            </div>
+            <div class="field">
+                <label>Civil Status</label>
+                {{uform.civilstatus}}
+            </div>
+            <div class="field">
+                <label>Citizenship</label>
+                {{uform.citizenship}}
+            </div>
+            <div class="field">
+                <label>Religion</label>
+                {{uform.religion}}
+            </div>
+            <div class="field">
+                <label>Hair Color</label>
+                {{uform.haircolor}}
+            </div>
+        </div>
+        <div class="seven fields">
+            <div class="field">
+                <label>Eye Color</label>
+                {{uform.eyecolor}}
+            </div>
+            <div class="field">
+                <label>Skin Color</label>
+                {{uform.skincolor}}
+            </div>
+            <div class="field">
+                <label>Height</label>
+                {{uform.height}}
+            </div>
+            <div class="field">
+                <label>Weight</label>
+                {{uform.weight}}
+            </div>
+            <div class="field">
+                <label>Head Size</label>
+                {{uform.headsize}}
+            </div>
+            <div class="field">
+                <label>Foot Size</label>
+                {{uform.footsize}}
+            </div>
+            <div class="field">
+                <label>Body Build</label>
+                {{uform.bodybuild}}
+            </div>
+        </div>
+        <h3 class="ui dividing header">Personal Info</h3>
+        <div class="five fields">
+            <div class="field">
+                <label>Mobile Number</label>
+                {{pform.mobile_number}}
+            </div>
+            <div class="field">
+                <label>Telephone Number</label>
+                {{pform.tel_number}}
+            </div>
+            <div class="field">
+                <label>Street</label>
+                {{pform.street}}
+            </div>
+            <div class="field">
+                <label>Barangay</label>
+                {{pform.barangay}}
+            </div>
+            <div class="field">
+                <label>City</label>
+                {{pform.city}}
+            </div>
+        </div>
+        <div class="three fields">
+            <div class="field">
+                <label>Province</label>
+                {{pform.province}}
+            </div>
+            <div class="field">
+                <label>Tin</label>
+                {{pform.tin}}
+            </div>
+            <div class="field">
+                <label>Philhealth</label>
+                {{pform.philhealth}}
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>Mother</label>
+                {{pform.mother_name}}
+            </div>
+            <div class="field">
+                <label>Birthday</label>
+                {{pform.mother_birthdate}}
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>Father</label>
+                {{pform.father_name}}
+            </div>
+            <div class="field">
+                <label>Birthday</label>
+                {{pform.father_birthdate}}
+            </div>
+        </div>
+        <h3 class="ui dividing header">Education Info</h3>
+        <div class="three fields">
+            <div class="field">
+                <label>Primary Education</label>
+                {{eform.primary_education}}
+            </div>
+            <div class="field">
+                <label>School Year</label>
+                {{eform.pe_schoolyear}}
+            </div>
+            <div class="field">
+                <label>Degree</label>
+                {{eform.pe_degree}}
+            </div>
+        </div>
+        <div class="three fields">
+            <div class="field">
+                <label>Secondary Education</label>
+                {{eform.secondary_education}}
+            </div>
+            <div class="field">
+                <label>School Year</label>
+                {{eform.se_schoolyear}}
+            </div>
+            <div class="field">
+                <label>Degree</label>
+                {{eform.se_degree}}
+            </div>
+        </div>
+        <div class="three fields">
+            <div class="field">
+                <label>Tertiary Education</label>
+                {{eform.tertiary_education}}
+            </div>
+            <div class="field">
+                <label>School Year</label>
+                {{eform.te_schoolyear}}
+            </div>
+            <div class="field">
+                <label>Degree</label>
+                {{eform.te_degree}}
+            </div>
+        </div>
+        <div class="ui center aligned basic segment">
+                <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Update</button>
+          </div>
+        </form>
+      </div>
+  </div>
 </div>
 
-<div class="ui tab segment active" data-tab="first">
- <table id="tabledata1" class="ui two column celled table">
-          	<tr>
-                <td>Name</td>
-                <td>{{user}}</td>
-            </tr>
-            <tr>
-              <td>Position</td>
-                <td>{{user.position}}</td>
-                </tr>
-            <tr>
-              <td>Rank</td>
-                <td>{{user.rank}}</td>
-            </tr>
-            <tr>
-			  <td>Nickname</td>
-                <td>{{user.nickname}}</td>
-            </tr>
-            <tr>
-              <td>Birthdate</td>
-                <td>{{user.birthdate}}</td>
-            </tr>
-            <tr>
-              <td>Age</td>
-                <td>{{user.age}}</td>
-            </tr>
-            <tr>
-              <td>Birthplace</td>
-                <td>{{user.birthplace}}</td>
-            </tr>
-            <tr>
-              <td>Gender</td>
-                <td>{{user.gender}}</td>
-            </tr>
-            <tr>
-              <td>Civil Status</td>
-                <td>{{user.civilstatus}}</td>
-            </tr>
-            <tr>
-              <td>Citizenship</td>
-                <td>{{user.citizenship}}</td>
-            </tr>
-            <tr>
-              <td>Religion</td>
-                <td>{{user.religion}}</td>
-            </tr>
-            <tr>
-              <td>Bloodtype</td>
-                <td>{{user.bloodtype}}</td>
-            </tr>
-            <tr>
-              <td>Distinct Feature</td>
-                <td>{{user.distinct_feature}}</td>
-            </tr>
-            <tr>
-              <td>Hair Color</td>
-                <td>{{user.haircolor}}</td>
-            </tr>
-            <tr>
-              <td>Eye Color</td>
-                <td>{{user.eyecolor}}</td>
-            </tr>
-            <tr>
-              <td>Skin Color</td>
-                <td>{{user.skincolor}}</td>
-            </tr>
-            <tr>
-              <td>Height</td>
-                <td>{{user.height}}</td>
-            </tr>
-            <tr>
-              <td>Weight</td>
-                <td>{{user.weight}}</td>
-            </tr>
-            <tr>
-              <td>Head Size</td>
-                <td>{{user.headsize}}</td>
-            </tr>
-            <tr>
-              <td>Foot Size</td>
-                <td>{{user.footsize}}</td>
-            </tr>
-            <tr>
-              <td>Body Build</td>
-                <td>{{user.bodybuild}}</td>
-            </tr>
-        </table>
-</div>
-
-<div class="ui tab segment" data-tab="second">
-    <table id="tabledata2" class="ui two column celled table">
-            <tr>
-                <td>Mobile Number</td>
-                <td>{{personal_info.mobile_number}}</td>
-            </tr>
-            <tr>
-                <td>Telephone Number</td>
-                <td>{{personal_info.tel_number}}</td>
-            </tr>
-            <tr>
-                <td>Street</td>
-                <td>{{personal_info.street}}</td>
-            </tr>
-            <tr>
-                <td>Barangay</td>
-                <td>{{personal_info.barangay}}</td>
-            </tr>
-            <tr>
-                <td>City</td>
-                <td>{{personal_info.city}}</td>
-            </tr>
-            <tr>
-                <td>Province</td>
-                <td>{{personal_info.province}}</td>
-            </tr>
-            <tr>
-                <td>Mother's Name</td>
-                <td>{{personal_info.mother_name}}</td>
-            </tr>
-            <tr>
-                <td>Mother's Birthdate</td>
-                <td>{{personal_info.mother_birthdate}}</td>
-            </tr>
-            <tr>
-                <td>Father's Name</td>
-                <td>{{personal_info.father_name}}</td>
-            </tr>
-            <tr>
-                <td>Father's Birthdate</td>
-                <td>{{personal_info.father_birthdate}}</td>
-            </tr>
-            <tr>
-                <td>TIN</td>
-                <td>{{personal_info.tin}}</td>
-            </tr>
-            <tr>
-                <td>Philhealth</td>
-                <td>{{personal_info.philhealth}}</td>
-            </tr>
-        </table>
-</div>
-<div class="ui tab segment" data-tab="third">
-    <table id="tabledata3" class="ui celled table">
-            <tr>
-                <td>Primary Education</td>
-                <td>{{education.primary_education}}</td>
-            </tr>
-            <tr>
-                <td>Primary Education School Year</td>
-                <td>{{education.pe_schoolyear}}</td>
-            </tr>
-            <tr>
-                <td>Primary Education Degree</td>
-                <td>{{education.pe_degree}}</td>
-            </tr>
-            <tr>
-                <td>Secondary Education</td>
-                <td>{{education.secondary_education}}</td>
-            </tr>
-            <tr>
-                <td>Secondary Education School Year</td>
-                <td>{{education.se_schoolyear}}</td>
-            </tr>
-            <tr>
-                <td>Secondary Education Degree</td>
-                <td>{{education.se_degree}}</td>
-            </tr>
-            <tr>
-                <td>Tertiary Education</td>
-                <td>{{education.tertiary_education}}</td>
-            </tr>
-            <tr>
-                <td>Tertiary Education School Year</td>
-                <td>{{education.te_schoolyear}}</td>
-            </tr>
-            <tr>
-                <td>Tertiary Education Degree</td>
-                <td>{{education.te_degree}}</td>
-            </tr>
-        </table>
-</div>
-<div class="ui tab segment" data-tab="fourth">
-    <table id="tabledata4" class="ui celled table">
-            <tr>
-                <td>Serial Number</td>
-                <td>{{account.serial_number}}</td>
-            </tr>
-            <tr>
-                <td>Email Address</td>
-                <td>{{account.email_address}}</td>
-            </tr>
-        </table>
-</div>
 
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1');
-        $('#tabledata2');
-        $('#tabledata3');
-        $('#tabledata4');
-
-        $('.menu .item').tab();
+      $('.ui.dropdown').dropdown();
     });
 
 </script>
-
 {% endblock%}
