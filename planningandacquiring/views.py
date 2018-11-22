@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity
 from training.models import Training
-from inventory.models import Medicine_Subtracted_Trail, Medicine
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
@@ -11,7 +10,12 @@ from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ReportDateForm
-
+from deployment.models import Dog_Request, Team_Assignment
+from unitmanagement.models import Health, HealthMedicine
+from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
+from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
+from django.db.models import Avg, Count, Min, Sum
+import dateutil.parser
 from faker import Faker
 
 #statistical imports
@@ -50,6 +54,7 @@ import statsmodels.api as sm'''
 
 
 # Create your views here.
+
 
 def index(request):
     data = [[],[],[]]
@@ -129,7 +134,7 @@ def add_donated_K9(request):
             print(form)
 
     context = {
-        'Title' : "Receive Donated K9",
+        'Title' : "Add New K9",
         'form' : form,
         'style': style,
             }
@@ -388,6 +393,30 @@ def breeding_confirmed(request):
 def K9_listview(request):
 
     k9 = K9.objects.all()
+
+    #Test trunc
+    #print(K9_Quantity.objects.annotate(day=TruncDay('date_bought')).values('day').annotate(total=Sum('quantity')).order_by('date_bought'))
+
+    #Sample Aggregation by year
+    '''
+    k9_quantities = K9_Quantity.objects.all()
+    
+    my_list = []
+    for k9_quantity in k9_quantities:
+        date = k9_quantity.date_bought
+        my_list.append(date.year)
+
+    my_list = list(set(my_list))
+    my_quantities = []
+
+    for item in my_list:
+        sum = 0
+        for k9_quantity in k9_quantities:
+            date = k9_quantity.date_bought
+            if date.year == item:
+                sum += k9_quantity.quantity
+        my_quantities.append(sum)
+    '''
 
     '''
     for x in range(50):
@@ -770,9 +799,10 @@ def scatter_model_float(timeseries, prediction, title):
 def Average(lst):
     return sum(lst) / len(lst)
 
-def K9_forecast(request):
-    quantity_set = K9_Quantity.objects.all().order_by('date_bought')
-
+#TODO turn this into a method not a view
+def forecast_result(date_list, quantity_list, graph_title):
+    #quantity_set = K9_Quantity.objects.all().order_by('date_bought')
+    result = ""
     context = {
         'title': 'Forecasting',
         'graph': "",
@@ -781,19 +811,19 @@ def K9_forecast(request):
         'predictions': ""
     }
 
-    if quantity_set:
+    if date_list or quantity_list:
         quantity = []
         date = []
 
-        for data in quantity_set:
-            date_object = data.date_bought
+        for date_item, quantity_item in zip(date_list, quantity_list):
+            date_object = date_item
             dt64 = np.datetime64(str(date_object))
 
             date.append(dt64)
-            quantity.append(data.quantity)
+            quantity.append(quantity_item)
 
         df = pd.DataFrame({'Date': list(date),
-                       'Quantity': list(quantity),
+                           'Quantity': list(quantity),
                        })
 
 
@@ -869,92 +899,47 @@ def K9_forecast(request):
 
         Scatter_Models = [AR_scatter, MA_scatter, ARMA_scatter, ARIMA_scatter, SES_scatter,]
 
-        graph_title = "Forecasting K9s Demand Using Various Models"
+        #graph_title = "Forecasting K9s Demand Using Various Models"
         graph = graph_forecast(ts, Scatter_Models, graph_title)
 
+        result = []
+        result.append(graph)
+        result.append(models)
+        result.append(errors)
+        result.append(predictions)
+
+        recommended = 0
+        ctr = 0
+        zipped_list = zip(errors, predictions)
+        for error, prediction in  zipped_list:
+            if prediction < 0:
+                del errors[ctr]
+                del predictions[ctr]
+            ctr += 1
+
+        recommended_list = []
+
+        #In case there are more than 1 items where error is minimal, average them
+        for error, prediction in  zipped_list:
+            if error == min(errors):
+                recommended_list.append(prediction)
+
+        recommended = Average(recommended_list)
+
+        result.append(recommended)
 
         context = {
             'title': 'Forecasting',
             'graph': graph,
             'models': models,
             'errors': errors,
-            'predictions': predictions
-        }
+            'predictions': predictions,
+            'recommended': recommended
+            }
 
-    return render(request, 'planningandacquiring/forecast_k9_required.html', context)
+    return result
+    #return render(request, 'planningandacquiring/forecast_k9_required.html', context)
 
-#Use in forecasting to test if original data is stationary
-def test_stationarity(timeseries, index):
-    # Determing rolling statistics
-    # Set at which index will test data start
-
-    rolmean = timeseries.rolling(index).mean()
-    rolstd = timeseries.rolling(index).std()
-
-    idx = pd.IndexSlice
-
-    # Perform Dickey-Fuller test:
-    print('Results of Dickey-Fuller Test:')
-    dftest = adfuller(timeseries.iloc[:,0].values, autolag='AIC')
-    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
-    for key, value in dftest[4].items():
-        dfoutput['Critical Value (%s)' % key] = value
-    print(dfoutput)
-
-    #Check Root Mean Squared Error, the lower the better
-    #rms = sqrt(mean_squared_error())
-    #print(rms)
-
-    ts_d = []
-    ts_q = []
-
-    for index, row in timeseries.iterrows():
-
-        ts_q.append(row["Quantity"])
-        ts_d.append(index)
-
-    mean_d = []
-    mean_q = []
-
-    for index, row in rolmean.iterrows():
-        mean_q.append(row["Quantity"])
-        mean_d.append(index)
-
-    std_d = []
-    std_q = []
-
-    for index, row in rolstd.iterrows():
-        std_q.append(row["Quantity"])
-        std_d.append(index)
-
-
-    naive = go.Scatter(
-        x=list(ts_d),
-        y=list(ts_q),
-        name = "Original"
-    )
-    ave = go.Scatter(
-        x=list(mean_d),
-        y=list(mean_q),
-        name = "Rolling Mean"
-    )
-    sdev = go.Scatter(
-        x=list(std_d),
-        y=list(std_q),
-        name = "Rolling Standard Deviation"
-    )
-
-
-    data = [naive, ave, sdev]
-
-    layout = go.Layout(
-        title="Stationary Test"
-    )
-
-    fig = go.Figure(data=data, layout=layout)
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-
-    return graph
 
 def timeseries_generator():
     fake = Faker()
@@ -966,3 +951,265 @@ def timeseries_generator():
         date_quantity.save()
 
     return None
+
+#TODO Test Budgeting
+#This does not compute how much each k9 could cost
+def budgeting(request):
+    #TODO All categories should return lists (1. Dates, 2. Quantities) Especially for forecasts
+    #REQUEST FORECAST
+    dog_request = Dog_Request.objects.all()
+    request_date = []
+
+    for data in dog_request:
+        date = data.start_date
+        request_date.append(date.year)
+
+    request_date = list(set(request_date))
+    request_quantity = []
+
+    #Aggregate sum from same year
+    for year in request_date:
+        sum = 0
+        for data in dog_request:
+            if data.year == year:
+                current_needed_peryear = data.total_dogs_demand - data.total_dogs_deployed
+                if current_needed_peryear < 0:
+                    current_needed_peryear = 0
+                sum += current_needed_peryear
+        request_quantity.append(sum)
+
+    request_forecast = forecast_result(request_date, request_quantity, "Forecast for K9 Requests")
+
+    #DOGS REQUIRED
+    dog_demand = Team_Assignment.objects.all()
+    dogs_needed = 0
+    for demand in dog_demand:
+        temp = demand.total_dogs_demand - demand.total_dogs_deployed
+        if temp < 0:
+            temp = 0
+        dogs_needed += temp
+
+    '''
+    unclassified, classified, on-training, trained, for-breeding, for-adoption, for-deployment, deployed, adopted, breeding, sick, recovery, dead, retired
+    '''
+
+    #DOGS AVAILABLE IN THE FUTURE
+    undeployed_dogs = K9.objects.exclude(classification = 'Deployed').exclude(classification = 'Dead').exclude(classification = 'Retired').exclude(classification = 'Adopted') #TODO Confirm filtering
+    #ALL DOGS
+    all_current_dogs = K9.objects.all()
+
+    #ALL DOGS INCLUDED IN THE BUDGET
+
+    dogs_to_budget = (request_forecast[4] + dogs_needed) - undeployed_dogs + all_current_dogs
+
+    #TODO Multiply every item price by dogs to budget
+    #TODO Check if parsed date works
+    #MEDICINE BUDGET
+    medicine_name_list = []
+    medicine_forecast_list = []
+    medicine_price_list = []
+    medicines = Medicine.object.exclude(med_type = 'Vaccine')
+    for medicine in medicines:
+        inventory = Medicine_Inventory.objects.filter(medicine = medicine)
+        medicine_usage = Medicine_Subtracted_Trail.objects.filter(inventory = inventory.id)
+
+        med_date_list = []
+        for usage in medicine_usage:
+            date = usage.date_subtracted
+            med_date_list.append(date.year)
+
+        med_date_list = list(set(med_date_list))
+        med_quantity_list = []
+
+        for year in med_date_list:
+            sum = 0
+            for usage in medicine_usage:
+                date = usage.date_subtracted
+                if date.year == year:
+                    sum += usage.quantity
+            med_quantity_list.append(sum)
+
+        medicine_forecast = forecast_result(med_date_list, med_quantity_list, "Forecast for " + str(medicine.name))
+        medicine_name_list.append(medicine.medicine)
+        medicine_forecast_list.append(medicine_forecast)
+        medicine_price_list.append(medicine.price)
+
+    #VACCINE BUDGET
+    vaccines = Medicine.objects.filter(med_type = 'Vaccine')
+    vaccine_names_list = []
+    vaccine_used_yearly_list = []
+    vaccine_price_list = []
+    for vaccine in vaccines:
+        vaccine_names_list.append(vaccine.medicine)
+        vaccine_used_yearly_list.append(vaccine.used_yearly)
+        vaccine_price_list.append(vaccine.price)
+
+
+
+    #FOOD BUDGET
+    adult_food = Food.objects.filter(foodtype = "Adult Dog Food")
+    puppy_food = Food.objects.filter(foodtype = "Puppy Dog Food")
+
+    adult = []
+    puppy = []
+
+    max_adult = 0
+    max_puppy = 0
+
+    for food in adult_food:
+        adult.append(food.price)
+
+    if adult_food:
+        max_adult = max(adult)
+
+    for food in puppy_food:
+        puppy.append(food.price)
+
+    if puppy_food:
+        max_puppy = max(puppy)
+
+    adult_food_quantity = all_current_dogs * 12
+    puppy_food_quantity = (request_forecast + dogs_needed) * 12
+
+    #EQUIPMENT BUDGET
+    equipment = Miscellaneous.objects.filter(misc_type = "Equipment")
+
+    equipment_name = []
+    equipment_price = []
+
+    for item in equipment:
+        equipment_name.append(item.miscellaneous)
+        equipment_price.append(item.price)
+
+    equipment_quantity = dogs_to_budget
+
+    #VET SUPPLY BUDGET
+    vet_supply = Miscellaneous.objects.filter(misc_type="Vet Supply")
+
+    vet_supply_name = []
+    vet_supply_price = []
+
+    for item in vet_supply:
+        vet_supply_name.append(item.miscellaneous)
+        vet_supply_price.append(item.price)
+
+
+    vet_supply_quantity = dogs_to_budget * 12
+
+    print("REQUEST FORECAST")
+    print(request_forecast)
+    print("DOGS NEEDED")
+    print(dogs_needed)
+    print("UNDEPLOYED DOGS")
+    print(undeployed_dogs)
+    print("ALL CURRENT DOGS")
+    print(all_current_dogs)
+    print("DOGS TO BUDGET")
+    print(dogs_to_budget)
+
+    print("MEDICINE NAME")
+    print(medicine_name_list)
+    print("MEDICINE FORECAST")
+    print(medicine_forecast_list)
+    print ("MEDICINE PRICE")
+    print(medicine_price_list)
+
+    print("VACCINE NAME")
+    print(vaccine_names_list)
+    print("VACCINE USED")
+    print(vaccine_used_yearly_list)
+    print("VACCINE PRICE")
+    print(vaccine_price_list)
+
+    print("ADULT FOOD QUANTITY")
+    print(adult_food_quantity)
+    print ("PUPPY FOOD QUANTITY")
+    print(puppy_food_quantity)
+    print ("ADULT PRICE")
+    print(max_adult)
+    print("PUPPY PRICE")
+    print(max_puppy)
+
+    print("EQUIPMENT NAME")
+    print(equipment_name)
+    print("EQUIPMENT QUANTITY")
+    print(equipment_price)
+    print("EQUIPMENT PRICE")
+    print(equipment_quantity)
+
+    print("VET SUPPLY NAME")
+    print(vet_supply_name)
+    print("VET SUPPLY PRICE")
+    print(vet_supply_price)
+    print("VET SUPPLY QUANTITY")
+    print(vet_supply_quantity)
+
+    context = {
+        'title': 'Budgeting',
+        'request_forecast': request_forecast,
+        'dogs_needed': dogs_needed,
+        'undeployed_dogs': undeployed_dogs,
+        'all_current_dogs': all_current_dogs,
+        'dogs_to_budget': dogs_to_budget,
+
+        'medicine_name': medicine_name_list,
+        'medicine_forecast': medicine_forecast_list,
+        'medicine_price': medicine_price_list,
+
+        'vaccine_name': vaccine_names_list,
+        'vaccine_used_yearly': vaccine_used_yearly_list,
+        'vaccine_price': vaccine_price_list,
+
+        'adult_food_quantity': adult_food_quantity,
+        'puppy_food_quantity': puppy_food_quantity,
+        'adult_price': max_adult,
+        'puppy_price': max_puppy,
+
+
+        'equipment_name': equipment_name,
+        'equipment_quantity': equipment_quantity,
+        'equipment_price': equipment_price,
+
+        'vet_supply_name': vet_supply_name,
+        'vet_supply_quantity': vet_supply_quantity,
+        'vet_supply_price': vet_supply_price
+
+    }
+
+    return None
+
+
+def breeding_recommendation(request):
+
+    k9_list_breed = None
+    k9_list_skill = None
+    k9_list_breed_skill = None
+
+    form = select_breeder(request.POST)
+    if request.method == 'POST':
+
+        k9 = form['k9'].value()
+        k9 = K9.objects.get(id = int(k9))
+
+        if form.is_valid():
+            if k9.sex == "Male":
+                k9_list_breed = K9.objects.filter(breed = k9.breed).filter(training_status = 'For-Breeding').exclude(id = k9.id).filter(sex = "Female")
+                k9_list_skill = K9.objects.filter(capability = k9.capability).filter(training_status = 'For-Breeding').exclude(id = k9.id).filter(sex = "Female")
+                k9_list_breed_skill = K9.objects.filter(capability = k9.capability).filter(breed = k9.breed).filter(training_status = 'For-Breeding').exclude(id = k9.id).filter(sex = "Female")
+            elif k9.sex == "Female":
+                k9_list_breed = K9.objects.filter(breed=k9.breed).filter(training_status='For-Breeding').exclude(id=k9.id).filter(sex = "Male")
+                k9_list_skill = K9.objects.filter(capability=k9.capability).filter(training_status='For-Breeding').exclude(id=k9.id).filter(sex = "Male")
+                k9_list_breed_skill = K9.objects.filter(capability=k9.capability).filter(breed=k9.breed).filter(training_status='For-Breeding').exclude(id=k9.id).filter(sex = "Male")
+    print(k9_list_breed)
+    print(k9_list_skill)
+    print(k9_list_breed_skill)
+
+    context = {
+        'test': "test",
+        'form': form,
+        'k9_list_breed': k9_list_breed,
+        'k9_list_skill': k9_list_skill,
+        'k9_list_breed_skill': k9_list_breed_skill,
+    }
+
+    return render(request, 'planningandacquiring/breeding_recommendation.html', context)

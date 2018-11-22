@@ -8,9 +8,11 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location
+from deployment.models import Location, Team_Assignment, Dog_Request
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
+from django.db.models import Sum
+from unitmanagement.models import Requests
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord
 import datetime
@@ -20,9 +22,53 @@ import calendar
 def dashboard(request):
 
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
+    NDD_count = K9.objects.filter(capability='NDD').count()
+    EDD_count = K9.objects.filter(capability='EDD').count()
+    SAR_count = K9.objects.filter(capability='SAR').count()
+
+    NDD_deployed = list(Team_Assignment.objects.aggregate(Sum('NDD_deployed')).values())[0]
+    EDD_deployed = list(Team_Assignment.objects.aggregate(Sum('EDD_deployed')).values())[0]
+    SAR_deployed = list(Team_Assignment.objects.aggregate(Sum('SAR_deployed')).values())[0]
+
+    NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+    EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+    SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+    NDD_needed = list(Dog_Request.objects.aggregate(Sum('NDD_needed')).values())[0]
+    EDD_needed = list(Dog_Request.objects.aggregate(Sum('EDD_needed')).values())[0]
+    SAR_needed = list(Dog_Request.objects.aggregate(Sum('SAR_needed')).values())[0]
+
+    NDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('NDD_deployed')).values())[0]
+    EDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('EDD_deployed')).values())[0]
+    SAR_deployed_request = list(Dog_Request.objects.aggregate(Sum('SAR_deployed')).values())[0]
+
+    k9_demand = NDD_demand + EDD_demand + SAR_demand
+    k9_deployed = NDD_deployed + EDD_deployed + SAR_deployed
+
+    k9_demand_request = NDD_needed + EDD_needed + SAR_needed
+    k9_deployed_request = NDD_deployed_request + EDD_deployed_request + SAR_deployed_request
+
+    unclassified_k9 = K9.objects.filter(capability="None").count()
+    untrained_k9 = K9.objects.filter(training_status="Unclassified").count()
+    on_training = K9.objects.filter(training_level="Stage 1").count()
+    trained = K9.objects.filter(training_status="Trained").count()
+
+    equipment_requests = Requests.objects.filter(request_status="Pending").count()
+
+    for_breeding = K9.objects.filter(training_status="For-Breeding").count()
 
     context = {
-        'can_deploy': can_deploy
+        'can_deploy': can_deploy,
+        'k9_demand': k9_demand,
+        'k9_deployed': k9_deployed,
+        'k9_demand_request': k9_demand_request,
+        'k9_deployed_request': k9_deployed_request,
+        'unclassified_k9': unclassified_k9,
+        'untrained_k9': untrained_k9,
+        'on_training': on_training,
+        'trained': trained,
+        'equipment_requests': equipment_requests,
+        'for_breeding': for_breeding,
     }
 
     return render (request, 'profiles/dashboard.html', context)
