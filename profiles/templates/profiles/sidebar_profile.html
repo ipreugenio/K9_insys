@@ -4,12 +4,12 @@
     <div class="pusher" style="background:white;">
         <div class="ui basic segment">
 
-              <div class="ui fluid container">
+          <!--    <div class="ui fluid container">
                     <div class="ui grid">
                         <div class="three wide column">
                                 <div class="ui tiny pointing vertical menu" style="width:230px;">
                                     <a class="item"> <b>Unit Management Menu</b></a>
-                                    {% if request.session.session_user_position == "Veterinarian" %}
+
                                     <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
                                         <i class="user plus icon"></i>
                                     </a>
@@ -28,21 +28,14 @@
                                     <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
                                         <i class="h square icon"></i>
                                     </a>
-                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
-                                        <i class="clipboard list icon"></i>
-                                    </a>
-                                    {% endif %}
-
-                                    {% if request.session.session_user_position == "Handler" %}
-                                    <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
-                                        <i class="h square icon"></i>
-                                    </a>
                                     <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
                                         <i class="exclamation icon"></i>
                                     </a>
-                                    {% endif %}
+                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
+                                        <i class="clipboard list icon"></i>
+                                    </a>
                                 </div>
-                        </div>
+                        </div>-->
                         <!>
                         <div class="thirteen wide column">
                             {% block content %}

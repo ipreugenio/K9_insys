@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_um.html" %}  
+{% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -45,21 +45,33 @@
     </table>
 </div>
 <div class="ui tab segment" data-tab="second">
-    <table id="tabledata2" class="ui two column celled table">
+    <table id="tabledata2" class="ui three column celled table">
         <thead>
             <tr>
-                <th>Date</th>
+                <th>Exam Date</th>
+                <th>Next Exam Date</th>
                 <th>Veterinarian</th>
             </tr>
         </thead>
         <tbody>
             {% for phyexam_data in phyexam_data %}
-            <tr>
-                <td>
-                    <a href="{% url 'unitmanagement:physical_exam_details' phyexam_data.id %}">{{phyexam_data.date}}</a>
-                </td>
-                <td >{{phyexam_data.veterinary}}</td>
-            </tr>
+              {%if phyexam_data.date < dtoday %}
+              <tr class="negative">
+                  <td>
+                      <a href="{% url 'unitmanagement:physical_exam_details' phyexam_data.id %}">{{phyexam_data.date}}</a>
+                  </td>
+                  <td >{{phyexam_data.date_next_exam}}</td>
+                  <td >{{phyexam_data.veterinary}}</td>
+              </tr>
+              {%else%}
+              <tr>
+                  <td>
+                      <a href="{% url 'unitmanagement:physical_exam_details' phyexam_data.id %}">{{phyexam_data.date}}</a>
+                  </td>
+                  <td >{{phyexam_data.date_next_exam}}</td>
+                  <td >{{phyexam_data.veterinary}}</td>
+              </tr>
+              {%endif%}
             {% endfor %}
         </tbody>
     </table>
@@ -77,25 +89,37 @@
         </thead>
         <tbody>
             {% for vaccine_data in vaccine_data %}
-            <tr>
-                <td>{{vaccine_data.disease}}</td>
-                <td >{{vaccine_data.vaccine}}</td>
-                <td >{{vaccine_data.date_vaccinated}}</td>
-                <td >{{vaccine_data.date_validity}}</td>
-                <td >{{vaccine_data.veterinary}}</td>
-            </tr>
+              {%if vaccine_data.date_validity < dtoday %}
+              <tr class="negative">
+                  <td>{{vaccine_data.disease}}</td>
+                  <td >{{vaccine_data.vaccine}}</td>
+                  <td >{{vaccine_data.date_vaccinated}}</td>
+                  <td >{{vaccine_data.date_validity}}</td>
+                  <td >{{vaccine_data.veterinary}}</td>
+              </tr>
+              {%else%}
+              <tr>
+                  <td>{{vaccine_data.disease}}</td>
+                  <td >{{vaccine_data.vaccine}}</td>
+                  <td >{{vaccine_data.date_vaccinated}}</td>
+                  <td >{{vaccine_data.date_validity}}</td>
+                  <td >{{vaccine_data.veterinary}}</td>
+              </tr>
+              {%endif%}
             {% endfor %}
         </tbody>
     </table>
 </div>
 <script type="text/javascript">
-        
+
     $(document).ready(function() {
         $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
+        $('#tabledata2').DataTable({
+        "order": [[ 0, "desc" ]]
+        });
         $('#tabledata3').DataTable();
         $('.menu .item').tab();
     } );
-    
+
 </script>
  {% endblock %}

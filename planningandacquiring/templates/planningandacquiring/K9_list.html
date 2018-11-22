@@ -28,7 +28,7 @@
     		<tbody>
 				{% for K9 in k9 %}
     				<tr>
-    					<td><a  href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
+    					<td><a href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
                         <td>{{ K9.serial_number }}</td>
     					<td>{{ K9.breed }}</td>
     					<td>{{ K9.sex }}</td>

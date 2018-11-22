@@ -257,7 +257,7 @@ def request_dog_list(request):
 def request_dog_details(request, id):
     data2 = Dog_Request.objects.get(id=id)
     '''data = Team_Assignment.objects.get(id=id)'''
-    '''k9 = Team_Dog_Deployed.objects.filter(team_assignment=data2)'''
+    k9 = Team_Dog_Deployed.objects.filter(team_requested=data2)
     style = ""
     # filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data2.area.city)
@@ -282,26 +282,17 @@ def request_dog_details(request, id):
         assignment='None')
     # print(can_deploy)
 
-    # count deployed dogs
-    edd_count = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(k9__capability='EDD').count()
-    ndd_count = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(k9__capability='NDD').count()
-    sar_count = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(k9__capability='SAR').count()
-
-    # save count
-    data2.EDD_deployed = edd_count
-    data2.NDD_deployed = ndd_count
-    data2.SAR_deployed = sar_count
-    data2.save()
-
     # dogs deployed
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2)
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(status='Deployed')
 
     if request.method == 'POST':
         if 'approve' in request.POST:
+            data2.remarks = request.POST.get('remarks')
             data2.status = "Approved"
             data2.save()
             return HttpResponseRedirect('../request_dog_list/')
         elif 'deny' in request.POST:
+            data2.remarks = request.POST.get('remarks')
             data2.status = "Denied"
             data2.save()
             return HttpResponseRedirect('../request_dog_list/')
@@ -315,6 +306,15 @@ def request_dog_details(request, id):
 
         for checked_dogs in checked_dogs:
             Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs)
+            # TODO: if dog is equal capability increment
+            if checked_dogs.capability == 'EDD':
+                data2.EDD_deployed = data2.EDD_deployed + 1
+            elif checked_dogs.capability == 'NDD':
+                data2.NDD_deployed = data2.NDD_deployed + 1
+            else:
+                data2.SAR_deployed = data2.SAR_deployed + 1
+
+            data2.save()
             dog = K9.objects.get(id=checked_dogs.id)
             dog.assignment = str(data2)
             dog.save()
@@ -333,6 +333,35 @@ def request_dog_details(request, id):
     }
 
     return render(request, 'deployment/request_dog_details.html', context)
+
+def remove_dog_request(request, id):
+    pull_k9 = Team_Dog_Deployed.objects.get(id=id)
+    k9 = K9.objects.get(id=pull_k9.k9.id)
+    dog_request = Dog_Request.objects.get(id=pull_k9.team_requested.id)
+
+    #change Team_Dog_Deployed model
+    pull_k9.status = 'Pulled-Out'
+    pull_k9.date_pulled = datetime.date.today()
+    pull_k9.save()
+
+    #change K9 model
+    k9.assignment = 'None'
+    k9.save()
+
+    #change Dog_Request model
+    if pull_k9.k9.capability == 'EDD':
+        dog_request.EDD_deployed  = dog_request.EDD_deployed - 1
+    elif pull_k9.k9.capability == 'NDD':
+        dog_request.NDD_deployed = dog_request.NDD_deployed - 1
+    elif pull_k9.k9.capability == 'SAR':
+        dog_request.SAR_deployed = dog_request.SAR_deployed - 1
+    else:
+        pass
+    dog_request.save()
+
+    messages.success(request, 'Dogs has been successfully Pulled!')
+
+    return redirect('deployment:request_dog_details', id=pull_k9.team_requested.id)
 
 
 '''

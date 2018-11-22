@@ -11,6 +11,8 @@ from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm
 import datetime
+from deployment.models import Team_Assignment
+from django.db.models import Sum
 
 
 # from collections import OrderedDict
@@ -103,6 +105,16 @@ def classify_k9_list(request):
     data_ontraining = K9.objects.filter(training_status="On-Training")
     data_trained = K9.objects.filter(training_status="Trained")
 
+    NDD_count = K9.objects.filter(capability='NDD').count()
+    EDD_count = K9.objects.filter(capability='EDD').count()
+    SAR_count = K9.objects.filter(capability='SAR').count()
+
+    NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+    EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+    SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+
+
     # TODO:
     '''
     if k9 has failed 2 training records, disable reasign button
@@ -114,6 +126,12 @@ def classify_k9_list(request):
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
         'data_trained': data_trained,
+        'EDD_count': EDD_count,
+        'NDD_count': NDD_count,
+        'SAR_count': SAR_count,
+        'NDD_demand': NDD_demand,
+        'EDD_demand': EDD_demand,
+        'SAR_demand': SAR_demand
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -316,6 +334,7 @@ def classify_k9_select(request, id):
         else:
             data.training_status = "Classified"
 
+        data.training_count = data.training_count+1 
         data.capability = request.POST.get('radio')
         data.save()
 
@@ -1357,6 +1376,4 @@ def genealogy(id):
             tree = None
 
     return tree
-
-
 

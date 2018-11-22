@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_um.html" %}  
+{% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
 <div class="ui basic segment" style="margin-bottom:0px;">
@@ -23,18 +23,14 @@
             <div class="field"></div>
             <div class="field"></div>
         </div>
-        <div class="three fields">
+        <div class="two fields">
             <div class="field">
                 <label>Disease</label>
                 {{form.disease}}
             </div>
             <div class="field">
-                <label>Vaccine Used</label>
+                <label>Vaccine</label>
                 {{form.vaccine}}
-            </div>
-            <div class="field">
-                <label>Valid Until</label>
-                {{form.date_validity}}
             </div>
         </div>
         <div class="ui inverted right aligned segment" style="padding: 0px;">
@@ -43,11 +39,11 @@
     </form>
 </div>
 <script type="text/javascript">
-        
+
     $(document).ready(function() {
         $('#tabledata').DataTable();
-    
+
     } );
-    
+
 </script>
  {% endblock %}

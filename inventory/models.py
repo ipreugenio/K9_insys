@@ -21,10 +21,11 @@ class Medicine(models.Model):
     medicine = models.CharField(max_length=100)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
     dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
-    uom = models.CharField('uom', choices=UOM, max_length=10, default='none')
+    uom = models.CharField('uom', max_length=10, default='unit', blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
     used_yearly = models.IntegerField('used_yearly', default=0)
+    duration = models.IntegerField('duration', default=0)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -35,6 +36,7 @@ class Medicine(models.Model):
 
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
+        self.duration = 365 / int(self.used_yearly)
         super(Medicine, self).save(*args, **kwargs)
 
 

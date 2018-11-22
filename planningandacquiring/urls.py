@@ -23,3 +23,4 @@ urlpatterns = [
     path('K9_forecast/', views.forecast_result, name='K9_forecast'),
     path('breeding_recommendation/', views.breeding_recommendation, name = 'breeding_recommendation')
 ];
+

@@ -4,13 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-import datetime as dt
+import datetime
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm, RequestForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests
+from profiles.models import User, Account
+from training.models import K9_Handler
 # Create your views here.
 
 def index(request):
@@ -57,7 +59,7 @@ def health_form(request):
             else:
                 style = "ui red message"
                 messages.warning(request, 'Invalid input data!')
-           
+
     context = {
         'title': "Health Form",
         'form':HealthForm,
@@ -74,6 +76,10 @@ def physical_exam_form(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            new_form = form.save()
+            new_form.date_next_exam = datetime.date.today() + datetime.timedelta(days=365)
+            new_form.save()
+
             style = "ui green message"
             messages.success(request, 'Physical Exam has been successfully recorded!')
             form = PhysicalExamForm()
@@ -90,7 +96,19 @@ def physical_exam_form(request):
     return render (request, 'unitmanagement/physical_exam_form.html', context)
 
 def health_record(request):
-    data = K9.objects.all()
+    position = request.session["session_user_position"]
+
+    if position == "Handler":
+        serial = request.session["session_serial"]
+
+        number = Account.objects.get(serial_number=serial)
+        handler = User.objects.get(id=number.UserID.id)
+        k9 = K9_Handler.objects.get(handler_id=handler.id)
+        data = K9.objects.get(id = int(k9.id))
+
+    elif position == "Veterinarian":
+        data = K9.objects.all()
+
     context = {
         'title': "Health Record",
         'actiontype': "Submit",
@@ -102,15 +120,24 @@ def health_history(request, id):
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data)
     phyexam_data = PhysicalExam.objects.filter(dog = data)
-    vaccine_data = VaccinceRecord.objects.filter(dog = data)
+    vd = VaccinceRecord.objects.filter(dog = data).values_list('disease', flat=True).distinct().order_by()
+
+    vaccine_data = []
+    for vd in vd:
+        v = VaccinceRecord.objects.filter(dog = data).filter(disease=vd).latest('date_validity')
+        vaccine_data.append(v)
+
+    dtoday = datetime.date.today()
+
     context = {
         'title': "Health History of ",
         'name': data.name,
         'actiontype': "Submit",
         'data': data,
-        'health_data': health_data, 
-        'phyexam_data': phyexam_data, 
-        'vaccine_data': vaccine_data, 
+        'health_data': health_data,
+        'phyexam_data': phyexam_data,
+        'vaccine_data': vaccine_data,
+        'dtoday':dtoday,
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -122,11 +149,11 @@ def health_details(request, id):
     style = "ui red message"
 
     for med in medicine:
-        i = Medicine_Inventory.objects.filter(id = med.medicine.id)# get Inventory Items 
+        i = Medicine_Inventory.objects.filter(id = med.medicine.id)# get Inventory Items
         for x in i:
             if x.quantity >= med.quantity:
                 count = count+1
-    
+
     if medicine.count() == count:
         style = "ui green message"
     else:
@@ -153,14 +180,14 @@ def physical_exam_details(request, id):
     }
     return render (request, 'unitmanagement/physical_exam_details.html', context)
 
-#Approval of medicine 
+#Approval of medicine
 def medicine_approve(request, id):
     data = Health.objects.get(id=id) #get health details
-    medicine = HealthMedicine.objects.filter(health=data) #get medicine in health  
+    medicine = HealthMedicine.objects.filter(health=data) #get medicine in health
     count = 0
-   
+
     for med in medicine: #form items
-        i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items 
+        i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items
         for x in i:
             print("Inventory Items", x.medicine, x.quantity)
             print("Form Items", med.medicine, med.quantity)
@@ -171,38 +198,51 @@ def medicine_approve(request, id):
 
     if medicine.count() == count:
         for med in medicine:
-            i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items 
+            i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items
             for x in i:
                 Medicine_Subtracted_Trail.objects.create(inventory = x, quantity = med.quantity, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
                 x.quantity = (x.quantity - med.quantity)
                 data.status = "Approved"
                 data.save()
                 x.save()
-     
+
         messages.success(request, 'Medicine Acquisition has been approved!')
     else:
         messages.warning(request, 'Insufficient Inventory!')
         return redirect('unitmanagement:health_details', id = data.id)
 
     return redirect('unitmanagement:health_details', id = data.id)
-     
+
 #Vaccination form
 def vaccination_form(request):
     form = VaccinationForm(request.POST or None)
     style=""
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            style = "ui green message"
-            messages.success(request, 'Vaccination has been successfully recorded!')
-            form = VaccinationForm()
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
+            v = request.POST.get('vaccine')
+            med = Medicine_Inventory.objects.get(medicine=v)
+            if med.quantity != 0:
+                form.save()
+                new_form = form.save()
+                #get vaccine yearly-Used
+                vaccine = Medicine.objects.get(id=new_form.vaccine.id)
+                duration = 365 / vaccine.used_yearly
+                new_form.date_validity = datetime.date.today() + datetime.timedelta(days=duration)
+                new_form.save()
+
+                q = med.quantity-1
+                Medicine_Subtracted_Trail.objects.create(inventory = med, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                style = "ui green message"
+                messages.success(request, 'Vaccination has been successfully recorded!')
+                form = VaccinationForm()
+            else:
+                style = "ui red message"
+                messages.warning(request, 'Insufficient Inventory Quantity!')
     context = {
         'title': "Vaccination",
         'actiontype': "Submit",
         'form': form,
+        'style': style,
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 
@@ -231,7 +271,7 @@ def request_list(request):
 
     context = {
         'data': data,
-        'title': 'Request Equipment List',
+        'title': 'Damaged Equipment List',
     }
     return render (request, 'unitmanagement/request_list.html', context)
 
@@ -245,13 +285,14 @@ def change_equipment(request, id):
             data.date_approved = changedate
             data.save()
             style = "ui green message"
+            messages.success(request, 'Equipment Approved!')
         else:
             data.request_status = "Cancelled"
             data.date_approved = changedate
             data.save()
             style = "ui red message"
-    
-        messages.success(request, 'Equipment has been successfully changed!')
+            messages.success(request, 'Equipment Denied!')
+
     context = {
         'data': data,
         'style': style,
