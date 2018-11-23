@@ -1,26 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py">
-      <change afterPath="$PROJECT_DIR$/unitmanagement/templatetags/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/view_graph.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/view_graph.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/views.py" afterDir="false" />
+    <list default="true" id="7fe084af-f5aa-4022-ac14-33a3e919be63" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,8 +15,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="218" column="76" selection-start-line="218" selection-start-column="76" selection-end-line="218" selection-end-column="76" />
+            <state relative-caret-position="306">
+              <caret line="515" column="26" selection-start-line="515" selection-start-column="26" selection-end-line="515" selection-end-column="26" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -41,11 +24,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="forms.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="426">
-              <caret line="74" column="62" selection-start-line="74" selection-start-column="62" selection-end-line="74" selection-end-column="62" />
+            <state relative-caret-position="17">
+              <caret line="46" column="51" lean-forward="true" selection-start-line="46" selection-start-column="51" selection-end-line="46" selection-end-column="51" />
             </state>
           </provider>
         </entry>
@@ -62,8 +45,17 @@
       <file leaf-file-name="classify_k9_list.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="173" column="11" selection-start-line="173" selection-start-column="11" selection-end-line="173" selection-end-column="11" />
+            <state relative-caret-position="304">
+              <caret line="171" selection-start-line="171" selection-end-line="171" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="classify_k9_select.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="457">
+              <caret line="130" column="11" selection-start-line="130" selection-start-column="11" selection-end-line="130" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -79,13 +71,6 @@
       </file>
     </leaf>
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="FindInProjectRecents">
     <findStrings>
       <find>k9_new</find>
@@ -94,38 +79,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/training/forms.py" />
-        <option value="$PROJECT_DIR$/training/urls.py" />
-        <option value="$PROJECT_DIR$/inventory/models.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" />
-        <option value="$PROJECT_DIR$/deployment/models.py" />
-        <option value="$PROJECT_DIR$/profiles/views.py" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/dashboard.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/urls.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/views.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/templatetags/__init__.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/models.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/view_graph.html" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" />
-        <option value="$PROJECT_DIR$/training/views.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="172" />
-    <option name="width" value="606" />
-    <option name="height" value="682" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -296,9 +249,6 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
     </layout>
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -580,10 +530,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templatetags/pa_tags.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
+        <state relative-caret-position="69">
+          <caret line="9" column="14" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="46" column="51" lean-forward="true" selection-start-line="46" selection-start-column="51" selection-end-line="46" selection-end-column="51" />
         </state>
       </provider>
     </entry>
@@ -594,34 +551,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="173" column="11" selection-start-line="173" selection-start-column="11" selection-end-line="173" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/training/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="218" column="76" selection-start-line="218" selection-start-column="76" selection-end-line="218" selection-end-column="76" />
+        <state relative-caret-position="306">
+          <caret line="515" column="26" selection-start-line="515" selection-start-column="26" selection-end-line="515" selection-end-column="26" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templatetags/pa_tags.py">
+    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="9" column="14" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
+        <state relative-caret-position="304">
+          <caret line="171" selection-start-line="171" selection-end-line="171" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
+    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="74" column="62" selection-start-line="74" selection-start-column="62" selection-end-line="74" selection-end-column="62" />
+        <state relative-caret-position="457">
+          <caret line="130" column="11" selection-start-line="130" selection-start-column="11" selection-end-line="130" selection-end-column="11" />
         </state>
       </provider>
     </entry>
