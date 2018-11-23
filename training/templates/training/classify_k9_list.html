@@ -60,7 +60,11 @@
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
                 <td>{{data_unclassified.age}}</td>
-                <td>{{data_unclassified.capability}}</td>
+                {% if data_unclassified.capability == "None" %}
+                    <td>Unassigned</td>
+                {% else %}
+                    <td>{{data_unclassified.capability}}</td>
+                {% endif %}
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -164,6 +168,8 @@
     </tbody>
 </table>
 </div>
+
+
 
 <script type="text/javascript">
 

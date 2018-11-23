@@ -160,18 +160,18 @@ class Location(models.Model):
 
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
-    place = models.CharField('place', max_length=100)
+    place = models.CharField('place', max_length=100, default='Undefined')
     status = models.CharField('status', max_length=100, default="unassigned")
 
     def __str__(self):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
 
 class Team_Assignment(models.Model):
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     team = models.CharField('team', max_length=100)
-    EDD_demand = models.IntegerField('EDD_demand')
-    NDD_demand = models.IntegerField('NDD_demand')
-    SAR_demand = models.IntegerField('SAR_demand')
+    EDD_demand = models.IntegerField('EDD_demand', default=0)
+    NDD_demand = models.IntegerField('NDD_demand', default=0)
+    SAR_demand = models.IntegerField('SAR_demand', default=0)
     EDD_deployed = models.IntegerField('EDD_deployed', default=0)
     NDD_deployed = models.IntegerField('NDD_deployed', default=0)
     SAR_deployed = models.IntegerField('SAR_deployed', default=0)
@@ -194,9 +194,9 @@ class Dog_Request(models.Model):
     email_address = models.CharField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
     area = models.ForeignKey(Location, on_delete=models.CASCADE)
-    EDD_needed = models.IntegerField('EDD_needed')
-    NDD_needed = models.IntegerField('NDD_needed')
-    SAR_needed = models.IntegerField('SAR_needed')
+    EDD_needed = models.IntegerField('EDD_needed', default=0)
+    NDD_needed = models.IntegerField('NDD_needed', default=0)
+    SAR_needed = models.IntegerField('SAR_needed', default=0)
     EDD_deployed = models.IntegerField('EDD_deployed', default=0)
     NDD_deployed = models.IntegerField('NDD_deployed', default=0)
     SAR_deployed = models.IntegerField('SAR_deployed', default=0)

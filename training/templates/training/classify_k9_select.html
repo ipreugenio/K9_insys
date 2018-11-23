@@ -48,10 +48,6 @@
                 <td>Unknown</td>
             </tr>
             {% endif %}
-            <tr>
-                <th>Classification</th>
-                <td>{{data.capability}}</td>
-            </tr>
         </thead>
     </table>
 </div>
@@ -129,6 +125,10 @@
           <button class="ui green button" type="Submit">Submit</button>
   </div>
 </form>
+
+{% if graph %}
+{{ graph|safe }}
+{% endif %}
 
 <script type="text/javascript">
 

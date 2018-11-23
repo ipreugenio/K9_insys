@@ -1,3 +1,349 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
+{% load um_tags %}
+<h2 class="ui header">
+ {{title}}
+  <div class="sub header">View Suggested Budgeted Here</div>
+</h2>
+
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Medicine</a>
+    <a class="item" data-tab="second">Vaccine</a>
+     <a class="item" data-tab="third">Dog Food</a>
+     <a class="item" data-tab="fourth">Equipment</a>
+     <a class="item" data-tab="fifth">Vet Supply</a>
+</div>
+
+ <div class="ui tab segment active" data-tab="first">
+
+     <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{request_forecast}}
+    </div>
+    <div class="label">
+      Request Forecast
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_needed}}
+    </div>
+    <div class="label">
+      Dogs needed to be deployed
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_to_budget}}
+    </div>
+    <div class="label">
+      Dogs to budget
+    </div>
+  </div>
+</div>
+
+
+    <table id="tabledata1" class="ui four column celled table">
+        <tr>
+            <thead>
+            <th>Medicine</th>
+            <th>Forecasted Quantity</th>
+            <th>Price per Item</th>
+            <th>Total Price</th>
+            </thead>
+        </tr>
+        <tbody>
+        {% for name in medicine_name %}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{medicine_forecast|list_item:forloop.counter0}}</td>
+            <td>₱{{medicine_price|list_item:forloop.counter0}}</td>
+            <td>₱{{medicine_total|list_item:forloop.counter0}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Subtotal:</strong> ₱	{{medicine_sub_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+        </tr>
+        </tbody>
+        </table>
+ </div>
+
+<div class="ui tab segment" data-tab="second">
+    <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{request_forecast}}
+    </div>
+    <div class="label">
+      Request Forecast
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_needed}}
+    </div>
+    <div class="label">
+      Dogs needed to be deployed
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_to_budget}}
+    </div>
+    <div class="label">
+      Dogs to budget
+    </div>
+  </div>
+</div>
+
+
+    <table id="tabledata2" class="ui four column celled table">
+    <tr>
+            <thead>
+            <th>Vaccine</th>
+            <th>Quantity Used Yearly</th>
+            <th>Price per Item</th>
+            <th>Total Price</th>
+            </thead>
+        </tr>
+         <tbody>
+        {% for name in vaccine_name %}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{vaccine_used_yearly|list_item:forloop.counter0}}</td>
+            <td>₱{{vaccine_price|list_item:forloop.counter0}}</td>
+             <td>₱{{vaccine_total|list_item:forloop.counter0}}</td>
+            <td></td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Subtotal:</strong> ₱{{vaccine_sub_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+        </tr>
+        </table>
+    </div>
+
+<div class="ui tab segment" data-tab="third">
+    <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{request_forecast}}
+    </div>
+    <div class="label">
+      Request Forecast
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_needed}}
+    </div>
+    <div class="label">
+      Dogs needed to be deployed
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_to_budget}}
+    </div>
+    <div class="label">
+      Dogs to budget
+    </div>
+  </div>
+</div>
+
+    <table id="tabledata3" class="ui four column celled table">
+      <tr>
+            <thead>
+            <th>Dog Food</th>
+            <th>Quantity Used Yearly</th>
+            <th>Price per Item</th>
+            <th>Total Price</th>
+            </thead>
+        </tr>
+        <tr>
+            <td>Adult Food</td>
+            <td>{{adult_food_quantity}}</td>
+             <td>₱{{adult_price}}</td>
+            <td>₱{{adult_food_total}}</td>
+        </tr>
+         <tr>
+            <td>Puppy Food</td>
+            <td>{{puppy_food_quantity}}</td>
+             <td>₱{{puppy_price}}</td>
+             <td>₱{{puppy_food_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Subtotal:</strong> ₱{{dog_food_sub_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+        </tr>
+        </table>
+    </div>
+
+<div class="ui tab segment" data-tab="fourth">
+    <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{request_forecast}}
+    </div>
+    <div class="label">
+      Request Forecast
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_needed}}
+    </div>
+    <div class="label">
+      Dogs needed to be deployed
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_to_budget}}
+    </div>
+    <div class="label">
+      Dogs to budget
+    </div>
+  </div>
+</div>
+
+    <table id="tabledata4" class="ui four column celled table">
+     <tr>
+            <thead>
+            <th>Equipment</th>
+            <th>Number of Dogs</th>
+            <th>Price per Item</th>
+            <th>Total Price</th>
+            </thead>
+        </tr>
+        <tbody>
+        {% for name in equipment_name %}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{equipment_quantity}}</td>
+            <td>₱{{equipment_price|list_item:forloop.counter0}}</td>
+            <td>₱{{equipment_total|list_item:forloop.counter0}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Subtotal:</strong> ₱{{equipment_sub_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Grandtotal:</strong>₱{{grand_total}}</td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+
+<div class="ui tab segment" data-tab="fifth">
+    <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{request_forecast}}
+    </div>
+    <div class="label">
+      Request Forecast
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_needed}}
+    </div>
+    <div class="label">
+      Dogs needed to deployed
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{dogs_to_budget}}
+    </div>
+    <div class="label">
+      Dogs to budget
+    </div>
+  </div>
+</div>
+
+    <table id="tabledata5" class="ui four column celled table">
+          <tr>
+            <thead>
+            <th>Vet Supply</th>
+            <th>Quantity Used Yearly</th>
+            <th>Price per Item</th>
+            <th>Total Price</th>
+            </thead>
+        </tr>
+        <tbody>
+        {% for name in vet_supply_name %}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{vet_supply_quantity}}</td>
+            <td>₱{{vet_supply_price|list_item:forloop.counter0}}</td>
+            <td>₱{{vet_supply_total|list_item:forloop.counter0}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Subtotal:</strong> ₱{{vet_supply_sub_total}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+
+
+
+
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabledata1')
+		$('#tabledata2')
+		$('#tabledata3')
+		$('#tabledata4')
+		$('#tabledata5')
+		$('.menu .item').tab();
+	});
+
+</script>
+
 
 {% endblock %}

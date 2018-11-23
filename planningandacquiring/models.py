@@ -97,7 +97,7 @@ class K9_Past_Owner(models.Model):
     last_name = models.CharField('last_name', max_length=200)
     address = models.CharField('address', max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
-    birth_date = models.DateField('birth_date')
+    birth_date = models.DateField('birth_date', blank=True, null=True)
     email = models.EmailField('email', max_length=200, default = "not specified")
     contact_no = models.CharField('contact_no', max_length=200, default = "not specified")
 
@@ -115,7 +115,7 @@ class K9_New_Owner(models.Model):
     address = models.CharField('address', max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     #age = models.IntegerField('age', default = 0)
-    birth_date = models.DateField('birth_date')
+    birth_date = models.DateField('birth_date', blank=True, null=True)
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 

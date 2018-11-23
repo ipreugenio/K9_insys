@@ -4,10 +4,6 @@
 
 <div class="ui huge header">{{title}}</div>
 
-{% for graph in graphs %}
-{{ graph|safe }}
-{% endfor %}
-
 <table class="ui inverted celled table">
      <tr>
     <th>
@@ -21,6 +17,10 @@
         </tr>
 {% endfor %}
     </table>
+
+{% for graph in graphs %}
+{{ graph|safe }}
+{% endfor %}
 
 
 {% endblock %}

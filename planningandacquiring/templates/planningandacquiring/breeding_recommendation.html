@@ -4,7 +4,7 @@
 
    <form class = "ui form" action="{% url 'planningandacquiring:breeding_recommendation' %}" method="post">
        {% csrf_token %}
-       SELECT K9 {{form}}
+       SELECT {{form}}
        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">View Recommended Partners</button>
    </form>
 

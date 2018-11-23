@@ -30,17 +30,45 @@ def dashboard(request):
     EDD_deployed = list(Team_Assignment.objects.aggregate(Sum('EDD_deployed')).values())[0]
     SAR_deployed = list(Team_Assignment.objects.aggregate(Sum('SAR_deployed')).values())[0]
 
+    if not NDD_deployed:
+        NDD_deployed = 0
+    if not EDD_deployed:
+        EDD_deployed = 0
+    if not SAR_deployed:
+        SAR_deployed = 0
+
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
     SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+    if not NDD_demand:
+        NDD_demand = 0
+    if not EDD_demand:
+        EDD_demand = 0
+    if not SAR_demand:
+        SAR_demand = 0
 
     NDD_needed = list(Dog_Request.objects.aggregate(Sum('NDD_needed')).values())[0]
     EDD_needed = list(Dog_Request.objects.aggregate(Sum('EDD_needed')).values())[0]
     SAR_needed = list(Dog_Request.objects.aggregate(Sum('SAR_needed')).values())[0]
 
+    if not NDD_needed:
+        NDD_needed = 0
+    if not EDD_needed:
+        EDD_needed = 0
+    if not SAR_needed:
+        SAR_needed = 0
+
     NDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('NDD_deployed')).values())[0]
     EDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('EDD_deployed')).values())[0]
     SAR_deployed_request = list(Dog_Request.objects.aggregate(Sum('SAR_deployed')).values())[0]
+
+    if not NDD_deployed_request:
+        NDD_deployed_request = 0
+    if not EDD_deployed_request:
+        EDD_deployed_request = 0
+    if not SAR_deployed_request:
+        SAR_deployed_request = 0
 
     k9_demand = NDD_demand + EDD_demand + SAR_demand
     k9_deployed = NDD_deployed + EDD_deployed + SAR_deployed
