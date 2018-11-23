@@ -201,6 +201,9 @@ class assign_team_form(forms.ModelForm):
 '''
 
 class RequestForm(forms.ModelForm):
+    
+    area = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
+    
     class Meta:
         model = Dog_Request
         fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'EDD_needed',

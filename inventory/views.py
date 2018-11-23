@@ -5,7 +5,8 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime
-
+from django.contrib.sessions.models import Session
+from profiles.models import User, Account
 from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Miscellaneous_Inventory_Count
 from inventory.models import Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail, DamagedEquipemnt
@@ -264,17 +265,19 @@ def medicine_count_form(request, id):
     data = Medicine_Inventory.objects.get(id=id)
     form = MedicineCountForm(request.POST or None)
     style = ""
+
     if request.method == 'POST':
         if form.is_valid():
             #Get session user id
-            # user_id = request.session['session_userid']
-            # current_user = User.objects.get(id=user_id)
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
 
             data.quantity = request.POST.get('quantity')
             data.save()
             #TODO 
             # add user = current_user
-            Medicine_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
+            Medicine_Inventory_Count.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
             style = "ui green message"
             form = MedicineCountForm()
             messages.success(request, 'Medicine has been successfully Updated!')
@@ -304,14 +307,15 @@ def food_count_form(request, id):
     if request.method == 'POST':
         if form.is_valid():
             #Get session user id
-            # user_id = request.session['session_userid']
-            # current_user = User.objects.get(id=user_id)
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
 
             data.quantity = request.POST.get('quantity')
             data.save()
             #TODO 
             # add user = current_user
-            Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
+            Food_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), user = current_user, date_counted = datetime.date.today(), time = datetime.datetime.now())
             style = "ui green message"
             form = FoodCountForm()
             messages.success(request, 'Dog Food has been successfully Updated!')
@@ -341,14 +345,15 @@ def miscellaneous_count_form(request, id):
     if request.method == 'POST':
         if form.is_valid():
             #Get session user id
-            # user_id = request.session['session_userid']
-            # current_user = User.objects.get(id=user_id)
+             user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
 
             data.quantity = request.POST.get('quantity')
             data.save()
             #TODO 
             # add user = current_user
-            Miscellaneous_Inventory_Count.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
+            Miscellaneous_Inventory_Count.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_counted = datetime.date.today(), time = datetime.datetime.now())
             style = "ui green message"
             form = MiscellaneousCountForm()
             messages.success(request, 'Miscellaneous Item has been successfully Updated!')
@@ -378,10 +383,16 @@ def medicine_receive_form(request, id):
             current_quantity = data.quantity
             data.quantity = int(current_quantity) + int(request.POST.get('quantity'))
             data.save()
+    
             style = "ui green message"
             form = MedicineCountForm()
             messages.success(request, 'Medicine has been successfully Updated!')
-            Medicine_Received_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
+            
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+
+            Medicine_Received_Trail.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
 
         else:
             style = "ui red message"
@@ -411,7 +422,12 @@ def food_receive_form(request, id):
             style = "ui green message"
             messages.success(request, 'Food has been successfully Updated!')
             form = FoodCountForm()
-            Food_Received_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
+             
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+
+            Food_Received_Trail.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -439,7 +455,12 @@ def miscellaneous_receive_form(request, id):
             style = "ui green message"
             messages.success(request, 'Miscellaneous Item has been successfully Updated!')
             form = MiscellaneousCountForm()
-            Miscellaneous_Received_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
+             
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+
+            Miscellaneous_Received_Trail.objects.create(inventory = data, user = 'current_user', quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -468,7 +489,12 @@ def medicine_subtract_form(request, id):
             style = "ui green message"
             messages.success(request, 'Medicine has been successfully Updated!')
             form = MedicineCountForm()
-            Medicine_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+            
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+            
+            Medicine_Subtracted_Trail.objects.create(inventory = data, user=current_user, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -496,7 +522,12 @@ def food_subtract_form(request, id):
             style = "ui green message"
             messages.success(request, 'Food has been successfully Updated!')
             form = FoodCountForm()
-            Food_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+
+            Food_Subtracted_Trail.objects.create(inventory = data, user=current_user, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -524,7 +555,12 @@ def miscellaneous_subtract_form(request, id):
             style = "ui green message"
             messages.success(request, 'Miscellaneous Item has been successfully Updated!')
             form = MiscellaneousCountForm()
-            Miscellaneous_Subtracted_Trail.objects.create(inventory = data, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+
+            user_serial = request.session['session_serial']
+            user = Account.objects.filter(serial_number = user_serial)
+            current_user = User.objects.get(id=user.id)
+
+            Miscellaneous_Subtracted_Trail.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_subtracted = datetime.date.today(), time = datetime.datetime.now())
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')

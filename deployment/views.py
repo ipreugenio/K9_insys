@@ -228,6 +228,7 @@ def dog_request(request):
     form = RequestForm(request.POST or None)
     style = ""
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
             form.save()
             style = "ui green message"
