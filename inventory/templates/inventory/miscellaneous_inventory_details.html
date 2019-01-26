@@ -78,11 +78,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for data2 in data2 %}
+            {% for data in data2 %}
             <tr>
-                <td>{{ data2.quantity }}</td>
-                <td>{{ data2.date_received }}</td>    
-                <td>{{data.user}}</td>  
+                <td>{{ data.quantity }}</td>
+                <td>{{ data.date_received }}</td>
+                <td>{{data.user}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -102,7 +102,7 @@
             <tr>
                 <td>{{ data3.quantity }}</td>
                 <td>{{ data3.date_subtracted }}</td>    
-                <td>{{data.user}}</td>   
+                <td>{{  data3.user}}</td>
             </tr>
             {% endfor %}
         </tbody>

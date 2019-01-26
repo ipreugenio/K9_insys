@@ -32,14 +32,27 @@
                              <div class="ui inverted center aligned segment" style="padding: 0px;">
                                 <form action="" method="post">
                                     {% csrf_token %}
+
+                                    {% if data.request_status == 'Pending'%}
+
                                     <div class="ui buttons">
-                                        <button class="ui button" name="redo" onclick="return confirm('Are you sure?')">Cancel</button>
+                                        <button class="ui red button" name="redo" onclick="return confirm('Are you sure?')">Deny</button>
                                         <div class="or"></div>
                                         <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Approve</button>
                                     </div>
+                                    {%else%}
+
+                                    <div class="ui buttons">
+                                        <button class="ui red button" name="redo" onclick="return confirm('Are you sure?')" disabled>Deny</button>
+                                        <div class="or"></div>
+                                        <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')" disabled>Approve</button>
+                                    </div>
+
+                                    {%endif%}
                                 </form>
                              </div>
                         </div>
+
             </div>
             <div class="four wide column"></div>
         </div>

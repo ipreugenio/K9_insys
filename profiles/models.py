@@ -275,3 +275,6 @@ class Account(models.Model):
     serial_number = models.CharField('serial_number', max_length=200)
     email_address = models.EmailField('email_address', max_length=200)
     password = models.CharField('password', max_length=200)
+
+    def __str__(self):
+        return str(self.UserID.id) + ' ' + str(self.serial_number)

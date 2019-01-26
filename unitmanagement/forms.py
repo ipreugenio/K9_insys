@@ -3,10 +3,12 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory
+from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous
+from profiles.models import Account, User
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -85,7 +87,7 @@ class VaccinationForm(forms.ModelForm):
     vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
 
     class Meta:
-        model = VaccinceRecord
+        model = VaccineUsed
         fields = ('dog', 'vaccine', 'disease', 'date_validity')
 
     def __init__(self, *args, **kwargs):
@@ -102,11 +104,14 @@ class RequestForm(forms.ModelForm):
     equipment = forms.ModelChoiceField(queryset=Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
 
+
     class Meta:
         model = Requests
         fields = ('handler', 'equipment', 'remarks', 'concern')
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
-        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Veterinarian")
-        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Administrator")
+
+        self.fields['handler'].required = False
+
+

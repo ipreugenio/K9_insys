@@ -13,6 +13,7 @@ class Health(models.Model):
     problem = models.TextField('problem', max_length=200)
     treatment = models.TextField('treatment', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
+    veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
@@ -58,6 +59,41 @@ class PhysicalExam(models.Model):
 #TODO
 #add vet user
 class VaccinceRecord(models.Model):
+    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+    deworming_1 = models.BooleanField(default=False, null=True, blank=True)     #2weeks
+    deworming_2 = models.BooleanField(default=False, null=True, blank=True)     #4weeks
+    deworming_3 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
+    deworming_4 = models.BooleanField(default=False, null=True, blank=True)     #9weeks
+   
+    dhppil_cv_1 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
+    dhppil_cv_2 = models.BooleanField(default=False, null=True, blank=True)     #9weeks
+    dhppil_cv_3 = models.BooleanField(default=False, null=True, blank=True)     #12weeks
+    
+    heartworm_1 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
+    heartworm_2 = models.BooleanField(default=False, null=True, blank=True)     #10weeks
+    heartworm_3 = models.BooleanField(default=False, null=True, blank=True)     #14weeks
+    heartworm_4 = models.BooleanField(default=False, null=True, blank=True)     #18weeks
+    heartworm_5 = models.BooleanField(default=False, null=True, blank=True)     #22weeks
+    heartworm_6 = models.BooleanField(default=False, null=True, blank=True)     #30weeks
+    heartworm_7 = models.BooleanField(default=False, null=True, blank=True)     #34weeks
+   
+    anti_rabies = models.BooleanField(default=False, null=True, blank=True)     #12weeks
+
+    bordetella_1 = models.BooleanField(default=False, null=True, blank=True)    #8weeks
+    bordetella_2 = models.BooleanField(default=False, null=True, blank=True)    #11weeks
+
+    dhppil4_1 = models.BooleanField(default=False, null=True, blank=True)       #15weeks
+    dhppil4_2 = models.BooleanField(default=False, null=True, blank=True)       #18weeks
+
+    tick_flea_1 = models.BooleanField(default=False, null=True, blank=True)     #8weeks
+    tick_flea_2 = models.BooleanField(default=False, null=True, blank=True)     #12weeks
+    tick_flea_3 = models.BooleanField(default=False, null=True, blank=True)     #16weeks
+    tick_flea_4 = models.BooleanField(default=False, null=True, blank=True)     #20weeks
+    tick_flea_5 = models.BooleanField(default=False, null=True, blank=True)     #24weeks
+    tick_flea_6 = models.BooleanField(default=False, null=True, blank=True)     #28weeks
+    tick_flea_7 = models.BooleanField(default=False, null=True, blank=True)     #23weeks
+
+class VaccineUsed(models.Model):
     DISEASE = (
         ('BORDETELLA', 'BORDETELLA'),
         ('CORONAVIRUS', 'CORONAVIRUS'),
@@ -72,7 +108,7 @@ class VaccinceRecord(models.Model):
         ('TRACHEOBRONCHTIS', 'TRACHEOBRONCHTIS'),
     )
 
-    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+    vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE)
     vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     disease = models.CharField('disease', choices=DISEASE, max_length=200)
     date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
@@ -90,7 +126,7 @@ class Requests(models.Model):
     )
 
     equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
     concern = models.CharField('concern', max_length=100, choices=CONCERN, default="")
     remarks = models.CharField('remarks', max_length=200, blank=True)
