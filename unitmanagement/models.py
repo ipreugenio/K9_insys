@@ -4,6 +4,8 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import User
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import datetime
 # Create your models here.
 
@@ -59,64 +61,53 @@ class PhysicalExam(models.Model):
 #TODO
 #add vet user
 class VaccinceRecord(models.Model):
-    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
-    deworming_1 = models.BooleanField(default=False, null=True, blank=True)     #2weeks
-    deworming_2 = models.BooleanField(default=False, null=True, blank=True)     #4weeks
-    deworming_3 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
-    deworming_4 = models.BooleanField(default=False, null=True, blank=True)     #9weeks
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    deworming_1 = models.BooleanField(default=False)     #2weeks
+    deworming_2 = models.BooleanField(default=False)     #4weeks
+    deworming_3 = models.BooleanField(default=False)     #6weeks
+    deworming_4 = models.BooleanField(default=False)     #9weeks
    
-    dhppil_cv_1 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
-    dhppil_cv_2 = models.BooleanField(default=False, null=True, blank=True)     #9weeks
-    dhppil_cv_3 = models.BooleanField(default=False, null=True, blank=True)     #12weeks
+    dhppil_cv_1 = models.BooleanField(default=False)     #6weeks
+    dhppil_cv_2 = models.BooleanField(default=False)     #9weeks
+    dhppil_cv_3 = models.BooleanField(default=False)     #12weeks
     
-    heartworm_1 = models.BooleanField(default=False, null=True, blank=True)     #6weeks
-    heartworm_2 = models.BooleanField(default=False, null=True, blank=True)     #10weeks
-    heartworm_3 = models.BooleanField(default=False, null=True, blank=True)     #14weeks
-    heartworm_4 = models.BooleanField(default=False, null=True, blank=True)     #18weeks
-    heartworm_5 = models.BooleanField(default=False, null=True, blank=True)     #22weeks
-    heartworm_6 = models.BooleanField(default=False, null=True, blank=True)     #30weeks
-    heartworm_7 = models.BooleanField(default=False, null=True, blank=True)     #34weeks
+    heartworm_1 = models.BooleanField(default=False)     #6weeks
+    heartworm_2 = models.BooleanField(default=False)     #10weeks
+    heartworm_3 = models.BooleanField(default=False)     #14weeks
+    heartworm_4 = models.BooleanField(default=False)     #18weeks
+    heartworm_5 = models.BooleanField(default=False)     #22weeks
+    heartworm_6 = models.BooleanField(default=False)     #26weeks
+    heartworm_7 = models.BooleanField(default=False)     #30weeks
+    heartworm_8 = models.BooleanField(default=False)     #34weeks
    
-    anti_rabies = models.BooleanField(default=False, null=True, blank=True)     #12weeks
+    anti_rabies = models.BooleanField(default=False)     #12weeks
 
-    bordetella_1 = models.BooleanField(default=False, null=True, blank=True)    #8weeks
-    bordetella_2 = models.BooleanField(default=False, null=True, blank=True)    #11weeks
+    bordetella_1 = models.BooleanField(default=False)    #8weeks
+    bordetella_2 = models.BooleanField(default=False)    #11weeks
 
-    dhppil4_1 = models.BooleanField(default=False, null=True, blank=True)       #15weeks
-    dhppil4_2 = models.BooleanField(default=False, null=True, blank=True)       #18weeks
+    dhppil4_1 = models.BooleanField(default=False)       #15weeks
+    dhppil4_2 = models.BooleanField(default=False)       #18weeks
 
-    tick_flea_1 = models.BooleanField(default=False, null=True, blank=True)     #8weeks
-    tick_flea_2 = models.BooleanField(default=False, null=True, blank=True)     #12weeks
-    tick_flea_3 = models.BooleanField(default=False, null=True, blank=True)     #16weeks
-    tick_flea_4 = models.BooleanField(default=False, null=True, blank=True)     #20weeks
-    tick_flea_5 = models.BooleanField(default=False, null=True, blank=True)     #24weeks
-    tick_flea_6 = models.BooleanField(default=False, null=True, blank=True)     #28weeks
-    tick_flea_7 = models.BooleanField(default=False, null=True, blank=True)     #23weeks
+    tick_flea_1 = models.BooleanField(default=False)     #8weeks
+    tick_flea_2 = models.BooleanField(default=False)     #12weeks
+    tick_flea_3 = models.BooleanField(default=False)     #16weeks
+    tick_flea_4 = models.BooleanField(default=False)     #20weeks
+    tick_flea_5 = models.BooleanField(default=False)     #24weeks
+    tick_flea_6 = models.BooleanField(default=False)     #28weeks
+    tick_flea_7 = models.BooleanField(default=False)     #32weeks
+
+    def __str__(self):
+        return 'PHP:' + str(self.k9.name)
 
 class VaccineUsed(models.Model):
-    DISEASE = (
-        ('BORDETELLA', 'BORDETELLA'),
-        ('CORONAVIRUS', 'CORONAVIRUS'),
-        ('DISTEPER', 'DISTEPER'),
-        ('HEPATITIS', 'HEPATITIS'),
-        ('LEPTOSPIROSIS', 'LEPTOSPIROSIS'),
-        ('LYME', 'LYME'),
-        ('MEASLES', 'MEASLES'),
-        ('PARAINLUENZA', 'PARAINLUENZA'),
-        ('PARVOVIRUS', 'PARVOVIRUS'),
-        ('RABIES', 'RABIES'),
-        ('TRACHEOBRONCHTIS', 'TRACHEOBRONCHTIS'),
-    )
-
     vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE)
-    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
-    disease = models.CharField('disease', choices=DISEASE, max_length=200)
-    date_vaccinated = models.DateField('date_vaccinated', auto_now_add=True)
-    date_validity = models.DateField('date_validity', null=True, blank=True)
+    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, null=True, blank=True)
+    disease = models.CharField('disease', max_length=200)
+    date_vaccinated = models.DateField('date_vaccinated', null=True, blank=True)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return str(self.date_vaccinated) + ':' + str(self.disease) +'-' + str(self.dog.name)
+        return str(self.vaccine_record) + ':' + str(self.disease) +'-' + str(self.date_vaccinated)
 
 class Requests(models.Model):
     CONCERN = (

@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ReportDateForm
 from deployment.models import Dog_Request, Team_Assignment
-from unitmanagement.models import Health, HealthMedicine
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import Avg, Count, Min, Sum
@@ -126,6 +126,8 @@ def add_donated_K9(request):
             Training.objects.create(k9=k9, training='NDD')
             Training.objects.create(k9=k9, training='SAR')
 
+            
+
             return HttpResponseRedirect('confirm_donation/')
 
         else:
@@ -184,8 +186,41 @@ def donation_confirmed(request):
     k9 = K9.objects.get(id=k9_id)
 
     if 'ok' in request.POST:
+        #CREATE VACCINE RECORD OF ACQUIRED K9
+        cvr = VaccinceRecord.objects.create(k9=offspring)
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
         return render(request, 'planningandacquiring/donation_confirmed.html')
     else:
+        #DELETE VACCINE RECORD
+        vr = VaccinceRecord.objects.get(k9=offspring)
+        vr.delete()
+
         #delete training record
         training = Training.objects.filter(k9=k9)
         training.delete()
@@ -360,8 +395,43 @@ def breeding_confirmed(request):
         Training.objects.create(k9=offspring, training='EDD')
         Training.objects.create(k9=offspring, training='NDD')
         Training.objects.create(k9=offspring, training='SAR')
+
+        #CREATE VACCINE RECORD OF NEWBORN K9
+        cvr = VaccinceRecord.objects.create(k9=offspring)
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
+
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
+        #DELETE VACCINE RECORD
+        vr = VaccinceRecord.objects.get(k9=offspring)
+        vr.delete()
+
         #delete training record
         training = Training.objects.filter(k9=offspring)
         training.delete()
