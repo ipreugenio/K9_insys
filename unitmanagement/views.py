@@ -137,7 +137,8 @@ def health_history(request, id):
     vaccine_record_form = VaccinationRecordForm(request.POST or None, instance = vaccine_record)
     vaccine_used_form = VaccinationUsedForm(request.POST or None)
     vaccines = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine')
-    
+    vaccine_available = Medicine_Inventory.objects.filter(medicine__in = vaccines).exclude(quantity=0)
+   
     active_1 = ' active'
     active_2 = ''
     active_3 = ''
@@ -148,7 +149,6 @@ def health_history(request, id):
     # 14weeks=98days, 15weeks=105days, 16weeks=112days, 18weeks=126days, 20weeks=140days, 22weeks=154days
     # 24weeks=168days, 26weeks=183days, 28weeks=196days, 30weeks=210days, 32weeks=224days, 34weeks=238days
     dog_days =  dtoday - data.birth_date
-    print(dog_days.days)
 
     #data of vaccines used
     data_deworming_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_1')
@@ -290,223 +290,360 @@ def health_history(request, id):
         else:
             vaccine_record.heartworm_8 = bool(request.POST.get('heartworm_8'))
         
+       
         # ERASE ELSE when everything is WORKING
         if vaccine_record.deworming_1 == True and request.POST.get('s_deworming_1') !='' and request.POST.get('s_deworming_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_deworming_1'))
-            data_deworming_1.vaccine = m
-            data_deworming_1.date_vaccinated = dtoday
-            data_deworming_1.veterinary = current_user
-            data_deworming_1.save()
-            vaccine_record.save()
-            messages.success(request, 'Preventive Health Program Updated!')
-          
-        if vaccine_record.deworming_2 == True and request.POST.get('s_deworming_2') !='' and request.POST.get('s_deworming_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_deworming_2'))
-            data_deworming_2.vaccine = m
-            data_deworming_2.date_vaccinated = dtoday
-            data_deworming_2.veterinary = current_user
-            data_deworming_2.save()
-            vaccine_record.save()
+            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+
+            if med.quantity > 0:
+                data_deworming_1.vaccine = m
+                data_deworming_1.date_vaccinated = dtoday
+                data_deworming_1.veterinary = current_user
+                data_deworming_1.save()
+                vaccine_record.save(update_fields=["deworming_1"]) 
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
+        if vaccine_record.deworming_2 == True and request.POST.get('s_deworming_2') !='' and request.POST.get('s_deworming_2') !=None:
+            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_deworming_2.vaccine = m
+                data_deworming_2.date_vaccinated = dtoday
+                data_deworming_2.veterinary = current_user
+                data_deworming_2.save()
+                vaccine_record.save(update_fields=["deworming_2"]) 
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
        
         if vaccine_record.deworming_3 == True and request.POST.get('s_deworming_3') !='' and request.POST.get('s_deworming_3') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_deworming_3'))
-            data_deworming_3.vaccine = m
-            data_deworming_3.date_vaccinated = dtoday
-            data_deworming_3.veterinary = current_user
-            data_deworming_3.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_3'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_deworming_3.vaccine = m
+                data_deworming_3.date_vaccinated = dtoday
+                data_deworming_3.veterinary = current_user
+                data_deworming_3.save()
+                vaccine_record.save(update_fields=["deworming_3"]) 
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.dhppil_cv_1 == True and request.POST.get('s_dhppil_cv_1') != '' and request.POST.get('s_dhppil_cv_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_dhppil_cv_1'))
-            data_dhppil_cv_1.vaccine = m
-            data_dhppil_cv_1.date_vaccinated = dtoday
-            data_dhppil_cv_1.veterinary = current_user
-            data_dhppil_cv_1.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_dhppil_cv_1.vaccine = m
+                data_dhppil_cv_1.date_vaccinated = dtoday
+                data_dhppil_cv_1.veterinary = current_user
+                data_dhppil_cv_1.save()
+                vaccine_record.save(update_fields=["dhppil_cv_1"]) 
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_1 == True and request.POST.get('s_heartworm_1') !='' and request.POST.get('s_heartworm_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_1'))
-            data_heartworm_1.vaccine = m
-            data_heartworm_1.date_vaccinated = dtoday
-            data_heartworm_1.veterinary = current_user
-            data_heartworm_1.save()
-            vaccine_record.save()
-         
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_1.vaccine = m
+                data_heartworm_1.date_vaccinated = dtoday
+                data_heartworm_1.veterinary = current_user
+                data_heartworm_1.save()
+                vaccine_record.save(update_fields=["heartworm_1"]) 
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.bordetella_1 == True and request.POST.get('s_bordetella_1') !='' and request.POST.get('s_bordetella_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_bordetella_1'))
-            data_bordetella_1.vaccine = m
-            data_bordetella_1.date_vaccinated = dtoday
-            data_bordetella_1.veterinary = current_user
-            data_bordetella_1.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_bordetella_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_bordetella_1.vaccine = m
+                data_bordetella_1.date_vaccinated = dtoday
+                data_bordetella_1.veterinary = current_user
+                data_bordetella_1.save()
+                vaccine_record.save(update_fields=["bordetella_1"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.tick_flea_1 == True and request.POST.get('s_tick_flea_1') !='' and request.POST.get('s_tick_flea_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_1'))
-            data_tick_flea_1.vaccine = m
-            data_tick_flea_1.date_vaccinated = dtoday
-            data_tick_flea_1.veterinary = current_user
-            data_tick_flea_1.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_1.vaccine = m
+                data_tick_flea_1.date_vaccinated = dtoday
+                data_tick_flea_1.veterinary = current_user
+                data_tick_flea_1.save()
+                vaccine_record.save(update_fields=["tick_flea_1"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.dhppil_cv_2 == True and request.POST.get('s_dhppil_cv_2') !='' and request.POST.get('s_dhppil_cv_2') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_dhppil_cv_2'))
-            data_dhppil_cv_2.vaccine = m
-            data_dhppil_cv_2.date_vaccinated = dtoday
-            data_dhppil_cv_2.veterinary = current_user
-            data_dhppil_cv_2.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_dhppil_cv_2.vaccine = m
+                data_dhppil_cv_2.date_vaccinated = dtoday
+                data_dhppil_cv_2.veterinary = current_user
+                data_dhppil_cv_2.save()
+                vaccine_record.save(update_fields=["dhppil_cv_2"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+            
         if vaccine_record.deworming_4 == True and request.POST.get('s_deworming_4') !='' and request.POST.get('s_deworming_4') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_deworming_4'))
-            data_deworming_4.vaccine = m
-            data_deworming_4.date_vaccinated = dtoday
-            data_deworming_4.veterinary = current_user
-            data_deworming_4.save()
-         
+            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_4'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_deworming_4.vaccine = m
+                data_deworming_4.date_vaccinated = dtoday
+                data_deworming_4.veterinary = current_user
+                data_deworming_4.save()
+                vaccine_record.save(update_fields=["deworming_4"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_2 == True and request.POST.get('s_heartworm_2') !='' and request.POST.get('s_heartworm_2') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_2'))
-            data_heartworm_2.vaccine = m
-            data_heartworm_2.date_vaccinated = dtoday
-            data_heartworm_2.veterinary = current_user
-            data_heartworm_2.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_2.vaccine = m
+                data_heartworm_2.date_vaccinated = dtoday
+                data_heartworm_2.veterinary = current_user
+                data_heartworm_2.save()
+                vaccine_record.save(update_fields=["heartworm_2"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.bordetella_2 == True and request.POST.get('s_bordetella_2') !='' and request.POST.get('s_bordetella_2') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_bordetella_2'))
-            data_bordetella_2.vaccine = m
-            data_bordetella_2.date_vaccinated = dtoday
-            data_bordetella_2.veterinary = current_user
-            data_bordetella_2.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_bordetella_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_bordetella_2.vaccine = m
+                data_bordetella_2.date_vaccinated = dtoday
+                data_bordetella_2.veterinary = current_user
+                data_bordetella_2.save()
+                vaccine_record.save(update_fields=["bordetella_2"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.anti_rabies == True and request.POST.get('s_anti_rabies') !='' and request.POST.get('s_anti_rabies') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_anti_rabies'))
-            data_anti_rabies.vaccine = m
-            data_anti_rabies.date_vaccinated = dtoday
-            data_anti_rabies.veterinary = current_user
-            data_anti_rabies.save()
-            vaccine_record.save()
+            m = Medicine.objects.get(medicine=request.POST.get('s_anti_rabies'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_anti_rabies.vaccine = m
+                data_anti_rabies.date_vaccinated = dtoday
+                data_anti_rabies.veterinary = current_user
+                data_anti_rabies.save()
+                vaccine_record.save(update_fields=["anti_rabies"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
 
         if vaccine_record.tick_flea_2 == True and request.POST.get('s_tick_flea_2') !='' and request.POST.get('s_tick_flea_2') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_2'))
-            data_tick_flea_2.vaccine = m
-            data_tick_flea_2.date_vaccinated = dtoday
-            data_tick_flea_2.veterinary = current_user
-            data_tick_flea_2.save()
-            vaccine_record.save()
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_2.vaccine = m
+                data_tick_flea_2.date_vaccinated = dtoday
+                data_tick_flea_2.veterinary = current_user
+                data_tick_flea_2.save()
+                vaccine_record.save(update_fields=["anti_rabies"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
 
         if vaccine_record.dhppil_cv_3 == True and request.POST.get('s_dhppil_cv_3') !='' and request.POST.get('s_dhppil_cv_3') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_dhppil_cv_3'))
-            data_dhppil_cv_3.vaccine = m
-            data_dhppil_cv_3.date_vaccinated = dtoday
-            data_dhppil_cv_3.veterinary = current_user
-            data_dhppil_cv_3.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_3'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_dhppil_cv_3.vaccine = m
+                data_dhppil_cv_3.date_vaccinated = dtoday
+                data_dhppil_cv_3.veterinary = current_user
+                data_dhppil_cv_3.save()
+                vaccine_record.save(update_fields=["dhppil_cv_3"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_3 == True and request.POST.get('s_heartworm_3') !='' and request.POST.get('s_heartworm_3') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_3'))
-            data_heartworm_3.vaccine = m
-            data_heartworm_3.date_vaccinated = dtoday
-            data_heartworm_3.veterinary = current_user
-            data_heartworm_3.save()
-            vaccine_record.save()
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_3'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_3.vaccine = m
+                data_heartworm_3.date_vaccinated = dtoday
+                data_heartworm_3.veterinary = current_user
+                data_heartworm_3.save()
+                vaccine_record.save(update_fields=["dhppil_cv_3"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
 
         if vaccine_record.dhppil4_1 == True and request.POST.get('s_dhppil4_1') !='' and request.POST.get('s_dhppil4_1') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_dhppil4_1'))
-            data_dhppil4_1.vaccine = m
-            data_dhppil4_1.date_vaccinated = dtoday
-            data_dhppil4_1.veterinary = current_user
-            data_dhppil4_1.save()
-            vaccine_record.save()
+            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil4_1'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_dhppil4_1.vaccine = m
+                data_dhppil4_1.date_vaccinated = dtoday
+                data_dhppil4_1.veterinary = current_user
+                data_dhppil4_1.save()
+                vaccine_record.save(update_fields=["dhppil4_1"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
 
         if vaccine_record.tick_flea_3 == True and request.POST.get('s_tick_flea_3') !='' and request.POST.get('s_tick_flea_3') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_3'))
-            data_tick_flea_3.vaccine = m
-            data_tick_flea_3.date_vaccinated = dtoday
-            data_tick_flea_3.veterinary = current_user
-            data_tick_flea_3.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_3'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_3.vaccine = m
+                data_tick_flea_3.date_vaccinated = dtoday
+                data_tick_flea_3.veterinary = current_user
+                data_tick_flea_3.save()
+                vaccine_record.save(update_fields=["tick_flea_3"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.dhppil4_2 == True and request.POST.get('s_dhppil4_2') !='' and request.POST.get('s_dhppil4_2') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_dhppil4_2'))
-            data_dhppil4_2.vaccine = m
-            data_dhppil4_2.date_vaccinated = dtoday
-            data_dhppil4_2.veterinary = current_user
-            data_dhppil4_2.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil4_2'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_dhppil4_2.vaccine = m
+                data_dhppil4_2.date_vaccinated = dtoday
+                data_dhppil4_2.veterinary = current_user
+                data_dhppil4_2.save()
+                vaccine_record.save(update_fields=["dhppil4_2"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_4 == True and request.POST.get('s_heartworm_4') !='' and request.POST.get('s_heartworm_4') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_4'))
-            data_heartworm_4.vaccine = m
-            data_heartworm_4.date_vaccinated = dtoday
-            data_heartworm_4.veterinary = current_user
-            data_heartworm_4.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_4'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_4.vaccine = m
+                data_heartworm_4.date_vaccinated = dtoday
+                data_heartworm_4.veterinary = current_user
+                data_heartworm_4.save()
+                vaccine_record.save(update_fields=["heartworm_4"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.tick_flea_4 == True and request.POST.get('s_tick_flea_4') !='' and request.POST.get('s_tick_flea_4') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_4'))
-            data_tick_flea_4.vaccine = m
-            data_tick_flea_4.date_vaccinated = dtoday
-            data_tick_flea_4.veterinary = current_user
-            data_tick_flea_4.save()
-            vaccine_record.save()  
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_4'))
+            if med.quantity > 0:
+                med = Medicine_Inventory.objects.get(medicine=m)
+                data_tick_flea_4.vaccine = m
+                data_tick_flea_4.date_vaccinated = dtoday
+                data_tick_flea_4.veterinary = current_user
+                data_tick_flea_4.save()
+                vaccine_record.save(update_fields=["tick_flea_4"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_5 == True and request.POST.get('s_heartworm_5') !='' and request.POST.get('s_heartworm_5') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_5'))
-            data_heartworm_5.vaccine = m
-            data_heartworm_5.date_vaccinated = dtoday
-            data_heartworm_5.veterinary = current_user
-            data_heartworm_5.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_5'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_5.vaccine = m
+                data_heartworm_5.date_vaccinated = dtoday
+                data_heartworm_5.veterinary = current_user
+                data_heartworm_5.save()
+                vaccine_record.save(update_fields=["heartworm_5"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.tick_flea_5 == True and request.POST.get('s_tick_flea_5') !='' and request.POST.get('s_tick_flea_5') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_5'))
-            data_tick_flea_5.vaccine = m
-            data_tick_flea_5.date_vaccinated = dtoday
-            data_tick_flea_5.veterinary = current_user
-            data_tick_flea_5.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_5'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_5.vaccine = m
+                data_tick_flea_5.date_vaccinated = dtoday
+                data_tick_flea_5.veterinary = current_user
+                data_tick_flea_5.save()
+                vaccine_record.save(update_fields=["tick_flea_5"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_6 == True and request.POST.get('s_heartworm_6') !='' and request.POST.get('s_heartworm_6') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_6'))
-            data_heartworm_6.vaccine = m
-            data_heartworm_6.date_vaccinated = dtoday
-            data_heartworm_6.veterinary = current_user
-            data_heartworm_6.save()
-            vaccine_record.save()
-          
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_6'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_6.vaccine = m
+                data_heartworm_6.date_vaccinated = dtoday
+                data_heartworm_6.veterinary = current_user
+                data_heartworm_6.save()
+                vaccine_record.save(update_fields=["heartworm_6"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.tick_flea_6 == True and request.POST.get('s_tick_flea_6') !='' and request.POST.get('s_tick_flea_6') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_6'))
-            data_tick_flea_6.vaccine = m
-            data_tick_flea_6.date_vaccinated = dtoday
-            data_tick_flea_6.veterinary = current_user
-            data_tick_flea_6.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_6'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_6.vaccine = m
+                data_tick_flea_6.date_vaccinated = dtoday
+                data_tick_flea_6.veterinary = current_user
+                data_tick_flea_6.save()
+                vaccine_record.save(update_fields=["tick_flea_6"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_7 == True and request.POST.get('s_heartworm_7') !='' and request.POST.get('s_heartworm_7') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_7'))
-            data_heartworm_7.vaccine = m
-            data_heartworm_7.date_vaccinated = dtoday
-            data_heartworm_7.veterinary = current_user
-            data_heartworm_7.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_7'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_7.vaccine = m
+                data_heartworm_7.date_vaccinated = dtoday
+                data_heartworm_7.veterinary = current_user
+                data_heartworm_7.save()
+                vaccine_record.save(update_fields=["heartworm_7"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.tick_flea_7 == True and request.POST.get('s_tick_flea_7') !='' and request.POST.get('s_tick_flea_7') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_tick_flea_7'))
-            data_tick_flea_7.vaccine = m
-            data_tick_flea_7.date_vaccinated = dtoday
-            data_tick_flea_7.veterinary = current_user
-            data_tick_flea_7.save()
-            vaccine_record.save()
-           
+            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_7'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_tick_flea_7.vaccine = m
+                data_tick_flea_7.date_vaccinated = dtoday
+                data_tick_flea_7.veterinary = current_user
+                data_tick_flea_7.save()
+                vaccine_record.save(update_fields=["tick_flea_7"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         if vaccine_record.heartworm_8 == True and request.POST.get('s_heartworm_8') !='' and request.POST.get('s_heartworm_8') !=None:
-            m = Medicine.objects.get(medicine_fullname=request.POST.get('s_heartworm_8'))
-            data_heartworm_8.vaccine = m
-            data_heartworm_8.date_vaccinated = dtoday
-            data_heartworm_8.veterinary = current_user
-            data_heartworm_8.save()
-            vaccine_record.save()
-            
+            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_8'))
+            med = Medicine_Inventory.objects.get(medicine=m)
+            if med.quantity > 0:
+                data_heartworm_8.vaccine = m
+                data_heartworm_8.date_vaccinated = dtoday
+                data_heartworm_8.veterinary = current_user
+                data_heartworm_8.save()
+                vaccine_record.save(update_fields=["heartworm_8"])
+                med.quantity = med.quantity - 1
+                med.save()
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+
         messages.success(request, 'Preventive Health Program Updated!')
         return redirect('unitmanagement:health_history', id = id)
     
@@ -523,7 +660,7 @@ def health_history(request, id):
         'dtoday':dtoday,
         'form1': vaccine_record_form,
         'form2': vaccine_used_form,
-        'vaccines':vaccines,
+        'vaccine_available':vaccine_available,
         'active_1':active_1,
         'active_2':active_2,
         'active_3':active_3,

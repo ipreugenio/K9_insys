@@ -81,7 +81,7 @@ class Medicine_Subtracted_Trail(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory.medicine.medicine_fullname
+        return self.inventory.medicine.medicine_fullname + ' : ' +str(self.date_subtracted)
 
     def save(self, *args, **kwargs):
         self.name = str(self.inventory.medicine.medicine_fullname)

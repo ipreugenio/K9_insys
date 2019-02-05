@@ -43,8 +43,8 @@
                     <td>
                         <select name="s_deworming_1" id="s_deworming_1" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -64,8 +64,8 @@
                 <td>
                     <select name="s_deworming_2" id="s_deworming_2" class="ui fluid search dropdown">
                         <option value="">----------</option>
-                        {% for vaccine in vaccines %}
-                        <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                        {% for vaccine in vaccine_available %}
+                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                         {% endfor %}
                     </select>
                 </td>
@@ -85,8 +85,8 @@
                 <td>
                     <select name="s_deworming_3" id="s_deworming_3" class="ui fluid search dropdown">
                         <option value="">----------</option>
-                        {% for vaccine in vaccines %}
-                        <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                        {% for vaccine in vaccine_available %}
+                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                         {% endfor %}
                     </select>
                 </td>
@@ -106,8 +106,8 @@
                 <td>
                     <select name="s_dhppil_cv_1" id="s_dhppil_cv_1" class="ui fluid search dropdown">
                         <option value="">----------</option>
-                        {% for vaccine in vaccines %}
-                        <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                        {% for vaccine in vaccine_available %}
+                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                         {% endfor %}
                     </select>
                 </td>
@@ -126,8 +126,8 @@
                 <td>
                     <select name="s_heartworm_1" id="s_heartworm_1" class="ui fluid search dropdown">
                         <option value="">----------</option>
-                        {% for vaccine in vaccines %}
-                        <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                        {% for vaccine in vaccine_available %}
+                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                         {% endfor %}
                     </select>
                 </td>
@@ -146,8 +146,8 @@
                 <td>
                     <select name="s_bordetella_1" id="s_bordetella_1" class="ui fluid search dropdown">
                         <option value="">----------</option>
-                        {% for vaccine in vaccines %}
-                        <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                        {% for vaccine in vaccine_available %}
+                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                         {% endfor %}
                     </select>
                 </td>
@@ -165,8 +165,8 @@
                     <td>
                         <select name="s_tick_flea_1" id="s_tick_flea_1" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -185,8 +185,8 @@
                     <td>
                         <select name="s_dhppil_cv_2" id="s_dhppil_cv_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -205,8 +205,8 @@
                     <td>
                         <select name="s_deworming_4" id="s_deworming_4" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -225,8 +225,8 @@
                     <td>
                         <select name="s_heartworm_2" id="s_heartworm_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -245,8 +245,8 @@
                     <td>
                         <select name="s_bordetella_2" id="s_bordetella_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -265,8 +265,8 @@
                     <td>
                         <select name="s_anti_rabies" id="s_anti_rabies" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -285,8 +285,8 @@
                     <td>
                         <select name="s_tick_flea_2" id="s_tick_flea_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -305,8 +305,8 @@
                     <td>
                         <select name="s_dhppil_cv_3" id="s_dhppil_cv_3" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -325,8 +325,8 @@
                     <td>
                         <select name="s_heartworm_3" id="s_heartworm_3" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -345,8 +345,8 @@
                     <td>
                         <select name="s_dhppil4_1" id="s_dhppil4_1" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -365,8 +365,8 @@
                     <td>
                         <select name="s_tick_flea_3" id="s_tick_flea_3" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -385,8 +385,8 @@
                     <td>
                         <select name="s_dhppil4_2" id="s_dhppil4_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -405,8 +405,8 @@
                     <td>
                         <select name="s_heartworm_4" id="s_heartworm_4" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -425,8 +425,8 @@
                     <td>
                         <select name="s_tick_flea_4" id="s_tick_flea_4" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -445,8 +445,8 @@
                     <td>
                         <select name="s_heartworm_5" id="s_heartworm_5" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -465,8 +465,8 @@
                     <td>
                         <select name="s_tick_flea_5" id="s_tick_flea_5" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -485,8 +485,8 @@
                     <td>
                         <select name="s_heartworm_6" id="s_heartworm_6" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -505,8 +505,8 @@
                     <td>
                         <select name="s_tick_flea_6" id="s_tick_flea_6" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -525,8 +525,8 @@
                     <td>
                         <select name="s_heartworm_7" id="s_heartworm_7" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -545,8 +545,8 @@
                     <td>
                         <select name="s_tick_flea_7" id="s_tick_flea_7" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -565,8 +565,8 @@
                     <td>
                         <select name="s_heartworm_8" id="s_heartworm_8" class="ui fluid search dropdown">
                             <option value="">----------</option>
-                            {% for vaccine in vaccines %}
-                            <option value="{{vaccine.medicine_fullname}}">{{vaccine.medicine_fullname}}</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
                             {% endfor %}
                         </select>
                     </td>
