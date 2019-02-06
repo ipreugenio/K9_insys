@@ -394,7 +394,10 @@ def medicine_receive_form(request, id):
             user_serial = request.session['session_serial']
             user = Account.objects.get(serial_number=user_serial)
             current_user = User.objects.get(id=user.UserID.id)
-            Medicine_Received_Trail.objects.create(inventory = data, user = current_user, quantity = request.POST.get('quantity'), date_received = datetime.date.today(), time = datetime.datetime.now())
+
+            Medicine_Received_Trail.objects.create(inventory = data, user = current_user, 
+            quantity = request.POST.get('quantity'), date_received = datetime.date.today(), 
+            expiration_date = request.POST.get('exp_date') ,time = datetime.datetime.now())
 
         else:
             style = "ui red message"

@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous
 from profiles.models import Account, User
@@ -68,31 +68,47 @@ class HealthMedicineForm(forms.ModelForm):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
         self.fields['medicine'].required = False
 
-class VaccinationForm(forms.ModelForm):
-    DISEASE = (
-        ('BORDETELLA', 'BORDETELLA'),
-        ('CORONAVIRUS', 'CORONAVIRUS'),
-        ('DISTEPER', 'DISTEPER'),
-        ('HEPATITIS', 'HEPATITIS'),
-        ('LEPTOSPIROSIS', 'LEPTOSPIROSIS'),
-        ('LYME', 'LYME'),
-        ('MEASLES', 'MEASLES'),
-        ('PARAINLUENZA', 'PARAINLUENZA'),
-        ('PARVOVIRUS', 'PARVOVIRUS'),
-        ('RABIES', 'RABIES'),
-        ('TRACHEOBRONCHTIS', 'TRACHEOBRONCHTIS'),
-    )
-    dog = forms.ModelChoiceField(queryset = K9.objects.all().order_by('name'))
-    disease = forms.CharField(widget = forms.Select(choices=DISEASE))
-    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
+class VaccinationRecordForm(forms.ModelForm):
 
     class Meta:
         model = VaccinceRecord
-        fields = ('dog', 'vaccine', 'disease', 'date_validity')
+        fields = ('deworming_1', 'deworming_2', 'deworming_3', 'dhppil_cv_1', 'heartworm_1', 'bordetella_1', 
+        'tick_flea_1', 'dhppil_cv_2', 'deworming_4', 'heartworm_2', 'bordetella_2', 'anti_rabies', 'tick_flea_2',
+        'dhppil_cv_3', 'heartworm_3', 'dhppil4_1', 'tick_flea_3', 'dhppil4_2', 'heartworm_4', 'tick_flea_4', 
+        'heartworm_5', 'tick_flea_5', 'heartworm_6', 'tick_flea_6', 'heartworm_7', 'tick_flea_7', 'heartworm_8')
 
     def __init__(self, *args, **kwargs):
-        super(VaccinationForm, self).__init__(*args, **kwargs)
-        self.fields['date_validity'].required = False
+        super(VaccinationRecordForm, self).__init__(*args, **kwargs)
+        self.fields['deworming_1'].required = False
+        self.fields['deworming_2'].required = False
+        self.fields['deworming_3'].required = False
+        self.fields['dhppil_cv_1'].required = False
+        self.fields['heartworm_1'].required = False
+        self.fields['bordetella_1'].required = False
+        self.fields['tick_flea_1'].required = False
+        self.fields['dhppil_cv_2'].required = False
+        self.fields['deworming_4'].required = False
+        self.fields['heartworm_2'].required = False
+        self.fields['bordetella_2'].required = False
+        self.fields['anti_rabies'].required = False
+        self.fields['tick_flea_2'].required = False
+        self.fields['dhppil_cv_3'].required = False
+        self.fields['heartworm_3'].required = False
+        self.fields['tick_flea_3'].required = False
+        self.fields['dhppil4_2'].required = False
+        self.fields['heartworm_4'].required = False
+        self.fields['tick_flea_4'].required = False
+        self.fields['heartworm_5'].required = False
+        self.fields['tick_flea_5'].required = False
+        self.fields['heartworm_6'].required = False
+        self.fields['tick_flea_6'].required = False
+        self.fields['heartworm_7'].required = False
+        self.fields['tick_flea_7'].required = False
+        self.fields['heartworm_8'].required = False
+
+class VaccinationUsedForm(forms.Form):
+    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
+
 
 class RequestForm(forms.ModelForm):
     CONCERN = (

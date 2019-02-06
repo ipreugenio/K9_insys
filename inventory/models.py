@@ -37,7 +37,9 @@ class Medicine(models.Model):
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
         if self.med_type == 'Vaccine':
-            self.duration = 365 / int(self.used_yearly)
+            #self.duration = 365 / int(self.used_yearly)
+            self.used_yearly = 365 / int(self.duration)
+
         super(Medicine, self).save(*args, **kwargs)
 
 
@@ -66,7 +68,8 @@ class Medicine_Received_Trail(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
-
+    expiration_date = models.DateField('expiration_date', null=True, blank=True)
+    
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
 
@@ -80,7 +83,7 @@ class Medicine_Subtracted_Trail(models.Model):
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.inventory.medicine.medicine_fullname
+        return self.inventory.medicine.medicine_fullname + ' : ' +str(self.date_subtracted)
 
     def save(self, *args, **kwargs):
         self.name = str(self.inventory.medicine.medicine_fullname)

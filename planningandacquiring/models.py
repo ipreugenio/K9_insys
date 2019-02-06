@@ -64,6 +64,12 @@ class K9(models.Model):
             bday = 0
         return bday
 
+    def calculate_months_before(birthday):
+        today = d.today()
+        birthdate = birth_date
+        bday = 13 - birthdate.month
+        return bday
+
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
         self.training_id = self.id
