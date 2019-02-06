@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine
 from training.models import Training
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -1358,6 +1358,10 @@ def budgeting(request):
 
     return render(request, 'planningandacquiring/budgeting.html', context)
 
+def budgeting_list(request):
+    budgets = Budget_allocation.objects.all()
+
+    return None
 
 def breeding_recommendation(request):
 

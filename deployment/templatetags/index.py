@@ -1,4 +1,5 @@
 from django import template
+from deployment.models import Incidents
 
 register = template.Library()
 
@@ -8,3 +9,10 @@ def capability(List, i):
     capability = item.capability
 
     return capability
+
+@register.filter
+def incident_count(Location, i):
+
+    incident_count=Incidents.objects.filter(location = Location).count()
+
+    return incident_count

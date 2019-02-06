@@ -1,4 +1,6 @@
-{% extends "profiles/sidebar_deployment.html" %} {% block content %}
+{% extends "profiles/sidebar_deployment.html" %}
+{% load index %}
+{% block content %}
 <div class="ui inverted segment" style="padding:20px;">
 		<h3 class="ui header">{{ title }}</h3>
 		{% if messages %}
@@ -14,6 +16,7 @@
 							<th>Area</th>
 							<th>City</th>
 							<th>Place</th>
+							<th>No. of Incidents</th>
 							<th></th>
           	</tr>
     		</thead>
@@ -26,6 +29,7 @@
 							<td>{{data.location.area}}</td>
 							<td>{{data.location.city}}</td>
 							<td>{{data.location.place}}</td>
+							<td>{{data.location|incident_count:0 }}</td>
 							<td class="ui center aligned">
 								<a href="{% url 'deployment:edit_team' data.id %}" class="ui basic blue button">Edit</a>
 							</td>

@@ -8,6 +8,7 @@
         <thead>
             <tr>
                 <th>Start date</th>
+                <th>End date</th>
                 <th>Requester</th>
                 <th>Place</th>
                 <th>Total Dogs Requested</th>
@@ -21,6 +22,7 @@
                 {% if Data.status == "Pending" %}
                     <tr class = "warning">
                         <td>{{Data.start_date}}</td>
+                        <td>{{Data.end_date}}</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
@@ -33,6 +35,7 @@
                 {% elif Data.status == "Approved" %}
                     <tr class = "positive">
                         <td>{{Data.start_date}}</td>
+                         <td>{{Data.end_date}}</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
@@ -70,6 +73,7 @@
         </tbody>
     </table>
 
+{{ gantt_chart|safe }}
 
 <script type="text/javascript">
 

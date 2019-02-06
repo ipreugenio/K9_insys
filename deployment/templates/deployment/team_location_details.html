@@ -81,6 +81,42 @@
       </div>
     </div>
   </div>
+
+
+    <div class="ui basic segment">
+    <label> No. of Incidents Related to</label>
+        <div class="ui statistics">
+
+         <div class="statistic">
+    <div class="value">
+      <i class="binoculars icon"></i> {{sar_inc}}
+    </div>
+    <div class="label">
+      Search and Rescue
+    </div>
+  </div>
+
+        <div class="statistic">
+    <div class="value">
+      <i class="pills icon"></i> {{ndd_inc}}
+    </div>
+    <div class="label">
+      Narcotics
+    </div>
+  </div>
+
+         <div class="statistic">
+    <div class="value">
+      <i class="bomb icon"></i> {{edd_inc}}
+    </div>
+    <div class="label">
+      Explosives
+    </div>
+  </div>
+
+        </div>
+    </div>
+
 <h2 class="ui header">
     <i class="paw icon"></i>
     <div class="content">
@@ -113,6 +149,7 @@
  </table>
 </div>
 
+
 <div class="ui tab segment" data-tab="second">
   <form class="ui form" method="POST">
     {% csrf_token %}
@@ -124,6 +161,7 @@
               <th>Serial Number</th>
               <th>Capability</th>
               <th>Handler</th>
+                <th>Schedules</th>
             </tr>
         </thead>
         <tbody>
@@ -136,6 +174,7 @@
               <td style="width:22%;">{{can_deploy.serial_number}}</td>
               <td style="width:22%;">{{can_deploy.capability}}</td>
               <td style="width:22%;">{{can_deploy.handler}}</td>
+                <td><a href="{% url 'deployment:view_schedule' can_deploy.id %}">View Schedule</a></td>
             </tr>
               {% endfor %}
         </tbody>
