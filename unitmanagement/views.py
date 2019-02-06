@@ -7,15 +7,9 @@ from django.contrib import messages
 import datetime as dt
 
 from planningandacquiring.models import K9
-<<<<<<< HEAD
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm
-=======
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine
-
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, VaccinationUsedForm
->>>>>>> 473e50f7030ca96c7191406ad1396580b0d4fddc
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Inventory, Miscellaneous_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
 
