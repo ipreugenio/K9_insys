@@ -7,11 +7,18 @@ from django.contrib import messages
 import datetime as dt
 
 from planningandacquiring.models import K9
+<<<<<<< HEAD
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm
+=======
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine
+
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, VaccinationUsedForm
+>>>>>>> 473e50f7030ca96c7191406ad1396580b0d4fddc
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Inventory, Miscellaneous_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
+
 from profiles.models import User, Account
 from training.models import K9_Handler
 # Create your views here.
@@ -132,6 +139,7 @@ def health_history(request, id):
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data)
     phyexam_data = PhysicalExam.objects.filter(dog = data)
+
     vaccine_record = VaccinceRecord.objects.get(k9 = data)
     dtoday = dt.date.today()
 
@@ -179,6 +187,7 @@ def health_history(request, id):
     data_heartworm_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_7')
     data_tick_flea_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_7')
     data_heartworm_8 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_8')
+
 
     if request.method == 'POST':
         # if is changed to TRUE, it cannot be changed back to FALSE 
@@ -773,7 +782,7 @@ def medicine_approve(request, id):
 
 # Vaccination form
 def vaccination_form(request):
-    form = VaccinationForm(request.POST or None)
+    form = VaccinationUsedForm(request.POST or None)
     style=""
     if request.method == 'POST':
         if form.is_valid():
@@ -796,7 +805,7 @@ def vaccination_form(request):
                 Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = dt.date.today(), time = dt.datetime.now())
                 style = "ui green message"
                 messages.success(request, 'Vaccination has been successfully recorded!')
-                form = VaccinationForm()
+                form = VaccinationUsedForm()
             else:
                 style = "ui red message"
                 messages.warning(request, 'Insufficient Inventory Quantity!')
