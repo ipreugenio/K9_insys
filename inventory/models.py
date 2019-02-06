@@ -36,7 +36,8 @@ class Medicine(models.Model):
 
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
-        self.duration = 365 / int(self.used_yearly)
+        if self.med_type == 'Vaccine':
+            self.duration = 365 / int(self.used_yearly)
         super(Medicine, self).save(*args, **kwargs)
 
 

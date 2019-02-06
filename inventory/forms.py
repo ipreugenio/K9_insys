@@ -45,7 +45,7 @@ class FoodForm(forms.ModelForm):
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
-        ('Both', 'Both'),
+
     )
 
     foodtype = forms.CharField(max_length=100, label = 'foodtype', widget = forms.Select(choices=FOODTYPE))
@@ -77,12 +77,13 @@ class MiscellaneousForm(forms.ModelForm):
         ('can', 'can'),
         ('bottle', 'bottle'),
         ('tube', 'tube'),
+        ('box', 'box'),
     )
 
     TYPE = (
         ('Equipment', 'Equipment'),
         ('Vet Supply', 'Vet Supply'),
-        ('Others', 'Others'),
+
     )
 
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))

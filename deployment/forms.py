@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents
 from planningandacquiring.models import K9
 
 class DateInput(forms.DateInput):
@@ -213,3 +213,13 @@ class RequestForm(forms.ModelForm):
             'start_date': DateInput(),
             'end_date': DateInput()
         }
+class IncidentForm(forms.ModelForm):
+    class Meta:
+        model = Incidents
+        fields = '__all__'
+
+        widgets = {
+            'date': DateInput(),
+            #'date_time': forms.widgets.DateTimeInput(format="%d %b %Y %H:%M:%S %Z")
+        }
+

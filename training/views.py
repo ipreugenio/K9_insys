@@ -41,9 +41,10 @@ def adoption_form(request, id):
 
     if request.method == "POST":
         print(form.errors)
+        form.k9 = data
         if form.is_valid():
             print('valid')
-            #form.save()
+            form.save()
             no_id = form.save()
             no_id.k9 = data
             no_id.save()
@@ -219,7 +220,7 @@ def unified_graph():
     data = [sar_male, sar_female, ndd_male, ndd_female, edd_male, edd_female]
 
     layout = go.Layout(
-        title="Classified K9 Count",
+        title="K9 Count by Skill, Breed and Gender",
         barmode='stack'
     )
 

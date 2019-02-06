@@ -51,7 +51,7 @@ class K9_Adopted_Owner(models.Model):
         ('Male', 'Male'),
         ('Female', 'Female')
     )
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     first_name = models.CharField('first_name', max_length=200)
     middle_name = models.CharField('middle_name', max_length=200)
     last_name = models.CharField('last_name', max_length=200)

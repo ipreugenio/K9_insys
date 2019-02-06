@@ -13,6 +13,7 @@ class Health(models.Model):
     problem = models.TextField('problem', max_length=200)
     treatment = models.TextField('treatment', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
+    veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
@@ -90,7 +91,7 @@ class Requests(models.Model):
     )
 
     equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
     concern = models.CharField('concern', max_length=100, choices=CONCERN, default="")
     remarks = models.CharField('remarks', max_length=200, blank=True)

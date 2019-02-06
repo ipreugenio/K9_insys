@@ -23,6 +23,7 @@
     <div class="label">
       Request Forecast
     </div>
+      <button id = 'forecast_btn' class="ui blue button" type = "button">Toggle Forecast</button>
   </div>
   <div class="statistic">
     <div class="value">
@@ -40,6 +41,8 @@
       Dogs to budget
     </div>
   </div>
+
+
 </div>
 
 
@@ -330,8 +333,6 @@
 
 
 
-
-
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -345,5 +346,60 @@
 
 </script>
 
+<div id = 'forecast'>
+{% if graph %}
+ {{ graph|safe }}
+{% endif %}
 
+<table class="ui celled table" >
+<tr>
+        <th>Model</th>
+
+     {% for model in models %}
+    <th>{{ model }}</th>
+    {% endfor %}
+</tr>
+        <tr>
+        <th>Error</th>
+            {% for error in errors %}
+    <td>{{ error }}</td>
+    {% endfor %}
+            </tr>
+
+    <tr>
+    <th>Forecast</th>
+        {% for prediction in predictions %}
+        {% if prediction <= 0%}
+        <td class = "negative" data-tooltip="Forecast is not applicable!">{{ prediction }}</td>
+        {% else %}
+        <td>{{ prediction }}</td>
+        {% endif %}
+    {% endfor %}
+    </tr>
+
+    <div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+   <i class="question icon"></i>Information
+  </div>
+  <ul class="list">
+    <li>Navigate through the graph by selecting the menu icons on the upper right of the screen.</li>
+      <li>The lower the error percentage, the better the forecast.</li>
+      <li>Select the forecast which you think is best!</li>
+  </ul>
+</div>
+
+</table>
+
+</div>
+
+<script>
+    $(document).ready(function(){
+        $('#forecast').hide();
+
+        $('#forecast_btn').on("click", function(e){
+               $('#forecast').toggle();
+         });
+     });
+</script>
 {% endblock %}

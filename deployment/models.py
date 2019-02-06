@@ -216,7 +216,7 @@ class Dog_Request(models.Model):
 
 class Team_Dog_Deployed(models.Model):
     team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
-    team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True)
+    team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True) #Dog Rquest
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
     date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
@@ -224,3 +224,22 @@ class Team_Dog_Deployed(models.Model):
 
     def __str__(self):
         return str(self.k9) + ' - ' + str(self.team_assignment)
+
+class K9_Schedule(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    dog_request = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, null=True, blank=True)
+    date_start = models.DateField('date_start', null=True, blank=True)
+    date_end = models.DateField('date_end', null=True, blank=True)
+
+class Incidents (models.Model):
+    TYPE = (
+        ('Explosives Related', 'Explosives Related'),
+        ('Narcotics Related', 'Narcotics Related'),
+        ('Search and Rescue Related', 'Search and Rescue Related'),
+        ('Others', 'Others'),
+    )
+
+    date = models.DateField('date', null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    type = models.CharField('type', choices=TYPE, max_length=100, default='Others')
+    remarks = models.TextField('remarks', max_length=200, blank=True, null=True)

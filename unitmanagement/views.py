@@ -9,7 +9,7 @@ import datetime as dt
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationForm, RequestForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail
+from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Inventory, Miscellaneous_Subtracted_Trail
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests
 from profiles.models import User, Account
 from training.models import K9_Handler
@@ -77,10 +77,11 @@ def physical_exam_form(request):
         if form.is_valid():
             form.save()
             new_form = form.save()
-            new_form.date_next_exam = datetime.date.today() + datetime.timedelta(days=365)
-            
-            user_id = request.session['session_userid']
-            current_user = User.objects.get(id=user_id)
+            new_form.date_next_exam = dt.date.today() + dt.timedelta(days=365)
+
+            user_serial = request.session['session_serial']
+            user = Account.objects.get(serial_number=user_serial)
+            current_user = User.objects.get(id=user.UserID.id)
            
             new_form.user = current_user
             new_form.save()
@@ -132,7 +133,7 @@ def health_history(request, id):
         v = VaccinceRecord.objects.filter(dog = data).filter(disease=vd).latest('date_validity')
         vaccine_data.append(v)
 
-    dtoday = datetime.date.today()
+    dtoday = dt.date.today()
 
     context = {
         'title': "Health History of ",
@@ -200,16 +201,15 @@ def medicine_approve(request, id):
                 count = count+1
 
     print(count)
-
-    user_id = request.session['session_userid']
-    current_user = User.objects.get(id=user_id)
-
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
 
     if medicine.count() == count:
         for med in medicine:
             i = Medicine_Inventory.objects.filter(id = med.medicine.id) # get Inventory Items
             for x in i:
-                Medicine_Subtracted_Trail.objects.create(inventory = x, user = current_user, quantity = med.quantity, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                Medicine_Subtracted_Trail.objects.create(inventory = x, user = current_user, quantity = med.quantity, date_subtracted = dt.date.today(), time = dt.datetime.now())
                 x.quantity = (x.quantity - med.quantity)
                 data.status = "Approved"
                 data.save()
@@ -236,15 +236,15 @@ def vaccination_form(request):
                 #get vaccine yearly-Used
                 vaccine = Medicine.objects.get(id=new_form.vaccine.id)
                 duration = 365 / vaccine.used_yearly
-                new_form.date_validity = datetime.date.today() + datetime.timedelta(days=duration)
+                new_form.date_validity = dt.date.today() + dt.timedelta(days=duration)
                 new_form.save()
 
-                user_id = request.session['session_userid']
-                current_user = User.objects.get(id=user_id)
-
+                user_serial = request.session['session_serial']
+                user = Account.objects.get(serial_number=user_serial)
+                current_user = User.objects.get(id=user.UserID.id)
 
                 q = med.quantity-1
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = datetime.date.today(), time = datetime.datetime.now())
+                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = dt.date.today(), time = dt.datetime.now())
                 style = "ui green message"
                 messages.success(request, 'Vaccination has been successfully recorded!')
                 form = VaccinationForm()
@@ -262,9 +262,19 @@ def vaccination_form(request):
 def requests_form(request):
     form = RequestForm(request.POST or None)
     style=""
+
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
+
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            no_id = form.save()
+            no_id.handler = current_user
+            no_id.save()
+
             style = "ui green message"
             messages.success(request, 'Request has been successfully recorded!')
             form = RequestForm()
@@ -292,18 +302,38 @@ def change_equipment(request, id):
     data = Requests.objects.get(id=id)
     style = ""
     changedate = dt.datetime.now()
+
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
     if request.method == 'POST':
         if 'ok' in request.POST:
             data.request_status = "Approved"
             data.date_approved = changedate
             data.save()
-            style = "ui green message"
-            messages.success(request, 'Equipment Approved!')
+            #subtract inventory
+            equipment = Miscellaneous_Inventory.objects.get(miscellaneous=data.equipment)
+            if equipment.quantity > 0:
+                equipment.quantity = equipment.quantity-1
+                equipment.save()
+
+                Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=current_user,
+                                                         quantity=1,
+                                                         date_subtracted=dt.date.today(),
+                                                         time=dt.datetime.now())
+                style = "ui green message"
+                messages.success(request, 'Equipment Approved!')
+
+            else:
+                style = "ui red message"
+                messages.success(request, 'Insufficient Inventory!')
+
         else:
-            data.request_status = "Cancelled"
+            data.request_status = "Denied"
             data.date_approved = changedate
             data.save()
-            style = "ui red message"
+            style = "ui green message"
             messages.success(request, 'Equipment Denied!')
 
     context = {

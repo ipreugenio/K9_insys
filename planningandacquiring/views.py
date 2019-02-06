@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine
 from training.models import Training
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -205,8 +205,8 @@ def add_K9_parents(request):
 
     form = add_K9_parents_form(request.POST)
     style = "ui teal message"
-    mothers = K9.objects.filter(sex="Female")
-    fathers = K9.objects.filter(sex="Male")
+    mothers = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
+    fathers = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
 
     mother_list = []
     father_list = []
@@ -825,8 +825,7 @@ def forecast_result(date_list, quantity_list, graph_title):
         df = pd.DataFrame({'Date': list(date),
                            'Quantity': list(quantity),
                        })
-
-
+        #TODO Fix Order of Graph
         ts = df.set_index('Date')
 
         models = []
@@ -982,14 +981,16 @@ def budgeting(request):
     #TODO All categories should return lists (1. Dates, 2. Quantities) Especially for forecasts
     #REQUEST FORECAST
 
-    dog_request = Dog_Request.objects.all()
+    dog_request = Dog_Request.objects.all().order_by('start_date')
     request_date = []
+
 
     for data in dog_request:
         date = data.start_date
         request_date.append(date.year)
 
     request_date = list(set(request_date))
+    request_date.sort()
     request_quantity = []
 
     #Aggregate sum from same year
@@ -1025,13 +1026,13 @@ def budgeting(request):
     '''
 
     #DOGS AVAILABLE IN THE FUTURE
-    undeployed_dogs = K9.objects.exclude(training_status = 'Deployed').exclude(training_status = 'Dead').exclude(training_status = 'Retired').exclude(training_status = 'Adopted').count()
+    deployed_dogs = K9.objects.filter(training_status = 'Deployed').filter(training_status = 'Dead').filter(training_status = 'Retired').filter(training_status = 'Adopted').count()
     #ALL DOGS
     all_current_dogs = K9.objects.all().count()
 
     #ALL DOGS INCLUDED IN THE BUDGET
 
-    dogs_to_budget = (request_forecast[4] + dogs_needed) - undeployed_dogs + all_current_dogs
+    dogs_to_budget = (request_forecast[4] + dogs_needed) - (all_current_dogs - deployed_dogs) + all_current_dogs #Subtract Undeployed Dogs(aka dogs that may be available in the future)
 
     #TODO Check if parsed date works
     #MEDICINE BUDGET
@@ -1132,12 +1133,15 @@ def budgeting(request):
 
     vet_supply_quantity = dogs_to_budget * 12
 
+
     print("REQUEST FORECAST")
     print(request_forecast)
+    print("REQUEST YEARS")
+    print(request_date)
     print("DOGS NEEDED")
     print(dogs_needed)
-    print("UNDEPLOYED DOGS")
-    print(undeployed_dogs)
+    print("DEPLOYED DOGS")
+    print(deployed_dogs)
     print("ALL CURRENT DOGS")
     print(all_current_dogs)
     print("DOGS TO BUDGET")
@@ -1237,9 +1241,13 @@ def budgeting(request):
         'title': 'Budgeting',
         'request_forecast': request_forecast[4],
         'dogs_needed': dogs_needed,
-        'undeployed_dogs': undeployed_dogs,
+        'undeployed_dogs': deployed_dogs,
         'all_current_dogs': all_current_dogs,
         'dogs_to_budget': dogs_to_budget,
+        'graph': request_forecast[0],
+        'models': request_forecast[1],
+        'errors': request_forecast[2],
+        'predictions': request_forecast[3],
 
         'medicine_name': medicine_name_list,
         'medicine_forecast': medicine_forecast_list,
@@ -1280,6 +1288,10 @@ def budgeting(request):
 
     return render(request, 'planningandacquiring/budgeting.html', context)
 
+def budgeting_list(request):
+    budgets = Budget_allocation.objects.all()
+
+    return None
 
 def breeding_recommendation(request):
 
