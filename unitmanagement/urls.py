@@ -13,9 +13,11 @@ urlpatterns = [
     path('physical-exam-details/<int:id>', views.physical_exam_details, name='physical_exam_details'),
     path('approve-medicine/<int:id>', views.medicine_approve, name='medicine_approve'),
     path('vaccination-form', views.vaccination_form, name='vaccination_form'),
-    path('vaccination', views.vaccination, name='vaccination'),
     path('request-form', views.requests_form, name='request_form'),
     path('request-list', views.request_list, name='request_list'),
     path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    path('k9-incident', views.k9_incident, name='k9_incident'),
+    path('handler-incident', views.handler_incident, name='handler_incident'),
+    path('reassign-assets', views.reassign_assets, name='reassign_assets'),
     #path('/<int:id>/', views., name=''),
 ];

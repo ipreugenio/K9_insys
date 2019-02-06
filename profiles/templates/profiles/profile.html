@@ -7,18 +7,7 @@
         <div class="circular ui icon top left pointing dropdown black button">
             <i class="orange bell icon"></i>
             <div class="menu">
-                {% for phex,vac in list %}
-                    {% if today > phex.date_next_exam %}
-                    <a style='background:#e85140;color:white;' class="item" href="#">{{phex.dog.name}}: Next Physical Exam - {{phex.date_next_exam}}</a>
-                    {%else%}
-                    <a class="item" href="#">{{phex.dog.name}}: Next Physical Exam - {{phex.date_next_exam}}</a>
-                    {%endif%}
-                    {% if today > vac.date_validity %}
-                    <a style='background:#e85140;color:white;' class="item" href="#">{{vac.dog.name}}: Vaccine Expire Date - {{vac.date_validity}}</a>
-                    {%else%}
-                    <a class="item" href="#">{{vac.dog.name}}: Vaccine Expire Date - {{vac.date_validity}}</a>
-                    {%endif%}
-                {%endfor%}
+               <a href=""></a>
             </div>
         </div>
     </div>

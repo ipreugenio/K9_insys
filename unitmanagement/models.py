@@ -123,3 +123,23 @@ class Requests(models.Model):
     remarks = models.CharField('remarks', max_length=200, blank=True)
     request_status = models.CharField('request_status', max_length=200, default="Pending")
     date_approved = models.DateField('date_approved', blank=True, null=True)
+
+class K9_Incident(models.Model):
+    INCIDENT = (
+        ('Died', 'Died'),
+    )
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
+    date = models.DateField('date', auto_now_add=True)
+    description = models.TextField('description', max_length=200)
+
+class Handler_Incident(models.Model):
+    INCIDENT = (
+        ('Died', 'Died'),
+    )
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
+    date = models.DateField('date', auto_now_add=True)
+    description = models.TextField('description', max_length=200)
+
+

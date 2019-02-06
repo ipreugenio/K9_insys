@@ -19,6 +19,17 @@
                                     <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
                                         <i class="clipboard list icon"></i>
                                     </a>
+                                    <a href="{% url 'unitmanagement:reassign_assets'%}" class="item">Reassign Assets
+                                        <i class="retweet icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
+                                        <i class="exclamation icon"></i>
+                                        <i class="paw icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:handler_incident'%}" class="item">Handler-Incident Form
+                                        <i class="exclamation icon"></i>
+                                        <i class="male icon"></i>
+                                    </a>
                                     {% endif %}
 
                                     {% if request.session.session_user_position == "Veterinarian" %}
@@ -34,9 +45,6 @@
                                     <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
                                         <i class="heartbeat icon"></i>
                                     </a>
-                                    <!-- <a href="{% url 'unitmanagement:vaccination_form'%}" class="item">Vaccination Form
-                                        <i class="syringe icon"></i>
-                                    </a> -->
                                     <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
                                         <i class="h square icon"></i>
                                     </a>
@@ -48,6 +56,10 @@
                                     </a>
                                     <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
                                         <i class="exclamation icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
+                                        <i class="exclamation icon"></i>
+                                        <i class="paw icon"></i>
                                     </a>
                                     {% endif %}
                                 </div>

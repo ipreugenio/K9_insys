@@ -106,10 +106,10 @@ def profile(request):
     first_day = datetime.date.today().replace(day=1)
     last_day = datetime.date.today().replace(day=calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1])
 
-    print(first_day, last_day)
-    phex = PhysicalExam.objects.filter(date_next_exam__range=[first_day, last_day])
-    vac = VaccinceRecord.objects.filter(date_validity__range=[first_day, last_day])
-    list = zip(phex,vac)
+    # print(first_day, last_day)
+    # phex = PhysicalExam.objects.filter(date_next_exam__range=[first_day, last_day])
+    # vac = VaccinceRecord.objects.filter(date_validity__range=[first_day, last_day])
+    # list = zip(phex,vac)
     today = datetime.date.today()
 
     serial = request.session['session_serial']
@@ -136,9 +136,9 @@ def profile(request):
                     messages.success(request, 'Your Profile has been successfully Updated!')
 
     context={
-        'phex': phex,
-        'vac': vac,
-        'list': list,
+        # 'phex': phex,
+        # 'vac': vac,
+        # 'list': list,
         'today': today,
         'uform':uform,
         'pform': pform,

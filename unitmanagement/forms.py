@@ -6,6 +6,7 @@ from django.forms import formset_factory, inlineformset_factory
 from django.contrib.sessions.models import Session
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
+from unitmanagement.models import K9_Incident, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous
 from profiles.models import Account, User
@@ -127,7 +128,33 @@ class RequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
-
         self.fields['handler'].required = False
+        
+class K9IncidentForm(forms.ModelForm):
+    
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog'))
 
+    class Meta:
+        model = K9_Incident
+        fields = ('k9', 'incident', 'description')
+
+    def __init__(self, *args, **kwargs):
+        super(K9IncidentForm, self).__init__(*args, **kwargs)
+        self.fields['description'].required = False
+
+class HandlerIncidentForm(forms.ModelForm):
+    
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working'))
+
+    class Meta:
+        model = Handler_Incident
+        fields = ('handler', 'incident', 'description')
+
+    def __init__(self, *args, **kwargs):
+        super(HandlerIncidentForm, self).__init__(*args, **kwargs)
+        self.fields['description'].required = False
+
+class ReassignAssetsForm(forms.Form):
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog').filter(partnered=False))
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 

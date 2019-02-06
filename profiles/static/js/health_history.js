@@ -37,7 +37,6 @@ $(document).ready(function() {
 
     // if checkbox is checked -> vaccine is enabled
     // else if checkbox is not checked -> vaccine is disabled
-    alert($('#dog_days').val())
 
     $("input[name='deworming_1']").change(function() {   
         if ($('#dog_days').val() < 14){

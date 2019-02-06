@@ -230,10 +230,10 @@ def unified_graph():
     return graph
 
 def classify_k9_list(request):
-    data_unclassified = K9.objects.filter(training_status="Unclassified")
-    data_classified = K9.objects.filter(training_status="Classified")
-    data_ontraining = K9.objects.filter(training_status="On-Training")
-    data_trained = K9.objects.filter(training_status="Trained")
+    data_unclassified = K9.objects.filter(training_status="Unclassified").filter(status="Material Dog")
+    data_classified = K9.objects.filter(training_status="Classified").filter(status="Material Dog")
+    data_ontraining = K9.objects.filter(training_status="On-Training").filter(status="Material Dog")
+    data_trained = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
 
     NDD_count = K9.objects.filter(capability='NDD').count()
     EDD_count = K9.objects.filter(capability='EDD').count()
@@ -519,21 +519,28 @@ def classify_k9_select(request, id):
 
     return render (request, 'training/classify_k9_select.html', context)
 
-
+# TODO 
 def assign_k9_select(request, id):
     form = add_handler_form(request.POST)
-    style = "ui teal message"
-    handlers = User.objects.filter(position="Handler")
+    style = ""
     k9 = K9.objects.get(id=id)
 
     if request.method == 'POST':
         if form.is_valid():
-            handler_id = request.POST.get('handler')
-            handler = User.objects.get(id=handler_id)
-            K9_Handler.objects.create(k9 = k9, handler = handler)
+            handler = User.objects.get(id=form.data['handler'])
+            
+            # status of handler and k9 to partnered=TRUE
+            handler.partnered=True
+            handler.save()
+
+            k9.partnered=True
             k9.training_status = "On-Training"
             k9.handler = handler
             k9.save()
+
+            #Create K9_Handler Model
+            #K9_Handler.objects.create(k9 = k9, handler = handler)
+
             messages.success(request, 'K9 has been assigned to a handler!')
         else:
             style = "ui red message"
@@ -544,7 +551,6 @@ def assign_k9_select(request, id):
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
         'style': style,
-        'handler': handlers,
     }
     return render (request, 'training/assign_k9_select.html', context)
 

@@ -1,0 +1,54 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui basic segment" style="margin-bottom:0px;">
+    <h2 class="ui header">
+        {{title}}
+        <div class="sub header">Reassign K9 and Handler</div>
+    </h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="ui inverted segment">
+    <form class="ui inverted form" method="POST">
+        {% csrf_token %}
+        <div class="ui inverted placeholder segment">
+            <div class="ui two column stackable center aligned grid">
+                <div class="ui inverted vertical divider">AND</div>
+                <div class="middle aligned row">
+                    <div class="column">
+                        <div class="ui inverted icon header">
+                            <i class="paw icon"></i>K9
+                        </div>
+                        <div class="field">
+                           {{form.k9}}
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui inverted icon header">
+                        <i class="male icon"></i>Handler
+                        </div>
+                        <div class="field">
+                            {{form.handler}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui inverted center aligned segment" style="padding: 0px;">
+            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+        </div>
+    </form>    
+</div>
+
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+      
+    });
+    
+</script>
+ {% endblock %}

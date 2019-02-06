@@ -35,6 +35,12 @@ class K9(models.Model):
         ('Mixed', 'Mixed'),
     )
 
+    STATUS = (
+        ('Material Dog', 'Material Dog'),
+        ('Retired', 'Retired'),
+        ('Dead', 'Dead'),
+        ('Sick', 'Sick'), 
+    )
 
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
@@ -47,9 +53,10 @@ class K9(models.Model):
     source = models.CharField('source', max_length=200, default="Not Specified")
     year_retired = models.DateField('year_retired', blank=True, null=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
-    status = models.CharField('status', max_length=200, default="Material Dog")
+    status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
+    partnered = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
