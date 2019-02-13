@@ -2,8 +2,9 @@ from django.db import models
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
-from inventory.models import Medicine, Miscellaneous, Food
 from profiles.models import User
+from inventory.models import Medicine, Miscellaneous, Food
+
 
 class Date(models.Model):
     date_from = models.DateField('date_from', blank=True, null=True)
@@ -25,7 +26,6 @@ class K9(models.Model):
     )
 
     BREED = (
-
         ('Belgian Malinois', 'Belgian Malinois'),
         ('Dutch Sheperd', 'Dutch Sheperd'),
         ('German Sheperd', 'German Sheperd'),
@@ -60,6 +60,7 @@ class K9(models.Model):
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
+    in_heat = models.BooleanField(default=False)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date

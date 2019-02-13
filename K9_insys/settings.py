@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
+from __future__ import absolute_import, unicode_literals
 import os
+from datetime import timedelta 
+
+from celery.task.schedules import crontab
+from celery.decorators import periodic_task
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,8 +95,24 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '8888',
+        'PORT': '',
     }
+}
+
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_IMPORTS = ('K9_insys', 'unitmanagement')
+#CELERY_RESULT_BACKEND = 'db+mysql://root:@localhost/k9_db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Manila'
+CELER_IGNORE_RESULT = False
+
+CELERY_BEAT_SCHEDULE = {
+    # 'every-10-seconds':{
+    #     'task': 'unitmanagement.tasks.showx',
+    #     'schedule': timedelta(seconds=10),
+    # },
 }
 
 # Password validation

@@ -1,7 +1,6 @@
 from django.db import models
 from datetime import date as d
 
-
 # Create your models here.
 class User(models.Model):
     SEX = (

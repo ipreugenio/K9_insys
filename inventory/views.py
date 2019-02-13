@@ -27,9 +27,9 @@ def medicine_add(request):
         if form.is_valid():
             form.save()
             
-            #save in medicine inventory
-            data_id = Medicine.objects.last() 
-            Medicine_Inventory.objects.create(medicine = data_id, quantity = 0)
+            # #save in medicine inventory
+            # data_id = Medicine.objects.last() 
+            # Medicine_Inventory.objects.create(medicine = data_id, quantity = 0)
 
             style = "ui green message" 
             messages.success(request, 'Medicine has been successfully Added!')
@@ -72,8 +72,8 @@ def food_add(request):
         if form.is_valid():
             form.save()
             #save in food inventory
-            data_id = Food.objects.last() 
-            Food_Inventory.objects.create(food = data_id, quantity = 0)
+            # data_id = Food.objects.last() 
+            # Food_Inventory.objects.create(food = data_id, quantity = 0)
 
             style = "ui green message"
             messages.success(request, 'Dog Food has been successfully Added!')
@@ -118,8 +118,8 @@ def miscellaneous_add(request):
             form.save()
             
             #save in miscellaneous inventory
-            data_id = Miscellaneous.objects.last() 
-            Miscellaneous_Inventory.objects.create(miscellaneous = data_id, quantity = 0)
+            # data_id = Miscellaneous.objects.last() 
+            # Miscellaneous_Inventory.objects.create(miscellaneous = data_id, quantity = 0)
 
             style = "ui green message"
             messages.success(request, 'Miscellaneous Item has been successfully Added!')

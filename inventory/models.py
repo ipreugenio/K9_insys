@@ -1,6 +1,7 @@
 from django.db import models
 
 from profiles.models import User
+# from unitmanagement.models import Notification
 # Create your models here.
 
 #TODO inventory information before
@@ -41,7 +42,6 @@ class Medicine(models.Model):
             self.used_yearly = 365 / int(self.duration)
 
         super(Medicine, self).save(*args, **kwargs)
-
 
 class Medicine_Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
