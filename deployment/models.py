@@ -1,5 +1,7 @@
 from django.db import models
 from planningandacquiring.models import K9
+from profiles.models import User
+from datetime import timedelta, date
 # Create your models here.
 
 class Area(models.Model):
@@ -206,6 +208,14 @@ class Dog_Request(models.Model):
     end_date = models.DateField('end_date', null=True, blank=True)
     status = models.CharField('status', max_length=100, default="Pending")
 
+    def due_start(self):
+        notif = self.date_start - timedelta(days=7)
+        return notif
+    
+    def due_end(self):
+        notif = self.date_end - timedelta(days=7)
+        return notif
+
     def __str__(self):
         return str(self.requester) + ' - ' + str(self.location)
 
@@ -231,7 +241,15 @@ class K9_Schedule(models.Model):
     date_start = models.DateField('date_start', null=True, blank=True)
     date_end = models.DateField('date_end', null=True, blank=True)
 
-class Incidents (models.Model):
+    def due_start(self):
+        notif = self.date_start - timedelta(days=7)
+        return notif
+    
+    def due_end(self):
+        notif = self.date_end - timedelta(days=7)
+        return notif
+
+class Incidents(models.Model):
     TYPE = (
         ('Explosives Related', 'Explosives Related'),
         ('Narcotics Related', 'Narcotics Related'),
@@ -239,6 +257,7 @@ class Incidents (models.Model):
         ('Others', 'Others'),
     )
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField('type', choices=TYPE, max_length=100, default='Others')

@@ -2,8 +2,9 @@ from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt
-from inventory.models import Medicine_Inventory, Miscellaneous_Inventory, Food_Inventory
+from inventory.models import Medicine_Inventory
 from profiles.models import User
+from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -56,7 +57,7 @@ class PhysicalExam(models.Model):
     date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
 
     def due_notification(self):
-        notif = self.date_next_exam - timedelta(days=2)
+        notif = self.date_next_exam - timedelta(days=7)
         return notif
 
     def save(self, *args, **kwargs):
@@ -167,6 +168,7 @@ class Notification(models.Model):
     def __str__(self):
         return str(self.message) + ' : ' + str(self.datetime)
 
+#Handler Incident repored
 @receiver(post_save, sender=Handler_Incident)
 def create_handler_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -174,6 +176,7 @@ def create_handler_incident_notif(sender, instance, **kwargs):
                             position = 'Administrator',
                             message= str(instance.handler) + ' has been reported dead.')
 
+#Handler Reported
 @receiver(post_save, sender=Requests)
 def create_equipment_request_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -181,6 +184,7 @@ def create_equipment_request_notif(sender, instance, **kwargs):
                             position = 'Administrator',
                             message= str(instance.handler) + ' has made an equipment request.')
 
+#Damaged Equipment Reported
 @receiver(post_save, sender=DamagedEquipemnt)
 def create_damaged_equipment_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -188,20 +192,23 @@ def create_damaged_equipment_notif(sender, instance, **kwargs):
                             position = 'Administrator',
                             message= str(instance.handler) + ' has reported an equipment concern.')
 
+#When medicine is created, also create inventory instance
 @receiver(post_save, sender=Medicine)
 def create_medicine_inventory(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
 
-@receiver(post_save, sender=Food)
-def create_food_inventory(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        Food_Inventory.objects.create(food=instance, quantity=0)
+# #When food is created, also create inventory instance
+# @receiver(post_save, sender=Food)
+# def create_food_inventory(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Food_Inventory.objects.create(food=instance, quantity=0)
 
-@receiver(post_save, sender=Miscellaneous)
-def create_miscellaneous_inventory(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        Miscellaneous_Inventory.objects.create(miscellaneous=instance, quantity=0)
+#When miscellaneous is created, also create inventory instance
+# @receiver(post_save, sender=Miscellaneous)
+# def create_miscellaneous_inventory(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Miscellaneous_Inventory.objects.create(miscellaneous=instance, quantity=0)
 
 #create vaccine record, and vaccine used
 @receiver(post_save, sender=K9)
@@ -236,3 +243,25 @@ def create_k9_vaccines(sender, instance, **kwargs):
         VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
         VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
      
+#Location incidentes reported
+@receiver(post_save, sender=Incidents)
+def location_incident(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        c = ''
+        if instance.type == 'Explosives Related':
+            c = ' has reported an '
+        elif instance.type == 'Narcotics Related' or instance.type == 'Search and Rescue Related':
+            c = ' has reported a '
+        else:
+            pass
+
+        if c == '':
+            Notification.objects.create(user = instance.user,
+                                position = 'Administrator',
+                                message= str(instance.user) + ' has reported an incident at ' + 
+                                str(instance.location) + '.')
+        else:
+            Notification.objects.create(user = instance.user,
+                                position = 'Administrator',
+                                message= str(instance.user) + c + str(instance.type) +
+                                ' incident at ' + str(instance.location) + '.')

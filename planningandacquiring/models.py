@@ -61,6 +61,8 @@ class K9(models.Model):
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
     in_heat = models.BooleanField(default=False)
+    age_days = models.IntegerField('age_days', default = 0)
+    age_month = models.IntegerField('age_month', default = 0)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -79,6 +81,9 @@ class K9(models.Model):
         return bday
 
     def save(self, *args, **kwargs):
+        days = d.today() - self.birth_date
+        self.age_month = self.age_days / 30
+        self.age_days = days.days
         self.age = self.calculate_age()
         self.training_id = self.id
         if self.age == 9:

@@ -493,9 +493,17 @@ def load_teams(request):
 def add_incident(request):
     form = IncidentForm(request.POST or None)
     style = ""
+
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            incident = form.save()
+            incident.user = current_user
+            incident.save()
+            
             style = "ui green message"
             messages.success(request, 'Incident has been successfully added!')
             form = IncidentForm()
