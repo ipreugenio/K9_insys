@@ -41,9 +41,10 @@ def adoption_form(request, id):
 
     if request.method == "POST":
         print(form.errors)
+        form.k9 = data
         if form.is_valid():
             print('valid')
-            #form.save()
+            form.save()
             no_id = form.save()
             no_id.k9 = data
             no_id.save()
@@ -99,11 +100,140 @@ def adoption_details(request, id):
 
     return render (request, 'training/adoption_details.html', context)
 
+
+def unified_graph():
+    k9_set = K9.objects.all()
+
+    breeds = []
+
+    sar_count_male = []
+    ndd_count_male = []
+    edd_count_male = []
+
+    sar_count_female = []
+    ndd_count_female = []
+    edd_count_female = []
+
+    skills = ['SAR', 'NDD', 'EDD']
+
+    for k9 in k9_set:
+        breeds.append(k9.breed)
+
+    breeds = list(set(breeds))
+
+    loop = 0
+    for breed in breeds:
+        SAR = K9.objects.filter(sex='Male', breed=str(breed), capability="SAR").count()
+        NDD = K9.objects.filter(sex='Male', breed=str(breed), capability="NDD").count()
+        EDD = K9.objects.filter(sex='Male', breed=str(breed), capability="EDD").count()
+
+        sar_count_male.append(SAR)
+        ndd_count_male.append(NDD)
+        edd_count_male.append(EDD)
+
+        loop += 1
+
+    for breed in breeds:
+        SAR = K9.objects.filter(sex='Female', breed=str(breed), capability="SAR").count()
+        NDD = K9.objects.filter(sex='Female', breed=str(breed), capability="NDD").count()
+        EDD = K9.objects.filter(sex='Female', breed=str(breed), capability="EDD").count()
+
+        sar_count_female.append(SAR)
+        ndd_count_female.append(NDD)
+        edd_count_female.append(EDD)
+        loop += 1
+
+    sar_breed = []
+    ndd_breed = []
+    edd_breed = []
+    for breed in breeds:
+        sar_breed.append("SAR - " + str(breed))
+        ndd_breed.append("NDD - " + str(breed))
+        edd_breed.append("EDD - " + str(breed))
+
+    print("K9 COUNT")
+    print(str(k9_set.count()))
+    print("X")
+    print(sar_breed)
+    print(ndd_breed)
+    print(edd_breed)
+    print("MALE")
+    print(sar_count_male)
+    print(ndd_count_male)
+    print(edd_count_male)
+    print("FEMALE")
+    print(sar_count_female)
+    print(ndd_count_female)
+    print(edd_count_female)
+
+
+    ctr = 0
+    # SAR
+    # for breed in breeds:
+    # Tig 3 per breed
+
+    sar_male = go.Bar(
+        x=sar_breed,
+        y=sar_count_male,
+        name='Male'
+    )
+    ctr += 1
+    sar_female = go.Bar(
+        x=sar_breed,
+        y=sar_count_female,
+        name='Female'
+    )
+    ctr += 1
+
+    # NDD
+    # for breed in breeds:
+    # Tig 3 per breed
+    ndd_male = go.Bar(
+        x=ndd_breed,
+        y=ndd_count_male,
+        name='Male'
+    )
+    ctr += 1
+    ndd_female = go.Bar(
+        x=ndd_breed,
+        y=ndd_count_female,
+        name='Female'
+    )
+    ctr += 1
+
+    # EDD
+    # for breed in breeds:
+    # Tig 3 per breed
+    edd_male = go.Bar(
+        x=edd_breed,
+        y=edd_count_male,
+        name='Male'
+    )
+    ctr += 1
+    edd_female = go.Bar(
+        x=edd_breed,
+        y=edd_count_female,
+        name='Female'
+    )
+    ctr += 1
+
+    data = [sar_male, sar_female, ndd_male, ndd_female, edd_male, edd_female]
+
+    layout = go.Layout(
+        title="K9 Count by Skill, Breed and Gender",
+        barmode='stack'
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    graph = opy.plot(fig, auto_open=False, output_type='div')
+
+    return graph
+
 def classify_k9_list(request):
-    data_unclassified = K9.objects.filter(training_status="Unclassified")
-    data_classified = K9.objects.filter(training_status="Classified")
-    data_ontraining = K9.objects.filter(training_status="On-Training")
-    data_trained = K9.objects.filter(training_status="Trained")
+    data_unclassified = K9.objects.filter(training_status="Unclassified").filter(status="Material Dog")
+    data_classified = K9.objects.filter(training_status="Classified").filter(status="Material Dog")
+    data_ontraining = K9.objects.filter(training_status="On-Training").filter(status="Material Dog")
+    data_trained = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
 
     NDD_count = K9.objects.filter(capability='NDD').count()
     EDD_count = K9.objects.filter(capability='EDD').count()
@@ -113,9 +243,15 @@ def classify_k9_list(request):
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
     SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
 
+    if not NDD_demand:
+        NDD_demand = 0
+    if not EDD_demand:
+        EDD_demand = 0
+    if not SAR_demand:
+        SAR_demand = 0
 
 
-    # TODO:
+
     '''
     if k9 has failed 2 training records, disable reasign button
     '''
@@ -131,7 +267,8 @@ def classify_k9_list(request):
         'SAR_count': SAR_count,
         'NDD_demand': NDD_demand,
         'EDD_demand': EDD_demand,
-        'SAR_demand': SAR_demand
+        'SAR_demand': SAR_demand,
+
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -313,6 +450,7 @@ def classify_k9_select(request, id):
 	#if already has capability and on training from other records,
 	#previous record training will result to grade 0
 
+    graph = unified_graph()
 
     if request.method == 'POST':
         print(data.capability)
@@ -356,7 +494,8 @@ def classify_k9_select(request, id):
             'sar_recommended': sar_recommended,
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
-            'form': form
+            'form': form,
+            'graph': graph
         }
     else:
         parent_exist = 1
@@ -374,26 +513,34 @@ def classify_k9_select(request, id):
             'sar_recommended': sar_recommended,
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
-            'form': form
+            'form': form,
+            'graph': graph
         }
 
     return render (request, 'training/classify_k9_select.html', context)
 
-
+# TODO 
 def assign_k9_select(request, id):
     form = add_handler_form(request.POST)
-    style = "ui teal message"
-    handlers = User.objects.filter(position="Handler")
+    style = ""
     k9 = K9.objects.get(id=id)
 
     if request.method == 'POST':
         if form.is_valid():
-            handler_id = request.POST.get('handler')
-            handler = User.objects.get(id=handler_id)
-            K9_Handler.objects.create(k9 = k9, handler = handler)
+            handler = User.objects.get(id=form.data['handler'])
+            
+            # status of handler and k9 to partnered=TRUE
+            handler.partnered=True
+            handler.save()
+
+            k9.partnered=True
             k9.training_status = "On-Training"
             k9.handler = handler
             k9.save()
+
+            #Create K9_Handler Model
+            #K9_Handler.objects.create(k9 = k9, handler = handler)
+
             messages.success(request, 'K9 has been assigned to a handler!')
         else:
             style = "ui red message"
@@ -404,7 +551,6 @@ def assign_k9_select(request, id):
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
         'style': style,
-        'handler': handlers,
     }
     return render (request, 'training/assign_k9_select.html', context)
 
@@ -601,48 +747,7 @@ def daily_record(request, id):
 def adoption_confirmed(request):
     return render (request, 'training/adoption_confirmed.html')
 
-def gender_count_between_breeds():
-    k9_set = K9.objects.all()
 
-    breed = []
-    male_count = []
-    female_count = []
-
-    loop = 0
-    for k9 in k9_set:
-        breed.append(k9.breed)
-        M = K9.objects.filter(sex='Male', breed=breed[loop])
-        F = K9.objects.filter(sex='Female', breed=breed[loop])
-        male_count.append(M.count())
-        female_count.append(F.count())
-        loop += 1
-
-    male = go.Bar(
-        x=breed,
-        y=male_count,
-        name="Male",
-        text=male_count
-    )
-
-    female = go.Bar(
-        x=breed,
-        y=female_count,
-        name="Female",
-        text=female_count
-    )
-
-    data = [male, female]
-
-    layout = go.Layout(
-        title="Gender Count for " + str(k9_set.count()) + " Dogs Based on Breed",
-        barmode='group'
-    )
-
-    fig = go.Figure(data=data, layout=layout)
-    graph = opy.plot(fig, auto_open=False, output_type='div')
-
-
-    return graph
 
 
 def skill_count_between_breeds(id):
@@ -701,7 +806,7 @@ def skill_count_between_breeds(id):
 
 
     layout = go.Layout(
-        title="Skill Count of Trained Dogs Categorized by Breed (" + str(skill_total) + " Dogs)",
+        title="Skill Count of Classified Dogs Categorized by Breed (" + str(skill_total) + " Dogs)",
         xaxis =  {'title': 'Breeds'},
         yaxis =  {'title': 'Skill Count'},
     )
@@ -813,7 +918,7 @@ def skill_percentage_between_sexes(id):
         }],
 
     layout =  {
-        "title": "Skill Count of Trained Dogs Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
+        "title": "Skill Count of Classified Dogs Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
         "annotations": [
             {
                 "font": {
@@ -901,7 +1006,7 @@ def skill_count_ratio():
     data = [trace]
 
     layout = go.Layout(
-        title="Skill Count of Trained Dogs (" + str(k9_set.count()) + " Dogs)",
+        title="Skill Count of Classified Dogs (" + str(k9_set.count()) + " Dogs)",
     )
 
     fig = go.Figure(data=data, layout=layout)
@@ -1199,7 +1304,7 @@ def skills_from_gender(id):
             }],
 
         layout={
-            "title": "Skill Count of Trained Descendants Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
+            "title": "Skill Count of Classified Descendants Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
             "annotations": [
                 {
                     "font": {
@@ -1311,7 +1416,7 @@ def skill_in_general(id):
     data = [trace]
 
     layout = go.Layout(
-        title="Skill Count of Trained Descendants (" + str(k9_set.count()) + " dogs)",
+        title="Skill Count of Classified Descendants (" + str(k9_set.count()) + " dogs)",
     )
 
     fig = go.Figure(data=data, layout=layout)

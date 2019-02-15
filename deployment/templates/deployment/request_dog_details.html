@@ -134,6 +134,7 @@
 </div>
 
 <div class="ui tab segment" data-tab="second">
+  {% if data2.status == "Approved" %}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata2" class="ui four column celled table">
@@ -165,6 +166,15 @@
         <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
     </div>
   </form>
+    {% else %}
+<div class="ui visible message">
+      <div class="header">
+    You must approve this request before you can deploy K9s!
+  </div>
+  <p>Go back to details tab to deny or approve request.</p>
+</div>
+    {% endif %}
+
 </div>
 
 <script type="text/javascript">

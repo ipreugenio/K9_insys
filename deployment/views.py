@@ -10,9 +10,14 @@ from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User
 from inventory.models import Medicine
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm
-# Create your views here.
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm
+
+#Plotly
+import plotly.offline as opy
+import plotly.graph_objs as go
+import plotly.graph_objs.layout as lout
+import plotly.figure_factory as ff
 
 def index(request):
     context = {
@@ -129,6 +134,10 @@ def assigned_location_list(request):
 def team_location_details(request, id):
     data = Team_Assignment.objects.get(id=id)
     k9 = Team_Dog_Deployed.objects.filter(team_assignment=data)
+    incidents = Incidents.objects.filter(location = data.location)
+    edd_inc = Incidents.objects.filter(location = data.location).filter(type = "Explosives Related").count()
+    ndd_inc = Incidents.objects.filter(location=data.location).filter(type="Narcotics Related").count()
+    sar_inc = Incidents.objects.filter(location=data.location).filter(type="Search and Rescue Related").count()
     style = ""
     #filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data.location.city)
@@ -152,9 +161,11 @@ def team_location_details(request, id):
     can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
     #print(can_deploy)
 
+
     #dogs deployed
     dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
+
 
     if request.method == 'POST':
         checks =  request.POST.getlist('checks') # get the id of all the dogs checked
@@ -165,7 +176,7 @@ def team_location_details(request, id):
         #print(checked_dogs)
 
         for checked_dogs in checked_dogs:
-            Team_Dog_Deployed.objects.create(team_assignment=data, k9=checked_dogs)
+            Team_Dog_Deployed.objects.create(team_assignment=data, k9=checked_dogs) # date = team_assignment
             # TODO: if dog is equal capability increment
             if checked_dogs.capability == 'EDD':
                 data.EDD_deployed = data.EDD_deployed + 1
@@ -191,6 +202,9 @@ def team_location_details(request, id):
         'style': style,
         'dogs_deployed':dogs_deployed,
         'dogs_pulled': dogs_pulled,
+        'sar_inc': sar_inc,
+        'ndd_inc': ndd_inc,
+        'edd_inc': edd_inc
     }
 
     return render(request, 'deployment/team_location_details.html', context)
@@ -228,6 +242,7 @@ def dog_request(request):
     form = RequestForm(request.POST or None)
     style = ""
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
             form.save()
             style = "ui green message"
@@ -248,9 +263,42 @@ def dog_request(request):
 def request_dog_list(request):
     data = Dog_Request.objects.all()
 
+    date_now = datetime.date.today()
+    latest_date = Dog_Request.objects.latest('end_date')
+    latest_date = latest_date.end_date
+
+    k9_schedule = Dog_Request.objects.filter(end_date__range=[str(date_now), str(latest_date)])
+    gantt_chart_dict = []
+
+    # TODO Remove finished requests and add current date marker
+    for sched in k9_schedule:
+        data_list = {"Task": str(sched),
+                     "Start": str(sched.start_date),
+                     "Finish": str(sched.end_date),
+                     "Resource": str(sched.status)}
+        gantt_chart_dict.append(data_list)
+
+    colors = dict(Pending='rgb(255, 0, 0)',
+                  Food='rgb(0, 0, 255)',)
+
+    # df = [   dict(Task="Job A", Start='2009-01-01', Finish='2009-02-28'),
+    #       dict(Task="Job B", Start='2009-03-05', Finish='2009-04-15'),
+    #       dict(Task="Job C", Start='2009-02-20', Finish='2009-05-30') ]
+
+    if gantt_chart_dict:
+        df = gantt_chart_dict
+
+        title = "Schedule of Upcoming Requests"
+        fig = ff.create_gantt(df, colors=colors, title=title, group_tasks=True, showgrid_x=True, showgrid_y=True,
+                          bar_width=0.6, index_col='Resource', show_colorbar=True)
+        gantt_chart = opy.plot(fig, auto_open=False, output_type='div')
+    else:
+        gantt_chart = "There are no upcoming requests scheduled!"
+
     context = {
         'data': data,
         'title': 'Request Dog List',
+        'gantt_chart': gantt_chart
     }
     return render (request, 'deployment/request_dog_list.html', context)
 
@@ -276,14 +324,37 @@ def request_dog_details(request, id):
     for u in user:
         user_deploy.append(u.id)
 
-    # print(user_deploy)
+    print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
     can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(
         assignment='None')
     # print(can_deploy)
-
     # dogs deployed
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(status='Deployed')
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2) #.filter(status='Deployed')
+
+    #>>>> start of new Code for saving schedules instead of direct deployment
+    # TODO Filter can deploy to with teams without date conflicts
+    can_deploy_filtered = []
+    for k9 in can_deploy:
+        #1 = true, 0 = false
+        deployable = 1
+        schedules = K9_Schedule.objects.filter(k9=k9)
+        print("can_deploy")
+        print(k9)
+        #TODO obtain schedule of request then compare to start and end date of schedules (loop)
+        for sched in schedules:
+            if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date):
+                deployable = 0
+
+        if deployable == 1:
+            can_deploy_filtered.append(k9.id)
+
+    can_deploy2 =  K9.objects.filter(id__in = can_deploy_filtered) #Trained and Assigned dogs without date conflicts TODO Can be displayed but disabled and tagged
+    #TODO If a dog is deployed to a request, the dog will only be deployed if system datetime is same as scheduled request.
+    #>>Also, dog deployment means scheduling first
+
+    #>>Use can_deploy2 instead of can_deploy or assign can_deplyo2 to can_deploy
+    can_deploy = can_deploy2
 
     if request.method == 'POST':
         if 'approve' in request.POST:
@@ -305,7 +376,10 @@ def request_dog_details(request, id):
         # print(checked_dogs)
 
         for checked_dogs in checked_dogs:
-            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs)
+            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled") #TODO Only save k9.assignment when system datetime is same as request
+
+            K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date)
+
             # TODO: if dog is equal capability increment
             if checked_dogs.capability == 'EDD':
                 data2.EDD_deployed = data2.EDD_deployed + 1
@@ -316,8 +390,8 @@ def request_dog_details(request, id):
 
             data2.save()
             dog = K9.objects.get(id=checked_dogs.id)
-            dog.assignment = str(data2)
-            dog.save()
+            #dog.assignment = str(data2) #TODO remove assignement for dog requests, only do this if schedule is already hit
+            #dog.save()
 
         style = "ui green message"
         messages.success(request, 'Dogs has been successfully Deployed!')
@@ -347,6 +421,7 @@ def remove_dog_request(request, id):
     #change K9 model
     k9.assignment = 'None'
     k9.save()
+    #TODO Only put None if K9 is currently deployed on said request
 
     #change Dog_Request model
     if pull_k9.k9.capability == 'EDD':
@@ -375,6 +450,48 @@ def deployment_report(request):
     return render (request, 'deployment/request_dog_list.html', context)
 
 
+def view_schedule(request, id):
+
+    date_now = datetime.date.today()
+    latest_date = K9_Schedule.objects.latest('date_end')
+    latest_date = latest_date.date_end
+
+    k9 = K9.objects.get(id = id)
+    k9_schedule = K9_Schedule.objects.filter(k9=k9).filter(date_end__range=[str(date_now), str(latest_date)])
+
+    gantt_chart_dict = []
+
+    #TODO Remove finished requests and add current date marker
+    for sched in k9_schedule:
+        data_list = {"Task": str(sched.dog_request),
+                     "Start": str(sched.date_start),
+                     "Finish": str(sched.date_end)}
+                     #"Resource": str()}
+        gantt_chart_dict.append(data_list)
+
+
+    # df = [   dict(Task="Job A", Start='2009-01-01', Finish='2009-02-28'),
+    #       dict(Task="Job B", Start='2009-03-05', Finish='2009-04-15'),
+    #       dict(Task="Job C", Start='2009-02-20', Finish='2009-05-30') ]
+
+    if gantt_chart_dict:
+        df = gantt_chart_dict
+
+        title = "Upcoming Requests Schedule for " + str(k9)
+        fig = ff.create_gantt(df, title=title, group_tasks=True, showgrid_x=True, showgrid_y=True,
+                           bar_width=0.6)
+        gantt_chart = opy.plot(fig, auto_open=False, output_type='div')
+    else:
+        gantt_chart = "There are no upcoming schedules for "+str(k9)+ ", go to the Request List to assign K9 to a request."
+
+
+    context = {
+        'k9' : k9,
+        'gantt_chart': gantt_chart
+    }
+
+    return render(request, 'deployment/k9_schedule.html', context)
+
 '''
 def load_teams(request):
     area_id = request.GET.get('area')
@@ -383,3 +500,43 @@ def load_teams(request):
 
     return render(request, 'deployment/ajax_load_teams.html', {'teams': teams})
 '''
+
+def add_incident(request):
+    form = IncidentForm(request.POST or None)
+    style = ""
+
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            incident = form.save()
+            incident.user = current_user
+            incident.save()
+            
+            style = "ui green message"
+            messages.success(request, 'Incident has been successfully added!')
+            form = IncidentForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+    context = {
+        'title': 'Report Incident Form',
+        'texthelp': 'Input Incident Details Here',
+        'form': form,
+        'actiontype': 'Submit',
+        'style': style,
+    }
+    return render(request, 'deployment/incident_form.html', context)
+
+def incident_list(request):
+    title = "Incidents List View"
+    incidents = Incidents.objects.all()
+
+    context = {
+        'incidents': incidents,
+        'title': title
+    }
+
+    return render(request, 'deployment/incident_list.html', context)

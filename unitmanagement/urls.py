@@ -16,5 +16,8 @@ urlpatterns = [
     path('request-form', views.requests_form, name='request_form'),
     path('request-list', views.request_list, name='request_list'),
     path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    path('k9-incident', views.k9_incident, name='k9_incident'),
+    path('handler-incident', views.handler_incident, name='handler_incident'),
+    path('reassign-assets', views.reassign_assets, name='reassign_assets'),
     #path('/<int:id>/', views., name=''),
 ];

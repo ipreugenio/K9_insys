@@ -4,7 +4,7 @@
 
    <form class = "ui form" action="{% url 'planningandacquiring:breeding_recommendation' %}" method="post">
        {% csrf_token %}
-       SELECT K9 {{form}}
+       SELECT {{form}}
        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">View Recommended Partners</button>
    </form>
 
@@ -15,25 +15,27 @@
     </div>
 
     <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui four column celled table">
+    <table id="tabledata1" class="ui five column celled table">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Breed</th>
                 <th>Color</th>
                 <th>Age</th>
+                <th>Skill</th>
 
             </tr>
         </thead>
 
         <tbody>
 
-                {% for k9 in k9_list_breed %}
+                {% for k9 in k9_list_skill %}
             <tr>
                 <td>{{k9.name}}</td>
                 <td>{{k9.breed}}</td>
                 <td>{{k9.color}}</td>
                 <td>{{k9.age}}</td>
+                <td>{{k9.capability}}</td>
             </tr>
                 {% endfor %}
 
@@ -42,25 +44,27 @@
     </div>
 
     <div class="ui tab segment " data-tab="second">
-    <table id="tabledata2" class="ui four column celled table">
+    <table id="tabledata2" class="ui five column celled table">
         <thead>
             <tr>
                 <th>Name</th>
                  <th>Breed</th>
                 <th>Color</th>
                 <th>Age</th>
+                <th>Skill</th>
 
             </tr>
         </thead>
 
         <tbody>
 
-                 {% for k9 in k9_list_skill %}
+                 {% for k9 in k9_list_breed %}
             <tr>
                 <td>{{k9.name}}</td>
                 <td>{{k9.breed}}</td>
                 <td>{{k9.color}}</td>
                 <td>{{k9.age}}</td>
+                <td>{{k9.capability}}</td>
             </tr>
                 {% endfor %}
 
@@ -69,13 +73,14 @@
     </div>
 
     <div class="ui tab segment " data-tab="third">
-    <table id="tabledata3" class="ui four column celled table">
+    <table id="tabledata3" class="ui five column celled table">
         <thead>
             <tr>
                 <th>Name</th>
                  <th>Breed</th>
                 <th>Color</th>
                 <th>Age</th>
+                <th>Skill</th>
 
             </tr>
         </thead>
@@ -88,6 +93,7 @@
                 <td>{{k9.breed}}</td>
                 <td>{{k9.color}}</td>
                 <td>{{k9.age}}</td>
+                <td>{{k9.capability}}</td>
             </tr>
          {% endfor %}
 

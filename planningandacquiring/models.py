@@ -2,8 +2,9 @@ from django.db import models
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
-from inventory.models import Medicine, Miscellaneous, Food
 from profiles.models import User
+from inventory.models import Medicine, Miscellaneous, Food
+
 
 class Date(models.Model):
     date_from = models.DateField('date_from', null=True)
@@ -25,7 +26,6 @@ class K9(models.Model):
     )
 
     BREED = (
-
         ('Belgian Malinois', 'Belgian Malinois'),
         ('Dutch Sheperd', 'Dutch Sheperd'),
         ('German Sheperd', 'German Sheperd'),
@@ -35,6 +35,12 @@ class K9(models.Model):
         ('Mixed', 'Mixed'),
     )
 
+    STATUS = (
+        ('Material Dog', 'Material Dog'),
+        ('Retired', 'Retired'),
+        ('Dead', 'Dead'),
+        ('Sick', 'Sick'), 
+    )
 
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
@@ -47,12 +53,16 @@ class K9(models.Model):
     source = models.CharField('source', max_length=200, default="Not Specified")
     year_retired = models.DateField('year_retired', null=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
-    status = models.CharField('status', max_length=200, default="Material Dog")
+    status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
+    partnered = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
+    in_heat = models.BooleanField(default=False)
+    age_days = models.IntegerField('age_days', default = 0)
+    age_month = models.IntegerField('age_month', default = 0)
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -64,7 +74,16 @@ class K9(models.Model):
             bday = 0
         return bday
 
+    def calculate_months_before(birthday):
+        today = d.today()
+        birthdate = birth_date
+        bday = 13 - birthdate.month
+        return bday
+
     def save(self, *args, **kwargs):
+        days = d.today() - self.birth_date
+        self.age_month = self.age_days / 30
+        self.age_days = days.days
         self.age = self.calculate_age()
         self.training_id = self.id
         if self.age == 9:
@@ -97,7 +116,7 @@ class K9_Past_Owner(models.Model):
     last_name = models.CharField('last_name', max_length=200)
     address = models.CharField('address', max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
-    birth_date = models.DateField('birth_date', null=True)
+    birth_date = models.DateField('birth_date', blank=True, null=True)
     email = models.EmailField('email', max_length=200, default = "not specified")
     contact_no = models.CharField('contact_no', max_length=200, default = "not specified")
 
@@ -115,7 +134,7 @@ class K9_New_Owner(models.Model):
     address = models.CharField('address', max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     #age = models.IntegerField('age', default = 0)
-    birth_date = models.DateField('birth_date', null=True)
+    birth_date = models.DateField('birth_date', blank=True, null=True)
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 

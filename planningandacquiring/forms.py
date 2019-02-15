@@ -45,8 +45,8 @@ class add_donator_form(forms.ModelForm):
 
 class add_K9_parents_form(forms.Form):
     try:
-        females = K9.objects.filter(sex = "Female")
-        males = K9.objects.filter(sex = "Male")
+        females = K9.objects.filter(sex = "Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
+        males = K9.objects.filter(sex = "Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
 
         mother_list = []
         father_list = []
@@ -72,8 +72,8 @@ class add_K9_parents_form(forms.Form):
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
 
-        females = K9.objects.filter(sex="Female")
-        males = K9.objects.filter(sex="Male")
+        females = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
+        males = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
 
         mother_list = []
         father_list = []

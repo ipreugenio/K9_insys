@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
+from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory
 from inventory.models import DamagedEquipemnt
 
 class DateInput(forms.DateInput):
@@ -23,29 +23,34 @@ class MedicineForm(forms.ModelForm):
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'used_yearly')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'used_yearly','duration')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
-        self.fields['used_yearly'].required = False
+        self.fields['duration'].required = False
         self.fields['uom'].required = False
+        self.fields['used_yearly'].widget.attrs['readonly'] = "readonly"
+        self.fields['dose'].widget.attrs['readonly'] = "readonly"
+        self.fields['uom'].widget.attrs['disabled'] = "disabled"
+        self.fields['med_type'].widget.attrs['disabled'] = "disabled"
 
 class MedicineCountForm(forms.ModelForm):
     class Meta:
         model = Medicine_Inventory
         fields = ('medicine', 'quantity')
-
+    
     def __init__(self, *args, **kwargs):
         super(MedicineCountForm, self).__init__(*args, **kwargs)
         self.fields['medicine'].required = False
+        
 #Food
 class FoodForm(forms.ModelForm):
 
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
-        ('Both', 'Both'),
+        ('Milk', 'Milk'),
     )
 
     foodtype = forms.CharField(max_length=100, label = 'foodtype', widget = forms.Select(choices=FOODTYPE))
@@ -61,7 +66,7 @@ class FoodForm(forms.ModelForm):
 
 class FoodCountForm(forms.ModelForm):
     class Meta:
-        model = Food_Inventory
+        model = Food
         fields = ('food', 'quantity')
 
     def __init__(self, *args, **kwargs):
@@ -77,12 +82,13 @@ class MiscellaneousForm(forms.ModelForm):
         ('can', 'can'),
         ('bottle', 'bottle'),
         ('tube', 'tube'),
+        ('box', 'box'),
     )
 
     TYPE = (
         ('Equipment', 'Equipment'),
         ('Vet Supply', 'Vet Supply'),
-        ('Others', 'Others'),
+
     )
 
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
@@ -99,7 +105,7 @@ class MiscellaneousForm(forms.ModelForm):
 
 class MiscellaneousCountForm(forms.ModelForm):
     class Meta:
-        model = Miscellaneous_Inventory
+        model = Miscellaneous
         fields = ('miscellaneous', 'quantity')
 
     def __init__(self, *args, **kwargs):

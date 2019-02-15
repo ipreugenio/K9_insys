@@ -2,19 +2,93 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b8e7ebdf-e23c-4ba6-9c9f-748589539b5b" name="Default" comment="Merge branch 'master' of https://github.com/ipreugenio/K9_insys&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/workspace.xml&#10;#&#9;planningandacquiring/views.py&#10;#&#9;training/forms.py&#10;#&#9;training/templates/training/classify_k9_select.html&#10;#&#9;training/urls.py&#10;#&#9;training/views.py">
-      <change afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/K9_insys/celery.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/migrations/0002_k9_schedule.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/migrations/0003_k9_schedule_dog_request.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/incident_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/incident_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/k9_schedule.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/inventory/migrations/0003_auto_20181122_2125.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles/migrations/0002_auto_20181122_2125.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles/static/js/health_history.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/notification.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/migrations/0002_auto_20181126_1030.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/migrations/0002_auto_20181126_1100.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/tasks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/handler_incident.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_incident.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/reassign_assets.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templatetags/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/migrations/0002_auto_20181025_1835.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/migrations/0003_auto_20181027_1932.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/assigned_location_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/assigned_location_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templatetags/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templatetags/index.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/migrations/0001_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inventory/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/food_add.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/food_add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/food_count_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/food_count_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/food_inventory_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/food_inventory_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/medicine_add.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/medicine_add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/medicine_count_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/medicine_count_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/medicine_inventory_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/medicine_inventory_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/miscellaneous_inventory_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/miscellaneous_inventory_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/templates/inventory/miscellaneous_inventory_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/templates/inventory/miscellaneous_inventory_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/migrations/0002_auto_20181025_1835.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/breeding_recommendation.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/forecast_k9_required.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/forecast_k9_required.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_training.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_training.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/templates/training/view_graph.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/view_graph.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_history.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_history.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/views.py" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,42 +99,72 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="html" value="1" />
+          <entry key="py" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="1" />
+          <entry key="Python" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="html" value="1" />
+          <entry key="py" value="33" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="HTML" value="1" />
+          <entry key="Python" value="33" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/deployment_report.html">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+            <state relative-caret-position="1263">
+              <caret line="446" column="33" selection-start-line="446" selection-start-column="33" selection-end-line="446" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/training/forms.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="127">
+              <caret line="83" column="31" lean-forward="true" selection-start-line="83" selection-start-column="31" selection-end-line="83" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#24#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="10" column="64" selection-start-line="10" selection-start-column="42" selection-end-line="10" selection-end-column="64" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>training_count</find>
-    </findStrings>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -69,6 +173,35 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" />
+        <option value="$PROJECT_DIR$/K9_insys/settings.py" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/add_breed.html" />
+        <option value="$PROJECT_DIR$/profiles/urls.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/view_breeds.html" />
+        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_breed.html" />
+        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/view_breed.html" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html" />
+        <option value="$PROJECT_DIR$/training/templates/training/k9_training_list.html" />
+        <option value="$PROJECT_DIR$/profiles/views.py" />
+        <option value="$PROJECT_DIR$/profiles/forms.py" />
+        <option value="$PROJECT_DIR$/training/templates/training/training_details.html" />
+        <option value="$PROJECT_DIR$/training/urls.py" />
+        <option value="$PROJECT_DIR$/training/templates/training/training_records.html" />
+        <option value="$PROJECT_DIR$/training/views.py" />
+        <option value="$PROJECT_DIR$/training/templates/training/daily_record.html" />
+        <option value="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" />
+        <option value="$PROJECT_DIR$/training/templates/training/training_update_edd.html" />
+        <option value="$PROJECT_DIR$/training/templates/training/training_update_sar.html" />
+        <option value="$PROJECT_DIR$/training/models.py" />
+        <option value="$PROJECT_DIR$/deployment/views.py" />
+        <option value="$PROJECT_DIR$/deployment/models.py" />
+        <option value="$PROJECT_DIR$/K9_insys/urls.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/models.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/urls.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
+        <option value="$PROJECT_DIR$/profiles/models.py" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" />
+        <option value="$PROJECT_DIR$/training/forms.py" />
       </list>
     </option>
   </component>
@@ -78,7 +211,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -94,11 +226,47 @@
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="deployment" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="deployment" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="deployment" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="inventory" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="profiles" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -117,20 +285,44 @@
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="global-base-ui" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="RunDashboard">
@@ -169,7 +361,7 @@
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2217262" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21651785" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -187,354 +379,86 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
-    <layout-to-restore>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22108346" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.3288889" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-    </layout-to-restore>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/unitmanagement/models.py">
+    <entry file="file://$PROJECT_DIR$/deployment/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="19" column="7" selection-start-line="19" selection-start-column="7" selection-end-line="19" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_form.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-90">
-          <caret line="37" column="30" lean-forward="true" selection-start-line="37" selection-start-column="30" selection-end-line="37" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/confirm_K9_parents.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="185" column="93" selection-start-line="185" selection-start-column="93" selection-end-line="185" selection-end-column="93" />
+        <state relative-caret-position="153">
+          <caret line="10" column="24" lean-forward="true" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/K9_insys/urls.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/K9_insys/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_donated_K9.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-209">
-          <caret line="17" column="39" selection-start-line="17" selection-start-column="39" selection-end-line="17" selection-end-column="39" />
+        <state relative-caret-position="209">
+          <caret line="25" column="62" selection-start-line="25" selection-start-column="62" selection-end-line="25" selection-end-column="62" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/confirm_K9_donation.html">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="38" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
+        <state relative-caret-position="176">
+          <caret line="135" column="50" selection-start-line="135" selection-start-column="50" selection-end-line="135" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/models.py">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="170" selection-start-line="170" selection-end-line="170" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/k9_skill_classifier.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="1" selection-start-line="2" selection-start-column="1" selection-end-line="4" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templatetags/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templatetags/pa_tags.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="14" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templatetags/training_tags.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="30" column="32" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="87" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/view_graph.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/misc.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="117" selection-start-line="2" selection-start-column="117" selection-end-line="2" selection-end-column="117" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9333">
-          <caret line="604" column="16" lean-forward="true" selection-start-line="604" selection-start-column="16" selection-end-line="604" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="48" selection-start-line="8" selection-start-column="48" selection-end-line="8" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="84" column="51" lean-forward="true" selection-start-line="84" selection-start-column="51" selection-end-line="84" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="15" column="18" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
+        <state relative-caret-position="195">
+          <caret line="26" column="59" selection-start-line="26" selection-start-column="59" selection-end-line="26" selection-end-column="59" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="840">
-          <caret line="382" column="9" selection-start-line="382" selection-start-column="9" selection-end-line="382" selection-end-column="9" />
+        <state relative-caret-position="17">
+          <caret line="1" column="116" selection-start-line="1" selection-start-column="116" selection-end-line="1" selection-end-column="116" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html">
+    <entry file="file://$PROJECT_DIR$/profiles/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1088">
-          <caret line="1" column="15" selection-start-line="1" selection-start-column="15" selection-end-line="1" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="68" selection-start-line="68" selection-end-line="68" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="46" column="6" lean-forward="true" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/index.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_record.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-10" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_history.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="111" column="6" selection-start-line="111" selection-start-column="6" selection-end-line="111" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/K9_insys/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="92" column="17" selection-start-line="92" selection-start-column="17" selection-end-line="92" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/dashboard.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="38" column="14" lean-forward="true" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="14" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/models.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="243">
+          <caret line="278" column="66" selection-start-line="278" selection-start-column="66" selection-end-line="278" selection-end-column="66" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/models.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-51">
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="15" column="62" lean-forward="true" selection-start-line="15" selection-start-column="62" selection-end-line="15" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_adoption.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-153" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="24" column="51" selection-start-line="24" selection-start-column="51" selection-end-line="24" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="316" column="27" selection-start-line="316" selection-start-column="13" selection-end-line="316" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_profile.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_training.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="47" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="19" column="57" lean-forward="true" selection-start-line="19" selection-start-column="57" selection-end-line="19" selection-end-column="57" />
+        <state relative-caret-position="268">
+          <caret line="62" column="40" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/add_education.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html">
+    <entry file="file://$PROJECT_DIR$/deployment/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-714" />
+        <state relative-caret-position="1263">
+          <caret line="446" column="33" selection-start-line="446" selection-start-column="33" selection-end-line="446" selection-end-column="33" />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/urls.py">
+    <entry file="file://$PROJECT_DIR$/training/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="64" selection-start-line="10" selection-start-column="42" selection-end-line="10" selection-end-column="64" />
+        <state relative-caret-position="127">
+          <caret line="83" column="31" lean-forward="true" selection-start-line="83" selection-start-column="31" selection-end-line="83" selection-end-column="31" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#24#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/sidebar_menu.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="25" column="75" selection-start-line="25" selection-start-column="75" selection-end-line="25" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/inventory/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="17" column="42" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="65" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
         </state>
       </provider>
     </entry>

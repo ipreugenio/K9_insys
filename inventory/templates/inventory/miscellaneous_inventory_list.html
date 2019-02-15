@@ -14,7 +14,7 @@
     <thead>
         <tr>
             <th>Miscellaneous</th>
-            <th>Unit of Measurement</th>
+            <th>Type</th>
             <th>Quantity</th>
             <th></th>
         </tr>
@@ -23,9 +23,9 @@
             {% for data in data %}
             <tr>
                 <td>
-                    <a href="{% url 'inventory:miscellaneous_inventory_details' data.id %}">{{ data.miscellaneous }}</a>
+                    <a href="{% url 'inventory:miscellaneous_inventory_details' data.id %}">{{ data.miscellaneous }} {{ data.uom }}</a>
                 </td>
-                <td>{{ data.miscellaneous.uom }}</td>
+                <td>{{ data.misc_type }}</td>
                 <td>{{ data.quantity }}</td>
                 <td class="two wide center aligned">
                     <a href="{% url 'inventory:miscellaneous_count_form' data.id %}" style="margin-right:10px;">

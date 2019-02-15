@@ -4,28 +4,28 @@
     <div class="pusher" style="background:white;">
         <div class="ui basic segment">
 
-              <div class="ui fluid container">
-                    <div class="ui grid">
-                        <div class="three wide column">
-                                <div class="ui tiny pointing vertical menu" style="width:230px;">
-                                    {% if request.session.session_user_position == "Administrator" %}
-                                        <a class="item"> <b>Training Menu</b></a>
-                                        <a href="{% url 'training:training_records'%}" class="item">Training Records
-                                            <i class="folder open icon"></i>
-                                        </a>
-                                        <a href="{% url 'training:classify_k9_list'%}" class="item">Classify K9's
-                                            <i class="clipboard check icon"></i>
-                                        </a>
-                                    {% endif %}
-                                    </div>
-                        </div>
-                        <!>
-                        <div class="thirteen wide column">
-                            {% block content %}
-                            {% endblock %}
+            <div class="ui fluid container">
+                <div class="ui grid">
+                    <div class="three wide column">
+                        <div class="ui tiny pointing vertical menu" style="width:230px;">
+                            {% if request.session.session_user_position == "Administrator" %}
+                                <a class="item"> <b>Training Menu</b></a>
+                                <a href="{% url 'training:training_records'%}" class="item">Training Records
+                                    <i class="folder open icon"></i>
+                                </a>
+                                <a href="{% url 'training:classify_k9_list'%}" class="item">Classify K9's
+                                    <i class="clipboard check icon"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
-              </div>
+                    <!>
+                    <div class="thirteen wide column">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
 

@@ -1,0 +1,41 @@
+{% extends "profiles/sidebar_deployment.html" %}
+{% load index %}
+
+{% block content %}
+<div class="ui segment" style="padding:20px;">
+    <h1 class="ui header">{{ title }}</h1>
+
+</div>
+
+<div class = "ui segment">
+
+		<table id="tabledata" class="ui celled table">
+        	<thead>
+          	<tr>
+            <th>Date</th>
+                <th>Location</th>
+                <th>Type</th>
+          	</tr>
+    		</thead>
+    		<tbody>
+				{% for incident in incidents %}
+    				<tr>
+                        <td>{{ incident.date }}</td>
+                        <td>{{ incident.location }}</td>
+                        <td>{{ incident.type }}</td>
+    				</tr>
+				{% endfor %}
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ]]
+    });
+		$('.menu .item').tab();
+	});
+
+</script>
+{% endblock %}

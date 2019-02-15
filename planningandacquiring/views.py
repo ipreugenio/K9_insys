@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed
 from training.models import Training
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ReportDateForm, add_breed_form
 from deployment.models import Dog_Request, Team_Assignment
-from unitmanagement.models import Health, HealthMedicine
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import Avg, Count, Min, Sum
@@ -36,7 +36,7 @@ import pandas as pd
 import numpy as np
 
 #graphing imports
-'''from igraph import *
+from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
@@ -50,9 +50,9 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm'''
+import statsmodels.api as sm
 
-
+import math
 # Create your views here.
 
 
@@ -125,6 +125,8 @@ def add_donated_K9(request):
             Training.objects.create(k9=k9, training='EDD')
             Training.objects.create(k9=k9, training='NDD')
             Training.objects.create(k9=k9, training='SAR')
+
+            
 
             return HttpResponseRedirect('confirm_donation/')
 
@@ -205,8 +207,8 @@ def add_K9_parents(request):
 
     form = add_K9_parents_form(request.POST)
     style = "ui teal message"
-    mothers = K9.objects.filter(sex="Female")
-    fathers = K9.objects.filter(sex="Male")
+    mothers = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
+    fathers = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
 
     mother_list = []
     father_list = []
@@ -360,6 +362,7 @@ def breeding_confirmed(request):
         Training.objects.create(k9=offspring, training='EDD')
         Training.objects.create(k9=offspring, training='NDD')
         Training.objects.create(k9=offspring, training='SAR')
+
         return render(request, 'planningandacquiring/breeding_confirmed.html')
     else:
         #delete training record
@@ -825,8 +828,7 @@ def forecast_result(date_list, quantity_list, graph_title):
         df = pd.DataFrame({'Date': list(date),
                            'Quantity': list(quantity),
                        })
-
-
+        #TODO Fix Order of Graph
         ts = df.set_index('Date')
 
         models = []
@@ -910,21 +912,45 @@ def forecast_result(date_list, quantity_list, graph_title):
 
         recommended = 0
         ctr = 0
-        zipped_list = zip(errors, predictions)
-        for error, prediction in  zipped_list:
+
+        new_errors = []
+        for item in errors:
+            new_errors.append(math.floor(float(item)))
+
+        zipped_list = zip(new_errors, predictions)
+        print("ZIPPED LIST")
+        print(set(zipped_list))
+
+        for (error, prediction) in  set(zipped_list):
             if prediction < 0:
                 del errors[ctr]
                 del predictions[ctr]
             ctr += 1
 
-        recommended_list = []
 
         #In case there are more than 1 items where error is minimal, average them
-        for error, prediction in  zipped_list:
-            if error == min(errors):
+
+        print("NEWERRORS")
+        print(new_errors)
+
+        recommended_list = []
+        zipped_list = zip(new_errors, predictions)
+
+        for (error, prediction) in  set(zipped_list):
+            print("ERROR")
+            print(error)
+            print("PREDICTION")
+            print(prediction)
+            if error == min(new_errors):
                 recommended_list.append(prediction)
 
-        recommended = Average(recommended_list)
+        print("RECOMMENDED LIST")
+        print(recommended_list)
+
+        if len(recommended_list) > 1:
+            recommended = Average(recommended_list)
+        else:
+            recommended = recommended_list[0]
 
         result.append(recommended)
 
@@ -957,26 +983,35 @@ def timeseries_generator():
 def budgeting(request):
     #TODO All categories should return lists (1. Dates, 2. Quantities) Especially for forecasts
     #REQUEST FORECAST
-    dog_request = Dog_Request.objects.all()
+
+    dog_request = Dog_Request.objects.all().order_by('start_date')
     request_date = []
+
 
     for data in dog_request:
         date = data.start_date
         request_date.append(date.year)
 
     request_date = list(set(request_date))
+    request_date.sort()
     request_quantity = []
 
     #Aggregate sum from same year
     for year in request_date:
         sum = 0
         for data in dog_request:
-            if data.year == year:
+            temp_year = data.start_date
+            if temp_year.year == year:
                 current_needed_peryear = data.total_dogs_demand - data.total_dogs_deployed
                 if current_needed_peryear < 0:
                     current_needed_peryear = 0
                 sum += current_needed_peryear
         request_quantity.append(sum)
+
+    print("REQUEST DATE")
+    print(request_date)
+    print("REQUEST QUANTITY")
+    print(request_quantity)
 
     request_forecast = forecast_result(request_date, request_quantity, "Forecast for K9 Requests")
 
@@ -994,23 +1029,22 @@ def budgeting(request):
     '''
 
     #DOGS AVAILABLE IN THE FUTURE
-    undeployed_dogs = K9.objects.exclude(classification = 'Deployed').exclude(classification = 'Dead').exclude(classification = 'Retired').exclude(classification = 'Adopted') #TODO Confirm filtering
+    deployed_dogs = K9.objects.filter(training_status = 'Deployed').filter(training_status = 'Dead').filter(training_status = 'Retired').filter(training_status = 'Adopted').count()
     #ALL DOGS
-    all_current_dogs = K9.objects.all()
+    all_current_dogs = K9.objects.all().count()
 
     #ALL DOGS INCLUDED IN THE BUDGET
 
-    dogs_to_budget = (request_forecast[4] + dogs_needed) - undeployed_dogs + all_current_dogs
+    dogs_to_budget = (request_forecast[4] + dogs_needed) - (all_current_dogs - deployed_dogs) + all_current_dogs #Subtract Undeployed Dogs(aka dogs that may be available in the future)
 
-    #TODO Multiply every item price by dogs to budget
     #TODO Check if parsed date works
     #MEDICINE BUDGET
     medicine_name_list = []
     medicine_forecast_list = []
     medicine_price_list = []
-    medicines = Medicine.object.exclude(med_type = 'Vaccine')
+    medicines = Medicine.objects.exclude(med_type = 'Vaccine')
     for medicine in medicines:
-        inventory = Medicine_Inventory.objects.filter(medicine = medicine)
+        inventory = Medicine_Inventory.objects.get(medicine = medicine)
         medicine_usage = Medicine_Subtracted_Trail.objects.filter(inventory = inventory.id)
 
         med_date_list = []
@@ -1029,9 +1063,15 @@ def budgeting(request):
                     sum += usage.quantity
             med_quantity_list.append(sum)
 
-        medicine_forecast = forecast_result(med_date_list, med_quantity_list, "Forecast for " + str(medicine.name))
+        print("MED DATE LIST")
+        print(med_date_list)
+        print("MED QUANTITY LIST")
+        print(med_quantity_list)
+
+
+        medicine_forecast = forecast_result(med_date_list, med_quantity_list, "Forecast for " + str(medicine.medicine))
         medicine_name_list.append(medicine.medicine)
-        medicine_forecast_list.append(medicine_forecast)
+        medicine_forecast_list.append(medicine_forecast[4])
         medicine_price_list.append(medicine.price)
 
     #VACCINE BUDGET
@@ -1069,7 +1109,7 @@ def budgeting(request):
         max_puppy = max(puppy)
 
     adult_food_quantity = all_current_dogs * 12
-    puppy_food_quantity = (request_forecast + dogs_needed) * 12
+    puppy_food_quantity = (request_forecast[4] + dogs_needed) * 12
 
     #EQUIPMENT BUDGET
     equipment = Miscellaneous.objects.filter(misc_type = "Equipment")
@@ -1096,12 +1136,15 @@ def budgeting(request):
 
     vet_supply_quantity = dogs_to_budget * 12
 
+
     print("REQUEST FORECAST")
     print(request_forecast)
+    print("REQUEST YEARS")
+    print(request_date)
     print("DOGS NEEDED")
     print(dogs_needed)
-    print("UNDEPLOYED DOGS")
-    print(undeployed_dogs)
+    print("DEPLOYED DOGS")
+    print(deployed_dogs)
     print("ALL CURRENT DOGS")
     print(all_current_dogs)
     print("DOGS TO BUDGET")
@@ -1144,40 +1187,114 @@ def budgeting(request):
     print("VET SUPPLY QUANTITY")
     print(vet_supply_quantity)
 
+    medicine_total = []
+    vaccine_total = []
+    adult_food_total = 0
+    puppy_food_total = 0
+    equipment_total = []
+    vet_supply_total = []
+    grand_total = 0
+
+    medicine_subtotal = 0
+    vaccine_subtotal = 0
+    dog_food_subtotal = 0
+    equipment_subtotal = 0
+    vet_supply_subtotal = 0
+
+    ctr = 0
+    for price in medicine_price_list:
+        medicine_total.append(Decimal(medicine_forecast_list[ctr]) * price)
+        ctr += 1
+
+    ctr = 0
+    for price in vaccine_price_list:
+        vaccine_total.append(Decimal(vaccine_used_yearly_list[ctr]) * price)
+        ctr += 1
+
+    adult_food_total = adult_food_quantity * max_adult
+    puppy_food_total = puppy_food_quantity * max_puppy
+
+    ctr = 0
+    for price in equipment_price:
+        equipment_total.append(Decimal(equipment_quantity) * price)
+        ctr += 1
+
+    ctr = 0
+    for price in vet_supply_price:
+        vet_supply_total.append(Decimal(vet_supply_quantity) * price)
+        ctr += 1
+
+    for total in medicine_total:
+        medicine_subtotal += total
+        grand_total += total
+    for total in vaccine_total:
+        vaccine_subtotal += total
+        grand_total += total
+    grand_total += adult_food_total
+    grand_total += puppy_food_total
+    dog_food_subtotal += (adult_food_total + puppy_food_total)
+    for total in equipment_total:
+        equipment_subtotal += total
+        grand_total += total
+    for total in vet_supply_total:
+        vet_supply_subtotal += total
+        grand_total += total
+
     context = {
         'title': 'Budgeting',
-        'request_forecast': request_forecast,
+        'request_forecast': request_forecast[4],
         'dogs_needed': dogs_needed,
-        'undeployed_dogs': undeployed_dogs,
+        'undeployed_dogs': deployed_dogs,
         'all_current_dogs': all_current_dogs,
         'dogs_to_budget': dogs_to_budget,
+        'graph': request_forecast[0],
+        'models': request_forecast[1],
+        'errors': request_forecast[2],
+        'predictions': request_forecast[3],
 
         'medicine_name': medicine_name_list,
         'medicine_forecast': medicine_forecast_list,
         'medicine_price': medicine_price_list,
+        'medicine_total': medicine_total,
 
         'vaccine_name': vaccine_names_list,
         'vaccine_used_yearly': vaccine_used_yearly_list,
         'vaccine_price': vaccine_price_list,
+        'vaccine_total': vaccine_total,
 
         'adult_food_quantity': adult_food_quantity,
         'puppy_food_quantity': puppy_food_quantity,
         'adult_price': max_adult,
         'puppy_price': max_puppy,
+        'adult_food_total': adult_food_total,
+        'puppy_food_total': puppy_food_total,
 
 
         'equipment_name': equipment_name,
         'equipment_quantity': equipment_quantity,
         'equipment_price': equipment_price,
+        'equipment_total': equipment_total,
 
         'vet_supply_name': vet_supply_name,
         'vet_supply_quantity': vet_supply_quantity,
-        'vet_supply_price': vet_supply_price
+        'vet_supply_price': vet_supply_price,
+        'vet_supply_total': vet_supply_total,
+
+        'medicine_sub_total': medicine_subtotal,
+        'vaccine_sub_total': vaccine_subtotal,
+        'dog_food_sub_total': dog_food_subtotal,
+        'equipment_sub_total': equipment_subtotal,
+        'vet_supply_sub_total': vet_supply_subtotal,
+        'grand_total': grand_total
 
     }
 
-    return None
+    return render(request, 'planningandacquiring/budgeting.html', context)
 
+def budgeting_list(request):
+    budgets = Budget_allocation.objects.all()
+
+    return None
 
 def breeding_recommendation(request):
 

@@ -21,18 +21,18 @@
                                 <div class="two fields">
                                     <div class="field">
                                         <label>Name</label>
-                                        {{data.medicine}}
+                                        <input type="text" value="{{data.medicine}}" readonly>
                                     </div>
                                     <div class="field">
                                         <label>Current Quantity</label>
-                                        {{data.quantity}}
+                                        <input type="text" value="{{data.quantity}}" readonly>
                                     </div>
                                 </div>
 
                                 <div class="field">
                                     <div class="inline field">
                                         <div class="field">
-                                                <label>{{label}}</label>
+                                            <label>{{label}}</label>
                                         </div>
                                         {{form.quantity}}
                                         <div class="ui left pointing blue basic label">
@@ -40,6 +40,10 @@
                                         </div>
                                     </div>
                                 </div>  
+                                <div class="eight wide field" name = 'date'>
+                                    <label>Expiration Date</label>
+                                    <input name = "exp_date" type="date">
+                                </div>
 
                                 <div class="ui inverted right aligned segment" style="padding: 0px;">
                                     <button onclick="return confirm('Are you sure?')"  class = "ui button green" type="submit" >{{ actiontype }}</button>
@@ -52,5 +56,14 @@
     </div>                    
 </div>
 
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        if ('{{label}}' == 'Physical Count'){
+            $("div[name='date']").hide(); 
+        }
+    });
+
+</script>
 
 {% endblock%}

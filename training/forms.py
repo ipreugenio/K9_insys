@@ -4,6 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from planningandacquiring.models import K9
 from training.models import K9_Handler, Training, K9_Adopted_Owner, Record_Training
+from profiles.models import User
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -24,19 +25,21 @@ class TestForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.all())
 
 class add_handler_form(forms.ModelForm):
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
+    
     class Meta:
         model = K9_Handler
-        fields = ('handler', 'k9')
+        fields = ('handler',)
 
-    def __init__(self, *args, **kwargs):
-        super(add_handler_form, self).__init__(*args, **kwargs)
-        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Veterinarian")
-        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Administrator")
-        assigned_handler = K9_Handler.objects.all()
-        assigned_handler_list = []
-        for handler in assigned_handler:
-            assigned_handler_list.append(handler.id)
-        self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)
+    # def __init__(self, *args, **kwargs):
+    #     super(add_handler_form, self).__init__(*args, **kwargs)
+    #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Veterinarian")
+    #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(position="Administrator")
+    #     assigned_handler = K9_Handler.objects.all()
+    #     assigned_handler_list = []
+    #     for handler in assigned_handler:
+    #         assigned_handler_list.append(handler.id)
+    #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)
 
 class TrainingUpdateForm(forms.ModelForm):
     GRADE = (

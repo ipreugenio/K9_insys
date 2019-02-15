@@ -60,7 +60,11 @@
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
                 <td>{{data_unclassified.age}}</td>
-                <td>{{data_unclassified.capability}}</td>
+                {% if data_unclassified.capability == "None" %}
+                    <td>Unassigned</td>
+                {% else %}
+                    <td>{{data_unclassified.capability}}</td>
+                {% endif %}
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -122,12 +126,13 @@
             <td>{{data_ontraining.age}}</td>
             <td>{{data_ontraining.capability}}</td>
             <td style="width:25%;" class="ui center aligned">
-              {% if data_ontraining.capability == 2%}
+              {% if data_ontraining.training_count == 2%}
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <a href="{% url 'training:classify_k9_select' data_ontraining.id %}" class = "tiny ui orange basic button reassign">Reassign</a>
               <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
               {% else %}
-              <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
+
+                <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
+              <a href="{% url 'training:classify_k9_select' data_ontraining.id %}" class = "tiny ui orange basic button reassign">Reassign</a>
               <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
               {% endif %}
             </td>
@@ -164,6 +169,8 @@
     </tbody>
 </table>
 </div>
+
+
 
 <script type="text/javascript">
 

@@ -20,14 +20,22 @@
     <form class="ui form" method="POST">
         <h4 class="ui dividing header">Details</h4>
             {% csrf_token %}
-            <div class = "two fields">
-                <div class="twelve wide field">
+            <div class = "four fields">
+                <div class="four wide field">
                     <label>Medicine</label>
                     {{form.medicine}}
                 </div>
                 <div class="four wide field">
                     <label>Type</label>
                     {{form.med_type}}
+                </div>
+                <div class="four wide field">
+                    <label>Duration (In-Days)</label>
+                    {{form.duration}}
+                </div>
+                <div class="four wide field">
+                    <label>Used-yearly</label>
+                    {{form.used_yearly}}
                 </div>
             </div>
 
@@ -127,11 +135,7 @@
             $('#tabledata2').DataTable();
             $('#tabledata3').DataTable();
             $('.menu .item').tab();
-            // $(function() {
-            //     $( ".message" ).slideUp( 4000, function() {
-                   
-            //     });
-            // });
-        } );
+        
+        });
     </script>
  {% endblock %}
