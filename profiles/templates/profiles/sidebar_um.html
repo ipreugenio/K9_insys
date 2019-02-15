@@ -16,9 +16,6 @@
                                     <a href="{% url 'profiles:user_list'%}" class="item">User List
                                         <i class="address book icon"></i>
                                     </a>
-                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
-                                        <i class="clipboard list icon"></i>
-                                    </a>
                                     {% endif %}
 
                                     {% if request.session.session_user_position == "Veterinarian" %}
@@ -45,9 +42,6 @@
                                     {% if request.session.session_user_position == "Handler" %}
                                     <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
                                         <i class="h square icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
-                                        <i class="exclamation icon"></i>
                                     </a>
                                     {% endif %}
                                 </div>

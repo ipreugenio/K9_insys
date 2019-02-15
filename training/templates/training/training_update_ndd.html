@@ -9,6 +9,14 @@
         {% endfor %}
     {% endif %}
 </div>
+
+
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Training Status</a>
+    <a class="item" data-tab="second">Daily Record</a>
+</div>
+
+<div class="ui tab segment active" data-tab="first">
 <table class="ui very basic four column table">
     <thead>
         <tr>
@@ -22,7 +30,7 @@
 
 <form class="ui form" action="" method="POST">
     {% csrf_token %}
-    <table class="ui celled table">
+    <table id="tabledata1" class="ui celled table">
         <thead>
             <!--Stage 1-->
             <tr>
@@ -98,9 +106,176 @@
         <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>
     </div>
 </form>
+</div>
+
+<div class="ui tab segment" data-tab="second">
+    <table id="tabledata2" class="ui very basic four column table">
+        <thead>
+            <tr>
+                <th>Status: {{data.training_status}}</th>
+                <th>Type: {{data.status}}</th>
+                <th>Capability: {{data.capability}}</th>
+                <th>Level: {{data.training_level}}</th>
+            </tr>
+        </thead>
+    </table>
+
+    <form class="ui form" action="" method="POST">
+    {% csrf_token %}
+
+<div class="ui fluid container">
+    <div class="ui segment">
+        <div class="fields">
+            <div class="field">
+                <label><b>Training/Utilization (with Dog)</b></label>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                On Leash Obedience: {{form2.on_leash}}
+            </div>
+            <div class="field">
+                Off Leash Obedience: {{form2.off_leash}}
+            </div>
+            <div class="field">
+                Obstacle Course: {{form2.obstacle_course}}
+            </div>
+            <div class="field">
+                Panelling: {{form2.panelling}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Port Facility</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.port_plant}} {{form2.port_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.port_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Port Facility</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.port_plant}} {{form2.port_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.port_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Building</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.building_plant}} {{form2.building_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.building_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Vehicle (ex. Bus, Jeep, etc.)</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.vehicle_plant}} {{form2.vehicle_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.vehicle_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Baggage</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.baggage_plant}} {{form2.baggage_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.baggage_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Others</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Plant/Find: {{form2.others_plant}} {{form2.others_find}}
+            </div>
+            <div class="field">
+                Search Time (seconds): {{form2.others_time}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Daily Training Record (Satisfactory/Unsatisfactory): {{form2.daily_rating}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <label><b>Utilization (without Dog)</b></label>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                MARSEC: {{form2.MARSEC}}
+            </div>
+            <div class="field">
+                MARLEN: {{form2.MARLEN}}
+            </div>
+            <div class="field">
+                MARSAR: {{form2.MARSAR}}
+            </div>
+            <div class="field">
+                MAREP: {{form2.MAREP}}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <b>Daily Feeding</b>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                Morning Feed (Per cup): {{form2.morning_feed}}
+            </div>
+            <div class="field">
+                Evening Feed (Per cup): {{form2.evening_feed}}
+            </div>
+        </div>
+    </div>
+    </div>
+
+        <div class="ui basic center aligned segment">
+            <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>
+        </div>
+    </form>
+</div>
 
 
 <script type="text/javascript">
+
+ $(document).ready(function() {
+        $('#tabledata1');
+        $('#tabledata2');
+        $('.menu .item').tab();
+    });
 
     $(document).ready(function() {
         $('#tabledata').DataTable();

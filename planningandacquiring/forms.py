@@ -2,7 +2,8 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
-from .models import K9, K9_Past_Owner, K9_Parent, Date
+from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed
+from django.forms.widgets import CheckboxSelectMultiple
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -99,3 +100,64 @@ class add_offspring_K9_form(forms.ModelForm):
 
 class select_breeder(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
+
+class add_breed_form(forms.ModelForm):
+    TEMPERAMENT = (
+        ('Kind', 'Kind'),
+        ('Outgoing', 'Outgoing'),
+        ('Agile', 'Agile'),
+        ('Intelligent', 'Intelligent'),
+        ('Trusting', 'Trusting'),
+        ('Even Tempered', 'Even Tempered'),
+        ('Gentle', 'Gentle'),
+        ('Reliable', 'Reliable'),
+        ('Confident', 'Confident'),
+        ('Friendly', 'Friendly'),
+        ('Loyal', 'Loyal'),
+        ('Alert', 'Alert'),
+        ('Curious', 'Curious'),
+        ('Watchful', 'Watchful'),
+        ('Courageous', 'Courageous'),
+        ('Affectionate', 'Affectionate'),
+        ('Trainable', 'Trainable'),
+        ('Protective', 'Protective'),
+        ('Active', 'Active'),
+        ('Obedient', 'Obedient'),
+        ('Stubborn', 'Stubborn'),
+        ('Athletic', 'Athletic'),
+        ('Vocal', 'Vocal'),
+        ('Energetic', 'Energetic')
+    )
+
+    COLORS = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+
+    temperament = forms.MultipleChoiceField(required=False,
+                                     widget=forms.CheckboxSelectMultiple, choices=TEMPERAMENT)
+    colors = forms.MultipleChoiceField(required=False,
+                                     widget=forms.CheckboxSelectMultiple, choices=COLORS)
+
+    class Meta:
+        model = Dog_Breed
+        fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
+
+

@@ -17,6 +17,7 @@
             <th>Sex</th>
             <th>Age</th>
             <th>Status</th>
+            <th>Daily Record</th>
         </tr>
     </thead>
     <tbody>
@@ -29,6 +30,7 @@
             <td>{{data.sex}}</td>
             <td>{{data.age}}</td>
             <td>{{data.training_status}}</td>
+            <td><a href="{% url 'training:daily_record' data.id %}" class="ui blue button">Select</a></td>
         </tr>
         {% endfor %}
     </tbody>

@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from planningandacquiring.models import K9
-from training.models import K9_Handler, Training, K9_Adopted_Owner
+from training.models import K9_Handler, Training, K9_Adopted_Owner, Record_Training
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -75,3 +75,18 @@ class AdoptionForms(forms.ModelForm):
         widgets = {
             'birth_date': DateInput(),
         }
+
+class RecordForm(forms.ModelForm):
+    class Meta:
+        model = Record_Training
+        fields = ('on_leash', 'off_leash', 'obstacle_course', 'panelling', 'port_plant', 'port_find', 'port_time', 'building_plant', 'building_find',
+                  'building_time', 'vehicle_plant', 'vehicle_find', 'vehicle_time', 'baggage_plant', 'baggage_find', 'baggage_time',
+                  'others_plant', 'others_find', 'others_time', 'daily_rating', 'MARSEC', 'MARLEN', 'MARSAR', 'MAREP', 'morning_feed', 'evening_feed')
+
+class DateForm(forms.Form):
+    choose_date = forms.DateField( widget=DateInput())
+    # input_type = 'date'
+    #input_type = 'date'
+    # format='%Y/%m/%d'),
+    #                                   input_formats=('%Y/%m/%d',
+
