@@ -438,6 +438,17 @@ def remove_dog_request(request, id):
 
     return redirect('deployment:request_dog_details', id=pull_k9.team_requested.id)
 
+def deployment_report(request):
+    assignment = Team_Assignment.objects.all()
+
+
+    context = {
+        'title': 'Request Dog List',
+        'assignment': assignment,
+
+    }
+    return render (request, 'deployment/request_dog_list.html', context)
+
 
 def view_schedule(request, id):
 

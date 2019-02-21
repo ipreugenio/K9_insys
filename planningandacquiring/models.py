@@ -8,8 +8,8 @@ from inventory.models import Medicine, Miscellaneous, Food
 
 
 class Date(models.Model):
-    date_from = models.DateField('date_from', blank=True, null=True)
-    date_to = models.DateField('date_to', blank=True, null=True)
+    date_from = models.DateField('date_from', null=True)
+    date_to = models.DateField('date_to', null=True)
 
 class K9(models.Model):
     SEX = (
@@ -60,10 +60,10 @@ class K9(models.Model):
     breed = models.CharField('breed', choices=BREED, max_length=200)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
-    birth_date = models.DateField('birth_date', blank=True)
+    birth_date = models.DateField('birth_date', null=True)
     age = models.IntegerField('age', default = 0)
     source = models.CharField('source', max_length=200, default="Not Specified")
-    year_retired = models.DateField('year_retired', blank=True, null=True)
+    year_retired = models.DateField('year_retired', null=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', max_length=200, default="Unclassified")
@@ -229,7 +229,7 @@ class K9_Parent(models.Model):
 
 class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)
-    date_bought = models.DateField('date_bought', blank=True, null=True)
+    date_bought = models.DateField('date_bought', null=True)
 
 
 #TODO Add inventory attr > How many dogs each item can cater
@@ -240,7 +240,7 @@ class Budget_allocation(models.Model):
     #training_cost
     #grand_total
     date_created = models.DateField('date_created', auto_now_add=True)
-    date_tobe_budgeted = models.DateField('date_tobe_budgeted')
+    date_tobe_budgeted = models.DateField('date_tobe_budgeted', null=True)
 
 class Budget_food(models.Model):
     food = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True) #1 sack per dog per month
@@ -259,3 +259,20 @@ class Budget_medicine(models.Model):
     quantity = models.IntegerField('quantity', default = 0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Dog_Breed(models.Model):
+    SKILL = (
+        ('NDD', 'NDD'),
+        ('EDD', 'EDD'),
+        ('SAR', 'SAR')
+    )
+
+
+    breed = models.CharField('breed', max_length=200, null=True)
+    life_span = models.CharField('life_span', max_length=200, null=True)
+    temperament = models.CharField('temperament', max_length=200, null=True)
+    colors = models.CharField('colors', max_length=200, null=True)
+    weight = models.CharField('weight', max_length=200, null=True)
+    male_height = models.CharField('male_height', max_length=200, null=True)
+    female_height = models.CharField('female_height', max_length=200, null=True)
+    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed
 from training.models import Training
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -9,7 +9,7 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
-from .forms import ReportDateForm
+from .forms import ReportDateForm, add_breed_form
 from deployment.models import Dog_Request, Team_Assignment
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
@@ -1330,3 +1330,36 @@ def breeding_recommendation(request):
     }
 
     return render(request, 'planningandacquiring/breeding_recommendation.html', context)
+
+def add_breed(request):
+    form = add_breed_form(request.POST)
+    style = ""
+    if request.method == 'POST':
+        if form.is_valid():
+            breed = form.save()
+            breed.save()
+            style = "ui green message"
+            messages.success(request, 'Breed has been successfully Added!')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'Title': "Add Breed",
+        'form': form,
+        'style': style,
+    }
+    print(form)
+    return render(request, 'planningandacquiring/add_breed.html', context)
+
+
+def breed_listview(request):
+    breed = Dog_Breed.objects.all()
+
+    context = {
+        'Title': 'Breed List',
+        'breed': breed
+    }
+
+    return render(request, 'planningandacquiring/view_breed.html', context)

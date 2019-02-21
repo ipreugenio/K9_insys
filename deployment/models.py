@@ -169,7 +169,7 @@ class Location(models.Model):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
 
 class Team_Assignment(models.Model):
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, default='None')
     team = models.CharField('team', max_length=100)
     EDD_demand = models.IntegerField('EDD_demand', default=0)
     NDD_demand = models.IntegerField('NDD_demand', default=0)

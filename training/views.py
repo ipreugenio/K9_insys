@@ -6,10 +6,10 @@ from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
 from .models import K9_Genealogy, K9_Handler, User
-from training.models import Training, K9_Adopted_Owner
+from training.models import Training, K9_Adopted_Owner, Record_Training
 from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form
-from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm
+from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm, RecordForm, DateForm
 import datetime
 from deployment.models import Team_Assignment
 from django.db.models import Sum
@@ -18,11 +18,11 @@ from django.db.models import Sum
 # from collections import OrderedDict
 
 #graphing imports
-import igraph
-from igraph import *
-import plotly.offline as opy
-import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+#import igraph
+#from igraph import *
+#import plotly.offline as opy
+#import plotly.graph_objs as go
+#import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -567,8 +567,16 @@ def training_update_form(request, id):
     data = K9.objects.get(id=id) # get k9
     training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
     form = TrainingUpdateForm(request.POST or None, instance = training)
+    handlerID = K9_Handler.objects.filter(k9=data)
+    form2 = RecordForm(request.POST or None)
 
     if request.method == 'POST':
+        if form2.is_valid():
+            record = form2.save(commit=False)
+            record.k9 = data
+            record.handler = handlerID.handler
+            record.save()
+
         #save training status
         if training.stage1_1 == True:
             training.stage1_1 = training.stage1_1
@@ -650,6 +658,7 @@ def training_update_form(request, id):
         'title': data.name,
         'data': data,
         'form': form,
+        'form2': form2,
     }
 
     if data.capability == 'EDD':
@@ -707,7 +716,6 @@ def training_details(request, id):
     ndd = Training.objects.filter(k9=data).get(training='NDD')
     sar = Training.objects.filter(k9=data).get(training='SAR')
 
-    print(edd.grade)
     context = {
         'title': str(data),
         'data': data,
@@ -716,6 +724,25 @@ def training_details(request, id):
         'sar':sar,
     }
     return render (request, 'training/training_details.html', context)
+
+def daily_record(request, id):
+    form = DateForm(request.POST or None)
+    data = K9.objects.get(id=id) # get k9
+    context = ''
+    record = ''
+
+    if request.method == 'POST':
+        if form.is_valid():
+            date = request.POST.get('choose_date')
+            record = Record_Training.objects.filter(k9=data).get(date_today = date)
+
+    context = {
+        'title': str(data),
+        'data': data,
+        'form': form,
+        'record': record,
+    }
+    return render(request, 'training/daily_record.html', context)
 
 def adoption_confirmed(request):
     return render (request, 'training/adoption_confirmed.html')
@@ -1481,4 +1508,13 @@ def genealogy(id):
             tree = None
 
     return tree
+
+def k9_training_list(request):
+    data_ontraining = K9.objects.filter(training_status="On-Training")
+
+    context = {
+        'title': 'K9 Training List',
+        'data_ontraining': data_ontraining
+    }
+    return render (request, 'training/k9_training_list.html', context)
 

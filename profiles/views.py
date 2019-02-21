@@ -166,7 +166,8 @@ def login(request):
 
                 request.session["session_user_position"] = user.position
                 request.session["session_username"] = str(user)
-                return HttpResponseRedirect('../dashboard')
+               # return HttpResponseRedirect('../dashboard')
+            return HttpResponseRedirect('../training')
 
     '''else:
         style = "ui red message"
