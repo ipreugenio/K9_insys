@@ -12,7 +12,7 @@ from django.db.models import Sum, Avg
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm
+from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
@@ -23,96 +23,10 @@ from training.models import K9_Handler
 # Create your views here.
 
 def index(request):
-    data = Medicine.objects.all()
-    form = HealthMedicineForm(request.POST or None)
-    res = ""
-    med_id = ""
-    if request.method == "POST":
-        res = request.POST.get('dropdown')
-        med_id = Medicine.objects.get(id=res)
-        hm = Health.objects.last()
-        HealthMedicine.objects.create(health = hm, medicine_id = med_id.id,
-        medicine = med_id.medicine_fullname, quantity = 10, dosage = "take 3x a day")
-        form = HealthMedicineForm()
-    
+   
     context = {
-        'title': "Unit Management Test Page",
-        'data': data,
-        'form': form,
+      
     }        
-
-    adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
-    puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
-    milk_q = Food.objects.filter(foodtype='Milk').aggregate(sum=Sum('quantity'))['sum']
-
-    k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).count()
-    k9_jack_russel = K9.objects.filter(breed='Jack Russel').filter(age__gte=1).count()
-    k9_others = K9.objects.filter(age__gte=1).exclude(breed='Labrador Retriever').exclude(breed='Jack Russel').count()
-
-    # dog_count * food_per_day 
-    lab = k9_labrador * 0.5
-    jack = k9_jack_russel * 0.3
-    oth = k9_others * 0.8
-    adult_food = lab+jack+oth
-    
-    # PUPPY FOOD CONSUMPTION
-    # get puppy count by age
-    third_fourth = K9.objects.filter(age_days__range=(21,28)).count() # 3rd-4th week : milk only
-    fifth_sixth = K9.objects.filter(age_days__range=(29,42)).count() # 5th-6th week
-    seventh_eight = K9.objects.filter(age_days__range=(43,57)).count() # 5th-6th week
-    ninth_tenth = K9.objects.filter(age_days__range=(58,72)).count() # 9th-10th week
-    eleventh_twelve = K9.objects.filter(age_days__range=(73,87)).count() # 11th-12th week
-
-    four = K9.objects.filter(age_month=4).count() # 4 mos
-    five = K9.objects.filter(age_month=5).count() # 5 mos
-    six = K9.objects.filter(age_month=6).count() # 6 mos
-    seven = K9.objects.filter(age_month=7).count() # 7 mos
-    eight = K9.objects.filter(age_month=8).count() # 8 mos
-    nine_twelve = K9.objects.filter(age_month__range=(9,12)).count() # 9-12 mos
-
-    # get puppy_count * milk_consumption * month
-    tf_milk = third_fourth * 32 * 30
-    fs_milk = fifth_sixth * 48 * 30
-    se_milk = seventh_eight * 48 * 30
-    nt_milk = ninth_tenth * 60 * 30
-    et_milk = eleventh_twelve * 72 * 30
-
-    # get puppy_count * food_consumption * month
-    fs_food = fifth_sixth * 0.08 * 30
-    se_food = seventh_eight * 0.12 * 30
-    nt_food = ninth_tenth * 0.18 * 30
-    et_food = eleventh_twelve * 0.24 * 30
-    four_food = four * 0.25 * 30
-    five_food = five * 0.30 * 30
-    six_food = six * 0.35 * 30
-    seven_food = seven * 0.40 * 30
-    eight_food = eight * 0.45 * 30
-    nine_twelve_food = nine_twelve * 0.50 * 30
-
-    milk = tf_milk + fs_milk + se_milk + nt_milk + et_milk
-    puppy_food = fs_food + se_food + nt_food + et_food + four_food + five_food + six_food + seven_food + eight_food + nine_twelve_food
-    
-    # print(adult_food, puppy_food, milk)
-    # print(adult_dfq, puppy_dfq, milk_q)
-
-    #TODO: Delivery days
-    delivery = 10
-    #TODO GET STOCK LEVEL SAFETY
-    a = Food_Subtracted_Trail.objects.filter(inventory__foodtype='Adult Dog Food').aggregate(avg=Avg('quantity'))['avg']
-    p = Food_Subtracted_Trail.objects.filter(inventory__foodtype='Puppy Dog Food').aggregate(avg=Avg('quantity'))['avg']
-    m = Food_Subtracted_Trail.objects.filter(inventory__foodtype='Milk').aggregate(avg=Avg('quantity'))['avg']
-    # calculate the threshhold
-
-    adult_low = a * delivery
-    print('threshold', adult_low) 
-
-    if adult_dfq <= adult_low:
-        Notification.objects.create(message= 'Adult Dog Food is low. Please Replenish.')
-    if puppy_dfq <= puppy_low:
-        Notification.objects.create(message= 'Puppy Dog Food is low. Please Replenish.')
-    if milk_q <= milk_low:
-        Notification.objects.create(message= 'Milk is low. Please Replenish.')
-
 
     return render (request, 'unitmanagement/index.html', context)
 
@@ -123,24 +37,37 @@ def health_form(request):
     form = HealthForm(request.POST or None)
     style=""
     if request.method == "POST":
-        print(form)
+        #print(form)
         if form.is_valid():
             new_form = form.save()
             new_form = new_form.pk
             form_instance = Health.objects.get(id=new_form)
 
+            #Get K9
+            print('from form: ', form_instance.dog)
+
+            dog = K9.objects.get(id=form_instance.dog.id)
+            print('from query ', dog)
+            #TODO
+            # dog status = sick
+
+
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
 
-            print(formset)
-            if formset.is_valid():
-                for form in formset:
-                    form.save()
-                style = "ui green message"
-                messages.success(request, 'Health Form has been successfully recorded!')
-            else:
-                style = "ui red message"
-                messages.warning(request, 'Invalid input data!')
+            # TODO
+            # check if all quantity in the formset is sufficient   
+
+            # if formset.is_valid():
+            #     for form in formset:
+            #         #form.save()
+            #     style = "ui green message"
+            #     messages.success(request, 'Health Form has been successfully recorded!')
+            # else:
+            #     style = "ui red message"
+            #     messages.warning(request, 'Invalid input data!')
+
+        
 
     context = {
         'title': "Health Form",
@@ -1061,9 +988,7 @@ def handler_incident(request):
     }
     return render (request, 'unitmanagement/handler_incident.html', context)
 
-# TODO
-# Integrate K9_Handler Model
-# MAYBE SOMETHING!! LOOK AT THE CODES OF THE MODEL   
+
 def reassign_assets(request):
     style=''
     form = ReassignAssetsForm(request.POST or None)
@@ -1093,3 +1018,43 @@ def reassign_assets(request):
         'form': form,
     }
     return render (request, 'unitmanagement/reassign_assets.html', context)
+
+# TODO 
+# Reproductive Cycle
+def reproductive_list(request):
+    style=''
+    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female')
+    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female')
+    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female')
+    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female')
+    
+    context = {
+        'title': "Reproductive Cycle",
+        'proestrus': proestrus,
+        'estrus': estrus,
+        'metestrus': metestrus,
+        'anestrus': anestrus,
+    }
+    return render (request, 'unitmanagement/reproductive_list.html', context)
+
+def reproductive_edit(request, id):
+    style=''
+    data = K9.objects.get(id=id)
+    form = ReproductiveForm(request.POST or None, instance = data)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Reproductive Details has been successfully Updated!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Make sure all input is complete!')
+
+    context = {
+        'title': "Reproductive Details",
+        'data': data,
+        'form': form,
+        'style': style,
+    }
+    return render (request, 'unitmanagement/reproductive_details.html', context)

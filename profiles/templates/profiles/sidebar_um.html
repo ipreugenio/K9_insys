@@ -48,6 +48,9 @@
                                     <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
                                         <i class="h square icon"></i>
                                     </a>
+                                    <a href="{% url 'unitmanagement:reproductive_list'%}" class="item">Reproductive Cycle
+                                        <i class="venus icon"></i>
+                                    </a>
                                     {% endif %}
 
                                     {% if request.session.session_user_position == "Handler" %}

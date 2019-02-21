@@ -3,6 +3,7 @@ from planningandacquiring.models import K9
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt
 from inventory.models import Medicine_Inventory
+from training.models import Training
 from profiles.models import User
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
@@ -17,15 +18,28 @@ class Health(models.Model):
     treatment = models.TextField('treatment', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    duration = models.IntegerField('duration', null=True, blank=True)
+
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
 
 class HealthMedicine(models.Model):
+    TIME_OF_DAY = (
+        ('Morning', 'Morning'),
+        ('Afternoon', 'Afternoon'),
+        ('Night', 'Night'),
+        ('Morning/Afternoon', 'Morning/Afternoon'),
+        ('Morning/Night', 'Morning/Night'),
+        ('Afternoon/Night', 'Afternoon/Night'),
+        ('Morning/Afternoon/Night', 'Morning/Afternoon/Night'),
+    )
+
     health = models.ForeignKey(Health, on_delete=models.CASCADE)
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    medicine = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
-    dosage = models.CharField('dosage', max_length=200, default="")
+    time_of_day = models.CharField('time_of_day',  choices=TIME_OF_DAY, max_length=200, default="")
+    duration = models.IntegerField('duration', default = 1)
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog.name)
@@ -265,3 +279,11 @@ def location_incident(sender, instance, **kwargs):
                                 position = 'Administrator',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
+
+#When medicine is created, also create inventory instance
+@receiver(post_save, sender=K9)
+def create_medicine_inventory(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        Training.objects.create(k9=instance, training='EDD')
+        Training.objects.create(k9=instance, training='NDD')
+        Training.objects.create(k9=instance, training='SAR')

@@ -2,51 +2,45 @@
 
 {% block content %}
 <div class="ui fluid container">
-		<h1 class="ui header">
-		{{title}}
-			<div class="sub header">UI Formset for Health form Medicine Section. See Health Form for further
-				details. When submit is clicked, insert data to database. 
-				See def index and def health_form in views. Need to integrate codes. 
-				Remove and Add field NOT WORKING.
-			</div>
-		</h1>
-        <div class="ui inverted segment">
-			<form class="ui inverted form" method="POST">
-				{% csrf_token %}
-				<div class="three fields">
-					<div class="field">
-						<label>Medicine</label>
-						<select class="ui search dropdown" name = "dropdown">
-							{% for data in data %}
-							<option value={{data.id}}>{{data.medicine_fullname}}</option>
-							{% endfor %}
-						</select>  
-					</div>
-					<div class="five wide field">
-							<label for="">Dosage</label>
-							{{form.dosage}}
-					</div>
-					<div class="field">
-						<div class="inline field">
-							<div class="field">
-									<label>Quantity</label>
-							</div>
-							{{form.quantity}}
-							<div class="ui left pointing red label button">
-								Remove
-							</div>
-						</div>
-					</div>  
-					
-				</div>
-				<div class="field">
-					<button class="ui blue button">Add Field</button>
-				</div>
-				<div class="ui inverted right aligned segment" style="padding: 0px;">
-					<button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
-				</div>
-				
-			</form>  
-        </div>
+	<h1 class="ui header">Testing Page</h1>
+	
+	<form class="ui form" id = 'form1'>
+		<div class="field">
+			<label>Username</label>
+			<input type="text" placeholder="Username" id = 'username'>
+		</div>
+		<div class="field">
+			<label>Email</label>
+			<input type="email" placeholder="Email" id = 'email'>
+		</div>
+		<div class="field">
+			<label>Password</label>
+			<input type="password" placeholder="Password" id = 'password'>
+		</div>
+		
+		<button class="ui button" type="submit">Submit</button>
+	</form>
+	
 </div>
+
+<script type="text/javascript">
+	$(document).on('submit', '#form1', function(e){
+		e.preventDefault();
+
+		$.ajax({
+			type:'POST',
+			url: '',
+			data:{
+				username: $('#username').val(),
+				email: $('#email').val(),
+				password: $('#password').val(),
+			}, 
+			success:function(){
+				
+			}
+		});
+	});
+
+
+</script>
 {% endblock%}

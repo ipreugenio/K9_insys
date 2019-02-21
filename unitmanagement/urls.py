@@ -19,5 +19,7 @@ urlpatterns = [
     path('k9-incident', views.k9_incident, name='k9_incident'),
     path('handler-incident', views.handler_incident, name='handler_incident'),
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
+    path('reproductive-list', views.reproductive_list, name='reproductive_list'),
+    path('reproductive-edit/<int:id>', views.reproductive_edit, name='reproductive_edit'),
     #path('/<int:id>/', views., name=''),
 ];

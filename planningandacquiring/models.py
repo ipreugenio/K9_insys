@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
+from dateutil.relativedelta import relativedelta
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food
 
@@ -37,11 +38,22 @@ class K9(models.Model):
 
     STATUS = (
         ('Material Dog', 'Material Dog'),
+        ('Light Duty', 'Light Duty'),
+        ('Adopted', 'Adopted'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
         ('Sick', 'Sick'), 
     )
+    
+    REPRODUCTIVE = (
+        ('Proestrus', 'Proestrus'),
+        ('Estrus', 'Estrus'),
+        ('Metestrus', 'Metestrus'),
+        ('Anestrus', 'Anestrus'), 
+    )
 
+    #Training Status
+    # For-Breeding, For-Deployment, Trained, For-Adoption, Adopted, etc.
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
@@ -60,9 +72,19 @@ class K9(models.Model):
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
-    in_heat = models.BooleanField(default=False)
+    reproductive_stage = models.CharField('reproductive_stage', choices=REPRODUCTIVE, max_length=200, default="Anestrus")
     age_days = models.IntegerField('age_days', default = 0)
     age_month = models.IntegerField('age_month', default = 0)
+    in_heat_months = models.IntegerField('in_heat_months', default = 6)
+    last_proestrus_date = models.DateField(blank=True, null=True)
+    next_proestrus_date = models.DateField(blank=True, null=True)
+    estrus_date = models.DateField(blank=True, null=True)
+    metestrus_date = models.DateField(blank=True, null=True)
+    anestrus_date = models.DateField(blank=True, null=True)
+
+    # def best_fertile_notification(self):
+    #     notif = self.estrus_date - td(days=7)
+    #     return notif
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -85,7 +107,27 @@ class K9(models.Model):
         self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
-        self.training_id = self.id
+        self.training_id = self.id 
+        if self.age_days == 183:
+            self.last_proestrus_date = d.today()
+        
+        if self.last_proestrus_date != None:
+            self.estrus_date = self.last_proestrus_date + td(days=7)
+            self.metestrus_date = self.estrus_date + td(days=20)
+            self.anestrus_date = self.metestrus_date + td(days=90)
+            self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
+        
+        if d.today() == self.last_proestrus_date: 
+            self.reproductive_stage = 'Proestrus'
+        elif d.today() == self.estrus_date:
+            self.reproductive_stage = 'Estrus'
+        elif d.today() == self.metestrus_date:
+            self.reproductive_stage = 'Metestrus'
+        elif d.today() == self.anestrus_date:
+            self.reproductive_stage = 'Anestrus'
+        else:
+            pass
+
         if self.age == 9:
             self.training_status = 'Due-For-Retirement'
             self.status = 'Light Duty'
@@ -95,6 +137,16 @@ class K9(models.Model):
             self.status = 'Retired'
         else:
             pass
+
+        if self.sex == 'Male':
+            self.in_heat_months = 0
+            self.last_proestrus_date = None
+            self.next_proestrus_date = None
+            self.estrus_date = None
+            self.metestrus_date = None
+            self.anestrus_date = None
+        
+
         # Serial Numbers and Microchips are given after training
         # lead_zero = str(self.id).zfill(5)
         # serial_number = '#%s' % (lead_zero)

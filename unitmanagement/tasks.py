@@ -20,6 +20,24 @@ from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, 
 def unitmanagement_notifs():
     k9 = K9.objects.all() 
     phex = PhysicalExam.objects.all()
+    p = K9.objects.filter(next_proestrus_date=date.today())
+
+    # HEAT CYCLE
+    # when it is time for the next heat, the last_heat = next_heat thus updating the dates
+    for p in p:
+        p.last_proestrus_date = p.next_proestrus_date
+        p.save()
+
+    k9_breed = K9.objects.all(training_status='For-Breeding') 
+    for k9_breed in k9_breed:
+        if k9_breed.estrus_date == date.today() and k9_breed.age >= 1:
+            Notification.objects.create(message= str(k9_breed) + ' is recommended to mate this week as she is most fertile!')
+
+        if k9_breed.last_proestrus_date == date.today():
+            Notification.objects.create(message= str(k9_breed) + ' is in heat!')
+
+        if k9_breed.metestrus_date == date.today():
+            Notification.objects.create(message= 'If you mated ' + str(k9_breed) + ', she is about to show signs of pregnancy!')
 
     # PHYSICAL EXAMINATION DUE
     for phex in phex:
@@ -116,6 +134,7 @@ def deployment_notifs():
 # TODO AUTO SUBTRACT 
 # TODO Add Subtract trail for food
 #@periodic_task(run_every=crontab(hour=6, minutes=0))
+# every 5am?
 def auto_subtract():
     # TODO Vitamins consumption
 
@@ -216,6 +235,7 @@ def auto_subtract():
                 t_food=0
                 query_food.save()
     
+
     # EXPIRATION OF MEDICINE
     med_receive = Medicine_Received_Trail.objects.filter(expiration_date=date.today())
     med_inventory = Medicine_Inventory.objects.all()
@@ -224,14 +244,32 @@ def auto_subtract():
             if m.medicine == med.inventory.medicine:
                 m.quantity = m.quantity - med.quantity
                 m.save()
+
+    # TODO Get Delivery Days
+    # INVENTORY LOW NOTIFICATION
+    delivery_days = 8 
+    day_adult = Decimal(total) * delivery_days
+    day_puppy = Decimal(food) * delivery_days
+    day_milk = Decimal(milk) * delivery_days
+
+    adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
+    puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
+    milk_q = Food.objects.filter(foodtype='Milk').aggregate(sum=Sum('quantity'))['sum']
+
+    if adult_dfq <= day_adult:
+        Notification.objects.create(message= 'Adult Dog Food is low. Its time to reorder!')
+    if puppy_dfq <= day_puppy:
+        Notification.objects.create(message= 'Puppy Dog Food is low. Its time to reorder!')
+    if milk_q <= day_milk:
+        Notification.objects.create(message= 'Milk is low. Its time to reorder!')
         
+
 # LOW INVENTORY NOTIFS
 #@periodic_task(run_every=timedelta(seconds=10))
 def inventory_notifs():
-    
+    pass
 
 @periodic_task(run_every=timedelta(seconds=10))
 def test():
-                
 
         
