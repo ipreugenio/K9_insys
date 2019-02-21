@@ -23,7 +23,7 @@ from training.models import K9_Handler
 # Create your views here.
 
 def index(request):
-   
+    
     context = {
       
     }        

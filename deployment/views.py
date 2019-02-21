@@ -279,7 +279,7 @@ def request_dog_list(request):
         gantt_chart_dict.append(data_list)
 
     colors = dict(Pending='rgb(255, 0, 0)',
-                  Food='rgb(0, 0, 255)',)
+                  Approved='rgb(0, 0, 255)',)
 
     # df = [   dict(Task="Job A", Start='2009-01-01', Finish='2009-02-28'),
     #       dict(Task="Job B", Start='2009-03-05', Finish='2009-04-15'),

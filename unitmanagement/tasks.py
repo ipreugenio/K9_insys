@@ -9,8 +9,8 @@ from decimal import Decimal
 from django.db.models import Sum
 
 from planningandacquiring.models import K9
-from deployment.models import Dog_Request
-from unitmanagement.models import Notification, PhysicalExam
+from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
+from unitmanagement.models import Notification, PhysicalExam, Dog_Request
 from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail
 # Create your tasks here
 # The @shared_task decorator lets you create tasks that can be used by any app(s).
@@ -264,12 +264,22 @@ def auto_subtract():
         Notification.objects.create(message= 'Milk is low. Its time to reorder!')
         
 
-# LOW INVENTORY NOTIFS
+# Deployment Change status to deployed
 #@periodic_task(run_every=timedelta(seconds=10))
-def inventory_notifs():
-    pass
+def deploy_dog():
+    sched = K9_Schedule.objects.filter(date_start=date.today())
+
+    for sched in sched:
+        sched.k9.training_status = 'Deployed'
+        sched.k9.save()
+        
+
 
 @periodic_task(run_every=timedelta(seconds=10))
 def test():
+    # TODO
+    pass
+    
+
 
         
