@@ -9,6 +9,8 @@ import re
 
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents
 from planningandacquiring.models import K9
+from profiles.models import Account, User
+from django.contrib.sessions.models import Session
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -247,3 +249,6 @@ class IncidentForm(forms.ModelForm):
             #'date_time': forms.widgets.DateTimeInput(format="%d %b %Y %H:%M:%S %Z")
         }
 
+    def __init__(self, *args, **kwargs):
+        super(IncidentForm, self).__init__(*args, **kwargs)
+        self.fields['user'].intial = current_user

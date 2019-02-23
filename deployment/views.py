@@ -449,6 +449,17 @@ def remove_dog_request(request, id):
 
     return redirect('deployment:request_dog_details', id=pull_k9.team_requested.id)
 
+def deployment_report(request):
+    assignment = Team_Assignment.objects.all()
+
+
+    context = {
+        'title': 'Request Dog List',
+        'assignment': assignment,
+
+    }
+    return render (request, 'deployment/request_dog_list.html', context)
+
 
 def view_schedule(request, id):
 
@@ -504,9 +515,17 @@ def load_teams(request):
 def add_incident(request):
     form = IncidentForm(request.POST or None)
     style = ""
+
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            incident = form.save()
+            incident.user = current_user
+            incident.save()
+            
             style = "ui green message"
             messages.success(request, 'Incident has been successfully added!')
             form = IncidentForm()

@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, Food_Inventory, Miscellaneous_Inventory
+from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory
 from inventory.models import DamagedEquipemnt
 
 class DateInput(forms.DateInput):
@@ -50,7 +50,7 @@ class FoodForm(forms.ModelForm):
     FOODTYPE = (
         ('Adult Dog Food', 'Adult Dog Food'),
         ('Puppy Dog Food', 'Puppy Dog Food'),
-
+        ('Milk', 'Milk'),
     )
 
     foodtype = forms.CharField(max_length=100, label = 'foodtype', widget = forms.Select(choices=FOODTYPE))
@@ -66,7 +66,7 @@ class FoodForm(forms.ModelForm):
 
 class FoodCountForm(forms.ModelForm):
     class Meta:
-        model = Food_Inventory
+        model = Food
         fields = ('food', 'quantity')
 
     def __init__(self, *args, **kwargs):
@@ -105,7 +105,7 @@ class MiscellaneousForm(forms.ModelForm):
 
 class MiscellaneousCountForm(forms.ModelForm):
     class Meta:
-        model = Miscellaneous_Inventory
+        model = Miscellaneous
         fields = ('miscellaneous', 'quantity')
 
     def __init__(self, *args, **kwargs):

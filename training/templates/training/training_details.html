@@ -9,7 +9,8 @@
         {% endfor %}
     {% endif %}
 </div>
-<table class="ui four column celled table">
+
+<table id="tabledata1" class="ui four column celled table">
     <thead>
         <tr>
             <th>Serial Number</th>
@@ -476,8 +477,9 @@
 </div>
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata').DataTable();
+     $(document).ready(function() {
+        $('#tabledata1');
+        $('#tabledata2');
         $('.menu .item').tab();
     });
 

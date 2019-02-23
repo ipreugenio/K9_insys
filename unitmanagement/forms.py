@@ -6,8 +6,9 @@ from django.forms import formset_factory, inlineformset_factory
 from django.contrib.sessions.models import Session
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
+from unitmanagement.models import K9_Incident, Handler_Incident
 from planningandacquiring.models import K9
-from inventory.models import Medicine, Miscellaneous
+from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
 
 class DateInput(forms.DateInput):
@@ -51,18 +52,29 @@ class HealthForm(forms.ModelForm):
     dog = forms.ModelChoiceField(queryset = K9.objects.all())
     problem = forms.CharField(label = 'problem', widget = forms.Textarea(attrs={'rows':'3'}))
     treatment = forms.CharField(label = 'treatment', widget = forms.Textarea(attrs={'rows':'3'}))
-
+    
     class Meta:
         model = Health
         fields = ('dog','problem', 'treatment')
 
 class HealthMedicineForm(forms.ModelForm):
+    TIME_OF_DAY = (
+        ('Morning', 'Morning'),
+        ('Afternoon', 'Afternoon'),
+        ('Night', 'Night'),
+        ('Morning/Afternoon', 'Morning/Afternoon'),
+        ('Morning/Night', 'Morning/Night'),
+        ('Afternoon/Night', 'Afternoon/Night'),
+        ('Morning/Afternoon/Night', 'Morning/Afternoon/Night'),
+    )
 
     class Meta:
         model = HealthMedicine
-        fields = ('medicine', 'quantity', 'dosage')
+        fields = ('medicine', 'quantity', 'time_of_day', 'duration')
 
-    medicine = forms.ModelChoiceField(queryset = Medicine.objects.exclude(med_type='Vaccine'))
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine'))
+    time_of_day = forms.CharField(label = 'Time of Day', widget = forms.Select(choices=TIME_OF_DAY))
+    duration = forms.CharField(label = 'Duration (Days)')
 
     def __init__(self, *args, **kwargs):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
@@ -127,7 +139,47 @@ class RequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
-
         self.fields['handler'].required = False
+        
+class K9IncidentForm(forms.ModelForm):
+    
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog'))
+
+    class Meta:
+        model = K9_Incident
+        fields = ('k9', 'incident', 'description')
+
+    def __init__(self, *args, **kwargs):
+        super(K9IncidentForm, self).__init__(*args, **kwargs)
+        self.fields['description'].required = False
+
+class HandlerIncidentForm(forms.ModelForm):
+    
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working'))
+
+    class Meta:
+        model = Handler_Incident
+        fields = ('handler', 'incident', 'description')
+
+    def __init__(self, *args, **kwargs):
+        super(HandlerIncidentForm, self).__init__(*args, **kwargs)
+        self.fields['description'].required = False
+
+class ReassignAssetsForm(forms.Form):
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog').filter(partnered=False))
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 
 
+class ReproductiveForm(forms.ModelForm):
+    class Meta:
+        model = K9
+        fields = ('reproductive_stage', 'last_proestrus_date', 'in_heat_months')
+
+        widgets = {
+            'last_proestrus_date': DateInput(),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super(ReproductiveForm, self).__init__(*args, **kwargs)
+        self.fields['last_proestrus_date'].required = False
+        

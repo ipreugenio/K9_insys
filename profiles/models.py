@@ -1,7 +1,6 @@
 from django.db import models
 from datetime import date as d
 
-
 # Create your models here.
 class User(models.Model):
     SEX = (
@@ -77,7 +76,8 @@ class User(models.Model):
     footsize = models.IntegerField('footsize')
     bodybuild = models.CharField('bodybuild', max_length=200)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
-
+    partnered = models.BooleanField(default=False)
+    
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date
         # return delta.days
@@ -255,7 +255,6 @@ class Personal_Info(models.Model):
     father_birthdate = models.DateField('father_birthdate', max_length=200)
     tin = models.IntegerField('tin')
     philhealth = models.IntegerField('philhealth')
-
 
 class Education(models.Model):
     UserID = models.ForeignKey(User, on_delete=models.CASCADE)

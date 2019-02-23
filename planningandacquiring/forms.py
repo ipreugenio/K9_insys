@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
+
 from .models import K9, K9_Past_Owner, K9_Parent, Date, Budget_allocation, Budget_medicine,Budget_food,Budget_equipment,Budget_vaccine,Budget_vet_supply
 
 import datetime
@@ -11,83 +12,89 @@ from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
-__all__ = ('MonthYearWidget',)
 
-RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
-
-class MonthYearWidget(Widget):
-    """
-    A Widget that splits date input into two <select> boxes for month and year,
-    with 'day' defaulting to the first of the month.
-
-    Based on SelectDateWidget, in
-
-    django/trunk/django/forms/extras/widgets.py
+from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed
+from django.forms.widgets import CheckboxSelectMultiple
 
 
-    """
-    none_value = (0, '---')
-    month_field = '%s_month'
-    year_field = '%s_year'
+# __all__ = ('MonthYearWidget',)
+#
+# RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
+#
+# class MonthYearWidget(Widget):
+#     """
+#     A Widget that splits date input into two <select> boxes for month and year,
+#     with 'day' defaulting to the first of the month.
+#
+#     Based on SelectDateWidget, in
+#
+#     django/trunk/django/forms/extras/widgets.py
+#
+#
+#     """
+#     none_value = (0, '---')
+#     month_field = '%s_month'
+#     year_field = '%s_year'
+#
+#     def __init__(self, attrs=None, years=None, required=True):
+#         # years is an optional list/tuple of years to use in the "year" select box.
+#         self.attrs = attrs or {}
+#         self.required = required
+#         if years:
+#             self.years = years
+#         else:
+#             this_year = datetime.date.today().year
+#             self.years = range(this_year, this_year+10)
+#
+#     def render(self, name, value, attrs=None):
+#         try:
+#             year_val, month_val = value.year, value.month
+#         except AttributeError:
+#             year_val = month_val = None
+#             if isinstance(value, basestring):
+#                 match = RE_DATE.match(value)
+#                 if match:
+#                     year_val, month_val, day_val = [int(v) for v in match.groups()]
+#
+#         output = []
+#
+#         if 'id' in self.attrs:
+#             id_ = self.attrs['id']
+#         else:
+#             id_ = 'id_%s' % name
+#
+#         month_choices = MONTHS.items()
+#         if not (self.required and value):
+#             month_choices.append(self.none_value)
+#         month_choices.sort()
+#         local_attrs = self.build_attrs(id=self.month_field % id_)
+#         s = Select(choices=month_choices)
+#         select_html = s.render(self.month_field % name, month_val, local_attrs)
+#         output.append(select_html)
+#
+#         year_choices = [(i, i) for i in self.years]
+#         if not (self.required and value):
+#             year_choices.insert(0, self.none_value)
+#         local_attrs['id'] = self.year_field % id_
+#         s = Select(choices=year_choices)
+#         select_html = s.render(self.year_field % name, year_val, local_attrs)
+#         output.append(select_html)
+#
+#         return mark_safe(u'\n'.join(output))
+#
+#     def id_for_label(self, id_):
+#         return '%s_month' % id_
+#     id_for_label = classmethod(id_for_label)
+#
+#     def value_from_datadict(self, data, files, name):
+#         y = data.get(self.year_field % name)
+#         m = data.get(self.month_field % name)
+#         if y == m == "0":
+#             return None
+#         if y and m:
+#             return '%s-%s-%s' % (y, m, 1)
+#         return data.get(name, None)
 
-    def __init__(self, attrs=None, years=None, required=True):
-        # years is an optional list/tuple of years to use in the "year" select box.
-        self.attrs = attrs or {}
-        self.required = required
-        if years:
-            self.years = years
-        else:
-            this_year = datetime.date.today().year
-            self.years = range(this_year, this_year+10)
-
-    def render(self, name, value, attrs=None):
-        try:
-            year_val, month_val = value.year, value.month
-        except AttributeError:
-            year_val = month_val = None
-            if isinstance(value, basestring):
-                match = RE_DATE.match(value)
-                if match:
-                    year_val, month_val, day_val = [int(v) for v in match.groups()]
-
-        output = []
-
-        if 'id' in self.attrs:
-            id_ = self.attrs['id']
-        else:
-            id_ = 'id_%s' % name
-
-        month_choices = MONTHS.items()
-        if not (self.required and value):
-            month_choices.append(self.none_value)
-        month_choices.sort()
-        local_attrs = self.build_attrs(id=self.month_field % id_)
-        s = Select(choices=month_choices)
-        select_html = s.render(self.month_field % name, month_val, local_attrs)
-        output.append(select_html)
-
-        year_choices = [(i, i) for i in self.years]
-        if not (self.required and value):
-            year_choices.insert(0, self.none_value)
-        local_attrs['id'] = self.year_field % id_
-        s = Select(choices=year_choices)
-        select_html = s.render(self.year_field % name, year_val, local_attrs)
-        output.append(select_html)
-
-        return mark_safe(u'\n'.join(output))
-
-    def id_for_label(self, id_):
-        return '%s_month' % id_
-    id_for_label = classmethod(id_for_label)
-
-    def value_from_datadict(self, data, files, name):
-        y = data.get(self.year_field % name)
-        m = data.get(self.month_field % name)
-        if y == m == "0":
-            return None
-        if y and m:
-            return '%s-%s-%s' % (y, m, 1)
-        return data.get(name, None)
 
 
 class DateInput(forms.DateInput):
@@ -186,6 +193,7 @@ class add_offspring_K9_form(forms.ModelForm):
 class select_breeder(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
 
+
 #class select_date(forms.Form):
 
 class budget_food(forms.Form):
@@ -222,4 +230,65 @@ class budget_vet_supply(forms.Form):
 class budget_date(forms.Form):
     #date = forms.DateField()
     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
+class add_breed_form(forms.ModelForm):
+    TEMPERAMENT = (
+        ('Kind', 'Kind'),
+        ('Outgoing', 'Outgoing'),
+        ('Agile', 'Agile'),
+        ('Intelligent', 'Intelligent'),
+        ('Trusting', 'Trusting'),
+        ('Even Tempered', 'Even Tempered'),
+        ('Gentle', 'Gentle'),
+        ('Reliable', 'Reliable'),
+        ('Confident', 'Confident'),
+        ('Friendly', 'Friendly'),
+        ('Loyal', 'Loyal'),
+        ('Alert', 'Alert'),
+        ('Curious', 'Curious'),
+        ('Watchful', 'Watchful'),
+        ('Courageous', 'Courageous'),
+        ('Affectionate', 'Affectionate'),
+        ('Trainable', 'Trainable'),
+        ('Protective', 'Protective'),
+        ('Active', 'Active'),
+        ('Obedient', 'Obedient'),
+        ('Stubborn', 'Stubborn'),
+        ('Athletic', 'Athletic'),
+        ('Vocal', 'Vocal'),
+        ('Energetic', 'Energetic')
+    )
+
+    COLORS = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+
+    temperament = forms.MultipleChoiceField(required=False,
+                                     widget=forms.CheckboxSelectMultiple, choices=TEMPERAMENT)
+    colors = forms.MultipleChoiceField(required=False,
+                                     widget=forms.CheckboxSelectMultiple, choices=COLORS)
+
+    class Meta:
+        model = Dog_Breed
+        fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
+
+
 

@@ -5,35 +5,29 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime as dt
+from datetime import timedelta, date
+from decimal import Decimal
+from django.db.models import Sum, Avg
 
 from planningandacquiring.models import K9
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine
-
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, VaccinationUsedForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Inventory, Miscellaneous_Subtracted_Trail
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
+from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
+from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
+from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
-
+from deployment.models import K9_Schedule
 from profiles.models import User, Account
 from training.models import K9_Handler
+
 # Create your views here.
 
 def index(request):
-    data = Medicine.objects.all()
-    form = HealthMedicineForm(request.POST or None)
-    res = ""
-    med_id = ""
-    if request.method == "POST":
-        res = request.POST.get('dropdown')
-        med_id = Medicine.objects.get(id=res)
-        hm = Health.objects.last()
-        HealthMedicine.objects.create(health = hm, medicine_id = med_id.id,
-        medicine = med_id.medicine_fullname, quantity = 10, dosage = "take 3x a day")
-        form = HealthMedicineForm()
+    
     context = {
-        'title': "Unit Management Test Page",
-        'data': data,
-        'form': form,
-    }
+      
+    }        
+
     return render (request, 'unitmanagement/index.html', context)
 
 #TODO Formset does not got to db
@@ -43,24 +37,37 @@ def health_form(request):
     form = HealthForm(request.POST or None)
     style=""
     if request.method == "POST":
-        print(form)
+        #print(form)
         if form.is_valid():
             new_form = form.save()
             new_form = new_form.pk
             form_instance = Health.objects.get(id=new_form)
 
+            #Get K9
+            print('from form: ', form_instance.dog)
+
+            dog = K9.objects.get(id=form_instance.dog.id)
+            print('from query ', dog)
+            #TODO
+            # dog status = sick
+
+
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
 
-            print(formset)
-            if formset.is_valid():
-                for form in formset:
-                    form.save()
-                style = "ui green message"
-                messages.success(request, 'Health Form has been successfully recorded!')
-            else:
-                style = "ui red message"
-                messages.warning(request, 'Invalid input data!')
+            # TODO
+            # check if all quantity in the formset is sufficient   
+
+            # if formset.is_valid():
+            #     for form in formset:
+            #         #form.save()
+            #     style = "ui green message"
+            #     messages.success(request, 'Health Form has been successfully recorded!')
+            # else:
+            #     style = "ui red message"
+            #     messages.warning(request, 'Invalid input data!')
+
+        
 
     context = {
         'title': "Health Form",
@@ -865,7 +872,7 @@ def change_equipment(request, id):
             data.date_approved = changedate
             data.save()
             #subtract inventory
-            equipment = Miscellaneous_Inventory.objects.get(miscellaneous=data.equipment)
+            equipment = Miscellaneous.objects.get(miscellaneous=data.equipment)
             if equipment.quantity > 0:
                 equipment.quantity = equipment.quantity-1
                 equipment.save()
@@ -895,19 +902,159 @@ def change_equipment(request, id):
 
     return render (request, 'unitmanagement/change_equipment.html', context)
 
+# TODO
+# Integrate K9_Handler Model
+# MAYBE SOMETHING!! LOOK AT THE CODES OF THE MODEL 
+def k9_incident(request):
+    form = K9IncidentForm(request.POST or None)
+    style=''
+    if request.method == "POST":
+        if form.is_valid():
+            incident_save = form.save()
 
-def vaccination(request):
-    vaccine_record_form = VaccinationRecordForm(request.POST or None)
-    vaccine_used_form = VaccinationUsedForm(request.POST or None)
-    style=""
+            # get k9 object
+            k9 =incident_save.k9
+            k9_obj=K9.objects.get(id=k9.id)
 
-    vaccines =Medicine.objects.filter(med_type = "Vaccine").order_by('medicine')
+            #if k9 has a partner handler and died
+            if k9_obj.partnered==True and incident_save.incident=='Died' :
+                handler = User.objects.get(id=k9_obj.handler.id)
+                k9_obj.status = 'Dead'
+                k9_obj.handler = None
+                k9_obj.partnered= False
+                handler.partnered = False
+                k9_obj.save()
+                handler.save()
+            else:
+                k9_obj.status = 'Dead'
+                k9_obj.save()
+
+            form = K9IncidentForm()
+            style = "ui green message"
+            messages.success(request, 'Incident has been successfully Reported!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+    
     context = {
-        'title': "Preventive Health Program",
-        'actiontype': "Update",
-        'form1': vaccine_record_form,
-        'form2': vaccine_used_form,
+        'title': "K9 Incident",
+        'actiontype': "Submit",
+        'form': form,
         'style': style,
-        'vaccines':vaccines,
     }
-    return render (request, 'unitmanagement/vaccination.html', context)
+    return render (request, 'unitmanagement/k9_incident.html', context)
+
+# TODO
+# Integrate K9_Handler Model
+# MAYBE SOMETHING!! LOOK AT THE CODES OF THE MODEL   
+def handler_incident(request):
+    form = HandlerIncidentForm(request.POST or None)
+    style=''
+    if request.method == "POST":
+        if form.is_valid():
+            incident_save = form.save()
+
+            # get k9 object
+            handler =incident_save.handler
+            handler_obj=User.objects.get(id=handler.id)
+            
+            #if k9 has a partner handler and died
+            if handler_obj.partnered==True and incident_save.incident=='Died' :
+                k9 = K9.objects.get(handler_id=handler_obj.id)
+                handler_obj.partnered = False
+                handler_obj.status = 'Dead'
+                k9.partnered = False
+                k9.handler = None
+                print(k9, k9.handler)
+                k9.save()
+                handler_obj.save()
+            else:
+                handler_obj.status = 'Dead'
+                handler_obj.save()
+
+            form = HandlerIncidentForm()
+            style = "ui green message"
+            messages.success(request, 'Incident has been successfully Reported!')
+        
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    context = {
+        'title': "Handler Incident",
+        'actiontype': "Submit",
+        'form': form,
+        'style': style,
+    }
+    return render (request, 'unitmanagement/handler_incident.html', context)
+
+
+def reassign_assets(request):
+    style=''
+    form = ReassignAssetsForm(request.POST or None)
+    
+    if request.method == 'POST':
+        if form.is_valid():
+            k9 = K9.objects.get(id=form.data['k9'])
+            handler = User.objects.get(id=form.data['handler'])
+            #save status
+            k9.handler = handler
+            k9.partnered = True
+            k9.save()
+
+            handler.partnered = True
+            handler.save()
+
+            form = ReassignAssetsForm()
+            style = "ui green message"
+            messages.success(request, 'Assets has been successfully Partnered!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Make sure all input is complete!')
+    context = {
+        'title': "Reassign Assets",
+        'actiontype': "Submit",
+        'style': style,
+        'form': form,
+    }
+    return render (request, 'unitmanagement/reassign_assets.html', context)
+
+# TODO 
+# Reproductive Cycle
+def reproductive_list(request):
+    style=''
+    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female')
+    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female')
+    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female')
+    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female')
+    
+    context = {
+        'title': "Reproductive Cycle",
+        'proestrus': proestrus,
+        'estrus': estrus,
+        'metestrus': metestrus,
+        'anestrus': anestrus,
+    }
+    return render (request, 'unitmanagement/reproductive_list.html', context)
+
+def reproductive_edit(request, id):
+    style=''
+    data = K9.objects.get(id=id)
+    form = ReproductiveForm(request.POST or None, instance = data)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            style = "ui green message"
+            messages.success(request, 'Reproductive Details has been successfully Updated!')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Make sure all input is complete!')
+
+    context = {
+        'title': "Reproductive Details",
+        'data': data,
+        'form': form,
+        'style': style,
+    }
+    return render (request, 'unitmanagement/reproductive_details.html', context)

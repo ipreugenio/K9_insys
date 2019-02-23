@@ -13,6 +13,7 @@ urlpatterns = [
     path('training-update/<int:id>', views.training_update_form, name='training_update_form'),
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
     path('training-details/<int:id>', views.training_details, name='training_details'),
+    path('daily-record/<int:id>', views.daily_record, name='daily_record'),
     path('fail-dog/<int:id>', views.fail_dog, name='fail_dog'),
     path('view_graph/<int:id>', views.view_graphs, name='view_graph'),
 
@@ -31,6 +32,8 @@ urlpatterns = [
     path('addoption/confirm-adoption/<int:id>', views.confirm_adoption, name='confirm_adoption'),
     path('addoption/adoption-confirmed', views.adoption_confirmed, name='adoption_confirmed'),
     path('addoption/adoption-details/<int:id>', views.adoption_details, name='adoption_details'),
+
+    path('list-training-k9', views.k9_training_list, name='k9_training_list'),
 
     #path('/<int:id>/', views., name=''),
 ];
