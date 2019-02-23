@@ -17,6 +17,7 @@ class Medicine(models.Model):
         ('Capsule', 'Capsule'),
         ('Bottle', 'Bottle'),
         ('Vaccine', 'Vaccine'),
+        #('Vitamins', 'Vitamins'),
     )
     medicine = models.CharField(max_length=100)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')

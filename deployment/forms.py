@@ -2,6 +2,10 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
+from django.core.validators import validate_integer
+from django.forms import fields
+
+import re
 
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents
 from planningandacquiring.models import K9
@@ -213,6 +217,26 @@ class RequestForm(forms.ModelForm):
             'start_date': DateInput(),
             'end_date': DateInput()
         }
+
+    def validate_date(self):
+        date_start = self.cleaned_data['start_date']
+        date_end = self.cleaned_data['end_date']
+
+        if date_start > date_end:
+            raise forms.ValidationError("Start and End dates are invalid! (Start Date must be < the End Date)")
+
+        if date_start < date.today():
+            raise forms.ValidationError("Start Date must be a future date!")
+
+
+    def clean_phone_number(self):
+        cd = self.cleaned_data['phone_number']
+        regex = re.compile('[^0-9]')
+        # First parameter is the replacement, second parameter is your input string
+
+        return regex.sub('', cd)
+
+
 class IncidentForm(forms.ModelForm):
     class Meta:
         model = Incidents
