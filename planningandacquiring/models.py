@@ -115,7 +115,7 @@ class K9(models.Model):
 
     def calculate_months_before(birthday):
         today = d.today()
-        birthdate = birth_date
+        birthdate = birthday
         bday = 13 - birthdate.month
         return bday
 
@@ -253,31 +253,65 @@ class K9_Quantity(models.Model):
 
 
 #TODO Add inventory attr > How many dogs each item can cater
+#TODO VITAMINS
 class Budget_allocation(models.Model):
     k9_request_forecast = models.IntegerField('k9_request_forecast', default=0)
     k9_needed_for_demand = models.IntegerField('k9s_needed_for_demand', default=0)
     k9_cuurent = models.IntegerField('k9_current', default=0)
-    #training_cost
-    #grand_total
+    food_total = models.DecimalField('food_total', default=0, max_digits=50, decimal_places=2,)
+    equipment_total = models.DecimalField('equipment_total', default=0, max_digits=50, decimal_places=2,)
+    medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=2,)
+    vaccine_total = models.DecimalField('vaccine_total', default=0, max_digits=50, decimal_places=2,)
+    vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=2,)
+    grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
     date_created = models.DateField('date_created', auto_now_add=True)
     date_tobe_budgeted = models.DateField('date_tobe_budgeted', null=True)
 
 class Budget_food(models.Model):
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True) #1 sack per dog per month
+    type = (
+        ('Adult', 'Adult'),
+        ('Puppy', 'Puppy')
+    )
+
+    food = models.CharField('food', max_length=200, default="Adult")
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Budget_equipment(models.Model):
     equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Budget_medicine(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_vaccine(models.Model):
+    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default = 0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+
+# class Budget_vitamins(models.Model):
+#     vitamins = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+#     quantity = models.IntegerField('quantity', default = 0)
+#     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+#     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_vet_supply(models.Model):
+    vet_supply = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Dog_Breed(models.Model):

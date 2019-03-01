@@ -161,7 +161,8 @@
               <th>Serial Number</th>
               <th>Capability</th>
               <th>Handler</th>
-                <th>Schedules</th>
+                <th>Days Before Next Request</th>
+                <th>View Schedules</th>
             </tr>
         </thead>
         <tbody>
@@ -174,6 +175,7 @@
               <td style="width:22%;">{{can_deploy.serial_number}}</td>
               <td style="width:22%;">{{can_deploy.capability}}</td>
               <td style="width:22%;">{{can_deploy.handler}}</td>
+                <td>{{can_deploy|days_before_next_request:forloop.counter0}}</td>
                 <td><a href="{% url 'deployment:view_schedule' can_deploy.id %}">View Schedule</a></td>
             </tr>
               {% endfor %}

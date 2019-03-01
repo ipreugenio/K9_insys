@@ -12,10 +12,18 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 from __future__ import absolute_import, unicode_literals
 import os
+
+from django.conf import settings
+
+#import pymysql
+
+#pymysql.install_as_MySQLdb()
+
 from datetime import timedelta 
 
-from celery.task.schedules import crontab
-from celery.decorators import periodic_task
+#from celery.task.schedules import crontab
+#from celery.decorators import periodic_task
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

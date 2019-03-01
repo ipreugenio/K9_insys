@@ -4,7 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+
+
 import datetime
+import re
+import sys
 
 from training.models import K9_Handler
 from planningandacquiring.models import K9
@@ -293,11 +297,18 @@ def remove_dog_deployed(request, id):
     return redirect('deployment:team_location_details', id=pull_k9.team_assignment.id)
 
 def dog_request(request):
+
     form = RequestForm(request.POST or None)
     style = ""
     if request.method == 'POST':
         print(form.errors)
+        form.validate_date()
         if form.is_valid():
+
+            cd = form.cleaned_data['phone_number']
+            regex = re.compile('[^0-9]')
+            form.phone_number = regex.sub('', cd)
+
             form.save()
             style = "ui green message"
             messages.success(request, 'Request has been successfully Added!')
@@ -634,3 +645,5 @@ def incident_list(request):
     }
 
     return render(request, 'deployment/incident_list.html', context)
+
+

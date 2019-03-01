@@ -2,6 +2,7 @@ from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
 from datetime import timedelta, date
+
 # Create your models here.
 
 class Area(models.Model):
@@ -192,8 +193,8 @@ class Team_Assignment(models.Model):
 class Dog_Request(models.Model):
     requester = models.CharField('requester', max_length=100)
     location = models.CharField('location', max_length=100)
-    phone_number = models.IntegerField('phone_number', blank=True, null=True)
-    email_address = models.CharField('email', max_length=100, blank=True, null=True)
+    phone_number = models.CharField('phone_number', max_length=100, default="n/a")
+    email_address = models.EmailField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
     area = models.ForeignKey(Location, on_delete=models.CASCADE)
     EDD_needed = models.IntegerField('EDD_needed', default=0)
@@ -262,3 +263,4 @@ class Incidents(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField('type', choices=TYPE, max_length=100, default='Others')
     remarks = models.TextField('remarks', max_length=200, blank=True, null=True)
+

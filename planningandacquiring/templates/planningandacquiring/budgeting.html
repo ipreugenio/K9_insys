@@ -13,35 +13,46 @@
      <a class="item" data-tab="fifth">Vet Supply</a>
 </div>
 
+<form action="{% url 'planningandacquiring:budgeting' %}" method="POST">
+    {% csrf_token %}
+
  <div class="ui tab segment active" data-tab="first">
 
-     <div class="ui three statistics">
-  <div class="statistic">
+    <div class="ui four statistics">
+  <div class="ui small statistic">
     <div class="value">
-      {{request_forecast}}
+      {{all_current_dogs}}
     </div>
     <div class="label">
-      Request Forecast
+      All Current Dogs
     </div>
+  </div>
+  <div class="ui small statistic">
+    <div class="value">
+      {{required_dogs}}
+    </div>
+    <div class="label">
+      Additional Dogs Needed <br> for Deployment (Ports)
+    </div>
+  </div>
+  <div class="ui small statistic">
+    <div class="value">
+      {{forecasted_dogs}}
+    </div>
+    <div class="label">
+      Forecasted Dogs Required <br> for Requests
+    </div>
+
       <button id = 'forecast_btn' class="ui blue button" type = "button">Toggle Forecast</button>
   </div>
-  <div class="statistic">
+        <div class="ui small statistic">
     <div class="value">
-      {{dogs_needed}}
+      {{recommended_dogs}}
     </div>
     <div class="label">
-      Dogs needed to be deployed
+      Recommended Dogs to <br> Include in Budget
     </div>
   </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
-  </div>
-
 
 </div>
 
@@ -50,18 +61,22 @@
         <tr>
             <thead>
             <th>Medicine</th>
-            <th>Forecasted Quantity</th>
+            <th>Current Quantity</th>
+            <th>Forecasted Usage</th>
             <th>Price per Item</th>
             <th>Total Price</th>
+            <th>Budget</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in medicine_name %}
+        {% for form in medicine_formset.forms %}
         <tr>
-            <td>{{name}}</td>
+            <td>{{medicine_name|list_item:forloop.counter0}}</td>
+            <td>{{medicine_current|list_item:forloop.counter0}}</td>
             <td>{{medicine_forecast|list_item:forloop.counter0}}</td>
             <td>₱{{medicine_price|list_item:forloop.counter0}}</td>
             <td>₱{{medicine_total|list_item:forloop.counter0}}</td>
+            <td>{{form.budget}}</td>
         </tr>
         {% endfor %}
         <tr>
@@ -81,31 +96,41 @@
  </div>
 
 <div class="ui tab segment" data-tab="second">
-    <div class="ui three statistics">
-  <div class="statistic">
+
+     <div class="ui four statistics">
+  <div class="ui small statistic">
     <div class="value">
-      {{request_forecast}}
+      {{all_current_dogs}}
     </div>
     <div class="label">
-      Request Forecast
+      All Current Dogs
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_needed}}
+      {{required_dogs}}
     </div>
     <div class="label">
-      Dogs needed to be deployed
+      Additional Dogs Needed <br> for Deployment (Ports)
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_to_budget}}
+      {{forecasted_dogs}}
     </div>
     <div class="label">
-      Dogs to budget
+      Forecasted Dogs Required <br> for Requests
     </div>
   </div>
+        <div class="ui small statistic">
+    <div class="value">
+      {{recommended_dogs}}
+    </div>
+    <div class="label">
+      Recommended Dogs to <br> Include in Budget
+    </div>
+  </div>
+
 </div>
 
 
@@ -116,16 +141,17 @@
             <th>Quantity Used Yearly</th>
             <th>Price per Item</th>
             <th>Total Price</th>
+            <th>Budget</th>
             </thead>
         </tr>
          <tbody>
-        {% for name in vaccine_name %}
+        {% for form in vaccine_formset.forms %}
         <tr>
-            <td>{{name}}</td>
+            <td>{{vaccine_name|list_item:forloop.counter0}}</td>
             <td>{{vaccine_used_yearly|list_item:forloop.counter0}}</td>
             <td>₱{{vaccine_price|list_item:forloop.counter0}}</td>
              <td>₱{{vaccine_total|list_item:forloop.counter0}}</td>
-            <td></td>
+            <td>{{form.budget}}</td>
         </tr>
         {% endfor %}
         <tr>
@@ -144,40 +170,51 @@
     </div>
 
 <div class="ui tab segment" data-tab="third">
-    <div class="ui three statistics">
-  <div class="statistic">
+
+     <div class="ui four statistics">
+  <div class="ui small statistic">
     <div class="value">
-      {{request_forecast}}
+      {{all_current_dogs}}
     </div>
     <div class="label">
-      Request Forecast
+      All Current Dogs
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_needed}}
+      {{required_dogs}}
     </div>
     <div class="label">
-      Dogs needed to be deployed
+      Additional Dogs Needed <br> for Deployment (Ports)
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_to_budget}}
+      {{forecasted_dogs}}
     </div>
     <div class="label">
-      Dogs to budget
+      Forecasted Dogs Required <br> for Requests
     </div>
   </div>
+        <div class="ui small statistic">
+    <div class="value">
+      {{recommended_dogs}}
+    </div>
+    <div class="label">
+      Recommended Dogs to <br> Include in Budget
+    </div>
+  </div>
+
 </div>
 
     <table id="tabledata3" class="ui four column celled table">
       <tr>
             <thead>
             <th>Dog Food</th>
-            <th>Quantity Used Yearly</th>
-            <th>Price per Item</th>
+            <th>Quantity Used Yearly (kg.)</th>
+            <th>Price per kg. (MAX)</th>
             <th>Total Price</th>
+            <th>Budget</th>
             </thead>
         </tr>
         <tr>
@@ -185,12 +222,14 @@
             <td>{{adult_food_quantity}}</td>
              <td>₱{{adult_price}}</td>
             <td>₱{{adult_food_total}}</td>
+            <td>{{food_form.budget_adult}}</td>
         </tr>
          <tr>
             <td>Puppy Food</td>
             <td>{{puppy_food_quantity}}</td>
              <td>₱{{puppy_price}}</td>
              <td>₱{{puppy_food_total}}</td>
+             <td>{{food_form.budget_puppy}}</td>
         </tr>
         <tr>
             <td></td>
@@ -208,31 +247,41 @@
     </div>
 
 <div class="ui tab segment" data-tab="fourth">
-    <div class="ui three statistics">
-  <div class="statistic">
+
+      <div class="ui four statistics">
+  <div class="ui small statistic">
     <div class="value">
-      {{request_forecast}}
+      {{all_current_dogs}}
     </div>
     <div class="label">
-      Request Forecast
+      All Current Dogs
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_needed}}
+      {{required_dogs}}
     </div>
     <div class="label">
-      Dogs needed to be deployed
+      Additional Dogs Needed <br> for Deployment (Ports)
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_to_budget}}
+      {{forecasted_dogs}}
     </div>
     <div class="label">
-      Dogs to budget
+      Forecasted Dogs Required <br> for Requests
     </div>
   </div>
+        <div class="ui small statistic">
+    <div class="value">
+      {{recommended_dogs}}
+    </div>
+    <div class="label">
+      Recommended Dogs to <br> Include in Budget
+    </div>
+  </div>
+
 </div>
 
     <table id="tabledata4" class="ui four column celled table">
@@ -242,15 +291,17 @@
             <th>Number of Dogs</th>
             <th>Price per Item</th>
             <th>Total Price</th>
+            <th>Budget</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in equipment_name %}
+        {% for form in equipment_formset.forms %}
         <tr>
-            <td>{{name}}</td>
+            <td>{{equipment_name|list_item:forloop.counter0}}</td>
             <td>{{equipment_quantity}}</td>
             <td>₱{{equipment_price|list_item:forloop.counter0}}</td>
             <td>₱{{equipment_total|list_item:forloop.counter0}}</td>
+            <td>{{form.budget}}</td>
         </tr>
         {% endfor %}
         <tr>
@@ -270,31 +321,42 @@
     </div>
 
 <div class="ui tab segment" data-tab="fifth">
-    <div class="ui three statistics">
-  <div class="statistic">
+
+    <div class="ui four statistics">
+  <div class="ui small statistic">
     <div class="value">
-      {{request_forecast}}
+      {{all_current_dogs}}
     </div>
     <div class="label">
-      Request Forecast
+      All Current Dogs
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_needed}}
+      {{required_dogs}}
     </div>
     <div class="label">
-      Dogs needed to deployed
+      Additional Dogs Needed <br> for Deployment (Ports)
     </div>
   </div>
-  <div class="statistic">
+  <div class="ui small statistic">
     <div class="value">
-      {{dogs_to_budget}}
+      {{forecasted_dogs}}
     </div>
     <div class="label">
-      Dogs to budget
+      Forecasted Dogs Required <br> for Requests
     </div>
   </div>
+        <div class="ui small statistic">
+    <div class="value">
+      {{recommended_dogs}}
+    </div>
+    <div class="label">
+      Recommended Dogs to <br> Include in Budget
+    </div>
+  </div>
+
+
 </div>
 
     <table id="tabledata5" class="ui four column celled table">
@@ -304,15 +366,17 @@
             <th>Quantity Used Yearly</th>
             <th>Price per Item</th>
             <th>Total Price</th>
+            <th>Budget</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in vet_supply_name %}
+        {% for form in vet_supply_formset.forms %}
         <tr>
-            <td>{{name}}</td>
+            <td>{{vet_supply_name|list_item:forloop.counter0}}</td>
             <td>{{vet_supply_quantity}}</td>
             <td>₱{{vet_supply_price|list_item:forloop.counter0}}</td>
             <td>₱{{vet_supply_total|list_item:forloop.counter0}}</td>
+            <td>{{form.budget}}</td>
         </tr>
         {% endfor %}
         <tr>
@@ -330,8 +394,15 @@
         </tbody>
         </table>
     </div>
+<div class="ui right aligned segment" style="padding: 0px;" style="border-width: 0px;">
+            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+        </div>
+    {{medicine_formset.management_form}}
+    {{vaccine_formset.management_form}}
+    {{equipment_formset.management_form}}
+    {{vet_supply_formset.management_form}}
 
-
+</form>
 
 <script type="text/javascript">
 

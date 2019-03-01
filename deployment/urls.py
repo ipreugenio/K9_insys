@@ -19,6 +19,8 @@ urlpatterns = [
     path('view-schedule/<int:id>', views.view_schedule, name='view_schedule'),
     path('add-incident/', views.add_incident, name='add_incident'),
     path('view-incidents/', views.incident_list, name='view_incidents'),
+
+
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),

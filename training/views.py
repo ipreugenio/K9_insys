@@ -1397,7 +1397,7 @@ def skills_from_gender(id):
             }],
 
         layout={
-            "title": "Skill Count of Classified Descendants Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
+            "title": "Skill Count of Classified Ancestors Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
             "annotations": [
                 {
                     "font": {
@@ -1459,7 +1459,7 @@ def skills_from_gender(id):
         EDD_score = 1
         desc2 = "EDD"
 
-    desc = str(k9.name) + " is a " + str(k9_gender) + " K9 and " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " descendants are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among trained " + str(k9_gender) + " descendants."
+    desc = str(k9.name) + " is a " + str(k9_gender) + " K9 and " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " ancestors are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among trained " + str(k9_gender) + " descendants."
 
     classifier = []
     classifier.append(graph)
@@ -1509,7 +1509,7 @@ def skill_in_general(id):
     data = [trace]
 
     layout = go.Layout(
-        title="Skill Count of Classified Descendants (" + str(k9_set.count()) + " dogs)",
+        title="Skill Count of Classified Ancestors (" + str(k9_set.count()) + " dogs)",
     )
 
     fig = go.Figure(data=data, layout=layout)
@@ -1530,7 +1530,7 @@ def skill_in_general(id):
         EDD_score = 1
         desc2 = "EDD"
 
-    desc = str(target_k9.name) + " has " + str(max(values)) + " out of " + str(k9_set.count()) + " descendants who are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among descendants."
+    desc = str(target_k9.name) + " has " + str(max(values)) + " out of " + str(k9_set.count()) + " ancestors who are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among descendants."
 
     classifier = []
     classifier.append(graph)

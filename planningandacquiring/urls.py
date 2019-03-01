@@ -22,8 +22,13 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('K9_forecast/', views.forecast_result, name='K9_forecast'),
     path('breeding_recommendation/', views.breeding_recommendation, name = 'breeding_recommendation'),
+
+    path('budgeting/', views.budgeting, name = 'budgeting'),
+    path('budget_list/budgeting/', views.budgeting, name = 'budgeting'),
+    path('budget_list/', views.budgeting_list, name='budget_list')
+
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
     path('view_breed/', views.breed_listview, name='view_breed'),
-    path('budgeting/', views.budgeting, name = 'budgeting')
+
 ];
 
