@@ -585,6 +585,14 @@ def assign_k9_select(request, id):
             # status of handler and k9 to partnered=TRUE
             handler.capability = k9.capability
             handler.partnered=True
+
+            # if k9.capability == 'EDD':
+            #     handler.edd = True
+            # elif k9.capability == 'NDD':
+            #     handler.ndd = True
+            # elif k9.capability == 'SAR':
+            #     handler.sar = True
+
             handler.save()
 
             k9.partnered=True

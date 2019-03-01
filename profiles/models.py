@@ -80,6 +80,9 @@ class User(models.Model):
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
     capability = models.CharField('capability', max_length=200, default="None")
+    # edd = models.BooleanField(default=False)
+    # ndd = models.BooleanField(default=False)
+    # sar = models.BooleanField(default=False)
     
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date

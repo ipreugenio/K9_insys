@@ -133,7 +133,7 @@ class VaccinceRecord(models.Model):
 
     def save(self, *args, **kwargs):
         if self.heartworm_8 == True:
-            k9.training_status = 'Unclassified'
+            self.k9.training_status = 'Unclassified'
         super(VaccinceRecord, self).save(*args, **kwargs)
 
 class VaccineUsed(models.Model):

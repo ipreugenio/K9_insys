@@ -202,15 +202,9 @@ def login(request):
         style = "ui red message"
         messages.warning(request, 'Wrong serial number or password!')'''
 
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-
     context = {
         'title': "Add User Form",
         'style': style,
-        'notif_data':notif_data,
-        'count':count,
     }
 
     return render (request, 'profiles/login.html', context)

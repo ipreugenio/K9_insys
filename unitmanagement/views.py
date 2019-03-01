@@ -1327,6 +1327,8 @@ def choose_handler_list(request, id):
     style=''
     k9 = K9.objects.get(id=id)
     data = User.objects.filter(status='Working').filter(position='Handler').filter(capability=k9.capability).filter(partnered=False)
+    data_available = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False).exclude(capability=k9.capability)
+    print(data_available)
     data_pi = Personal_Info.objects.filter(UserID__in=data)
 
     request.session["k9_id_partnered"] = k9.id 
@@ -1341,6 +1343,7 @@ def choose_handler_list(request, id):
         'k9':k9,
         'style':style,
         'data_pi': data_pi,
+        'data_available': data_available,
         'notif_data':notif_data,
         'count':count,
     }
@@ -1358,6 +1361,7 @@ def choose_handler(request, id):
     k9.save()
 
     handler.partnered = True
+    handler.capability = k9.capability
     handler.save()
 
     messages.success(request, 'Assets has been successfully Partnered!')

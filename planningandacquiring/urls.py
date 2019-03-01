@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/budgeting/', views.budgeting, name = 'budgeting'),
-    path('budget_list/', views.budgeting_list, name='budget_list')
+    path('budget_list/', views.budgeting_list, name='budget_list'),
 
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
     path('view_breed/', views.breed_listview, name='view_breed'),

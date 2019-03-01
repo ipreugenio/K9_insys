@@ -29,7 +29,12 @@
 
    </table>
 </div>
-<table id="tabledata1" class="ui celled table">
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Recommended Handlers</a>
+    <a class="item" data-tab="second">Available Handlers</a>
+</div>
+<div class="ui tab segment active" data-tab="first">
+    <table id="tabledata1" class="ui celled table">
     <thead>
         <tr class="center aligned">
             <th class="six wide">Handler</th>
@@ -58,11 +63,43 @@
             </tr>
         {% endfor %}
     </tbody>
+    </table>
+</div>
 
+<div class="ui tab segment" data-tab="second">
+    <table id = 'tabledata2' class="ui celled table">
+        <thead  class="center aligned">
+            <th class="six wide">Handler</th>
+            <th >Sex</th>
+            <th >Age</th>
+            <th >City</th>
+            <th >Select</th>
+        </thead>
+        {% for data in data_available %}
+            <tr>
+                <td class="six wide">{{data.fullname}}</td>
+                <td class="two wide center aligned">{{data.gender}}</td>
+                <td class="two wide center aligned">{{data.age}}</td>
+                {% for data_pi in data_pi %}
+                    {% if data_pi.UserID == data %}
+                        <td class="three wide">{{data_pi.city}}</td>
+                    {%else%}
+                    <td class="three wide">{{data_pi.city}}</td>
+                    {%endif%}
+                {% endfor %}
+                <td class="three wide center aligned">
+                    <a href="{% url 'unitmanagement:choose_handler' data.id %}" class="ui blue button" onclick="return confirm('Are you sure?')" >Choose</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
 <script type="text/javascript">
         
     $(document).ready(function() {
+        $('.menu .item').tab();
         $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
     });
     
 </script>
