@@ -11,6 +11,12 @@ from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
 
+def user_in_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)   
+    return user_in_session.id
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -20,7 +26,7 @@ class PhysicalExamForm(forms.ModelForm):
         ('Abnormal', 'Abnormal'),
         ('Not Examined', 'Not Examined'),
     )
-    dog = forms.ModelChoiceField(queryset = K9.objects.all())
+    #dog = forms.ModelChoiceField(queryset = K9.objects.all().order_by('name'))
     general_appearance = forms.CharField(label = 'general_appearance', widget = forms.Select(choices=EXAMSTATUS))
     integumentary = forms.CharField(label = 'integumentary', widget = forms.Select(choices=EXAMSTATUS))
     musculo_skeletal = forms.CharField(label = 'musculo_skeletal', widget = forms.Select(choices=EXAMSTATUS))
@@ -46,16 +52,28 @@ class PhysicalExamForm(forms.ModelForm):
         self.fields['cage_number'].required = False
         self.fields['remarks'].required = False
         self.fields['date_next_exam'].required = False
+        # a = K9.objects.filter(id=request.session['phex_k9_id'])
+        # self.fields['dog'].initial = a
 
 class HealthForm(forms.ModelForm):
 
     dog = forms.ModelChoiceField(queryset = K9.objects.all())
-    problem = forms.CharField(label = 'problem', widget = forms.Textarea(attrs={'rows':'3'}))
-    treatment = forms.CharField(label = 'treatment', widget = forms.Textarea(attrs={'rows':'3'}))
+    treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
+    problem = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
     
     class Meta:
         model = Health
         fields = ('dog','problem', 'treatment')
+
+    def __init__(self, *args, **kwargs):
+        dict_data = kwargs.pop('dict_data', None)
+        super(HealthForm, self).__init__(*args, **kwargs)
+        if dict_data:
+            self.fields['problem'].initial = dict_data[0]['problem']
+        # self.fields['treatment'].initial = 'something'
+
+
+        
 
 class HealthMedicineForm(forms.ModelForm):
     TIME_OF_DAY = (
@@ -72,9 +90,9 @@ class HealthMedicineForm(forms.ModelForm):
         model = HealthMedicine
         fields = ('medicine', 'quantity', 'time_of_day', 'duration')
 
-    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine'))
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine').exclude(medicine__med_type='Vitamins'))
     time_of_day = forms.CharField(label = 'Time of Day', widget = forms.Select(choices=TIME_OF_DAY))
-    duration = forms.CharField(label = 'Duration (Days)')
+    duration = forms.IntegerField(label = 'Duration (Days)')
 
     def __init__(self, *args, **kwargs):
         super(HealthMedicineForm, self).__init__(*args, **kwargs)
@@ -119,7 +137,7 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['heartworm_8'].required = False
 
 class VaccinationUsedForm(forms.Form):
-    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine'))
+    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").filter(med_type = "Others").order_by('medicine'))
 
 
 class RequestForm(forms.ModelForm):
@@ -166,9 +184,20 @@ class HandlerIncidentForm(forms.ModelForm):
         self.fields['description'].required = False
 
 class ReassignAssetsForm(forms.Form):
-    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog').filter(partnered=False))
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(partnered=False))
     handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['handler'].queryset = User.objects.none()
+    #     if 'k9' in self.data:
+    #         try:
+    #             k9_capability = str(self.data.get('k9').capability)
+    #             self.fields['handler'].queryset = User.objects.filter(handler_id=k9_capability).filter(status='Working').filter(position='Handler').filter(partnered=False)
+    #         except (ValueError, TypeError):
+    #             pass  # invalid input from the client; ignore and fallback to empty City queryset
+    #     elif self.instance.pk:
+    #          self.fields['handler'].queryset = self.k9.handler.order_by('name')
 
 class ReproductiveForm(forms.ModelForm):
     class Meta:

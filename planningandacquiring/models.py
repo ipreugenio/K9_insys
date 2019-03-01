@@ -38,8 +38,9 @@ class K9(models.Model):
 
     STATUS = (
         ('Material Dog', 'Material Dog'),
-        ('Light Duty', 'Light Duty'),
+        ('Working Dog', 'Working Dog'),
         ('Adopted', 'Adopted'),
+        ('Due-For-Retirement', 'Due-For-Retirement'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
         ('Sick', 'Sick'), 
@@ -50,6 +51,22 @@ class K9(models.Model):
         ('Estrus', 'Estrus'),
         ('Metestrus', 'Metestrus'),
         ('Anestrus', 'Anestrus'), 
+    )
+    SOURCE = (
+        ('Procured', 'Procured'),
+        ('Breeding', 'Breeding'),
+    )
+
+    TRAINING = (
+        ('Puppy', 'Puppy'),
+        ('Unclassified', 'Unclassified'),
+        ('Classified', 'Classified'),
+        ('On-Training', 'On-Training'),
+        ('Trained', 'Trained'),
+        ('For-Breeding', 'For-Breeding'),
+        ('For-Deployment', 'For-Deployment'),
+        ('Light Duty', 'Light Duty'),
+        ('Retired', 'Retired'),
     )
 
     #Training Status
@@ -62,11 +79,11 @@ class K9(models.Model):
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', null=True)
     age = models.IntegerField('age', default = 0)
-    source = models.CharField('source', max_length=200, default="Not Specified")
-    year_retired = models.DateField('year_retired', null=True)
+    source = models.CharField('source', max_length=200, default="Not Specified", choices=SOURCE)
+    year_retired = models.DateField('year_retired', null=True, blank=True)
     assignment = models.CharField('assignment', max_length=200, default="None")
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
-    training_status = models.CharField('training_status', max_length=200, default="Unclassified")
+    training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     partnered = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
@@ -104,6 +121,7 @@ class K9(models.Model):
 
     def save(self, *args, **kwargs):
         days = d.today() - self.birth_date
+        self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
@@ -130,7 +148,9 @@ class K9(models.Model):
 
         if self.age == 9:
             self.training_status = 'Due-For-Retirement'
-            self.status = 'Light Duty'
+            self.status = 'Working Dog'
+            #TODO notif 1 year
+            Notification.objects.create(message= str(k9) +' is due to retire next year.')
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))

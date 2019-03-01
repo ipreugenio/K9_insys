@@ -1,6 +1,7 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
+{% load static %}
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
@@ -12,43 +13,86 @@
         {% endfor %}
     {% endif %}
 </div>
-<div class="ui inverted segment">
-    <form class="ui inverted form" method="POST">
-        {% csrf_token %}
-        <div class="ui inverted placeholder segment">
-            <div class="ui two column stackable center aligned grid">
-                <div class="ui inverted vertical divider">AND</div>
-                <div class="middle aligned row">
-                    <div class="column">
-                        <div class="ui inverted icon header">
-                            <i class="paw icon"></i>K9
-                        </div>
-                        <div class="field">
-                           {{form.k9}}
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="ui inverted icon header">
-                        <i class="male icon"></i>Handler
-                        </div>
-                        <div class="field">
-                            {{form.handler}}
+<div class="ui inverted segment"  ng-controller="cont2" ng-app='notification'>
+        <form class="ui inverted form" method="POST">
+                {% csrf_token %}
+                <div class="ui inverted placeholder segment">
+                    <div class="ui two column stackable center aligned grid">
+                        <div class="ui inverted vertical divider">AND</div>
+                        <div class="middle aligned row">
+                            <div class="column">
+                                <div class="ui inverted icon header">
+                                    <i class="paw icon"></i>K9
+                                </div>
+                                <div class="field">
+                                    {{form.k9}}
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="ui inverted icon header">
+                                <i class="male icon"></i>Handler
+                                </div>
+                                <div class="field">
+                                    {{form.handler}}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="ui inverted center aligned segment" style="padding: 0px;">
-            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
-        </div>
-    </form>    
-</div>
+                <div class="ui inverted center aligned segment" style="padding: 0px;">
+                        <button ng-click="reassign()" onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+                </div>
+            </form> 
+    <div>{{num}}</div>
+    <p id= 'k9_id'>this is</p>
 
-<script type="text/javascript">
-        
-    $(document).ready(function() {
-      
-    });
+   
+    <select name="k" id="k">
+            {% for k9 in k9 %}
+            <option value="{{k9.capability}}">{{k9.name}}</option>
+            {% endfor %}
+    </select>
     
+    <select name="h" id="h">
+            {% for handler in handler %}
+            <option value="{{handler.id}}" data-add = '{{handler.capability}}'>{{handler.fullname}}</option>
+            {% endfor %}
+    </select>
+
+    <select name="s" id="s">
+        <option value=""></option>
+    </select>
+</div>
+<script>
+    $(document).ready(function() {
+
+        var capa = $("#k9_id").text()
+
+        $("#k").change(function(){
+            var itemlist= [];
+            b = $("#k").val()
+          
+            $(this).text()
+            $("#h option").each(function()
+            {
+                if(this.getAttribute('data-add')==b){
+                    itemlist.push({
+                        id :  $(this).val(),
+                        name :  $(this).text()
+                    })
+                }
+            });
+           
+            $.each(itemlist, function( index, obj) {
+                $.each(obj['id']['name'], function(key, value) {
+                    console.log(key);
+                    console.log(value);
+                });
+            });
+
+            $('#s').append($('', { value: 7, text: 'Dynamic Append' }));
+        });
+
+    });
 </script>
- {% endblock %}
+{% endblock %}

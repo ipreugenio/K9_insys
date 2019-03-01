@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf.urls import include, url
 from .import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 app_name='profiles'
 urlpatterns = [
@@ -16,6 +17,9 @@ urlpatterns = [
     path('user_list/', views.user_listview, name='user_list'),
     path('user_detail/<int:id>', views.user_detailview, name='user_detail'),
     path('user_add_confirmed/', views.user_add_confirmed, name='user_add_confirmed'),
+
+    path('api', views.NotificationListView.as_view()),
+    path('api/<int:id>', views.NotificationDetailView.as_view()),
 
     #path('/<int:id>/', views., name=''),
     #path('logout/', auth_views.logout, name='logout'),

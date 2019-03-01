@@ -26,6 +26,19 @@ from django.db.models import Sum
 
 #print(pd.__version__) #Version retrieved is not correct
 
+def notif(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    
+    if user_in_session.position == 'Veterinarian':
+        notif = Notification.objects.filter(position='Veterinarian')
+    elif user_in_session.position == 'Handler':
+        notif = Notification.objects.filter(position='Handler')
+    else:
+        notif = Notification.objects.filter(position='Administrator')
+   
+    return notif
 
 def index(request):
     return render (request, 'training/index.html')
@@ -52,9 +65,15 @@ def adoption_form(request, id):
             request.session['no_id'] = no_id.id
             return redirect('training:confirm_adoption', id = data.id)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': data,
         'form': form,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/adoption_form.html', context)
 
@@ -72,19 +91,31 @@ def confirm_adoption(request, id):
             print('not ok')
             new_owner.delete()
             return redirect('training:adoption_form', id = data.id)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'title': data,
         'data': data,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/confirm_adoption.html', context)
 
 def adoption_list(request):
     for_adoption = K9.objects.filter(training_status='For-Adoption')
     adopted = K9.objects.filter(training_status='Adopted')
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': 'Adoption List',
         'for_adoption': for_adoption,
         'adopted': adopted,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render (request, 'training/for_adoption_list.html', context)
@@ -92,10 +123,14 @@ def adoption_list(request):
 def adoption_details(request, id):
     k9 = K9.objects.get(id=id)
     data = K9_Adopted_Owner.objects.get(k9=k9)
-
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'title': data.k9,
         'data': data,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render (request, 'training/adoption_details.html', context)
@@ -255,7 +290,9 @@ def classify_k9_list(request):
     '''
     if k9 has failed 2 training records, disable reasign button
     '''
-
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
@@ -268,7 +305,8 @@ def classify_k9_list(request):
         'NDD_demand': NDD_demand,
         'EDD_demand': EDD_demand,
         'SAR_demand': SAR_demand,
-
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -356,10 +394,16 @@ def view_graphs(request, id):
         elif id == 2:
             title = "Explosives Detection Dogs"
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
     context = {'graphs': graphs,
                'descriptions': descriptions,
-               'title': title}
+               'title': title,
+               'notif_data':notif_data,
+                'count':count,
+               }
 
     return render(request, 'training/view_graph.html', context)
 
@@ -482,6 +526,11 @@ def classify_k9_select(request, id):
     try:
         parent = K9_Parent.objects.get(offspring=data)
     except K9_Parent.DoesNotExist:
+
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+
         context = {
             'data': data,
             'title': title,
@@ -495,7 +544,9 @@ def classify_k9_select(request, id):
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
             'form': form,
-            'graph': graph
+            'graph': graph,
+            'notif_data':notif_data,
+            'count':count,
         }
     else:
         parent_exist = 1
@@ -514,7 +565,9 @@ def classify_k9_select(request, id):
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
             'form': form,
-            'graph': graph
+            'graph': graph,
+            'notif_data':notif_data,
+            'count':count,
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -530,6 +583,7 @@ def assign_k9_select(request, id):
             handler = User.objects.get(id=form.data['handler'])
             
             # status of handler and k9 to partnered=TRUE
+            handler.capability = k9.capability
             handler.partnered=True
             handler.save()
 
@@ -546,20 +600,31 @@ def assign_k9_select(request, id):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
             print(form)
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
     context = {
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
         'style': style,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/assign_k9_select.html', context)
 
 
 def training_records(request):
     data = K9.objects.all()
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': "Training Records",
         'data': data,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render(request, 'training/training_records.html', context)
 
@@ -654,11 +719,17 @@ def training_update_form(request, id):
         messages.success(request, 'Training Progress has been successfully Updated!')
 
         return redirect('training:training_update_form', id = id)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'title': data.name,
         'data': data,
         'form': form,
         'form2': form2,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     if data.capability == 'EDD':
@@ -690,12 +761,18 @@ def serial_number_form(request, id):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'form': form,
         'title': 'Trained K9 Finalization',
         'texthelp': 'Input Final Details Here',
         'actiontype': 'Submit',
         'style' : style,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/serial_number_form.html', context)
 
@@ -716,12 +793,18 @@ def training_details(request, id):
     ndd = Training.objects.filter(k9=data).get(training='NDD')
     sar = Training.objects.filter(k9=data).get(training='SAR')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': str(data),
         'data': data,
         'edd':edd,
         'ndd':ndd,
         'sar':sar,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/training_details.html', context)
 
@@ -736,19 +819,29 @@ def daily_record(request, id):
             date = request.POST.get('choose_date')
             record = Record_Training.objects.filter(k9=data).get(date_today = date)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': str(data),
         'data': data,
         'form': form,
         'record': record,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render(request, 'training/daily_record.html', context)
 
 def adoption_confirmed(request):
-    return render (request, 'training/adoption_confirmed.html')
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
-
-
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+    }
+    return render (request, 'training/adoption_confirmed.html', context)
 
 def skill_count_between_breeds(id):
     k9_set = K9.objects.exclude(capability="None")
@@ -1511,10 +1604,15 @@ def genealogy(id):
 
 def k9_training_list(request):
     data_ontraining = K9.objects.filter(training_status="On-Training")
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
     context = {
         'title': 'K9 Training List',
-        'data_ontraining': data_ontraining
+        'data_ontraining': data_ontraining,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'training/k9_training_list.html', context)
 

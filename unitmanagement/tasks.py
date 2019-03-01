@@ -10,10 +10,15 @@ from django.db.models import Sum
 
 from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
-from unitmanagement.models import Notification, PhysicalExam, Dog_Request
 from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail
+from inventory.models import Safety_Stock
+from unitmanagement.models import Notification, PhysicalExam
+from profiles.serializers import NotificationSerializer
 # Create your tasks here
 # The @shared_task decorator lets you create tasks that can be used by any app(s).
+
+#TODO
+#ADD POSITION, OTHER_ID
 
 # TODO UNITMANAGEMENT NOTIFS
 #@periodic_task(run_every=crontab(hour=6, minutes=0))
@@ -31,82 +36,78 @@ def unitmanagement_notifs():
     k9_breed = K9.objects.all(training_status='For-Breeding') 
     for k9_breed in k9_breed:
         if k9_breed.estrus_date == date.today() and k9_breed.age >= 1:
-            Notification.objects.create(message= str(k9_breed) + ' is recommended to mate this week as she is most fertile!')
+            Notification.objects.create(message= str(k9_breed) + ' is recommended to mate this week as she is most fertile!', notif_type='heat_cycle', position='Veterinarian')
 
         if k9_breed.last_proestrus_date == date.today():
-            Notification.objects.create(message= str(k9_breed) + ' is in heat!')
+            Notification.objects.create(message= str(k9_breed) + ' is in heat!', notif_type='heat_cycle')
 
         if k9_breed.metestrus_date == date.today():
-            Notification.objects.create(message= 'If you mated ' + str(k9_breed) + ', she is about to show signs of pregnancy!')
+            Notification.objects.create(message= 'If you mated ' + str(k9_breed) + ', she is about to show signs of pregnancy!', notif_type='heat_cycle', position='Veterinarian')
 
     # PHYSICAL EXAMINATION DUE
     for phex in phex:
         if date.today() ==  phex.due_notification():
-            Notification.objects.create(k9=phex.dog, message= str(phex.dog.name) + ' is due for Physical Examination in next week.' + str(phex.date_next_exam))
+            Notification.objects.create(k9=phex.dog, message= str(phex.dog.name) + ' is due for Physical Examination in next week.' + str(phex.date_next_exam), notif_type='physical_exam', position='Veterinarian')
         elif date.today() ==  phex.date_next_exam:
-            Notification.objects.create(k9=phex.dog, message= str(phex.dog.name) + ' is due for Physical Examination today')
+            Notification.objects.create(k9=phex.dog, message= str(phex.dog.name) + ' is due for Physical Examination today', notif_type='physical_exam', position='Veterinarian')
 
     # VACCINATION DUE
     for k9 in k9:
         age = date.today() - k9.birth_date
-        # TODO ADD PARAMS FOR IN HEAT
-        # if age.days == [inheat month] :
-        #     k9.in_heat = True
-        #     k9.save()
         if age.days == 14 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Deworming this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Deworming this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 28 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due 2nd Deworming this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due 2nd Deworming this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 42 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due 3rd Deworming this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due 3rd Deworming this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 42 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st DHPPiL+CV Vaccination this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st DHPPiL+CV Vaccination this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 42 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 56 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Bordetella Bronchiseptica Bacterin this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Bordetella Bronchiseptica Bacterin this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 56 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 63 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd DHPPiL+CV this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd DHPPiL+CV this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 63 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Deworming this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Deworming this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 70 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 77 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Bordetella Bronchiseptica Bacterin this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Bordetella Bronchiseptica Bacterin this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 84 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for Anti-Rabies Vaccination this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for Anti-Rabies Vaccination this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 84 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 84 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd DHPPiL+CV Vaccination this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd DHPPiL+CV Vaccination this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 98 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 105 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st DHPPiL4 Vaccination this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 1st DHPPiL4 Vaccination this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 112 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 3rd Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 126 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd DHPPiL4 Vaccination this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 2nd DHPPiL4 Vaccination this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 126 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 140 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 4th Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 154 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 5th Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 5th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 168 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 5th Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 5th Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 183 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 6th Heartworm Prevention this week.')        
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 6th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')        
         elif age.days == 196 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 6th Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 6th Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 210 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 7th Heartworm Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 7th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 224 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 7th Tick and Flea Prevention this week.')
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 7th Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 238 :
-            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 8th Heartworm Prevention this week.')        
+            Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 8th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')        
 
 # TODO DEPLOYMENT NOTIFS
 #@periodic_task(run_every=crontab(hour=6, minutes=0))
@@ -118,25 +119,39 @@ def deployment_notifs():
         # start date
         if date.today() ==  request.due_start():
             Notification.objects.create(message= str(request.location) + ' deployment requested by ' + 
-            str(request.requester) + ' is due to start next week.')
+            str(request.requester) + ' is due to start next week.', notif_type='dog_request', other_id=request.id)
         elif date.today() ==  request.start_date:
            Notification.objects.create(message= str(request.location) + ' deployment requested by ' + 
-            str(request.requester) + ' will start today.')
+            str(request.requester) + ' will start today.', notif_type='dog_request', other_id=request.id)
 
         # end date
         elif date.today() ==  request.due_end():
             Notification.objects.create(message= str(request.location) + ' deployment requested by ' + 
-            str(request.requester) + ' is due to end next week.')
+            str(request.requester) + ' is due to end next week.', notif_type='dog_request', other_id=request.id)
         elif date.today() ==  request.end_date:
             Notification.objects.create(message= str(request.location) + ' deployment requested by ' + 
-            str(request.requester) + ' will end today.')
+            str(request.requester) + ' will end today.', notif_type='dog_request', other_id=request.id)
 
-# TODO AUTO SUBTRACT 
-# TODO Add Subtract trail for food
+
 #@periodic_task(run_every=crontab(hour=6, minutes=0))
 # every 5am?
 def auto_subtract():
     # TODO Vitamins consumption
+    vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
+    v = K9.objects.filter(status='Working Dog').count()
+    
+    for vitamins in vitamins:
+        if v > 0:
+            if v > vitamins.quantity:
+                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
+                v = v-food.quantity
+                vitamins.quantity = 0 
+                vitamins.save()
+            else: 
+                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
+                vitamins.quantity = vitamins.quantity-v
+                v=0
+                vitamins.save()
 
     # FOOD CONSUMPTION EVERYDAY
     k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).count()
@@ -247,21 +262,29 @@ def auto_subtract():
 
     # TODO Get Delivery Days
     # INVENTORY LOW NOTIFICATION
-    delivery_days = 8 
+    delivery_days = 4 
     day_adult = Decimal(total) * delivery_days
     day_puppy = Decimal(food) * delivery_days
     day_milk = Decimal(milk) * delivery_days
+
+    try:
+        stock = Safety_Stock.objects.get(id=1)
+        stock.puppy_food = day_puppy
+        stock.adult_food = day_adult
+        stock.milk = milk
+        stock.save()
+    except (stock.DoesNotExist):
 
     adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
     puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
     milk_q = Food.objects.filter(foodtype='Milk').aggregate(sum=Sum('quantity'))['sum']
 
     if adult_dfq <= day_adult:
-        Notification.objects.create(message= 'Adult Dog Food is low. Its time to reorder!')
+        Notification.objects.create(message= 'Adult Dog Food is low. Its time to reorder!', notif_type='inventory_low')
     if puppy_dfq <= day_puppy:
-        Notification.objects.create(message= 'Puppy Dog Food is low. Its time to reorder!')
+        Notification.objects.create(message= 'Puppy Dog Food is low. Its time to reorder!', notif_type='inventory_low')
     if milk_q <= day_milk:
-        Notification.objects.create(message= 'Milk is low. Its time to reorder!')
+        Notification.objects.create(message= 'Milk is low. Its time to reorder!', notif_type='inventory_low')
         
 
 # Deployment Change status to deployed
@@ -274,12 +297,9 @@ def deploy_dog():
         sched.k9.save()
         
 
-
+#Due for retirement dog
 @periodic_task(run_every=timedelta(seconds=10))
 def test():
-    # TODO
-    pass
+    Notification.objects.create(message='message', position="Veterinarian")
     
-
-
         

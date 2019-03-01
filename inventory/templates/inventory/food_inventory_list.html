@@ -22,6 +22,119 @@
     </thead>
         <tbody>
             {% for data in data %}
+            {% if data.foodtype == 'Adult Dog Food' %}
+                {% if adult_inventory <= ss.adult_food%}
+                <tr class = 'negative'>
+                    <td>
+                        <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
+                    </td>
+                    <td>{{ data.foodtype }}</td>
+                    {% if data.foodtype == 'Milk' %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ data.quantity }}</td>
+                    {% endif%}
+                    <td>{{ data.quantity_grams }}</td>
+                    <td class="two wide center aligned">
+                        <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal list ol icon"></i>
+                        </a>
+                        <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal dolly flatbed icon"></i>
+                        </a>
+                    </td>       
+                </tr>
+                {%else%}
+                <tr>
+                    <td>
+                        <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
+                    </td>
+                    <td>{{ data.foodtype }}</td>
+                    {% if data.foodtype == 'Milk' %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ data.quantity }}</td>
+                    {% endif%}
+                    <td>{{ data.quantity_grams }}</td>
+                    <td class="two wide center aligned">
+                        <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal list ol icon"></i>
+                        </a>
+                        <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal dolly flatbed icon"></i>
+                        </a>
+                    </td>       
+                </tr>
+                {%endif%}
+            {%endif%}
+            {% if data.foodtype == 'Puppy Dog Food' %}
+                {% if puppy_inventory <= ss.puppy_food%}
+                <tr class = 'negative'>
+                    <td>
+                        <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
+                    </td>
+                    <td>{{ data.foodtype }}</td>
+                    {% if data.foodtype == 'Milk' %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ data.quantity }}</td>
+                    {% endif%}
+                    <td>{{ data.quantity_grams }}</td>
+                    <td class="two wide center aligned">
+                        <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal list ol icon"></i>
+                        </a>
+                        <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal dolly flatbed icon"></i>
+                        </a>
+                    </td>       
+                </tr>
+                {%else%}
+                <tr>
+                    <td>
+                        <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
+                    </td>
+                    <td>{{ data.foodtype }}</td>
+                    {% if data.foodtype == 'Milk' %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ data.quantity }}</td>
+                    {% endif%}
+                    <td>{{ data.quantity_grams }}</td>
+                    <td class="two wide center aligned">
+                        <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal list ol icon"></i>
+                        </a>
+                        <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
+                            <i class="teal dolly flatbed icon"></i>
+                        </a>
+                    </td>       
+                </tr>
+                {%endif%}
+            {%endif%}
+            {% if data.foodtype == 'Milk' %}
+            {% if milk_inventory <= ss.milk%}
+            <tr class = 'negative'>
+                <td>
+                    <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
+                </td>
+                <td>{{ data.foodtype }}</td>
+                {% if data.foodtype == 'Milk' %}
+                    <td></td>
+                {% else %}
+                    <td>{{ data.quantity }}</td>
+                {% endif%}
+                <td>{{ data.quantity_grams }}</td>
+                <td class="two wide center aligned">
+                    <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal list ol icon"></i>
+                    </a>
+                    <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
+                        <i class="teal dolly flatbed icon"></i>
+                    </a>
+                </td>       
+            </tr>
+            {%else%}
             <tr>
                 <td>
                     <a href="{% url 'inventory:food_inventory_details' data.id %}">{{ data.food }}</a>
@@ -40,11 +153,10 @@
                     <a href="{% url 'inventory:food_receive_form' data.id %}" style="margin-right:10px;">
                         <i class="teal dolly flatbed icon"></i>
                     </a>
-                    <a href="{% url 'inventory:food_subtract_form' data.id %}" style="margin-right:10px;">
-                        <i class="teal truck icon"></i>
-                    </a>
                 </td>       
             </tr>
+            {%endif%}
+            {%endif%}
             {% endfor %}
         </tbody>
     </table>

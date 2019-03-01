@@ -1,14 +1,52 @@
-<div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
-    <i class="blue bell icon"></i>
-   
-    <span style="color:red;font-size: 12px;" id = 'count_notif'>1</span>
-    
-    <div class="menu" style="overflow: auto;max-height: 250px;max-width: 300px;">
-       
-        <a href="" class="item" >message here<br>
-            <small>date here</small>
-        </a>
-          
+{% load static %}
+<!-- <div ng-controller="cont1" ng-app='notification'>
+        <div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
+            <i class="blue bell icon"></i>
+            <span style="color:red;font-size: 12px;" ng-bind="count"></span>
+            <div class="menu" style='overflow: auto;max-height: 250px;'>
+                <div class="item" ng-repeat="notif in notifList">
+                    <a href="" style='color: black;' ng-style="{ 'opacity' : (notif.viewed == true) ? '0.6' : '10' }"> 
+                        <span ng-bind="notif.message | limitTo:limit"></span>
+                        <br>
+                        <small ng-bind="notif.datetime | date:'MM/dd/yyyy - hh:mm'"></small>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div> -->
+
+
+<div >
+    <div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
+        <i class="blue bell icon"></i>
+        <span style="color:red;font-size: 12px;">{{count}}</span>
+        <div class="menu" style='overflow: auto;max-height: 250px;'>
+            {% for notif_data in notif_data%}
+                {%if notif_data.viewed == True %}
+                <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:30}} 
+                    <br>
+                    <small>{{notif_data.datetime}}</small>
+                </a>
+                {%else%}
+                <a class="item" style='color: black;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:30}} 
+                        <br>
+                        <small>{{notif_data.datetime}}</small>
+                    </a>
+                {%endif%}
+            {% endfor%}
+        </div>
     </div>
 </div>
+    
 
+<style>
+    .dim{
+        opacity: 0.6;
+        color:black;
+    }
+    .notdim{
+        color:black;
+    }
+
+</style>

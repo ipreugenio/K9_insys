@@ -36,18 +36,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'profiles.apps.ProfilesConfig',
-    'planningandacquiring.apps.PlanningandacquiringConfig',
-    'deployment.apps.DeploymentConfig',
-    'training.apps.TrainingConfig',
-    'unitmanagement.apps.UnitmanagementConfig',
-    'inventory.apps.InventoryConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'profiles',
+    'planningandacquiring',
+    'deployment',
+    'training',
+    'unitmanagement',
+    'inventory',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'K9_insys.urls'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
 
 TEMPLATES = [
     {
@@ -101,22 +109,23 @@ DATABASES = {
 
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_IMPORTS = ('K9_insys', 'unitmanagement')
-#CELERY_RESULT_BACKEND = 'db+mysql://root:@localhost/k9_db'
+CELERY_RESULT_BACKEND = 'db+mysql://root:@localhost/k9_db'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Manila'
 CELER_IGNORE_RESULT = False
 
-CELERY_BEAT_SCHEDULE = {
-    # 'every-10-seconds':{
-    #     'task': 'unitmanagement.tasks.showx',
-    #     'schedule': timedelta(seconds=10),
-    # },
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'every-10-seconds':{
+#         'task': 'unitmanagement.tasks.what',
+#         'schedule': timedelta(seconds=10),
+#     },
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -152,3 +161,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS=[
+    'static'
+]

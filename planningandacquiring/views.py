@@ -55,6 +55,19 @@ import statsmodels.api as sm
 import math
 # Create your views here.
 
+def notif(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    
+    if user_in_session.position == 'Veterinarian':
+        notif = Notification.objects.filter(position='Veterinarian')
+    elif user_in_session.position == 'Handler':
+        notif = Notification.objects.filter(user=user_in_session)
+    else:
+        notif = Notification.objects.filter(position='Administrator')
+   
+    return notif
 
 def index(request):
     data = [[],[],[]]
@@ -68,7 +81,7 @@ def index(request):
         date_to = request.POST.get('date_to')
 
         i = Medicine_Subtracted_Trail.objects.values('name').distinct().filter(date_subtracted__range=[date_from, date_to])
-        count=0
+        count1=0
 
         c = [] #quantity
         d = [] #price
@@ -87,25 +100,38 @@ def index(request):
         for x in i:
             print(x['name'])
             n=x['name']
-            data[count].append(n)
-            data[count].append(c[count])
-            data[count].append(d[count]*c[count])
-            total=total+d[count]*c[count]
-            count= count+1
+            data[count1].append(n)
+            data[count1].append(c[count1])
+            data[count1].append(d[count1]*c[count1])
+            total=total+d[count]*c[count1]
+            count1= count1+1
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title' : "Medicine Used Report",
         'data': data,
         'total':total,
         'date_from': date_from,
         'date_to':date_to,
+        'notif_data':notif_data,
+        'count':count,
     }
     return render (request, 'planningandacquiring/index.html', context)
 
 def report(request):
     form = ReportDateForm()
+   #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'Title' : "REPORT",
         'form': form,
+        'notif_data':notif_data,
+        'count':count,
         }
     return render (request, 'planningandacquiring/report.html', context)
 
@@ -120,14 +146,6 @@ def add_donated_K9(request):
             k9.save()
 
             request.session['k9_id'] = k9.id
-
-            #create Training object when k9 is created, self.id of k9 will be the value of training_id
-            Training.objects.create(k9=k9, training='EDD')
-            Training.objects.create(k9=k9, training='NDD')
-            Training.objects.create(k9=k9, training='SAR')
-
-            
-
             return HttpResponseRedirect('confirm_donation/')
 
         else:
@@ -135,11 +153,17 @@ def add_donated_K9(request):
             messages.warning(request, 'Invalid input data!')
             print(form)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'Title' : "Add New K9",
         'form' : form,
         'style': style,
-            }
+        'notif_data':notif_data,
+        'count':count,
+    }
 
     return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
@@ -172,10 +196,15 @@ def confirm_donation(request):
 
     k9_id = request.session['k9_id']
     k9= K9.objects.get(id = k9_id)
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
     context = {
         'Title': "Receive Donated K9",
         'k9': k9,
+        'notif_data':notif_data,
+        'count':count,
 
     }
     return render(request, 'planningandacquiring/confirm_K9_donation.html', context)
@@ -184,19 +213,31 @@ def donation_confirmed(request):
     k9_id = request.session['k9_id']
 
     k9 = K9.objects.get(id=k9_id)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+    }
 
     if 'ok' in request.POST:
-        return render(request, 'planningandacquiring/donation_confirmed.html')
+        return render(request, 'planningandacquiring/donation_confirmed.html', context)
     else:
-        #delete training record
-        training = Training.objects.filter(k9=k9)
-        training.delete()
         #delete k9
         k9.delete()
+
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
 
         context = {
             'Title': "Receive Donated K9",
             'form': add_donated_K9_form,
+            'notif_data':notif_data,
+            'count':count,
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
@@ -240,14 +281,18 @@ def add_K9_parents(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
     context = {
         'Title': "K9_Breeding",
         'form': form,
         'style': style,
         'mothers' : mother_list,
-        'fathers' : father_list
+        'fathers' : father_list,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
@@ -259,9 +304,15 @@ def confirm_K9_parents(request):
     mother = K9.objects.get(id=mother_id)
     father = K9.objects.get(id=father_id)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'mother': mother,
         'father': father,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/confirm_K9_parents.html', context)
@@ -282,52 +333,64 @@ def K9_parents_confirmed(request):
     if 'ok' in request.POST:
         return HttpResponseRedirect('add_K9_offspring_form/')
     else:
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
             'mothers': mother_list,
-            'fathers': father_list
+            'fathers': father_list,
+            'notif_data':notif_data,
+            'count':count,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
 
 def add_offspring_K9(request):
-     form = add_offspring_K9_form(request.POST)
-     style = "ui teal message"
+    form = add_offspring_K9_form(request.POST)
+    style = "ui teal message"
 
-     if request.method == 'POST':
-         if form.is_valid():
-             k9 = form.save()
-             k9.source = "Breeding"
-             mother_id = request.session['mother_id']
-             father_id = request.session['father_id']
-             mother = K9.objects.get(id=mother_id)
-             father = K9.objects.get(id=father_id)
+    if request.method == 'POST':
+        if form.is_valid():
+            k9 = form.save()
+            k9.source = "Breeding"
+            mother_id = request.session['mother_id']
+            father_id = request.session['father_id']
+            mother = K9.objects.get(id=mother_id)
+            father = K9.objects.get(id=father_id)
 
-             if mother.breed != father.breed:
+            if mother.breed != father.breed:
                 breed = "Mixed"
-             else:
+            else:
                 breed = mother.breed
 
-             k9.breed = breed
-             k9.save()
+                k9.breed = breed
+                k9.save()
 
-             request.session['offspring_id'] = k9.id
+                request.session['offspring_id'] = k9.id
 
-             return HttpResponseRedirect('confirm_breeding/')
+                return HttpResponseRedirect('confirm_breeding/')
 
-         else:
-             style = "ui red message"
-             messages.warning(request, 'Invalid input data!')
-             print(form)
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            print(form)
 
-     context = {
-         'Title': "Receive Donated K9",
-         'form': form,
-         'style': style,
-     }
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
 
-     return render(request, 'planningandacquiring/add_K9_offspring.html', context)
+    context = {
+        'Title': "Receive Donated K9",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+    }
+
+    return render(request, 'planningandacquiring/add_K9_offspring.html', context)
 
 def confirm_breeding(request):
     offspring_id = request.session['offspring_id']
@@ -338,11 +401,17 @@ def confirm_breeding(request):
     mother = K9.objects.get(id=mother_id)
     father = K9.objects.get(id=father_id)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'Title': "Receive Donated K9",
         'offspring': offspring,
         'mother': mother,
         'father': father,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/confirm_breeding.html', context)
@@ -359,15 +428,17 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
-        Training.objects.create(k9=offspring, training='EDD')
-        Training.objects.create(k9=offspring, training='NDD')
-        Training.objects.create(k9=offspring, training='SAR')
 
-        return render(request, 'planningandacquiring/breeding_confirmed.html')
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+        context={
+            'notif_data':notif_data,
+            'count':count,
+        }
+
+        return render(request, 'planningandacquiring/breeding_confirmed.html', context)
     else:
-        #delete training record
-        training = Training.objects.filter(k9=offspring)
-        training.delete()
         #delete offspring
         offspring.delete()
 
@@ -383,11 +454,17 @@ def breeding_confirmed(request):
         for father in fathers:
             father_list.append(father)
 
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
             'mothers': mother_list,
             'fathers': father_list,
+            'notif_data':notif_data,
+            'count':count,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
@@ -427,9 +504,15 @@ def K9_listview(request):
         name = fake.name()
         dog = K9(name = name, birth_date = date)
         dog.save()'''
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'Title' : 'K9 List',
-        'k9' : k9
+        'k9' : k9,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/K9_list.html', context)
@@ -444,12 +527,18 @@ def K9_detailview(request, id):
         k9.save()
         messages.success(request, 'K9 is now ' + k9.training_status + '!')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     try:
         parent = K9_Parent.objects.get(offspring=k9)
     except K9_Parent.DoesNotExist:
         context = {
             'Title': 'K9 Details',
             'k9' : k9,
+            'notif_data':notif_data,
+            'count':count,
         }
     else:
         parent_exist = 1
@@ -457,7 +546,9 @@ def K9_detailview(request, id):
             'Title': 'K9 Details',
             'k9': k9,
             'parent': parent,
-            'parent_exist': parent_exist
+            'parent_exist': parent_exist,
+            'notif_data':notif_data,
+            'count':count,
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
@@ -954,13 +1045,19 @@ def forecast_result(date_list, quantity_list, graph_title):
 
         result.append(recommended)
 
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+
         context = {
             'title': 'Forecasting',
             'graph': graph,
             'models': models,
             'errors': errors,
             'predictions': predictions,
-            'recommended': recommended
+            'recommended': recommended,
+            'notif_data':notif_data,
+            'count':count,
             }
 
     return result
@@ -1240,6 +1337,10 @@ def budgeting(request):
         vet_supply_subtotal += total
         grand_total += total
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'title': 'Budgeting',
         'request_forecast': request_forecast[4],
@@ -1285,8 +1386,9 @@ def budgeting(request):
         'dog_food_sub_total': dog_food_subtotal,
         'equipment_sub_total': equipment_subtotal,
         'vet_supply_sub_total': vet_supply_subtotal,
-        'grand_total': grand_total
-
+        'grand_total': grand_total,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/budgeting.html', context)
@@ -1321,12 +1423,18 @@ def breeding_recommendation(request):
     print(k9_list_skill)
     print(k9_list_breed_skill)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'test': "test",
         'form': form,
         'k9_list_breed': k9_list_breed,
         'k9_list_skill': k9_list_skill,
         'k9_list_breed_skill': k9_list_breed_skill,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/breeding_recommendation.html', context)
@@ -1345,10 +1453,16 @@ def add_breed(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'Title': "Add Breed",
         'form': form,
         'style': style,
+        'notif_data':notif_data,
+        'count':count,
     }
     print(form)
     return render(request, 'planningandacquiring/add_breed.html', context)
@@ -1357,9 +1471,14 @@ def add_breed(request):
 def breed_listview(request):
     breed = Dog_Breed.objects.all()
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'Title': 'Breed List',
-        'breed': breed
+        'breed': breed,
+        'notif_data':notif_data,
+        'count':count,
     }
 
     return render(request, 'planningandacquiring/view_breed.html', context)
