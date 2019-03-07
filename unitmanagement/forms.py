@@ -56,24 +56,17 @@ class PhysicalExamForm(forms.ModelForm):
         # self.fields['dog'].initial = a
 
 class HealthForm(forms.ModelForm):
-
-    dog = forms.ModelChoiceField(queryset = K9.objects.all())
-    treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
-    problem = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
+    treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
     
     class Meta:
         model = Health
-        fields = ('dog','problem', 'treatment')
+        fields = ('dog','problem', 'treatment', 'incident_id')
 
     def __init__(self, *args, **kwargs):
-        dict_data = kwargs.pop('dict_data', None)
         super(HealthForm, self).__init__(*args, **kwargs)
-        if dict_data:
-            self.fields['problem'].initial = dict_data[0]['problem']
-        # self.fields['treatment'].initial = 'something'
-
-
-        
+        self.fields['dog'].required = False
+        self.fields['problem'].required = False
+        self.fields['incident_id'].required = False
 
 class HealthMedicineForm(forms.ModelForm):
     TIME_OF_DAY = (
@@ -161,7 +154,7 @@ class RequestForm(forms.ModelForm):
         
 class K9IncidentForm(forms.ModelForm):
     
-    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog'))
+    k9 = forms.ModelChoiceField(queryset = K9.objects.all())
 
     class Meta:
         model = K9_Incident

@@ -7,6 +7,7 @@ from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, a
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed
 
 from training.models import Training
+from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
@@ -16,7 +17,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ReportDateForm, add_breed_form
 from deployment.models import Dog_Request, Team_Assignment
-from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import Avg, Count, Min, Sum, Q

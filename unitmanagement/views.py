@@ -10,7 +10,7 @@ from decimal import Decimal
 from django.db.models import Sum, Avg, Max
 
 from planningandacquiring.models import K9
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
@@ -42,6 +42,12 @@ def notif(request):
    
     return notif
 
+def currrent_user(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def redirect_notif(request, id):
     notif = Notification.objects.get(id=id)
     if notif.notif_type == 'physical_exam':
@@ -64,7 +70,12 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'heat_cycle':
         notif.viewed = True
         notif.save()
-        return redirect('unitmanagement:reproductive-list')
+        return redirect('unitmanagement:reproductive_list')
+    elif notif.notif_type == 'k9_incident':
+        notif.viewed = True
+        notif.save()
+        i = K9_Incident.objects.get(id=notif.other_id)
+        return redirect('unitmanagement:k9_sick_details', id=i.id)
 
     
 
@@ -93,8 +104,7 @@ def health_form(request):
     a = request.session['problem']
     b = request.session['treatment']
 
-    dict_data = [{'problem': a}]
-    form = HealthForm(request.POST or None, dict_data=dict_data)
+    form = HealthForm(request.POST or None)
 
     if request.method == "POST":
         #print(form)
@@ -873,34 +883,22 @@ def health_history(request, id):
     return render (request, 'unitmanagement/health_history.html', context)
 
 def health_details(request, id):
-    data = Health.objects.get(id=id)
+    i = K9_Incident.objects.get(id=id)
+    data = Health.objects.get(incident_id=i)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
-    count1 = 0
-    style = "ui red message"
-
-    for med in medicine:
-        i = Medicine_Inventory.objects.filter(id = med.medicine.id)# get Inventory Items
-        for x in i:
-            if x.quantity >= med.quantity:
-                count1 = count1+1
-
-    if medicine.count() == count1:
-        style = "ui green message"
-    else:
-        style = "ui red message"
-
+   
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
 
     context = {
-        'title': "Health Details of ",
+        'title': "Prescription of ",
         'name': dog.name,
+        'date': data.date,
         'data': data,
         'medicine': medicine,
         'dog': dog,
-        'style':style,
         'notif_data':notif_data,
         'count':count,
     }
@@ -1105,15 +1103,19 @@ def change_equipment(request, id):
     return render (request, 'unitmanagement/change_equipment.html', context)
 
 # TODO
-# Integrate K9_Handler Model
-# MAYBE SOMETHING!! LOOK AT THE CODES OF THE MODEL 
 def k9_incident(request):
     form = K9IncidentForm(request.POST or None)
     style=''
+    
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
-
+            incident_save.repored_by = user_in_session.fullname
+            incident_save.save()
             # get k9 object
             k9 =incident_save.k9
             k9_obj=K9.objects.get(id=k9.id)
@@ -1127,8 +1129,11 @@ def k9_incident(request):
                 handler.partnered = False
                 k9_obj.save()
                 handler.save()
-            else:
+            elif k9_obj.partnered==False and incident_save.incident=='Died' :
                 k9_obj.status = 'Dead'
+                k9_obj.save()
+            elif incident_save.incident=='Sick' :
+                k9_obj.status = 'Sick'
                 k9_obj.save()
 
             form = K9IncidentForm()
@@ -1368,7 +1373,125 @@ def choose_handler(request, id):
      
     return redirect('unitmanagement:k9_unpartnered_list')
 
+#TODO
+#sick list
+def k9_sick_list(request):
+    
+    data = K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
+    data2 = K9_Incident.objects.filter(incident='Sick').filter(status='Done')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    style = "ui green message"
+    context = {
+        'title': 'Sick K9s',
+        'data':data,
+        'data2':data2,
+        'notif_data':notif_data,
+        'count':count,
+        'style':style,
+    }
+    return render (request, 'unitmanagement/k9_sick_list.html', context)
+
+#TODO
+#sick list
+def k9_sick_details(request, id):
+    
+    data = K9_Incident.objects.get(id=id)
+
+    medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
+    style=""
+
+    form = HealthForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            m = form.save()
+            m.dog = data.k9
+            m.problem  = data.description
+            m.incident_id = data
+            m.save()
+            new_form = m.pk
+            form_instance = Health.objects.get(id=new_form)
+            dog = K9.objects.get(id=form_instance.dog.id)
+            
+            #Use Health form instance for Health Medicine
+            formset = medicine_formset(request.POST, instance=form_instance)
+            form_med = []
+            form_quantity = []
+            inventory_quantity = []
+            insufficient_quantity = []
+            insufficient_med = []
+            days = []
+            
+            msg = 'Insuficient quantity! Availability for '
+
+            if formset.is_valid():
+                for form in formset:
+                    m = Medicine.objects.get(medicine_fullname= form.cleaned_data['medicine'])
+                    form_med.append(m)
+                    form_quantity.append(form.cleaned_data['quantity'])
+                    days.append(form.cleaned_data['duration'])
+
+                mi = Medicine_Inventory.objects.filter(medicine__in=form_med)
+                
+                for mi in mi:
+                    inventory_quantity.append(mi.quantity)
+
+                ctr1 = 0
+                ctr2 = len(form_quantity)
+              
+                while ctr1 < ctr2:
+                    if inventory_quantity[ctr1] >= form_quantity[ctr1]:
+                        pass
+                    else:
+                        insufficient_quantity.append(inventory_quantity[ctr1])
+                        insufficient_med.append(form_med[ctr1])
+                    ctr1=ctr1+1
+
+                ctr3 = len(insufficient_med)
+                ctr4=0
+
+                if ctr3 != 0:
+                    while ctr4 < ctr3:
+                        if ctr4 == ctr3-1:
+                            msg = msg + str(insufficient_med[ctr4]) + ': ' + str(insufficient_quantity[ctr4]) + 'pcs.'
+                        else:
+                            msg = msg + str(insufficient_med[ctr4]) + ': ' + str(insufficient_quantity[ctr4]) + 'pcs, '
+                        ctr4=ctr4+1
+                    form_instance.delete()
+                    style = "ui red message"
+                    form = HealthForm(initial=request.POST)
+                    messages.warning(request, msg)        
+                else:
+                    for form in formset:
+                        f = form.save()
+                        m = Medicine_Inventory.objects.get(id=f.medicine.id)
+                        m.quantity = m.quantity - f.quantity
+                        m.save()
+                        #Medicine_Subtracted_Trail.objects.create(inventory = m, user=current_user(), quantity = f.quantity)
+                    dog.status = 'Sick'
+                    data.status= 'Done'
+                    dog.save()
+                    data.save()
+                    style = "ui green message"
+                    messages.success(request, 'Health Form has been successfully recorded!')
+                    return redirect('unitmanagement:k9_sick_list')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': data.k9,
+        'data':data,
+        'form':HealthForm,
+        'formset':medicine_formset(),
+        'actiontype': "Submit",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+    }
+    return render (request, 'unitmanagement/k9_sick_details.html', context)
 
 #TODO
 class K9ListView(APIView):

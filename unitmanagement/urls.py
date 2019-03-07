@@ -25,6 +25,8 @@ urlpatterns = [
     path('k9-unpartnered-list', views.k9_unpartnered_list, name='k9_unpartnered_list'),
     path('choose-handler-list/<int:id>', views.choose_handler_list, name='choose_handler_list'),
     path('choose-handler/<int:id>', views.choose_handler, name='choose_handler'),
+    path('k9-sick-list', views.k9_sick_list, name='k9_sick_list'),
+    path('k9-sick-details/<int:id>', views.k9_sick_details, name='k9_sick_details'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),

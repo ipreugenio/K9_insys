@@ -7,48 +7,49 @@
         {% endfor %}
     {% endif %}
 </div>
-
-<div class = "ui segment">
-
-		<table id="tabledata" class="ui celled table">
-        	<thead>
-          	<tr>
-              <th>Name</th>
-              <th>Serial Number</th>
-              <th>Breed</th>
-              <th>Sex</th>
-			  <th>Color</th>
-              <th>Birthdate</th>
-              <th>Age</th>
-              <th>Skill</th>
-              <th>Assignment</th>
-			  <th>Status</th>
-          	</tr>
-    		</thead>
-    		<tbody>
-				{% for K9 in k9 %}
-    				<tr>
-    					<td><a href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
-                        <td>{{ K9.serial_number }}</td>
-    					<td>{{ K9.breed }}</td>
-    					<td>{{ K9.sex }}</td>
-						<td>{{ K9.color}}</td>
-                        <td>{{ K9.birth_date}}</td>
-                        <td>{{ K9.age}}</td>
-                        <td>{{ K9.capability}}</td>
-                        <td>{{ K9.assignment}}</td>
-						<td>{{ K9.training_status}}</td>
-    				</tr>
-				{% endfor %}
+<div class="ui segment">
+	<table id="tabledata1" class="ui ten column celled table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Serial Number</th>
+            <th>Breed</th>
+            <th>Sex</th>
+            <th>Color</th>
+            <th>Birthdate</th>
+            <th>Age</th>
+            <th>Skill</th>
+            <th>Assignment</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for K9 in k9 %}
+                <tr>
+                    <td><a href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
+                    <td>{{ K9.serial_number }}</td>
+                    <td>{{ K9.breed }}</td>
+                    <td>{{ K9.sex }}</td>
+                    <td>{{ K9.color}}</td>
+                    <td>{{ K9.birth_date}}</td>
+                    <td>{{ K9.age}}</td>
+                    <td>{{ K9.capability}}</td>
+                    <td>{{ K9.assignment}}</td>
+                    <td>{{ K9.training_status}}</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
+
+
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		$('#tabledata').DataTable( {
+		$('#tabledata1').DataTable( {
         "order": [[ 0, "desc" ]]
-    });
+        });
+      
 		$('.menu .item').tab();
 	});
 

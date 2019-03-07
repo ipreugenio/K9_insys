@@ -12,7 +12,7 @@ from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
 from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail
 from inventory.models import Safety_Stock
-from unitmanagement.models import Notification, PhysicalExam
+from unitmanagement.models import Notification, PhysicalExam, Health
 from profiles.serializers import NotificationSerializer
 # Create your tasks here
 # The @shared_task decorator lets you create tasks that can be used by any app(s).
@@ -108,6 +108,15 @@ def unitmanagement_notifs():
             Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 7th Tick and Flea Prevention this week.', notif_type='vaccination', position='Veterinarian')
         elif age.days == 238 :
             Notification.objects.create(k9=k9, message= str(k9.name) + ' is due for 8th Heartworm Prevention this week.', notif_type='vaccination', position='Veterinarian')        
+    
+    #health change to working if done with medicine
+    health = Health.objects.filter(status='Pending')
+
+    for h in health:
+        if date.today() == h.date_done:
+            h.status = 'Done'
+            h.dog.status = 'Working Dog'
+
 
 # TODO DEPLOYMENT NOTIFS
 #@periodic_task(run_every=crontab(hour=6, minutes=0))
@@ -301,5 +310,13 @@ def deploy_dog():
 @periodic_task(run_every=timedelta(seconds=10))
 def test():
     Notification.objects.create(message='message', position="Veterinarian")
+
+#TODO
+#DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
+#@periodic_task(run_every=timedelta(seconds=10))
+def delete():
+    notif_delete = Notification.objects.filter(datetime=date.today-timedelta(days=60))
+    notif_delete.delete()
+    
     
         

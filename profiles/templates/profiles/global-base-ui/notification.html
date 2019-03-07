@@ -24,12 +24,12 @@
         <div class="menu" style='overflow: auto;max-height: 250px;'>
             {% for notif_data in notif_data%}
                 {%if notif_data.viewed == True %}
-                <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:30}} 
+                <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:40}} 
                     <br>
                     <small>{{notif_data.datetime}}</small>
                 </a>
                 {%else%}
-                <a class="item" style='color: black;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:30}} 
+                <a class="item" style='color: black;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message | truncatechars:40}} 
                         <br>
                         <small>{{notif_data.datetime}}</small>
                     </a>

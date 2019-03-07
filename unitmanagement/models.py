@@ -12,22 +12,35 @@ from datetime import datetime, date, timedelta
 from django.contrib.sessions.models import Session
 # Create your models here.
 
-class Health(models.Model):
-    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+class K9_Incident(models.Model):
+    INCIDENT = (
+        ('Died', 'Died'),
+        ('Sick', 'Sick'),
+    )
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
     date = models.DateField('date', auto_now_add=True)
-    problem = models.TextField('problem', max_length=200)
-    treatment = models.TextField('treatment', max_length=200)
+    description = models.TextField('description', max_length=200)
+    status = models.CharField('status', max_length=200, default="Pending")
+    reported_by = models.CharField('reported_by', max_length=200, null=True, blank=True)
+
+class Health(models.Model):
+    dog = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField('date', auto_now_add=True)
+    problem = models.TextField('problem', max_length=200, null=True, blank=True)
+    treatment = models.TextField('treatment', max_length=200, null=True, blank=True)
     status = models.CharField('status', max_length=200, default="Pending")
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     duration = models.IntegerField('duration', null=True, blank=True)
-    date_done = models.DateField('date', null=True, blank=True)
+    date_done = models.DateField('date_done', null=True, blank=True)
+    incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
-
+        return str(self.id) + ': ' + str(self.date) +' - ' #+ str(self.dog.name)
     
     def save(self, *args, **kwargs):
-        self.date_done = self.date + timedelta(days=7)
+        if self.date != None:
+            self.date_done = self.date + timedelta(days=7)
 
         if date.today() == self.date_done:
             self.dog.status = 'Working Dog'
@@ -51,7 +64,7 @@ class HealthMedicine(models.Model):
     duration = models.IntegerField('duration', default = 1)
 
     def __str__(self):
-        return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog.name)
+        return str(self.id) + ': ' + str(self.health.date) #+ '-' + str(self.health.dog)
 
 class PhysicalExam(models.Model):
     EXAMSTATUS = (
@@ -161,15 +174,6 @@ class Requests(models.Model):
     request_status = models.CharField('request_status', max_length=200, default="Pending")
     date_approved = models.DateField('date_approved', blank=True, null=True)
 
-class K9_Incident(models.Model):
-    INCIDENT = (
-        ('Died', 'Died'),
-    )
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
-    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
-    date = models.DateField('date', auto_now_add=True)
-    description = models.TextField('description', max_length=200)
-
 class Handler_Incident(models.Model):
     INCIDENT = (
         ('Died', 'Died'),
@@ -195,6 +199,7 @@ class Notification(models.Model):
         ('location_incident', 'location_incident'),
         ('equipment_request', 'equipment_request'),
         ('equipment_damaged', 'equipment_damaged'),
+        ('k9_incident', 'k9_incident'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
@@ -207,11 +212,6 @@ class Notification(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # if self.k9 != None:
-        #     if self.k9.handler != None:
-        #         self.position = self.k9.handler.position    
-        # elif self.user != None:
-        #     self.position = self.user.position
         super(Notification, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -223,14 +223,24 @@ def create_handler_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has been reported dead.')
+                            other_id = instance.id,
+                            message= 'Reported Dead! ' + str(instance.handler))
 
 @receiver(post_save, sender=K9_Incident)
 def create_k9_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(k9 = instance.k9,
+        if instance.incident == 'Died':
+            Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
-                            message= str(instance.k9) + ' has been reported dead.')
+                            other_id = instance.id,
+                            notif_type = 'k9_incident',
+                            message= 'Reported Dead! ' + str(instance.k9.name))
+        else:
+            Notification.objects.create(k9 = instance.k9,
+                            position = 'Veterinarian',
+                            other_id = instance.id,
+                            notif_type = 'k9_incident',
+                            message= 'Reported Sick! ' + str(instance.k9.name))
 
 #Handler Reported
 @receiver(post_save, sender=Requests)
@@ -238,7 +248,7 @@ def create_equipment_request_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has made an equipment request.')
+                            message= 'Equipment Request! Reported by '+ str(instance.handler))
 
 #Damaged Equipment Reported
 @receiver(post_save, sender=DamagedEquipemnt)
@@ -246,25 +256,13 @@ def create_damaged_equipment_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Notification.objects.create(user = instance.user,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has reported an equipment concern.')
+                            message='Equipment Concern! Reported by '+ str(instance.handler))
 
 #When medicine is created, also create inventory instance
 @receiver(post_save, sender=Medicine)
 def create_medicine_inventory(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
-
-# #When food is created, also create inventory instance
-# @receiver(post_save, sender=Food)
-# def create_food_inventory(sender, instance, **kwargs):
-#     if kwargs.get('created', False):
-#         Food_Inventory.objects.create(food=instance, quantity=0)
-
-#When miscellaneous is created, also create inventory instance
-# @receiver(post_save, sender=Miscellaneous)
-# def create_miscellaneous_inventory(sender, instance, **kwargs):
-#     if kwargs.get('created', False):
-#         Miscellaneous_Inventory.objects.create(miscellaneous=instance, quantity=0)
 
 #create vaccine record, and vaccine used
 @receiver(post_save, sender=K9)

@@ -1,0 +1,75 @@
+{% extends "profiles/sidebar_um.html" %}
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+    {% if messages %}
+    {% for message in messages %}
+        <div class="{{style}}" > {{ message }}</div>
+    {% endfor %}
+    {% endif %}
+</div>
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Pending</a>
+    <a class="item" data-tab="second">Done</a>
+</div>
+<div class="ui tab segment active" data-tab="first">
+    <table id="tabledata1" class="ui three column celled table">
+        <thead>
+            <tr>
+                <th>K9</th>
+                <th>Reported By:</th>
+                <th>Date Reported</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in data %}
+            <tr>
+                <td>{{data.k9}}</td>
+                <td>{{data.date}}</td>
+                <td>{{data.reported_by}}</td>
+                <td class="center aligned">
+                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}" class="ui blue button">Select</a>
+                </td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="ui tab segment" data-tab="second">
+        <table id="tabledata2" class="ui three column celled table">
+            <thead>
+                <tr>
+                    <th>K9</th>
+                    <th>Handler</th>
+                    <th>Date Reported</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in data2 %}
+                <tr>
+                    <td>
+                        <a href="{% url 'unitmanagement:health_details' data.id %}">{{data.k9}}</a>
+                    </td>
+                    <td>{{data.k9.handler}}</td>
+                    <td>{{data.date}}</td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('.menu .item').tab();
+    });
+
+</script>
+ {% endblock %}
