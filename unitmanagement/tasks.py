@@ -325,6 +325,16 @@ def deploy_dog():
                 #Create new Team dog deployed for team_assignment
                 Team_Dog_Deployed.objects.create(team_assignment=td.team_assignment, k9=k9, status='Deployed',
                 date_added=date.today(), handler = str(k9.handler.fullname))
+
+                #update Team assignment
+                ta = Team_Assignment.objects.get(id=td.team_assignment.id)
+                if k9.capability == 'EDD':
+                    ta.EDD_deployed = ta.EDD_deployed+1
+                elif k9.capability == 'NDD':
+                    ta.NDD_deployed = ta.NDD_deployed+1
+                elif k9.capability == 'SAR':
+                    ta.SAR_deployed = ta.SAR_deployed+1
+
             except td.DoesNotExist:
                 #has no last assignment
                 k9.assignment = None
