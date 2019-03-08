@@ -8,6 +8,7 @@ import datetime as dt
 from datetime import timedelta, date
 from decimal import Decimal
 from django.db.models import Sum, Avg, Max
+from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
@@ -16,7 +17,7 @@ from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, Vaccinatio
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed, Notification
-from deployment.models import K9_Schedule
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
 
@@ -80,6 +81,7 @@ def redirect_notif(request, id):
     
 
 def index(request):
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     

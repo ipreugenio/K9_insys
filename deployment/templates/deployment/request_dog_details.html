@@ -87,33 +87,54 @@
       K9's Deployed
     </div>
   </h2>
-
- <table id="tabledata1" class="ui four column celled table">
-       <thead>
-         <tr>
-           <th>Name</th>
-           <th>Serial Number</th>
-           <th>Capability</th>
-           <th>Handler</th>
-             <th></th>
-         </tr>
-     </thead>
-     <tbody>
-        	{% for dogs_deployed in dogs_deployed %}
-         <tr>
-           <td>{{dogs_deployed.k9.name}}</td>
-           <td>{{dogs_deployed.k9.serial_number}}</td>
-           <td>{{dogs_deployed.k9.capability}}</td>
-           <td>{{dogs_deployed.k9.handler}}</td>
-             <td class="ui center aligned" style="width:15%;">
-              <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
-            </td>
-         </tr>
-         	{% endfor %}
-     </tbody>
-
- </table>
-
+  {% if data2.status == "Done" %}
+  <table id="tabledata1" class="ui four column celled table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Serial Number</th>
+          <th>Capability</th>
+          <th>Handler</th>
+        </tr>
+    </thead>
+    <tbody>
+         {% for dogs_deployed in dogs_deployed %}
+        <tr>
+          <td>{{dogs_deployed.k9.name}}</td>
+          <td>{{dogs_deployed.k9.serial_number}}</td>
+          <td>{{dogs_deployed.k9.capability}}</td>
+          <td>{{dogs_deployed.handler}}</td>
+        </tr>
+          {% endfor %}
+    </tbody>
+</table>
+ {%else%}
+ <table id="tabledata1" class="ui five column celled table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Serial Number</th>
+        <th>Capability</th>
+        <th>Handler</th>
+         <th></th>
+      </tr>
+  </thead>
+  <tbody>
+       {% for dogs_deployed in dogs_deployed %}
+      <tr>
+        <td>{{dogs_deployed.k9.name}}</td>
+        <td>{{dogs_deployed.k9.serial_number}}</td>
+        <td>{{dogs_deployed.k9.capability}}</td>
+        <td>{{dogs_deployed.handler}}</td>
+          <td class="ui center aligned" style="width:15%;">
+           <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
+         </td>
+      </tr>
+        {% endfor %}
+  </tbody>
+</table>
+ {% endif %}
+{% if data2.status == "Pending"%}
  <form action="" method="post">
         {% csrf_token %}
         <div class="ui very padded segment">
@@ -130,6 +151,12 @@
            <button class="ui positive button" name="approve" onclick="return confirm('Are you sure?')">Approve</button>
            </div></center>
     </form>
+{%else%}
+<div class="ui very padded segment">
+  <strong>Remarks:</strong>
+  <p>{{data2.remarks}}</p>
+</div>
+{%endif%}
 
 </div>
 
@@ -166,7 +193,14 @@
         <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
     </div>
   </form>
-    {% else %}
+  {% elif data2.status == "Done" %}
+  <div class="ui visible message">
+      <div class="header">
+    This Request is already Finished.
+  </div>
+  <p>No further action can be taken. This information only serves as historical reference.</p>
+  </div>
+  {% else %}
 <div class="ui visible message">
       <div class="header">
     You must approve this request before you can deploy K9s!

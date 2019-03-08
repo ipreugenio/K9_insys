@@ -65,6 +65,7 @@ class K9(models.Model):
         ('Trained', 'Trained'),
         ('For-Breeding', 'For-Breeding'),
         ('For-Deployment', 'For-Deployment'),
+        ('Deployed', 'Deployed'),
         ('Light Duty', 'Light Duty'),
         ('Retired', 'Retired'),
     )

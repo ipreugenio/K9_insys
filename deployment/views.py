@@ -9,10 +9,12 @@ from django.contrib import messages
 import datetime
 import re
 import sys
+from datetime import date
 
+from unitmanagement.models import Notification
 from training.models import K9_Handler
 from planningandacquiring.models import K9
-from profiles.models import Personal_Info, User
+from profiles.models import Personal_Info, User, Account
 from inventory.models import Medicine
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm
@@ -39,6 +41,7 @@ def notif(request):
     return notif
 
 def index(request):
+
     context = {
       'title':'Deployment'
     }
@@ -455,8 +458,8 @@ def request_dog_details(request, id):
         # print(checked_dogs)
 
         for checked_dogs in checked_dogs:
-            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled") #TODO Only save k9.assignment when system datetime is same as request
-
+            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname)) #TODO Only save k9.assignment when system datetime is same as request
+            
             K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date)
 
             # TODO: if dog is equal capability increment
