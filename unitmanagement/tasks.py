@@ -12,7 +12,7 @@ from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
 from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail
 from inventory.models import Safety_Stock
-from unitmanagement.models import Notification, PhysicalExam, Health
+from unitmanagement.models import Notification, PhysicalExam, Health, Handler_Incident
 from profiles.serializers import NotificationSerializer
 # Create your tasks here
 # The @shared_task decorator lets you create tasks that can be used by any app(s).
@@ -36,13 +36,13 @@ def unitmanagement_notifs():
     k9_breed = K9.objects.all(training_status='For-Breeding') 
     for k9_breed in k9_breed:
         if k9_breed.estrus_date == date.today() and k9_breed.age >= 1:
-            Notification.objects.create(message= str(k9_breed) + ' is recommended to mate this week as she is most fertile!', notif_type='heat_cycle', position='Veterinarian')
+            Notification.objects.create(k9=k9_breed, message= str(k9_breed) + ' is recommended to mate this week as she is most fertile!', notif_type='heat_cycle', position='Veterinarian')
 
         if k9_breed.last_proestrus_date == date.today():
-            Notification.objects.create(message= str(k9_breed) + ' is in heat!', notif_type='heat_cycle')
+            Notification.objects.create(k9=k9_breed, message= str(k9_breed) + ' is in heat!', notif_type='heat_cycle')
 
         if k9_breed.metestrus_date == date.today():
-            Notification.objects.create(message= 'If you mated ' + str(k9_breed) + ', she is about to show signs of pregnancy!', notif_type='heat_cycle', position='Veterinarian')
+            Notification.objects.create(k9=k9_breed, message= 'If you mated ' + str(k9_breed) + ', she is about to show signs of pregnancy!', notif_type='heat_cycle', position='Veterinarian')
 
     # PHYSICAL EXAMINATION DUE
     for phex in phex:
@@ -116,6 +116,52 @@ def unitmanagement_notifs():
         if date.today() == h.date_done:
             h.status = 'Done'
             h.dog.status = 'Working Dog'
+
+    #TODO
+    #Handler on leave end_date is today
+    hi = Handler_Incident.objects.filter(status='Approved')
+
+    for hi in hi:
+        if hi.date_to == date.today():
+            hi.status = 'Done'
+            hi.save()
+            # get handler and k9
+            h = User.objects.get(id=hi.handler.id)
+            k9 = K9.objects.get(id=hi.k9.id)
+            h.status = 'Working'
+            h.save()
+
+            if h.retain_last_handler == True:
+                k9.partnered = True
+                k9.handler = h
+                h.partnered = True
+
+                k9.save()
+                h.save()
+
+            try:
+                td = Team_Dog_Deployed.objects.filter(k9=k9).latest()
+                
+                try:
+                    ta = Team_Assignment.objects.get(id=td.team_assignment.id)
+                    
+                    #create new team dog
+                    Team_Dog_Deployed.objects.create(k9=k9, handler=h,team_assignment=ta,
+                    date_added=date.today())
+
+                    if k9.capability == 'EDD':
+                        ta.EDD_deployed = ta.EDD_deployed+1
+                    elif k9.capability == 'NDD':
+                        ta.NDD_deployed = ta.NDD_deployed+1
+                    elif k9.capability == 'SAR':
+                        ta.SAR_deployed = ta.SAR_deployed+1
+
+                    ta.save()
+                except Team_Assignment.DoesNotExist:
+                    pass
+            except Team_Dog_Deployed.DoesNotExist:
+                pass            
+
 
 
 # TODO DEPLOYMENT NOTIFS
@@ -329,12 +375,12 @@ def deploy_dog():
                 #update Team assignment
                 ta = Team_Assignment.objects.get(id=td.team_assignment.id)
                 if k9.capability == 'EDD':
-                    ta.EDD_deployed = ta.EDD_deployed+1
+                    ta.EDD_deployed = ta.EDD_deployed-1
                 elif k9.capability == 'NDD':
-                    ta.NDD_deployed = ta.NDD_deployed+1
+                    ta.NDD_deployed = ta.NDD_deployed-1
                 elif k9.capability == 'SAR':
-                    ta.SAR_deployed = ta.SAR_deployed+1
-
+                    ta.SAR_deployed = ta.SAR_deployed-1
+                ta.save()
             except td.DoesNotExist:
                 #has no last assignment
                 k9.assignment = None

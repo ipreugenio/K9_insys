@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
@@ -35,11 +35,11 @@ def notif(request):
     user_in_session = User.objects.get(id=account.UserID.id)
     
     if user_in_session.position == 'Veterinarian':
-        notif = Notification.objects.filter(position='Veterinarian')
+        notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
-        notif = Notification.objects.filter(user=user_in_session)
+        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
-        notif = Notification.objects.filter(position='Administrator')
+        notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
    
     return notif
 
@@ -49,6 +49,7 @@ def currrent_user(request):
     user_in_session = User.objects.get(id=account.UserID.id)
     return user_in_session
 
+#TODO REDIRECT
 def redirect_notif(request, id):
     notif = Notification.objects.get(id=id)
     if notif.notif_type == 'physical_exam':
@@ -71,13 +72,28 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'heat_cycle':
         notif.viewed = True
         notif.save()
-        return redirect('unitmanagement:reproductive_list')
-    elif notif.notif_type == 'k9_incident':
+        return redirect('unitmanagement:reproductive_edit', id = notif.k9.id)
+    elif notif.notif_type == 'k9_sick' :
         notif.viewed = True
         notif.save()
-        i = K9_Incident.objects.get(id=notif.other_id)
-        return redirect('unitmanagement:k9_sick_details', id=i.id)
-
+        return redirect('unitmanagement:k9_sick_details', id = notif.other_id)
+    elif notif.notif_type == 'k9_died' :
+        notif.viewed = True
+        notif.save()
+        return redirect('planningandacquiring:K9_detail', id = notif.k9.id)
+    elif notif.notif_type == 'handler_died' :
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:user_detail', id = notif.user.id)
+    elif notif.notif_type == 'equipment_request' :
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:change_equipment', id = notif.other_id)
+    #TODO location incident view details 
+    # elif notif.notif_type == 'location_incident' :
+    #     notif.viewed = True
+    #     notif.save()
+    #     return redirect('deployment:change_equipment', id = notif.other_id)
     
 
 def index(request):
@@ -206,9 +222,8 @@ def health_form(request):
 #TODO MAKE INITIAL VALUE OF DOG 
 def physical_exam_form(request):
     form = PhysicalExamForm(request.POST or None)
-    a = K9.objects.filter(id=request.session['phex_k9_id'])
     
-    form.fields['dog'].initial = K9.objects.filter(id=4)
+    form.initial['dog'] = K9.objects.get(id=request.session['phex_k9_id'])
     
     style=""
     if request.method == 'POST':
@@ -280,8 +295,8 @@ def health_history(request, id):
 
 
     data = K9.objects.get(id=id)
-    health_data = Health.objects.filter(dog = data)
-    phyexam_data = PhysicalExam.objects.filter(dog = data)
+    health_data = Health.objects.filter(dog = data).order_by('-date')
+    phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
     vaccine_record = VaccinceRecord.objects.get(k9 = data)
     dtoday = dt.date.today()
@@ -885,8 +900,8 @@ def health_history(request, id):
     return render (request, 'unitmanagement/health_history.html', context)
 
 def health_details(request, id):
-    i = K9_Incident.objects.get(id=id)
-    data = Health.objects.get(incident_id=i)
+    data = Health.objects.get(id=id)
+    i = K9_Incident.objects.get(id=data.incident_id.id)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
    
@@ -1004,17 +1019,23 @@ def vaccination_form(request):
     return render (request, 'unitmanagement/vaccination_form.html', context)
 
 def requests_form(request):
-    form = RequestForm(request.POST or None)
-    style=""
 
     user_serial = request.session['session_serial']
     user = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user.UserID.id)
+    style=""
 
-
+    form = RequestForm(request.POST or None)
+    
+    #form.initial['handler'] = current_user
+    #form.initial['handler'] = User.objects.get(id=current_user.id)
+    
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
-            form.save()
+            # form.initial['handler'] = User.objects.get(id=current_user.id)
+            # print(form['handler'].value())
+            
             no_id = form.save()
             no_id.handler = current_user
             no_id.save()
@@ -1116,8 +1137,9 @@ def k9_incident(request):
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
-            incident_save.repored_by = user_in_session.fullname
+            incident_save.reported_by = str(user_in_session.fullname)
             incident_save.save()
+            
             # get k9 object
             k9 =incident_save.k9
             k9_obj=K9.objects.get(id=k9.id)
@@ -1158,16 +1180,20 @@ def k9_incident(request):
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
 
-# TODO
-# Integrate K9_Handler Model
-# MAYBE SOMETHING!! LOOK AT THE CODES OF THE MODEL   
 def handler_incident(request):
     form = HandlerIncidentForm(request.POST or None)
     style=''
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
+    if current_user.position == 'Handler':
+        form.initial['handler'] = current_user
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
-
+            incident_save.status='Done'
+            incident_save.save()
             # get k9 object
             handler =incident_save.handler
             handler_obj=User.objects.get(id=handler.id)
@@ -1208,6 +1234,39 @@ def handler_incident(request):
     }
     return render (request, 'unitmanagement/handler_incident.html', context)
 
+def on_leave_request(request):
+    form = HandlerOnLeaveForm(request.POST or None)
+    style=''
+    user_serial = request.session['session_serial']
+    user = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user.UserID.id)
+
+    form.initial['handler'] = current_user
+    if request.method == "POST":
+        if form.is_valid():
+            incident_save = form.save()
+            
+            form = HandlerOnLeaveForm()
+            style = "ui green message"
+            messages.success(request, 'Request has been successfully Submited!')
+        
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'title': "On-Leave Form",
+        'actiontype': "Submit",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+    }
+    return render (request, 'unitmanagement/on_leave_form.html', context)
 
 def reassign_assets(request):
     style=''
@@ -1253,6 +1312,105 @@ def reassign_assets(request):
         'count':count,
     }
     return render (request, 'unitmanagement/reassign_assets.html', context)
+
+# TODO 
+# On Leave List
+def on_leave_list(request):
+    style=''
+    data1 = Handler_Incident.objects.filter(status='Pending').filter(incident='On-Leave') 
+    data2 = Handler_Incident.objects.filter(status='Approved').filter(incident='On-Leave') 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "On Leave List",
+        'data1': data1,
+        'data2': data2,
+        'notif_data':notif_data,
+        'count':count,
+    }
+    return render (request, 'unitmanagement/on_leave_list.html', context)
+
+#TODO
+# what to do if on-leave
+def on_leave_details(request, id):
+    style=''
+    data = Handler_Incident.objects.get(id=id)
+    #get k9 
+    days = data.date_to - data.date_from
+    #get user
+    u = User.objects.get(id=data.handler.id)
+    try:
+        k9 = K9.objects.get(handler=data.handler)
+        data.k9 = k9
+        data.save()
+    except K9.DoesNotExist:
+        k9 = None
+
+    if request.method == 'POST':
+        #get checkbox
+        c = request.POST.get("return_k9")
+        if 'approve' in request.POST:
+            data.status = "Approved"
+            data.save()
+            if c == None:
+                k9.handler_on_leave = False
+                k9.save()
+            elif c == 'on':
+                k9.handler_on_leave = True
+                k9.save()
+            # change status of handler to On leave
+            u.status = 'On-Leave'
+            u.partnered = False
+            u.save()
+            # What to do with k9?
+            k9.training_status = 'For-Deployment'
+            k9.assignment = None
+            k9.partnered = False
+            k9.save()
+
+            # If deployed, pull out
+            try:
+                td = Team_Dog_Deployed.objects.filter(k9=k9).filter(status='Deployed').latest()
+                td.status = 'Done'
+                td.date_pulled = date.today()
+                td.save()
+
+                try:
+                    ta = Team_Assignment.objects.get(id=td.team_assignment.id)
+                    if k9.capability == 'EDD':
+                        ta.EDD_deployed = ta.EDD_deployed-1
+                    elif k9.capability == 'NDD':
+                        ta.NDD_deployed = ta.NDD_deployed-1
+                    elif k9.capability == 'SAR':
+                        ta.SAR_deployed = ta.SAR_deployed-1
+
+                    ta.save()
+                except Team_Assignment.DoesNotExist:
+                    pass
+            except Team_Dog_Deployed.DoesNotExist:
+                pass
+
+            #Make Notification
+            return HttpResponseRedirect('../on-leave-list/')
+        elif 'deny' in request.POST:
+            data.status = "Denied"
+            data.save()
+            #Make Notification
+            return HttpResponseRedirect('../on-leave-list/')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': str(data.handler) + ' On-Leave Request',
+        'data': data,
+        'k9': k9,
+        'days': days,
+        'notif_data':notif_data,
+        'count':count,
+    }
+    return render (request, 'unitmanagement/on_leave_details.html', context)
 
 #TODO reassign
 def load_hander(request):
@@ -1314,14 +1472,15 @@ def reproductive_edit(request, id):
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
-    data = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
-    
+    data = K9.objects.filter(handler_on_leave=False).filter(training_status='For-Deployment').filter(partnered=False)
+    data2 = K9.objects.filter(handler_on_leave=True).filter(training_status='For-Deployment').filter(partnered=False)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     context = {
         'title': "Unpartnered K9 List",
         'data':data,
+        'data2':data2,
         'style':style,
         'notif_data':notif_data,
         'count':count,
@@ -1405,13 +1564,21 @@ def k9_sick_details(request, id):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
 
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+
     form = HealthForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
+            #get treatment
+            request.session['treatment'] = form['treatment'].value()
+
             m = form.save()
             m.dog = data.k9
             m.problem  = data.description
             m.incident_id = data
+            m.veterinary = user_in_session
             m.save()
             new_form = m.pk
             form_instance = Health.objects.get(id=new_form)
@@ -1463,9 +1630,11 @@ def k9_sick_details(request, id):
                         ctr4=ctr4+1
                     form_instance.delete()
                     style = "ui red message"
-                    form = HealthForm(initial=request.POST)
                     messages.warning(request, msg)        
                 else:
+                    m.duration =  max(days)
+                    m.save()
+
                     for form in formset:
                         f = form.save()
                         m = Medicine_Inventory.objects.get(id=f.medicine.id)

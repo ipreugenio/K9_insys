@@ -687,7 +687,7 @@
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Problem</th>
+                <th>Duration</th>
                 <th class="center aligned">Status</th>
             </tr>
         </thead>
@@ -697,7 +697,7 @@
                 <td>
                     <a href="{% url 'unitmanagement:health_details' health_data.id %}">{{health_data.date}}</a>
                 </td>
-                <td>{{health_data.problem}}</td>
+                <td>{{health_data.duration}}</td>
                 {% if health_data.status == "Approved" %}
                 <td class="center aligned positive three column wide">
                     <i class="icon checkmark"></i>{{health_data.status}}

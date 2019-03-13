@@ -30,11 +30,11 @@ def notif(request):
     user_in_session = User.objects.get(id=account.UserID.id)
     
     if user_in_session.position == 'Veterinarian':
-        notif = Notification.objects.filter(position='Veterinarian')
+        notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
-        notif = Notification.objects.filter(user=user_in_session)
+        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
-        notif = Notification.objects.filter(position='Administrator')
+        notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
    
     return notif
 

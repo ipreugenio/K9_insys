@@ -87,6 +87,7 @@ class K9(models.Model):
     training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     partnered = models.BooleanField(default=False)
+    handler_on_leave = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')

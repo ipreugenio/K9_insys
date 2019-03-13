@@ -27,9 +27,9 @@ class K9_Incident(models.Model):
 class Health(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
-    problem = models.TextField('problem', max_length=200, null=True, blank=True)
-    treatment = models.TextField('treatment', max_length=200, null=True, blank=True)
-    status = models.CharField('status', max_length=200, default="Pending")
+    problem = models.TextField('problem', max_length=800, null=True, blank=True)
+    treatment = models.TextField('treatment', max_length=800, null=True, blank=True)
+    status = models.CharField('status', max_length=200, default="On-Going")
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     duration = models.IntegerField('duration', null=True, blank=True)
     date_done = models.DateField('date_done', null=True, blank=True)
@@ -103,8 +103,6 @@ class PhysicalExam(models.Model):
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
 
-#TODO
-#add vet user
 class VaccinceRecord(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     deworming_1 = models.BooleanField(default=False)     #2weeks
@@ -177,11 +175,17 @@ class Requests(models.Model):
 class Handler_Incident(models.Model):
     INCIDENT = (
         ('Died', 'Died'),
+        ('On-Leave', 'On-Leave'),
     )
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
     date = models.DateField('date', auto_now_add=True)
     description = models.TextField('description', max_length=200)
+    status = models.CharField('status', max_length=200, default="Pending")
+    date_from = models.DateField('date_from', null=True, blank=True)
+    date_to = models.DateField('date_to', null=True, blank=True)
+    retain_last_handler = models.BooleanField(default=False)
 
 class Notification(models.Model):
     POSITION = (
@@ -198,8 +202,10 @@ class Notification(models.Model):
         ('heat_cycle', 'heat_cycle'),
         ('location_incident', 'location_incident'),
         ('equipment_request', 'equipment_request'),
-        ('equipment_damaged', 'equipment_damaged'),
-        ('k9_incident', 'k9_incident'),
+        ('k9_died', 'k9_died'),
+        ('k9_sick', 'k9_sick'),
+        ('handler_died', 'handler_died'),
+        ('handler_on_leave', 'handler_on_leave'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
@@ -221,10 +227,18 @@ class Notification(models.Model):
 @receiver(post_save, sender=Handler_Incident)
 def create_handler_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(user = instance.handler,
+        if instance.incident == 'Died':
+            Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
                             other_id = instance.id,
+                            notif_type = 'handler_died',
                             message= 'Reported Dead! ' + str(instance.handler))
+        else:
+            Notification.objects.create(user = instance.handler,
+                            position = 'Administrator',
+                            other_id = instance.id,
+                            notif_type = 'handler_on_leave',
+                            message= 'On-Leave Request! ' + str(instance.handler))
 
 @receiver(post_save, sender=K9_Incident)
 def create_k9_incident_notif(sender, instance, **kwargs):
@@ -233,30 +247,24 @@ def create_k9_incident_notif(sender, instance, **kwargs):
             Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
                             other_id = instance.id,
-                            notif_type = 'k9_incident',
+                            notif_type = 'k9_died',
                             message= 'Reported Dead! ' + str(instance.k9.name))
         else:
             Notification.objects.create(k9 = instance.k9,
                             position = 'Veterinarian',
                             other_id = instance.id,
-                            notif_type = 'k9_incident',
+                            notif_type = 'k9_sick',
                             message= 'Reported Sick! ' + str(instance.k9.name))
 
-#Handler Reported
+#Damaged Equipment Reported
 @receiver(post_save, sender=Requests)
-def create_equipment_request_notif(sender, instance, **kwargs):
+def create_damaged_equipment_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
-                            message= 'Equipment Request! Reported by '+ str(instance.handler))
-
-#Damaged Equipment Reported
-@receiver(post_save, sender=DamagedEquipemnt)
-def create_damaged_equipment_notif(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        Notification.objects.create(user = instance.user,
-                            position = 'Administrator',
-                            message='Equipment Concern! Reported by '+ str(instance.handler))
+                            other_id=instance.id,
+                            notif_type = 'equipment_request',
+                            message='Equipment Concern!')
 
 #When medicine is created, also create inventory instance
 @receiver(post_save, sender=Medicine)
@@ -320,11 +328,15 @@ def location_incident(sender, instance, **kwargs):
         if c == '':
             Notification.objects.create(user = instance.user,
                                 position = 'Administrator',
+                                other_id=instance.id,
+                                notif_type = 'location_incident',
                                 message= str(instance.user) + ' has reported an incident at ' + 
                                 str(instance.location) + '.')
         else:
             Notification.objects.create(user = instance.user,
                                 position = 'Administrator',
+                                other_id=instance.id,
+                                notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
 

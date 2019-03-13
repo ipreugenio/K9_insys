@@ -1,8 +1,17 @@
 {% extends "profiles/sidebar_um.html" %} {% block content %}
 <h1 class="ui header">
-    {{k9}}
+    {{user}}
     <div class="sub header">User details for {{user}}</div>
 </h1>
+{% if user.status == 'Dead'%}
+<div class="ui negative message">
+    <i class="close icon"></i>
+    <div class="header">
+      {{user}} is Dead....
+    </div>
+  </p>
+</div>
+{% endif %}
 
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">User Information</a>

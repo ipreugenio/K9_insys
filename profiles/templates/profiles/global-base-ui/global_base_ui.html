@@ -30,10 +30,8 @@
     <div class="ui inverted top attached demo menu" style="height:30px;">
         <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
         <p class="item" style="width: 175px; padding: 20px;">Welcome, {{request.session.session_username}}</p>
+        {% include 'profiles/global-base-ui/notification.html' %}
         <div class="right menu">
-            <div id = 'notif'>
-                {% include 'profiles/global-base-ui/notification.html' %}
-            </div>
             <div class="topdiv">
                 <img src="{% static 'images/k9_logo.png' %}" height="18" width="18" style="margin-right: 5px;">
                 <p class="topmenu">PHILIPPINE K9 COAST GUARD</p>

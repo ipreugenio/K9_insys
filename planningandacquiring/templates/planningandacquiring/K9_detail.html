@@ -8,6 +8,16 @@
         <div class="ui green message" > {{ message }}</div>
     {% endfor %}
 {% endif %}
+
+{% if k9.status == 'Dead'%}
+<div class="ui negative message">
+    <i class="close icon"></i>
+    <div class="header">
+      {{k9}} is Dead....
+    </div>
+  </p>
+</div>
+{% endif %}
 		<table class="ui celled table">
         	<thead>
           	<tr>
@@ -48,7 +58,7 @@
                 <td>{{k9.status}}</td>
                 </tr>
             <tr>
-              <th>Training Status</th>
+              <th>Assigned</th>
                 <td id='status'>{{k9.training_status}}</td>
                 </tr>
             <tr>

@@ -139,10 +139,10 @@ class RequestForm(forms.ModelForm):
         ('Lost', 'Lost'),
         ('Stolen', 'Stolen'),
     )
+    handler = forms.ModelChoiceField(queryset = User.objects.all())
     concern = forms.CharField(max_length=10, label='concern', widget=forms.Select(choices=CONCERN))
     equipment = forms.ModelChoiceField(queryset=Miscellaneous.objects.filter(misc_type="Equipment").order_by('miscellaneous'))
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
-
 
     class Meta:
         model = Requests
@@ -158,16 +158,22 @@ class K9IncidentForm(forms.ModelForm):
 
     class Meta:
         model = K9_Incident
-        fields = ('k9', 'incident', 'description')
+        fields = ('k9', 'incident', 'description', 'reported_by')
 
     def __init__(self, *args, **kwargs):
         super(K9IncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+        self.fields['reported_by'].required = False
 
 class HandlerIncidentForm(forms.ModelForm):
+    INCIDENT = (
+        #('Accident', 'Accident'),
+        ('Died', 'Died'),
+    )
     
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working'))
-
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
+    incident = forms.CharField(widget = forms.Select(choices=INCIDENT))
+    
     class Meta:
         model = Handler_Incident
         fields = ('handler', 'incident', 'description')
@@ -175,6 +181,23 @@ class HandlerIncidentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerIncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+
+class HandlerOnLeaveForm(forms.ModelForm):
+    incident = forms.CharField()
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
+    class Meta:
+        model = Handler_Incident
+        fields = ('handler', 'incident', 'description', 'date_from', 'date_to')
+
+        widgets = {
+            'date_from': DateInput(),
+            'date_to': DateInput()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
+        self.fields['incident'].initial = 'On-Leave'
+       
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(partnered=False))
