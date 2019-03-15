@@ -49,6 +49,12 @@ def currrent_user(request):
     user_in_session = User.objects.get(id=account.UserID.id)
     return user_in_session
 
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 #TODO REDIRECT
 def redirect_notif(request, id):
     notif = Notification.objects.get(id=id)
@@ -93,17 +99,18 @@ def redirect_notif(request, id):
     # elif notif.notif_type == 'location_incident' :
     #     notif.viewed = True
     #     notif.save()
-    #     return redirect('deployment:change_equipment', id = notif.other_id)
+    #     return redirect('deployment:incident_detail', id = notif.other_id)
     
 
 def index(request):
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    
+    user = user_session(request)
     context = {
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }        
 
     return render (request, 'unitmanagement/index.html', context)
@@ -113,15 +120,6 @@ def index(request):
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
-
-
-    #request.session['dog'] = dog
-    request.session['problem'] = 'problem'
-    request.session['treatment'] = 'treatment' 
-
-    a = request.session['problem']
-    b = request.session['treatment']
-
     form = HealthForm(request.POST or None)
 
     if request.method == "POST":
@@ -137,8 +135,6 @@ def health_form(request):
 
             dog = K9.objects.get(id=form_instance.dog.id)
             print('from query ', dog)
-            
-           
             
             print(request.session['problem'])
             #Use Health form instance for Health Medicine
@@ -184,6 +180,9 @@ def health_form(request):
                 print('inventory_quantity:', insufficient_quantity)
                 print('Duration:', max(days))
 
+                form_instance.duration = max(days)
+                form_instance.save()
+
                 ctr3 = len(insufficient_med)
                 ctr4=0
 
@@ -208,6 +207,7 @@ def health_form(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Health Form",
         'form':HealthForm,
@@ -216,14 +216,19 @@ def health_form(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/health_form.html', context)
 
 #TODO MAKE INITIAL VALUE OF DOG 
 def physical_exam_form(request):
     form = PhysicalExamForm(request.POST or None)
-    
-    form.initial['dog'] = K9.objects.get(id=request.session['phex_k9_id'])
+    user_serial = request.session['session_serial']
+    user_s = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user_s.UserID.id)
+
+    if 'phex_k9_id' in request.session:
+        form.initial['dog'] = K9.objects.get(id=request.session['phex_k9_id'])
     
     style=""
     if request.method == 'POST':
@@ -232,10 +237,6 @@ def physical_exam_form(request):
             new_form = form.save()
             new_form.date_next_exam = dt.date.today() + dt.timedelta(days=365)
 
-            user_serial = request.session['session_serial']
-            user = Account.objects.get(serial_number=user_serial)
-            current_user = User.objects.get(id=user.UserID.id)
-           
             new_form.user = current_user
             new_form.save()
 
@@ -250,6 +251,7 @@ def physical_exam_form(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Physical Exam",
         'actiontype': "Submit",
@@ -257,6 +259,7 @@ def physical_exam_form(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/physical_exam_form.html', context)
 
@@ -278,20 +281,21 @@ def health_record(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Health Record",
         'actiontype': "Submit",
         'data': data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/health_record.html', context)
 
 def health_history(request, id):
     user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
+    user_s = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user_s.UserID.id)
 
 
     data = K9.objects.get(id=id)
@@ -848,7 +852,7 @@ def health_history(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'dog_days': dog_days,
         'style': style,
@@ -895,7 +899,7 @@ def health_history(request, id):
         'data_heartworm_8':data_heartworm_8,
         'notif_data':notif_data,
         'count':count,
-
+        'user':user,
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -908,7 +912,7 @@ def health_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Prescription of ",
         'name': dog.name,
@@ -918,6 +922,7 @@ def health_details(request, id):
         'dog': dog,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/health_details.html', context)
 
@@ -928,7 +933,7 @@ def physical_exam_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Physical Exam Details of",
         'name': dog.name,
@@ -936,6 +941,7 @@ def physical_exam_details(request, id):
         'dog': dog,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/physical_exam_details.html', context)
 
@@ -1007,7 +1013,7 @@ def vaccination_form(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Vaccination",
         'actiontype': "Submit",
@@ -1015,29 +1021,21 @@ def vaccination_form(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 
 def requests_form(request):
-
-    user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
     style=""
 
     form = RequestForm(request.POST or None)
     
-    #form.initial['handler'] = current_user
-    #form.initial['handler'] = User.objects.get(id=current_user.id)
-    
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
-            # form.initial['handler'] = User.objects.get(id=current_user.id)
-            # print(form['handler'].value())
             
             no_id = form.save()
-            no_id.handler = current_user
+            no_id.handler =user_session(request)
             no_id.save()
 
             style = "ui green message"
@@ -1049,6 +1047,7 @@ def requests_form(request):
     
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Request of equipment",
         'actiontype': "Submit",
@@ -1056,6 +1055,7 @@ def requests_form(request):
         'form': form,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/request_form.html', context)
 
@@ -1065,12 +1065,13 @@ def request_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'data': data,
         'title': 'Damaged Equipment List',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/request_list.html', context)
 
@@ -1078,10 +1079,6 @@ def change_equipment(request, id):
     data = Requests.objects.get(id=id)
     style = ""
     changedate = dt.datetime.now()
-
-    user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
 
     if request.method == 'POST':
         if 'ok' in request.POST:
@@ -1094,7 +1091,7 @@ def change_equipment(request, id):
                 equipment.quantity = equipment.quantity-1
                 equipment.save()
 
-                Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=current_user,
+                Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=user_session(request),
                                                          quantity=1,
                                                          date_subtracted=dt.date.today(),
                                                          time=dt.datetime.now())
@@ -1115,12 +1112,13 @@ def change_equipment(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'data': data,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render (request, 'unitmanagement/change_equipment.html', context)
@@ -1170,6 +1168,7 @@ def k9_incident(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "K9 Incident",
         'actiontype': "Submit",
@@ -1177,6 +1176,7 @@ def k9_incident(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
 
@@ -1184,8 +1184,8 @@ def handler_incident(request):
     form = HandlerIncidentForm(request.POST or None)
     style=''
     user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
+    user_s = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user_s.UserID.id)
 
     if current_user.position == 'Handler':
         form.initial['handler'] = current_user
@@ -1223,7 +1223,7 @@ def handler_incident(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Handler Incident",
         'actiontype': "Submit",
@@ -1231,17 +1231,15 @@ def handler_incident(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/handler_incident.html', context)
 
 def on_leave_request(request):
     form = HandlerOnLeaveForm(request.POST or None)
     style=''
-    user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
-
-    form.initial['handler'] = current_user
+  
+    form.initial['handler'] = user_session(request)
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
@@ -1257,7 +1255,7 @@ def on_leave_request(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "On-Leave Form",
         'actiontype': "Submit",
@@ -1265,6 +1263,7 @@ def on_leave_request(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/on_leave_form.html', context)
 
@@ -1299,6 +1298,7 @@ def reassign_assets(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Reassign Assets",
         'actiontype': "Submit",
@@ -1310,6 +1310,7 @@ def reassign_assets(request):
         'numh': numh,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/reassign_assets.html', context)
 
@@ -1322,12 +1323,14 @@ def on_leave_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
-        'title': "On Leave List",
+        'title': "On Leave Request List",
         'data1': data1,
         'data2': data2,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/on_leave_list.html', context)
 
@@ -1402,6 +1405,7 @@ def on_leave_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': str(data.handler) + ' On-Leave Request',
         'data': data,
@@ -1409,6 +1413,7 @@ def on_leave_details(request, id):
         'days': days,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/on_leave_details.html', context)
 
@@ -1430,6 +1435,7 @@ def reproductive_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Reproductive Cycle",
         'proestrus': proestrus,
@@ -1438,6 +1444,7 @@ def reproductive_list(request):
         'anestrus': anestrus,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/reproductive_list.html', context)
 
@@ -1458,6 +1465,7 @@ def reproductive_edit(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Reproductive Details",
         'data': data,
@@ -1465,6 +1473,7 @@ def reproductive_edit(request, id):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/reproductive_details.html', context)
 
@@ -1477,6 +1486,7 @@ def k9_unpartnered_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': "Unpartnered K9 List",
         'data':data,
@@ -1484,6 +1494,7 @@ def k9_unpartnered_list(request):
         'style':style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/k9_unpartnered_list.html', context)
 
@@ -1496,22 +1507,25 @@ def choose_handler_list(request, id):
     data_available = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False).exclude(capability=k9.capability)
     print(data_available)
     data_pi = Personal_Info.objects.filter(UserID__in=data)
+    data_pi2 = Personal_Info.objects.filter(UserID__in=data_available)
 
     request.session["k9_id_partnered"] = k9.id 
     
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': k9,
         'data':data,
         'k9':k9,
         'style':style,
         'data_pi': data_pi,
+        'data_pi2':data_pi2,
         'data_available': data_available,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
 
@@ -1544,6 +1558,7 @@ def k9_sick_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     style = "ui green message"
     context = {
         'title': 'Sick K9s',
@@ -1552,6 +1567,7 @@ def k9_sick_list(request):
         'notif_data':notif_data,
         'count':count,
         'style':style,
+        'user':user,
     }
     return render (request, 'unitmanagement/k9_sick_list.html', context)
 
@@ -1652,6 +1668,7 @@ def k9_sick_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': data.k9,
         'data':data,
@@ -1661,6 +1678,7 @@ def k9_sick_details(request, id):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 

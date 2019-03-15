@@ -3,13 +3,12 @@
 {% block dashboard %}
 <div class="pusher" style="background:white;">
   <div class="ui container">
-    <div class="ui right aligned basic segment">
-        <div class="circular ui icon top left pointing dropdown black button">
-            <i class="orange bell icon"></i>
-            <div class="menu">
-               <a href=""></a>
-            </div>
-        </div>
+    <div class="ui basic segment">
+        
+        <center>
+            <img src="{{user.image.url}}" alt="" width="240">
+        </center>
+
     </div>
     {% if messages %}
         {% for message in messages %}
@@ -20,6 +19,10 @@
         <form class ='ui form' method="POST">
             {% csrf_token %}
           <h3 class="ui dividing header">User Info</h3>
+          <div class="field">
+            <label>Profile Picure</label>
+                {{uform.image}}
+            </div>
           <div class="five fields">
             <div class="field">
                 <label>Nickname</label>

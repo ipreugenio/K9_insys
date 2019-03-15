@@ -5,7 +5,9 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from planningandacquiring.models import K9, K9_Parent, K9_Quantity
-from .models import K9_Genealogy, K9_Handler, User
+from profiles.models import User, Account, Personal_Info
+from unitmanagement.models import Notification
+from .models import K9_Genealogy, K9_Handler
 from training.models import Training, K9_Adopted_Owner, Record_Training
 from .forms import TestForm, add_handler_form
 from planningandacquiring.forms import add_donator_form
@@ -40,6 +42,12 @@ def notif(request):
    
     return notif
 
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def index(request):
     return render (request, 'training/index.html')
 
@@ -68,12 +76,13 @@ def adoption_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data,
         'form': form,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/adoption_form.html', context)
 
@@ -95,11 +104,13 @@ def confirm_adoption(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': data,
         'data': data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/confirm_adoption.html', context)
 
@@ -109,13 +120,14 @@ def adoption_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Adoption List',
         'for_adoption': for_adoption,
         'adopted': adopted,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render (request, 'training/for_adoption_list.html', context)
@@ -126,13 +138,14 @@ def adoption_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': data.k9,
         'data': data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
-
     return render (request, 'training/adoption_details.html', context)
 
 
@@ -293,6 +306,7 @@ def classify_k9_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': 'K9 Classification',
         'data_unclassified': data_unclassified,
@@ -307,6 +321,7 @@ def classify_k9_list(request):
         'SAR_demand': SAR_demand,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -397,12 +412,13 @@ def view_graphs(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {'graphs': graphs,
                'descriptions': descriptions,
                'title': title,
                'notif_data':notif_data,
                 'count':count,
+                'user':user,
                }
 
     return render(request, 'training/view_graph.html', context)
@@ -530,7 +546,7 @@ def classify_k9_select(request, id):
         #NOTIF SHOW
         notif_data = notif(request)
         count = notif_data.filter(viewed=False).count()
-
+        user = user_session(request)
         context = {
             'data': data,
             'title': title,
@@ -547,6 +563,7 @@ def classify_k9_select(request, id):
             'graph': graph,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
     else:
         parent_exist = 1
@@ -568,6 +585,7 @@ def classify_k9_select(request, id):
             'graph': graph,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -611,13 +629,14 @@ def assign_k9_select(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/assign_k9_select.html', context)
 
@@ -627,12 +646,13 @@ def training_records(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Training Records",
         'data': data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render(request, 'training/training_records.html', context)
 
@@ -731,6 +751,7 @@ def training_update_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': data.name,
         'data': data,
@@ -738,6 +759,7 @@ def training_update_form(request, id):
         'form2': form2,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     if data.capability == 'EDD':
@@ -772,7 +794,7 @@ def serial_number_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Trained K9 Finalization',
@@ -781,6 +803,7 @@ def serial_number_form(request, id):
         'style' : style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/serial_number_form.html', context)
 
@@ -804,7 +827,7 @@ def training_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': str(data),
         'data': data,
@@ -813,6 +836,7 @@ def training_details(request, id):
         'sar':sar,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/training_details.html', context)
 
@@ -830,7 +854,7 @@ def daily_record(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': str(data),
         'data': data,
@@ -838,16 +862,18 @@ def daily_record(request, id):
         'record': record,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render(request, 'training/daily_record.html', context)
 
 def adoption_confirmed(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/adoption_confirmed.html', context)
 
@@ -1615,12 +1641,13 @@ def k9_training_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'K9 Training List',
         'data_ontraining': data_ontraining,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'training/k9_training_list.html', context)
 

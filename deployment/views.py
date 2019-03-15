@@ -40,6 +40,13 @@ def notif(request):
    
     return notif
 
+
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def index(request):
 
     context = {
@@ -63,7 +70,7 @@ def add_area(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
       'title':'Add Area Form',
       'texthelp': 'Input Name of Area Here',
@@ -72,6 +79,7 @@ def add_area(request):
       'style':style,
       'notif_data':notif_data,
       'count':count,
+      'user':user,
     }
     return render (request, 'deployment/add_area.html', context)
 
@@ -91,6 +99,7 @@ def add_location(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
       'title':'Add Location Form',
       'texthelp': 'Input Location Details Here',
@@ -99,6 +108,7 @@ def add_location(request):
       'style':style,
       'notif_data':notif_data,
       'count':count,
+      'user':user,
     }
     return render (request, 'deployment/add_location.html', context)
 
@@ -126,7 +136,7 @@ def assign_team_location(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
       'title':'Assign Team to Location',
       'texthelp': 'Input Team and Location Details Here',
@@ -135,6 +145,7 @@ def assign_team_location(request):
       'style':style,
       'notif_data':notif_data,
       'count':count,
+      'user':user,
     }
     return render (request, 'deployment/assign_team_location.html', context)
 
@@ -158,7 +169,7 @@ def edit_team(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
       'title': data.team,
       'texthelp': 'Edit Team Details Here',
@@ -168,6 +179,7 @@ def edit_team(request, id):
       'style':style,
       'notif_data':notif_data,
       'count':count,
+      'user':user,
     }
     return render(request, 'deployment/edit_team.html', context)
 
@@ -177,11 +189,13 @@ def assigned_location_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
         'data' : data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'deployment/assigned_location_list.html', context)
@@ -252,7 +266,7 @@ def team_location_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title' : data,
         'data' : data,
@@ -266,6 +280,7 @@ def team_location_details(request, id):
         'edd_inc': edd_inc,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'deployment/team_location_details.html', context)
@@ -323,7 +338,7 @@ def dog_request(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
       'title':'Request Form',
       'texthelp': 'Input request of client here.',
@@ -332,6 +347,7 @@ def dog_request(request):
       'style':style,
       'notif_data':notif_data,
       'count':count,
+      'user':user,
     }
     return render (request, 'deployment/request_form.html', context)
 
@@ -372,15 +388,15 @@ def request_dog_list(request):
 
     #NOTIF SHOW
     notif_data = notif(request)
-    count = 0
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'data': data,
         'title': 'Request Dog List',
         'gantt_chart': gantt_chart,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'deployment/request_dog_list.html', context)
 
@@ -483,13 +499,14 @@ def request_dog_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data2,
         'data2': data2,
         'can_deploy': can_deploy,
         'style': style,
         'dogs_deployed': dogs_deployed,
+        'user':user,
     }
 
     return render(request, 'deployment/request_dog_details.html', context)
@@ -530,12 +547,13 @@ def deployment_report(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Request Dog List',
         'assignment': assignment,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'deployment/request_dog_list.html', context)
 
@@ -577,12 +595,13 @@ def view_schedule(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'k9' : k9,
         'gantt_chart': gantt_chart,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'deployment/k9_schedule.html', context)
@@ -620,7 +639,7 @@ def add_incident(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Report Incident Form',
         'texthelp': 'Input Incident Details Here',
@@ -629,6 +648,7 @@ def add_incident(request):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render(request, 'deployment/incident_form.html', context)
 
@@ -639,12 +659,13 @@ def incident_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'incidents': incidents,
         'title': title,
         'notif_data':notif_data,
         'count':count,
+        'user':user,        
     }
 
     return render(request, 'deployment/incident_list.html', context)

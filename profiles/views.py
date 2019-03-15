@@ -38,6 +38,12 @@ def notif(request):
    
     return notif
 
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def dashboard(request):
 
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
@@ -106,7 +112,7 @@ def dashboard(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'can_deploy': can_deploy,
         'k9_demand': k9_demand,
@@ -121,6 +127,7 @@ def dashboard(request):
         'for_breeding': for_breeding,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render (request, 'profiles/dashboard.html', context)
@@ -162,7 +169,7 @@ def profile(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    
     context={
         # 'phex': phex,
         # 'vac': vac,
@@ -171,6 +178,7 @@ def profile(request):
         'uform':uform,
         'pform': pform,
         'eform': eform,
+        'user':user,
         'notif_data':notif_data,
         'count':count,
     }
@@ -234,14 +242,14 @@ def add_User(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': "Add User Form",
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
-
+        'user':user,
     }
 
     return render(request, 'profiles/add_User.html', context)
@@ -255,8 +263,8 @@ def add_personal_info(request):
         if form.is_valid():
             personal_info = form.save(commit=False)
             UserID = request.session["session_userid"]
-            user = User.objects.get(id=UserID)
-            personal_info.UserID = user
+            user_s = User.objects.get(id=UserID)
+            personal_info.UserID = user_s
             personal_info.save()
             '''style = "ui green message"
             messages.success(request, 'User has been successfully Added!')'''
@@ -267,18 +275,19 @@ def add_personal_info(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user = User.objects.get(id=request.session["session_userid"])
-    user_name = str(user)
+    user_s = User.objects.get(id=request.session["session_userid"])
+    user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Add Personal Information for " + user_name,
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     print(form)
     return render(request, 'profiles/add_personal_info.html', context)
@@ -291,8 +300,8 @@ def add_education(request):
         if form.is_valid():
             personal_info = form.save(commit=False)
             UserID = request.session["session_userid"]
-            user = User.objects.get(id=UserID)
-            personal_info.UserID = user
+            user_s = User.objects.get(id=UserID)
+            personal_info.UserID = user_s
             personal_info.save()
             '''style = "ui green message"
             messages.success(request, 'User has been successfully Added!')'''
@@ -303,18 +312,19 @@ def add_education(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user = User.objects.get(id=request.session["session_userid"])
-    user_name = str(user)
+    user_s = User.objects.get(id=request.session["session_userid"])
+    user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Add Education Information for " + user_name,
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     print(form)
     return render(request, 'profiles/add_education.html', context)
@@ -329,8 +339,8 @@ def add_account(request):
             UserID = request.session["session_userid"]
             data = User.objects.get(id = UserID)
             account_info.serial_number = 'O-' + str(data.id)
-            user = User.objects.get(id=UserID)
-            account_info.UserID = user
+            user_s = User.objects.get(id=UserID)
+            account_info.UserID = user_s
             account_info.save()
             '''style = "ui green message"
             messages.success(request, 'User has been successfully Added!')'''
@@ -340,34 +350,36 @@ def add_account(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user = User.objects.get(id=request.session["session_userid"])
-    user_name = str(user)
+    user_s = User.objects.get(id=request.session["session_userid"])
+    user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Add Account Information for " + user_name,
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     print(form)
     return render(request, 'profiles/add_user_account.html', context)
 
 #Listview format
 def user_listview(request):
-    user = User.objects.all()
+    user_s = User.objects.all()
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title' : 'User List',
-        'user' : user,
+        'user_s' : user_s,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'profiles/user_list.html', context)
@@ -382,7 +394,7 @@ def user_detailview(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': 'User Details',
         'user' : user,
@@ -391,6 +403,7 @@ def user_detailview(request, id):
         'account': account,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'profiles/user_detail.html', context)
@@ -400,10 +413,11 @@ def user_add_confirmed(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render(request, 'profiles/user_add_confirmed.html', context)
 

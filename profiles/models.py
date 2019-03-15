@@ -51,6 +51,7 @@ class User(models.Model):
         ('Dead', 'Dead')
     )
 
+    image = models.ImageField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
     rank = models.CharField('rank', max_length=200)
     fullname = models.CharField('fullname', max_length=200)
@@ -71,7 +72,6 @@ class User(models.Model):
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)
-    # profile image dito
     height = models.IntegerField('height')
     weight = models.IntegerField('weight')
     headsize = models.IntegerField('headsize')

@@ -32,6 +32,12 @@ def notif(request):
    
     return notif
 
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def index(request):
     return render (request, 'inventory/index.html')
 
@@ -54,7 +60,7 @@ def medicine_add(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Medicine Form',
@@ -63,6 +69,7 @@ def medicine_add(request):
         'style' : style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_add.html',context)
 
@@ -77,7 +84,7 @@ def medicine_edit(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Edit Medicine Form',
@@ -85,6 +92,7 @@ def medicine_edit(request, id):
         'actiontype': 'Submit',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_add.html',context)
 
@@ -110,7 +118,7 @@ def food_add(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Dog Food Form',
@@ -119,6 +127,7 @@ def food_add(request):
         'style' : style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_add.html', context)
 
@@ -134,7 +143,7 @@ def food_edit(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-      
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Edit Dog Food Form',
@@ -142,6 +151,7 @@ def food_edit(request, id):
         'actiontype': 'Submit',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_add.html',context)
 
@@ -168,7 +178,7 @@ def miscellaneous_add(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Miscellaneous Item Form',
@@ -177,6 +187,7 @@ def miscellaneous_add(request):
         'style' : style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_add.html', context)
 
@@ -192,7 +203,7 @@ def miscellaneous_edit(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'form': form,
         'title': 'Edit Miscellaneous Form',
@@ -200,6 +211,7 @@ def miscellaneous_edit(request, id):
         'actiontype': 'Submit',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_add.html',context)
 
@@ -209,12 +221,13 @@ def medicine_inventory_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Medicine Inventory List',
         'data' : data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_inventory_list.html',context)
 
@@ -228,6 +241,7 @@ def food_inventory_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title': 'Dog Food Inventory List',
         'data' : data,
@@ -237,6 +251,7 @@ def food_inventory_list(request):
         'milk_inventory': milk_inventory,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_inventory_list.html',context)
 
@@ -245,12 +260,13 @@ def miscellaneous_inventory_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Miscellaneous Inventory List',
         'data' : data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_inventory_list.html',context)
 
@@ -274,7 +290,7 @@ def medicine_inventory_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': i.medicine,
         'data' : data,
@@ -285,6 +301,7 @@ def medicine_inventory_details(request, id):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_inventory_details.html', context)
 
@@ -307,7 +324,7 @@ def food_inventory_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': i.food,
         'data' : data,
@@ -318,6 +335,7 @@ def food_inventory_details(request, id):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_inventory_details.html', context)
 
@@ -340,7 +358,7 @@ def miscellaneous_inventory_details(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': i.miscellaneous,
         'data' : data,
@@ -351,6 +369,7 @@ def miscellaneous_inventory_details(request, id):
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_inventory_details.html', context)
 
@@ -387,7 +406,7 @@ def medicine_count_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.medicine,
         'form': form,
@@ -398,6 +417,7 @@ def medicine_count_form(request, id):
         'texthelp': 'Input Medicine Physical Count data here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -432,7 +452,7 @@ def food_count_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.food,
         'form': form,
@@ -443,6 +463,7 @@ def food_count_form(request, id):
         'texthelp': 'Input Dog Food/Milk Physical Count here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -477,7 +498,7 @@ def miscellaneous_count_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.miscellaneous,
         'form': form,
@@ -487,6 +508,7 @@ def miscellaneous_count_form(request, id):
         'texthelp': 'Input Miscellaneous Physical Count here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)
 
@@ -522,7 +544,7 @@ def medicine_receive_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.medicine,
         'form': form,
@@ -533,6 +555,7 @@ def medicine_receive_form(request, id):
         'texthelp': 'Input Received Medicine Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -562,7 +585,7 @@ def food_receive_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.food,
         'form': form,
@@ -572,6 +595,7 @@ def food_receive_form(request, id):
         'texthelp': 'Input Received Dog Food/Milk Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -601,7 +625,7 @@ def miscellaneous_receive_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.miscellaneous,
         'form': form,
@@ -611,6 +635,7 @@ def miscellaneous_receive_form(request, id):
         'texthelp': 'Input Received Miscellaneous Items Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)
 
@@ -641,7 +666,7 @@ def medicine_subtract_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.medicine,
         'form': form,
@@ -651,6 +676,7 @@ def medicine_subtract_form(request, id):
         'texthelp': 'Input Subtracted Medicine Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/medicine_count_form.html', context)
 
@@ -679,7 +705,7 @@ def food_subtract_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.food,
         'form': form,
@@ -689,6 +715,7 @@ def food_subtract_form(request, id):
         'texthelp': 'Input Subtracted Dog Food/Milk Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/food_count_form.html', context)
 
@@ -718,7 +745,7 @@ def miscellaneous_subtract_form(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': data.miscellaneous,
         'form': form,
@@ -728,6 +755,7 @@ def miscellaneous_subtract_form(request, id):
         'texthelp': 'Input Subtracted Miscellaneous Items Quantity here',
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/miscellaneous_count_form.html', context)
 
@@ -748,13 +776,14 @@ def damaged_form(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title': 'Report Equipment Concern',
         'form' : form,
         'style':style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/damaged_form.html',context)
     
@@ -763,11 +792,12 @@ def damaged_report_list(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    
+    user = user_session(request)
     context = {
         'title': 'Report Damaged Equipment List',
         'data' : data,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'inventory/damaged_report_list.html',context)

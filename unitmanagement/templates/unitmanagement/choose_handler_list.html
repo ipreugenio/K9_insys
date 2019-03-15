@@ -53,8 +53,6 @@
                 {% for data_pi in data_pi %}
                     {% if data_pi.UserID == data %}
                         <td>{{data_pi.city}}</td>
-                    {%else%}
-                    <td>{{data_pi.city}}</td>
                     {%endif%}
                 {% endfor %}
                 <td class="center aligned">
@@ -67,24 +65,25 @@
 </div>
 
 <div class="ui tab segment" data-tab="second">
-    <table id = 'tabledata2' class="ui celled table">
-        <thead  class="center aligned">
+    <table id="tabledata2" class="ui celled table">
+    <thead>
+        <tr class="center aligned">
             <th class="six wide">Handler</th>
-            <th >Sex</th>
-            <th >Age</th>
-            <th >City</th>
-            <th >Select</th>
-        </thead>
+            <th class="two wide">Sex</th>
+            <th class="two wide">Age</th>
+            <th class="three wide">City</th>
+            <th class="three wide">Select</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for data in data_available %}
             <tr>
                 <td class="six wide">{{data.fullname}}</td>
                 <td class="two wide center aligned">{{data.gender}}</td>
                 <td class="two wide center aligned">{{data.age}}</td>
-                {% for data_pi in data_pi %}
-                    {% if data_pi.UserID == data %}
-                        <td class="three wide">{{data_pi.city}}</td>
-                    {%else%}
-                    <td class="three wide">{{data_pi.city}}</td>
+                {% for data_pi2 in data_pi2 %}
+                    {% if data_pi2.UserID == data %}
+                        <td class="three wide">{{data_pi2.city}}</td>
                     {%endif%}
                 {% endfor %}
                 <td class="three wide center aligned">
@@ -92,8 +91,10 @@
                 </td>
             </tr>
         {% endfor %}
+    </tbody>
     </table>
 </div>
+
 <script type="text/javascript">
         
     $(document).ready(function() {

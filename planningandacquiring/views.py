@@ -75,6 +75,12 @@ def notif(request):
    
     return notif
 
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
+
 def index(request):
     data = [[],[],[]]
     total = 0
@@ -115,7 +121,7 @@ def index(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'title' : "Medicine Used Report",
         'data': data,
@@ -124,6 +130,7 @@ def index(request):
         'date_to':date_to,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     return render (request, 'planningandacquiring/index.html', context)
 
@@ -132,12 +139,13 @@ def report(request):
    #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title' : "REPORT",
         'form': form,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
         }
     return render (request, 'planningandacquiring/report.html', context)
 
@@ -162,13 +170,14 @@ def add_donated_K9(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title' : "Add New K9",
         'form' : form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/add_donated_K9.html', context)
@@ -205,13 +214,13 @@ def confirm_donation(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Receive Donated K9",
         'k9': k9,
         'notif_data':notif_data,
         'count':count,
-
+        'user':user,
     }
     return render(request, 'planningandacquiring/confirm_K9_donation.html', context)
 
@@ -223,10 +232,11 @@ def donation_confirmed(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     if 'ok' in request.POST:
@@ -238,12 +248,13 @@ def donation_confirmed(request):
         #NOTIF SHOW
         notif_data = notif(request)
         count = notif_data.filter(viewed=False).count()
-
+        user = user_session(request)
         context = {
             'Title': "Receive Donated K9",
             'form': add_donated_K9_form,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
@@ -290,7 +301,7 @@ def add_K9_parents(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "K9_Breeding",
         'form': form,
@@ -299,6 +310,7 @@ def add_K9_parents(request):
         'fathers' : father_list,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
@@ -313,12 +325,13 @@ def confirm_K9_parents(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'mother': mother,
         'father': father,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/confirm_K9_parents.html', context)
@@ -342,7 +355,7 @@ def K9_parents_confirmed(request):
         #NOTIF SHOW
         notif_data = notif(request)
         count = notif_data.filter(viewed=False).count()
-
+        user = user_session(request)
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
@@ -350,6 +363,7 @@ def K9_parents_confirmed(request):
             'fathers': father_list,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
@@ -387,13 +401,14 @@ def add_offspring_K9(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Receive Donated K9",
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/add_K9_offspring.html', context)
@@ -410,7 +425,7 @@ def confirm_breeding(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Receive Donated K9",
         'offspring': offspring,
@@ -418,6 +433,7 @@ def confirm_breeding(request):
         'father': father,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/confirm_breeding.html', context)
@@ -463,7 +479,7 @@ def breeding_confirmed(request):
         #NOTIF SHOW
         notif_data = notif(request)
         count = notif_data.filter(viewed=False).count()
-
+        user = user_session(request)
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
@@ -471,6 +487,7 @@ def breeding_confirmed(request):
             'fathers': father_list,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
@@ -513,12 +530,13 @@ def K9_listview(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title' : 'K9 List',
         'k9' : k9,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/K9_list.html', context)
@@ -536,7 +554,7 @@ def K9_detailview(request, id):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     try:
         parent = K9_Parent.objects.get(offspring=k9)
     except K9_Parent.DoesNotExist:
@@ -545,6 +563,7 @@ def K9_detailview(request, id):
             'k9' : k9,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
     else:
         parent_exist = 1
@@ -555,6 +574,7 @@ def K9_detailview(request, id):
             'parent_exist': parent_exist,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
@@ -1062,7 +1082,7 @@ def forecast_result(date_list, quantity_list, graph_title):
         #NOTIF SHOW
         notif_data = notif(request)
         count = notif_data.filter(viewed=False).count()
-
+        user = user_session(request)
         context = {
             'title': 'Forecasting',
             'graph': graph,
@@ -1072,6 +1092,7 @@ def forecast_result(date_list, quantity_list, graph_title):
             'recommended': recommended,
             'notif_data':notif_data,
             'count':count,
+            'user':user,
             }
 
     return result
@@ -1505,7 +1526,7 @@ def budgeting(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    
+    user = user_session(request)
     context = {
         'title': 'Budgeting',
         'request_forecast': request_forecast[4],
@@ -1571,6 +1592,7 @@ def budgeting(request):
 
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/budgeting.html', context)
@@ -1584,7 +1606,7 @@ def budgeting_list(request):
      #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     if request.method == 'POST':
         request.session['budget_date'] = form['date'].value()
 
@@ -1596,6 +1618,7 @@ def budgeting_list(request):
         'Title' : "Create Budget",
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/budget_list.html', context)
@@ -1628,7 +1651,7 @@ def breeding_recommendation(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'test': "test",
         'form': form,
@@ -1637,6 +1660,7 @@ def breeding_recommendation(request):
         'k9_list_breed_skill': k9_list_breed_skill,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/breeding_recommendation.html', context)
@@ -1658,13 +1682,14 @@ def add_breed(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
+    user = user_session(request)
     context = {
         'Title': "Add Breed",
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
     print(form)
     return render(request, 'planningandacquiring/add_breed.html', context)
@@ -1676,11 +1701,13 @@ def breed_listview(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': 'Breed List',
         'breed': breed,
         'notif_data':notif_data,
         'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/view_breed.html', context)
