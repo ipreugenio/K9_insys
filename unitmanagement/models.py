@@ -9,6 +9,7 @@ from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
 # Create your models here.
 
@@ -97,11 +98,16 @@ class PhysicalExam(models.Model):
         return notif
 
     def save(self, *args, **kwargs):
-        self.date_next_exam = self.date + timedelta(days=365)
+        #self.date_next_exam = self.date + timedelta(days=365)
         super(PhysicalExam, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
+
+@receiver(post_save, sender=PhysicalExam)
+def phex_next_date(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        instance.date_next_exam = instance.date + relativedelta(year=+1,)
 
 class VaccinceRecord(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
