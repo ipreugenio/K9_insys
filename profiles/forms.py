@@ -60,6 +60,7 @@ class add_User_form(forms.ModelForm):
         def __init__(self, *args, **kwargs):
             super(add_User_form, self).__init__(*args, **kwargs)
             self.fields['extensionname'].required = False
+            self.fields['distinct_feature'].required = False
 
 class add_personal_form(forms.ModelForm):
     class Meta:

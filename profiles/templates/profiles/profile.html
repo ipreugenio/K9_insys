@@ -16,7 +16,7 @@
         {% endfor %}
     {% endif %}
       <div class="ui segment">
-        <form class ='ui form' method="POST">
+        <form class ='ui form' method="POST" enctype="multipart/form-data">
             {% csrf_token %}
           <h3 class="ui dividing header">User Info</h3>
           <div class="field">

@@ -15,7 +15,7 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
-from .forms import ReportDateForm, add_breed_form
+from .forms import ReportDateForm, add_breed_form, k9_detail_form
 from deployment.models import Dog_Request, Team_Assignment
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
@@ -151,7 +151,7 @@ def report(request):
 
 #Form format
 def add_donated_K9(request):
-    form = add_donated_K9_form(request.POST)
+    form = add_donated_K9_form(request.POST or None, request.FILES or None)
     style = "ui teal message"
     if request.method == 'POST':
         if form.is_valid():
@@ -369,10 +369,11 @@ def K9_parents_confirmed(request):
 
 
 def add_offspring_K9(request):
-    form = add_offspring_K9_form(request.POST)
+    form = add_offspring_K9_form(request.POST or None, request.FILES or None)
     style = "ui teal message"
 
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
             k9 = form.save()
             k9.source = "Breeding"
@@ -386,12 +387,12 @@ def add_offspring_K9(request):
             else:
                 breed = mother.breed
 
-                k9.breed = breed
-                k9.save()
+            k9.breed = breed
+            k9.save()
 
-                request.session['offspring_id'] = k9.id
+            request.session['offspring_id'] = k9.id
 
-                return HttpResponseRedirect('confirm_breeding/')
+            return HttpResponseRedirect('confirm_breeding/')
 
         else:
             style = "ui red message"
@@ -544,12 +545,23 @@ def K9_listview(request):
 #Detailview format
 def K9_detailview(request, id):
     k9 = K9.objects.get(id = id)
-
+    form = k9_detail_form(request.POST or None, request.FILES or None, instance=k9)
     if request.method == "POST":
-        print(request.POST.get('radio'))
-        k9.training_status = request.POST.get('radio')
-        k9.save()
-        messages.success(request, 'K9 is now ' + k9.training_status + '!')
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'K9 Details Updated!')
+
+            if k9.training_status == 'For-Deployment' or k9.training_status == 'For-Breeding':
+                k9.training_status = request.POST.get('radio')
+                k9.save()
+
+            return redirect('planningandacquiring:K9_detail', id = k9.id)
+
+        # if 'change_training_status' in request.POST:
+        #     print(request.POST.get('radio'))
+        #     k9.training_status = request.POST.get('radio')
+        #     k9.save()
+        #     messages.success(request, 'K9 is now ' + k9.training_status + '!')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -564,6 +576,7 @@ def K9_detailview(request, id):
             'notif_data':notif_data,
             'count':count,
             'user':user,
+            'form':form,
         }
     else:
         parent_exist = 1
@@ -575,6 +588,7 @@ def K9_detailview(request, id):
             'notif_data':notif_data,
             'count':count,
             'user':user,
+            'form':form,
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)

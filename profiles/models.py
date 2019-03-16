@@ -51,7 +51,7 @@ class User(models.Model):
         ('Dead', 'Dead')
     )
 
-    image = models.ImageField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
+    image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
     rank = models.CharField('rank', max_length=200)
     fullname = models.CharField('fullname', max_length=200)
@@ -68,7 +68,7 @@ class User(models.Model):
     citizenship = models.CharField('citizenship', max_length=200)
     religion = models.CharField('religion', max_length=200)
     bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
-    distinct_feature = models.CharField('distinct_feature', max_length=200)
+    distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)

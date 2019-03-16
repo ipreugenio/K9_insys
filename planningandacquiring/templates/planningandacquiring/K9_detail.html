@@ -18,6 +18,20 @@
   </p>
 </div>
 {% endif %}
+<div class="ui basic segment">
+        
+  <center>
+      <img src="{{k9.image.url}}" alt="" width="280">
+  </center>
+
+</div>
+    <form class="ui form" action="" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+          <label>K9 Image</label>
+          {{form.image}}
+      </div>
+    
 		<table class="ui celled table">
         	<thead>
           	<tr>
@@ -99,28 +113,27 @@
 
     		</thead>
         </table>
-        {% if k9.training_status ==  'For-Breeding' or k9.training_status ==  'For-Deployment'%}
-        <div class="ui segment">
-          <form class="ui form" method="POST">
-            {% csrf_token %}
-            <div class="inline fields">
-              <div class="field">
-                  <input type="radio" name="radio" value="For-Breeding">For-Breeding
-              </div>
-              <div class="field">
-                  <input type="radio" name="radio" value="For-Deployment">For-Deployment
-              </div>
-              <div class="field">
-                <button type="submit" class="ui green button" onclick="return confirm('Are you sure?')">Submit</button>
-              </div>
-            </div>
-          </form>
-        </div>
-        {% endif %}
 
+        {% if k9.training_status ==  'For-Breeding' or k9.training_status ==  'For-Deployment'%}
+        <div class="inline fields">
+          <div class="field">
+              <input type="radio" name="radio" value="For-Breeding">For-Breeding
+          </div>
+          <div class="field">
+              <input type="radio" name="radio" value="For-Deployment">For-Deployment
+          </div>
+        </div>
+       {% endif %}
+        
+        <div class="ui very basic center aligned segment" style="padding: 0px;">
+          <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Update</button>
+        </div>
+        
+      </form>
         <div class="ui basic segment">
             <a href="{% url 'planningandacquiring:K9_list'%}" class="ui blue button">Back</a>
         </div>
+        
 
 <script type="text/javascript">
 

@@ -153,7 +153,7 @@ def profile(request):
 
     print(account.UserID.position)
 
-    uform = add_User_form(request.POST or None, instance = user)
+    uform = add_User_form(request.POST or None,  request.FILES or None, instance = user)
     pform = add_personal_form(request.POST or None, instance = p_info)
     eform = add_education_form(request.POST or None, instance = e_info)
 
@@ -164,6 +164,9 @@ def profile(request):
             if pform.is_valid():
                 print(eform.errors)
                 if eform.is_valid():
+                    uform.save()
+                    pform.save()
+                    eform.save()
                     messages.success(request, 'Your Profile has been successfully Updated!')
 
     #NOTIF SHOW
@@ -221,7 +224,6 @@ def add_User(request):
 
     form = add_User_form(request.POST)
     style = ""
-
 
     if request.method == 'POST':
         print(form.errors)
@@ -386,7 +388,7 @@ def user_listview(request):
 
 #Detailview format
 def user_detailview(request, id):
-    user = User.objects.get(id = id)
+    user_s = User.objects.get(id = id)
     personal_info = Personal_Info.objects.get(UserID = id)
     education = Education.objects.get(UserID=id)
     account = Account.objects.get(UserID=id)
@@ -397,7 +399,7 @@ def user_detailview(request, id):
     user = user_session(request)
     context = {
         'Title': 'User Details',
-        'user' : user,
+        'user_s' : user_s,
         'personal_info': personal_info,
         'education': education,
         'account': account,

@@ -70,8 +70,7 @@ class K9(models.Model):
         ('Retired', 'Retired'),
     )
 
-    #Training Status
-    # For-Breeding, For-Deployment, Trained, For-Adoption, Adopted, etc.
+    image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)

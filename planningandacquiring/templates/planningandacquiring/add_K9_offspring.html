@@ -42,8 +42,14 @@
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" method="post">
+<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" enctype="multipart/form-data" method="post">
     {% csrf_token %}
+    
+    <div class="sixteen wide field">
+      <label>K9 Image</label>
+      {{form.image}}
+    </div>
+  
     <div class="fields">
         <div class="sixteen wide field">
             <label>Name</label>

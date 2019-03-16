@@ -10,6 +10,7 @@ from decimal import Decimal
 from django.db.models import Sum, Avg, Max
 from django.core.exceptions import ObjectDoesNotExist
 
+from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
@@ -103,20 +104,30 @@ def redirect_notif(request, id):
     
 
 def index(request):
-
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    form = k9_detail_form(request.POST or None, request.FILES or None, instance = user)
+
+    if request.method == "POST":
+        print('post')
+        print(form.errors)
+        if form.is_valid():
+            print('Valid')   
+            a = form['image'].value() 
+            print(a)
+            form.save()
+
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'form':form,
     }        
 
     return render (request, 'unitmanagement/index.html', context)
 
-#TODO Formset does not got to db
-#INITIALIZE HEALTH FORM AND PHYSICAL FORM
+#TODO Initialize treatment
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
