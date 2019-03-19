@@ -38,6 +38,19 @@ def notif(request):
    
     return notif
 
+def notif_list(request):
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context={
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/notification_list.html', context)
+
 def user_session(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)

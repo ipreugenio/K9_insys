@@ -63,7 +63,7 @@ class HealthMedicine(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     time_of_day = models.CharField('time_of_day',  choices=TIME_OF_DAY, max_length=200, default="")
     duration = models.IntegerField('duration', default = 1)
-
+    
     def __str__(self):
         return str(self.id) + ': ' + str(self.health.date) #+ '-' + str(self.health.dog)
 
@@ -212,6 +212,8 @@ class Notification(models.Model):
         ('k9_sick', 'k9_sick'),
         ('handler_died', 'handler_died'),
         ('handler_on_leave', 'handler_on_leave'),
+        ('retired_k9', 'retired_k9'),
+        ('medicine_done', 'medicine_done'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

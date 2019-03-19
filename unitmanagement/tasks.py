@@ -6,7 +6,8 @@ from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 from datetime import timedelta, date, datetime
 from decimal import Decimal
-from django.db.models import Sum
+from django.db.models import 
+from dateutil.relativedelta import relativedelta
 
 from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
@@ -21,7 +22,8 @@ from profiles.serializers import NotificationSerializer
 #ADD POSITION, OTHER_ID
 
 # TODO UNITMANAGEMENT NOTIFS
-#@periodic_task(run_every=crontab(hour=6, minutes=0))
+#8AM
+@periodic_task(run_every=crontab(hour=8, minutes=0))
 def unitmanagement_notifs():
     k9 = K9.objects.all() 
     phex = PhysicalExam.objects.all()
@@ -113,6 +115,10 @@ def unitmanagement_notifs():
     health = Health.objects.filter(status='Pending')
 
     for h in health:
+        if h.date_done == date.today():
+            Notification.objects.create(k9=h.dog, message= str(dog.name) + ' will be done with medication today!', 
+            notif_type='medicine_done', position='Veterinarian', other_id=h.id)        
+        
         if date.today() == h.date_done:
             h.status = 'Done'
             h.dog.status = 'Working Dog'
@@ -140,9 +146,11 @@ def unitmanagement_notifs():
                 h.save()
 
             try:
+                #where dog is deployed
                 td = Team_Dog_Deployed.objects.filter(k9=k9).latest()
                 
                 try:
+                #where location is updated
                     ta = Team_Assignment.objects.get(id=td.team_assignment.id)
                     
                     #create new team dog
@@ -165,7 +173,8 @@ def unitmanagement_notifs():
 
 
 # TODO DEPLOYMENT NOTIFS
-#@periodic_task(run_every=crontab(hour=6, minutes=0))
+#8:30AM
+@periodic_task(run_every=crontab(hour=8, minutes=30))
 def deployment_notifs():
     request = Dog_Request.objects.all()
 
@@ -188,8 +197,8 @@ def deployment_notifs():
             str(request.requester) + ' will end today.', notif_type='dog_request', other_id=request.id)
 
 
-#@periodic_task(run_every=crontab(hour=6, minutes=0))
-# every 5am?
+# 6AM
+@periodic_task(run_every=crontab(hour=6, minutes=0))
 def auto_subtract():
     # TODO Vitamins consumption
     vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
@@ -342,8 +351,8 @@ def auto_subtract():
         Notification.objects.create(message= 'Milk is low. Its time to reorder!', notif_type='inventory_low')
         
 
-# Deployment Change status to deployed
-#@periodic_task(run_every=timedelta(seconds=10))
+# 9AM
+@periodic_task(run_every=crontab(hour=9, minutes=0))
 def deploy_dog():
     #When Schedule is today, change training status to deployed
     sched = K9_Schedule.objects.filter(date_start=date.today())
@@ -395,14 +404,20 @@ def deploy_dog():
     
         
 
-#Due for retirement dog
-@periodic_task(run_every=timedelta(seconds=10))
-def test():
-    Notification.objects.create(message='message', position="Veterinarian")
+# 8:50AM
+@periodic_task(run_every=crontab(hour=8, minutes=50))
+def due_retired_k9():
+    k9 = K9.objects.all()
+    for k9 in k9:
+        due_year = k9.year_retired - relativedelta(year=-1) 
+        if due_year == date.today()
+            Notification.objects.create(message=str(k9) + ' is due for retirement next year!', 
+            notif_type = 'retired_k9',
+            position="Administrator")
 
-#TODO
+# 12AM
 #DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
-#@periodic_task(run_every=timedelta(seconds=10))
+@periodic_task(run_every=crontab(hour=24, minutes=0))
 def delete():
     notif_delete = Notification.objects.filter(datetime=date.today-timedelta(days=60))
     notif_delete.delete()

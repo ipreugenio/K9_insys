@@ -1,26 +1,11 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
-
-<div class="ui floating icon dropdown button">
-    <i class="filter icon"></i>
-    <div class="menu">
-            <div class="item">this is a message that needs to be read by the user. plse dropdown.
-                    loren ipsum what the hell am i writing.</div><br>
-            <div class="item">this is a message that needs to be read by the user. plse dropdown.
-                    loren ipsum what the hell am i writing.</div>   
-    </div>
-</div>
-
-<script>
-    $('.ui.dropdown').dropdown();
-</script>
-
-<div >
+<div>
     <div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
         <i class="blue bell icon"></i>
         <span style="color:red;font-size: 12px;">{{count}}</span>
-        <div class="menu" style='overflow: auto;max-height: 350px;'>
+        <div class="ui vertical scrolling menu">
             {% for notif_data in notif_data%}
                 {%if notif_data.viewed == True %}
                 <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 
@@ -38,20 +23,10 @@
     </div>
 </div>
 
-<div class="ui basic segment">
-        
-    <center>
-        <img src="{{user.image.url}}" alt="" width="240">
-    </center>
-
-</div>
-
-<!-- <form action="" class="ui form" enctype="multipart/form-data" method="POST">
-    {% csrf_token %}
-    <div class="field">
-        {{form.image}}
-    </div>
-    <button class="ui green button" type="submit">Submit</button>
-</form> -->
-
+    
+<script>
+$('.ui.dropdown')
+  .dropdown()
+;
+</script>
 {% endblock%}

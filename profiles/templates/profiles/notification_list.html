@@ -1,0 +1,36 @@
+{% extends "profiles/global-base-ui/sidebar_menu.html" %}
+{% block dashboard %}
+<div class="pusher" style="background:white;">
+    <div class="ui container">
+        <div class="ui very basic segment">
+            <div class="ui icon message">
+            <i class="teal inbox icon"></i>
+                <div class="content">
+                    <div class="header">
+                    Notifications
+                    </div>
+                    <p>Dont miss out!</p>
+                </div>
+            </div>
+        </div>
+      
+   
+        <div class="ui very basic segment">
+            {% for notif_data in notif_data%}
+            <div class="ui orange message">
+                <a href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">   
+                    {{notif_data.message}} 
+                </a>
+                <small style="float:right;">{{notif_data.datetime}}</small>
+            </div>
+           
+            {% endfor%}
+        </div>
+          
+        
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -8,6 +8,7 @@ app_name='profiles'
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
+    path('notifications/', views.notif_list, name='notif_list'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('add_User_form/', views.add_User, name='add_User_form'),

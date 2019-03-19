@@ -96,6 +96,14 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('unitmanagement:change_equipment', id = notif.other_id)
+    elif notif.notif_type == 'retired_k9' :
+        notif.viewed = True
+        notif.save()
+        return redirect('planningandacquiring:K9_detail', id = notif.k9.id)
+    elif notif.notif_type == 'medicine_done' :
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:health_details', id = notif.other_id)
     #TODO location incident view details 
     # elif notif.notif_type == 'location_incident' :
     #     notif.viewed = True

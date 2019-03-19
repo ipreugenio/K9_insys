@@ -568,7 +568,7 @@ def K9_detailview(request, id):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     try:
-        parent = K9_Parent.objects.get(offspring=k9)
+        parent = K9_Parent.objects.filter(offspring=k9)
     except K9_Parent.DoesNotExist:
         context = {
             'Title': 'K9 Details',
