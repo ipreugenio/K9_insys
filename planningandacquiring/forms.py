@@ -200,32 +200,51 @@ class budget_food(forms.Form):
     # class Meta:
     #     model = Budget_food
     #     fields = ('food', 'quantity', 'price', 'total', 'budget_allocation')
-    budget_puppy = forms.IntegerField()
-    budget_adult = forms.IntegerField()
+    budget_puppy = forms.DecimalField()
+    budget_milk = forms.DecimalField()
+    budget_adult = forms.DecimalField()
+
+    quantity_puppy = forms.DecimalField()
+    quantity_milk = forms.DecimalField()
+    quantity_adult = forms.DecimalField()
+
+    price_puppy = forms.IntegerField()
+    price_milk = forms.IntegerField()
+    price_adult = forms.IntegerField()
+
 
 class budget_equipment(forms.Form):
     # class Meta:
     #     model = Budget_equipment
     #     fields = ('equipment', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.IntegerField()
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
 
 class budget_medicine(forms.Form):
     # class Meta:
     #     model = Budget_medicine
     #     fields = ('medicine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.IntegerField()
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
+
 
 class budget_vaccine(forms.Form):
     # class Meta:
     #     model = Budget_vaccine
     #     fields = ('vaccine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.IntegerField()
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
 
 class budget_vet_supply(forms.Form):
     # class Meta:
     #     model = Budget_vet_supply
     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.IntegerField()
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
 
 class budget_date(forms.Form):
     #date = forms.DateField()
@@ -285,6 +304,7 @@ class add_breed_form(forms.ModelForm):
                                      widget=forms.CheckboxSelectMultiple, choices=TEMPERAMENT)
     colors = forms.MultipleChoiceField(required=False,
                                      widget=forms.CheckboxSelectMultiple, choices=COLORS)
+
 
     class Meta:
         model = Dog_Breed

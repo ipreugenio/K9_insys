@@ -265,8 +265,8 @@ class Education(models.Model):
     se_schoolyear = models.CharField('se_schoolyear', max_length=200)
     te_schoolyear = models.CharField('te_schoolyear', max_length=200)
     pe_degree = models.CharField('pe_degree', max_length=200)
-    se_degree = models.CharField('pe_degree', max_length=200)
-    te_degree = models.CharField('pe_degree', max_length=200)
+    se_degree = models.CharField('se_degree', max_length=200)
+    te_degree = models.CharField('te_degree', max_length=200)
 
 
 class Account(models.Model):

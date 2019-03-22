@@ -14,11 +14,8 @@
 <form action="{% url 'planningandacquiring:budget_list' %}" method="POST">
     {% csrf_token %}
 
-    Select
 
-    {{date}}
-
-    <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+    <button class = "ui button green" type="submit" onclick="return confirm('Proceed to Budgeting?')">Create Budget Estimate</button>
 
 </form>
 

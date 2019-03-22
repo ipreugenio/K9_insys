@@ -2,17 +2,29 @@
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
-    <h3 class="ui header">{{ title }}</h3>
+    <h3 class="ui header">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
+  <link rel="stylesheet" type="text/css" href="{'% static 'cal/css/styles.css' %}">
+        K9 Request List
+    </h3>
 </div>
-<table id="tabledata1" class="ui seven column celled table">
+
+
+<table id="tabledata1" class="ui nine column celled table">
         <thead>
             <tr>
                 <th>Start date</th>
                 <th>End date</th>
+                <th>Duration</th>
                 <th>Requester</th>
                 <th>Place</th>
-                <th>Total Dogs Requested</th>
-                <th>Remarks</th>
+                <th>K9s Requested</th>
+                <th>K9s Deployed</th>
                 <th>Status</th>
                 <th></th>
             </tr>
@@ -23,10 +35,11 @@
                     <tr class = "warning">
                         <td>{{Data.start_date}}</td>
                         <td>{{Data.end_date}}</td>
+                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
-                        <td>{{Data.remarks}}</td>
+                        <td>{{Data.total_dogs_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
@@ -36,10 +49,11 @@
                     <tr class = "positive">
                         <td>{{Data.start_date}}</td>
                          <td>{{Data.end_date}}</td>
+                        <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
-                        <td>{{Data.remarks}}</td>
+                        <td>{{Data.total_dogs_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
@@ -49,10 +63,11 @@
                     <tr class = "error">
                         <td>{{Data.start_date}}</td>
                         <td>{{Data.end_date}}</td>
+                        <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
-                        <td>{{Data.remarks}}</td>
+                        <td>{{Data.total_dogs_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "ui disabled button">Select</a>
@@ -62,8 +77,11 @@
                 <tr class = "negative">
                         <td>{{Data.start_date}}</td>
                         <td>{{Data.requester}}</td>
+                        <td>{{Data.duration}} days</td>
+                        <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+                        <td>{{Data.total_dogs_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
@@ -73,8 +91,40 @@
             {% endfor %}
         </tbody>
     </table>
+<button id = 'calendar_btn' class="ui blue button" type = "button">Toggle Calendar</button>
 
-{{ gantt_chart|safe }}
+<div id = "calendar">
+<div class = "ui segment">
+<div class="ui horizontal segments">
+    <div class = "ui segment">
+
+        <div class="ui segment">
+        <div class="ui statistic">
+  <div class="value">
+    {{date_today}}
+  </div>
+  <div class="label">
+    CURRENT DATE
+  </div>
+</div>
+            </div>
+
+    <a class ="ui left attached large blue button" href="{% url 'deployment:request_dog_list' %}?{{prev_month}}">Previous Month</a>
+    <a class ="right attached ui large blue button" href="{% url 'deployment:request_dog_list' %}?{{next_month}}">Next Month</a>
+        </div>
+    <div class = "ui segment">
+    <form class = "ui form" method="POST">
+        {% csrf_token %}
+        <div class="inline fields">
+        {{monthyearform}}
+        </div>
+        <button class = "ui button green" type="submit" >Select Month/Year</button>
+    </form>
+    </div>
+</div>
+{{calendar}}
+</div>
+</div>
 
 <script type="text/javascript">
 
@@ -86,5 +136,58 @@
         $('.menu .item').tab();
     });
 
+
+    $(document).ready(function(){
+        $('#calendar').show();
+
+        $('#calendar_btn').on("click", function(e){
+               $('#calendar').toggle();
+         });
+     });
 </script>
+
+<style>
+
+    .calendar {
+  width: 98%;
+  margin: auto;
+  font-size: 13px;
+}
+
+.calendar tr, .calendar td {
+  border: 1px solid black;
+}
+
+.calendar th {
+  padding: 10px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.calendar td {
+  width: 200px;
+  height: 150px;
+  padding: 20px 0px 0px 5px;
+}
+
+.month {
+  font-size: 25px;
+}
+
+.date {
+  font-size: 16px;
+}
+
+ul {
+  height: 100%;
+  padding: 0px 5px 0px 20px;
+}
+
+a {
+  color: #17a2b8;
+}
+
+
+</style>
+
  {% endblock %}

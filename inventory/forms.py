@@ -125,3 +125,4 @@ class DamagedEquipmentForm(forms.ModelForm):
     class Meta:
         model = DamagedEquipemnt
         fields = ('inventory', 'quantity', 'concern')
+

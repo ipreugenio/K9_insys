@@ -4,16 +4,7 @@ from profiles.models import User
 from datetime import timedelta, date
 
 # Create your models here.
-
-class Area(models.Model):
-    name = models.CharField('name', max_length=100, default='')
-
-    def __str__(self):
-        return self.name
-
-class Location(models.Model):
-
-    CITY = (
+CITY = (
         ('Alaminos', 'Alaminos'),
         ('Angeles', 'Angeles'),
         ('Antipolo', 'Antipolo'),
@@ -160,11 +151,21 @@ class Location(models.Model):
         ('Vigan', 'Vigan'),
         ('Zamboanga', 'Zamboanga'),
     )
+class Area(models.Model):
+    name = models.CharField('name', max_length=100, default='')
+
+    def __str__(self):
+        return self.name
+
+class Location(models.Model):
 
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     place = models.CharField('place', max_length=100, default='Undefined')
     status = models.CharField('status', max_length=100, default="unassigned")
+    longtitude = models.DecimalField('longtitude', max_digits=50, decimal_places=4, null=True)
+    latitude = models.DecimalField('latitude', max_digits=50, decimal_places=4, null=True)
+
 
     def __str__(self):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
@@ -190,13 +191,15 @@ class Team_Assignment(models.Model):
         self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
         super(Team_Assignment, self).save(*args, **kwargs)
 
+
 class Dog_Request(models.Model):
     requester = models.CharField('requester', max_length=100)
     location = models.CharField('location', max_length=100)
+    city = models.CharField('city', choices=CITY, max_length=100, default="Manila")
     phone_number = models.CharField('phone_number', max_length=100, default="n/a")
     email_address = models.EmailField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
-    area = models.ForeignKey(Location, on_delete=models.CASCADE)
+    #area = models.ForeignKey(Area, on_delete=models.CASCADE, blank=True, null=True)
     EDD_needed = models.IntegerField('EDD_needed', default=0)
     NDD_needed = models.IntegerField('NDD_needed', default=0)
     SAR_needed = models.IntegerField('SAR_needed', default=0)
@@ -208,6 +211,10 @@ class Dog_Request(models.Model):
     start_date = models.DateField('start_date', null=True, blank=True)
     end_date = models.DateField('end_date', null=True, blank=True)
     status = models.CharField('status', max_length=100, default="Pending")
+    duration = models.IntegerField('duration', default=1)
+    #coordinates = models.ForeignKey(Request_Coordinates, on_delete=models.CASCADE, blank=True, null=True)
+    longtitude = models.DecimalField('longtitude', max_digits=50, decimal_places=4, null=True)
+    latitude = models.DecimalField('latitude', max_digits=50, decimal_places=4, null=True)
 
     def due_start(self):
         notif = self.date_start - timedelta(days=7)
@@ -220,10 +227,19 @@ class Dog_Request(models.Model):
     def __str__(self):
         return str(self.requester) + ' - ' + str(self.location)
 
+    def calculate_duration(self, date_start, date_end):
+        result = date_end - date_start
+        days = result.days + 1
+
+        return days
+
     def save(self, *args, **kwargs):
         self.total_dogs_demand = int(self.EDD_needed) + int(self.NDD_needed) + int(self.SAR_needed)
         self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
+        self.duration = self.calculate_duration(self.start_date, self.end_date)
         super(Dog_Request, self).save(*args, **kwargs)
+
+
 
 class Team_Dog_Deployed(models.Model):
     team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
@@ -249,6 +265,8 @@ class K9_Schedule(models.Model):
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
+
+
 
 class Incidents(models.Model):
     TYPE = (

@@ -29,7 +29,7 @@
 							<td>{{data.location.area}}</td>
 							<td>{{data.location.city}}</td>
 							<td>{{data.location.place}}</td>
-							<td>{{data.location|incident_count:0 }}</td>
+							<td>{{data.location|incident_count_location:0 }}</td>
 							<td class="ui center aligned">
 								<a href="{% url 'deployment:edit_team' data.id %}" class="ui basic blue button">Edit</a>
 							</td>

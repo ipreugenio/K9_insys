@@ -21,8 +21,8 @@ from django.conf import settings
 
 from datetime import timedelta 
 
-#from celery.task.schedules import crontab
-#from celery.decorators import periodic_task
+from celery.task.schedules import crontab
+from celery.decorators import periodic_task
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -44,18 +44,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'profiles.apps.ProfilesConfig',
-    'planningandacquiring.apps.PlanningandacquiringConfig',
-    'deployment.apps.DeploymentConfig',
-    'training.apps.TrainingConfig',
-    'unitmanagement.apps.UnitmanagementConfig',
-    'inventory.apps.InventoryConfig',
+    'profiles',
+    'planningandacquiring',
+    'deployment',
+    'training',
+    'unitmanagement',
+    'inventory',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -81,10 +83,15 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                #'django.template.context_processors.request'
             ],
         },
     },
 ]
+
+# TEMPLATE_CONTEXT_PROCESSORS = [
+#     "django.template.context_processors.request"
+# ]
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.load_template_source',
@@ -103,7 +110,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '8888',
     }
 }
 
@@ -160,3 +167,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+if os.name == 'nt':
+    import platform
+    #OSGEO4W = r"C:\OSGeo4W"
+    OSGEO4W = r"C:\Users\Ian Eugenio\AppData\Local\Programs\Python\Python36-32\Lib\site-packages\osgeo"
+    # if '64' in platform.architecture()[0]:
+    #     OSGEO4W += "64"
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    #os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+    os.environ['PATH'] = OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    #os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+    #os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+    os.environ['GDAL_DATA'] = OSGEO4W + r"\data\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\data\proj"

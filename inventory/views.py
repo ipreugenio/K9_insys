@@ -16,6 +16,7 @@ from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm, DamagedEq
 from inventory.forms import MedicineCountForm, FoodCountForm, MiscellaneousCountForm
 # Create your views here.
 
+
 def index(request):
     return render (request, 'inventory/index.html')
 
@@ -181,7 +182,9 @@ def miscellaneous_inventory_list(request):
 
 #Inventory Details
 def medicine_inventory_details(request, id):
-    i = Medicine.objects.get(id=id)
+    x = Medicine_Inventory.objects.get(id = id)
+    x = x.medicine
+    i = Medicine.objects.get(id=x.id)
     data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Medicine_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
     data3 = Medicine_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')

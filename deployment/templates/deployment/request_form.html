@@ -3,17 +3,19 @@
 {% block content %}
 <h2 class="ui header">
     {{title}}
+    {{geoform.media}}
     <div class="sub header">Input request details here</div>
 </h2>
        
 <div class="ui fluid container">
+    <form class="ui equal width form" id="request_form" action="{% url 'deployment:request_form' %}" method="POST">
     <div class="ui inverted segment">
         {% if messages %}
             {% for message in messages %}
                 <div class="{{ style }}">{{message}}</div>
             {% endfor %}
         {% endif %}
-    <form class="ui inverted equal width form" id="request_form" action="{% url 'deployment:request_form' %}" method="POST">
+
         {% csrf_token %}
         <div class="fields">
             <div class="field">
@@ -32,12 +34,12 @@
 
         <div class="fields">
             <div class="field">
-                <label>Place</label>
+                <label>Address</label>
                 {{form.location}}
             </div>
             <div class="field">
-                <label>Area</label>
-                {{form.area}}
+                <label>City</label>
+                {{form.city}}
             </div>
         </div>
 
@@ -67,11 +69,12 @@
             </div>
         </div>
 
-        <div class="ui inverted right aligned segment" style="padding: 0px;" style="border-width: 0px;">
-            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
-        </div>
-    </form>
     </div>
+
+
+            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+    {{geoform.point}}
+        </form>
 </div>
 
   <!--<script>
