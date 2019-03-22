@@ -4,7 +4,7 @@
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
-        <div class="sub header">Input data of Handler Incident Here</div>
+        <div class="sub header">Input data of On-Leave Here</div>
     </h2>
     {% if messages %}
         {% for message in messages %}
@@ -21,12 +21,20 @@
                 {{form.handler}}
             </div>
             <div class="field">
-                <label>Incident</label>
+                <label>Request</label>
                 {{form.incident}}
+            </div>
+            <div class="field">
+                <label>From Date:</label>
+                {{form.date_from}}
+            </div>
+            <div class="field">
+                <label>To Date:</label>
+                {{form.date_to}}
             </div>
         </div>
         <div class="field">
-            <label>Additional Information</label>
+            <label>Reason / Additional Information</label>
             {{form.description}}
         </div>
 
@@ -39,7 +47,8 @@
 <script type="text/javascript">
         
     $(document).ready(function() {
-      
+        $("#id_incident").prop('readonly', true);
+        $("#id_handler").prop('readonly', true);
     });
     
 </script>

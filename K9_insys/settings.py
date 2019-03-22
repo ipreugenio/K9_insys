@@ -44,20 +44,33 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+
     'profiles',
     'planningandacquiring',
     'deployment',
     'training',
     'unitmanagement',
     'inventory',
+
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'django.contrib.gis',
     'widget_tweaks',
+
+    'rest_framework',
+    'profiles',
+    'planningandacquiring',
+    'deployment',
+    'training',
+    'unitmanagement',
+    'inventory',
+
 ]
 
 MIDDLEWARE = [
@@ -71,6 +84,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'K9_insys.urls'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
 
 TEMPLATES = [
     {
@@ -116,22 +136,23 @@ DATABASES = {
 
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_IMPORTS = ('K9_insys', 'unitmanagement')
-#CELERY_RESULT_BACKEND = 'db+mysql://root:@localhost/k9_db'
+CELERY_RESULT_BACKEND = 'db+mysql://root:@localhost/k9_db'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Manila'
 CELER_IGNORE_RESULT = False
 
-CELERY_BEAT_SCHEDULE = {
-    # 'every-10-seconds':{
-    #     'task': 'unitmanagement.tasks.showx',
-    #     'schedule': timedelta(seconds=10),
-    # },
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'every-10-seconds':{
+#         'task': 'unitmanagement.tasks.what',
+#         'schedule': timedelta(seconds=10),
+#     },
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -162,11 +183,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+TIME_ZONE = 'Asia/Manila'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+
 
 
 if os.name == 'nt':
@@ -183,3 +206,11 @@ if os.name == 'nt':
     #os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
     os.environ['GDAL_DATA'] = OSGEO4W + r"\data\gdal"
     os.environ['PROJ_LIB'] = OSGEO4W + r"\data\proj"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'profiles/media')
+
+STATICFILES_DIRS=[
+    'static'
+]
+

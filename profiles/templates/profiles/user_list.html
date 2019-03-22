@@ -16,7 +16,7 @@
           	</tr>
     		</thead>
     		<tbody>
-				{% for User in user %}
+				{% for User in user_s %}
     				<tr>
     					<td><a  href="{% url 'profiles:user_detail' User.id %}">{{User}}</a></td>
     					<td>{{ User.position }}</td>

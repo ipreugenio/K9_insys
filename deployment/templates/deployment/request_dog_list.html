@@ -23,8 +23,12 @@
                 <th>Duration</th>
                 <th>Requester</th>
                 <th>Place</th>
+
                 <th>K9s Requested</th>
                 <th>K9s Deployed</th>
+
+                <th>Total Dogs Requested</th>
+
                 <th>Status</th>
                 <th></th>
             </tr>
@@ -32,14 +36,16 @@
         <tbody>
             {% for Data in data %}
                 {% if Data.status == "Pending" %}
-                    <tr class = "warning">
+                    <tr>
                         <td>{{Data.start_date}}</td>
                         <td>{{Data.end_date}}</td>
                          <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+
                         <td>{{Data.total_dogs_deployed}}</td>
+
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
@@ -53,8 +59,11 @@
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+
                         <td>{{Data.total_dogs_deployed}}</td>
-                        <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
+
+                        <td><center><i class="checkmark icon"></i>{{Data.status}}</center></td>
+
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
                         </td>
@@ -74,15 +83,18 @@
                         </td>
                     </tr>
                 {%else%}
-                <tr class = "negative">
+                <tr>
                         <td>{{Data.start_date}}</td>
+                        <td>{{Data.end_date}}</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
+
                         <td>{{Data.total_dogs_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
+
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
                         </td>

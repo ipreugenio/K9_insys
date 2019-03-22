@@ -19,7 +19,7 @@
                                     <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
                                         <i class="clipboard list icon"></i>
                                     </a>
-                                    <a href="{% url 'unitmanagement:reassign_assets'%}" class="item">Reassign Assets
+                                    <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">Reallocate Assets
                                         <i class="retweet icon"></i>
                                     </a>
                                     <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
@@ -30,6 +30,9 @@
                                         <i class="exclamation icon"></i>
                                         <i class="male icon"></i>
                                     </a>
+                                    <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">On-Leave Request list
+                                        <i class="clipboard list icon"></i>
+                                    </a>
                                     {% endif %}
 
                                     {% if request.session.session_user_position == "Veterinarian" %}
@@ -39,11 +42,14 @@
                                     <a href="{% url 'profiles:user_list'%}" class="item">User List
                                         <i class="address book icon"></i>
                                     </a>
-                                    <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
+                                    <!-- <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
                                         <i class="first aid icon"></i>
-                                    </a>
+                                    </a> -->
                                     <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
                                         <i class="heartbeat icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:k9_sick_list'%}" class="item">Sick K9's List
+                                        <i class="ambulance icon"></i>
                                     </a>
                                     <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
                                         <i class="h square icon"></i>
@@ -63,6 +69,9 @@
                                     <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
                                         <i class="exclamation icon"></i>
                                         <i class="paw icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">On-Leave Request Form
+                                        <i class="question icon"></i>
                                     </a>
                                     {% endif %}
                                 </div>

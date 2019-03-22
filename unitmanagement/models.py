@@ -9,20 +9,43 @@ from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
+from django.contrib.sessions.models import Session
 # Create your models here.
 
-class Health(models.Model):
-    dog = models.ForeignKey(K9, on_delete=models.CASCADE)
+class K9_Incident(models.Model):
+    INCIDENT = (
+        ('Died', 'Died'),
+        ('Sick', 'Sick'),
+    )
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
     date = models.DateField('date', auto_now_add=True)
-    problem = models.TextField('problem', max_length=200)
-    treatment = models.TextField('treatment', max_length=200)
+    description = models.TextField('description', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
+    reported_by = models.CharField('reported_by', max_length=200, null=True, blank=True)
+
+class Health(models.Model):
+    dog = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField('date', auto_now_add=True)
+    problem = models.TextField('problem', max_length=800, null=True, blank=True)
+    treatment = models.TextField('treatment', max_length=800, null=True, blank=True)
+    status = models.CharField('status', max_length=200, default="On-Going")
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     duration = models.IntegerField('duration', null=True, blank=True)
-
+    date_done = models.DateField('date_done', null=True, blank=True)
+    incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return str(self.id) + ': ' + str(self.date) +' - ' + str(self.dog.name)
+        return str(self.id) + ': ' + str(self.date) +' - ' #+ str(self.dog.name)
+    
+    def save(self, *args, **kwargs):
+        if self.date != None:
+            self.date_done = self.date + timedelta(days=7)
+
+        if date.today() == self.date_done:
+            self.dog.status = 'Working Dog'
+        super(Health, self).save(*args, **kwargs)
 
 class HealthMedicine(models.Model):
     TIME_OF_DAY = (
@@ -40,9 +63,9 @@ class HealthMedicine(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     time_of_day = models.CharField('time_of_day',  choices=TIME_OF_DAY, max_length=200, default="")
     duration = models.IntegerField('duration', default = 1)
-
+    
     def __str__(self):
-        return str(self.id) + ': ' + str(self.health.date) + '-' + str(self.health.dog.name)
+        return str(self.id) + ': ' + str(self.health.date) #+ '-' + str(self.health.dog)
 
 class PhysicalExam(models.Model):
     EXAMSTATUS = (
@@ -75,14 +98,17 @@ class PhysicalExam(models.Model):
         return notif
 
     def save(self, *args, **kwargs):
-        self.date_next_exam = self.date + timedelta(days=365)
+        #self.date_next_exam = self.date + timedelta(days=365)
         super(PhysicalExam, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
 
-#TODO
-#add vet user
+@receiver(post_save, sender=PhysicalExam)
+def phex_next_date(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        instance.date_next_exam = instance.date + relativedelta(year=+1,)
+
 class VaccinceRecord(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     deworming_1 = models.BooleanField(default=False)     #2weeks
@@ -122,6 +148,11 @@ class VaccinceRecord(models.Model):
     def __str__(self):
         return 'PHP:' + str(self.k9)
 
+    def save(self, *args, **kwargs):
+        if self.heartworm_8 == True:
+            self.k9.training_status = 'Unclassified'
+        super(VaccinceRecord, self).save(*args, **kwargs)
+
 class VaccineUsed(models.Model):
     vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE)
     vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, null=True, blank=True)
@@ -147,37 +178,55 @@ class Requests(models.Model):
     request_status = models.CharField('request_status', max_length=200, default="Pending")
     date_approved = models.DateField('date_approved', blank=True, null=True)
 
-class K9_Incident(models.Model):
+class Handler_Incident(models.Model):
     INCIDENT = (
         ('Died', 'Died'),
+        ('On-Leave', 'On-Leave'),
     )
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
     date = models.DateField('date', auto_now_add=True)
     description = models.TextField('description', max_length=200)
-
-class Handler_Incident(models.Model):
-    INCIDENT = (
-        ('Died', 'Died'),
-    )
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
-    date = models.DateField('date', auto_now_add=True)
-    description = models.TextField('description', max_length=200)
+    status = models.CharField('status', max_length=200, default="Pending")
+    date_from = models.DateField('date_from', null=True, blank=True)
+    date_to = models.DateField('date_to', null=True, blank=True)
+    retain_last_handler = models.BooleanField(default=False)
 
 class Notification(models.Model):
-    INCIDENT = (
+    POSITION = (
         ('Administrator', 'Administrator'),
         ('Veterinarian', 'Veterinarian'),
         ('Handler', 'Handler'),
     )
 
+    NOTIF_TYPE = (
+        ('physical_exam', 'physical_exam'),
+        ('vaccination', 'vaccination'),
+        ('dog_request', 'dog_request'),
+        ('inventory_low', 'inventory_low'),
+        ('heat_cycle', 'heat_cycle'),
+        ('location_incident', 'location_incident'),
+        ('equipment_request', 'equipment_request'),
+        ('k9_died', 'k9_died'),
+        ('k9_sick', 'k9_sick'),
+        ('handler_died', 'handler_died'),
+        ('handler_on_leave', 'handler_on_leave'),
+        ('retired_k9', 'retired_k9'),
+        ('medicine_done', 'medicine_done'),
+    )
+
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    position = models.CharField('position', max_length=100, choices=INCIDENT, default="Administrator")
+    other_id = models.IntegerField(blank=True, null=True)
+    notif_type = models.CharField('notif_type', max_length=100, choices=NOTIF_TYPE, blank=True, null=True)
+    position = models.CharField('position', max_length=100, choices=POSITION, default="Administrator")
     message = models.CharField(max_length=200)
     viewed = models.BooleanField(default=False)
     datetime = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super(Notification, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.message) + ' : ' + str(self.datetime)
@@ -186,25 +235,44 @@ class Notification(models.Model):
 @receiver(post_save, sender=Handler_Incident)
 def create_handler_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(user = instance.handler,
+        if instance.incident == 'Died':
+            Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has been reported dead.')
+                            other_id = instance.id,
+                            notif_type = 'handler_died',
+                            message= 'Reported Dead! ' + str(instance.handler))
+        else:
+            Notification.objects.create(user = instance.handler,
+                            position = 'Administrator',
+                            other_id = instance.id,
+                            notif_type = 'handler_on_leave',
+                            message= 'On-Leave Request! ' + str(instance.handler))
 
-#Handler Reported
-@receiver(post_save, sender=Requests)
-def create_equipment_request_notif(sender, instance, **kwargs):
+@receiver(post_save, sender=K9_Incident)
+def create_k9_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(user = instance.handler,
+        if instance.incident == 'Died':
+            Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has made an equipment request.')
+                            other_id = instance.id,
+                            notif_type = 'k9_died',
+                            message= 'Reported Dead! ' + str(instance.k9.name))
+        else:
+            Notification.objects.create(k9 = instance.k9,
+                            position = 'Veterinarian',
+                            other_id = instance.id,
+                            notif_type = 'k9_sick',
+                            message= 'Reported Sick! ' + str(instance.k9.name))
 
 #Damaged Equipment Reported
-@receiver(post_save, sender=DamagedEquipemnt)
+@receiver(post_save, sender=Requests)
 def create_damaged_equipment_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(user = instance.user,
+        Notification.objects.create(user = instance.handler,
                             position = 'Administrator',
-                            message= str(instance.handler) + ' has reported an equipment concern.')
+                            other_id=instance.id,
+                            notif_type = 'equipment_request',
+                            message='Equipment Concern!')
 
 #When medicine is created, also create inventory instance
 @receiver(post_save, sender=Medicine)
@@ -212,50 +280,46 @@ def create_medicine_inventory(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
 
-# #When food is created, also create inventory instance
-# @receiver(post_save, sender=Food)
-# def create_food_inventory(sender, instance, **kwargs):
-#     if kwargs.get('created', False):
-#         Food_Inventory.objects.create(food=instance, quantity=0)
-
-#When miscellaneous is created, also create inventory instance
-# @receiver(post_save, sender=Miscellaneous)
-# def create_miscellaneous_inventory(sender, instance, **kwargs):
-#     if kwargs.get('created', False):
-#         Miscellaneous_Inventory.objects.create(miscellaneous=instance, quantity=0)
-
 #create vaccine record, and vaccine used
 @receiver(post_save, sender=K9)
 def create_k9_vaccines(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        cvr = VaccinceRecord.objects.create(k9=instance)
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
-        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
+        if instance.source == 'Procured':
+            cvr = VaccinceRecord.objects.create(k9=instance,  deworming_1=True, deworming_2=True, deworming_3=True,
+            deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True, heartworm_1=True, heartworm_2=True,
+            heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True, heartworm_7=True, heartworm_8=True,
+            anti_rabies=True, bordetella_1=True, bordetella_2=True, dhppil4_1=True, dhppil4_2=True, tick_flea_1=True,
+            tick_flea_2=True, tick_flea_3=True, tick_flea_4=True, tick_flea_5=True, tick_flea_6=True, tick_flea_7=True)
+
+        else:
+            cvr = VaccinceRecord.objects.create(k9=instance)
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
+            VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
      
 #Location incidentes reported
 @receiver(post_save, sender=Incidents)
@@ -272,18 +336,27 @@ def location_incident(sender, instance, **kwargs):
         if c == '':
             Notification.objects.create(user = instance.user,
                                 position = 'Administrator',
+                                other_id=instance.id,
+                                notif_type = 'location_incident',
                                 message= str(instance.user) + ' has reported an incident at ' + 
                                 str(instance.location) + '.')
         else:
             Notification.objects.create(user = instance.user,
                                 position = 'Administrator',
+                                other_id=instance.id,
+                                notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
 
 #When medicine is created, also create inventory instance
 @receiver(post_save, sender=K9)
-def create_medicine_inventory(sender, instance, **kwargs):
+def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Training.objects.create(k9=instance, training='EDD')
         Training.objects.create(k9=instance, training='NDD')
         Training.objects.create(k9=instance, training='SAR')
+
+@receiver(post_save, sender=Medicine)
+def create_medicine_inventory(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        Medicine_Inventory.objects.create(medicine=instance, quantity=0)

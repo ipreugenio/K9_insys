@@ -245,6 +245,7 @@ class Team_Dog_Deployed(models.Model):
     team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
     team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True) #Dog Rquest
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    handler = models.CharField('handler', max_length=100, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
     date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
     date_pulled = models.DateField('date_pulled' , null=True, blank=True)

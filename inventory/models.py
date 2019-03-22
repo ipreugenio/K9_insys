@@ -18,7 +18,8 @@ class Medicine(models.Model):
         ('Capsule', 'Capsule'),
         ('Bottle', 'Bottle'),
         ('Vaccine', 'Vaccine'),
-        #('Vitamins', 'Vitamins'),
+        ('Vitamins', 'Vitamins'),
+        ('Others', 'Others'),
     )
     medicine = models.CharField(max_length=100)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
@@ -39,9 +40,7 @@ class Medicine(models.Model):
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
         if self.med_type == 'Vaccine':
-            #self.duration = 365 / int(self.used_yearly)
             self.used_yearly = 365 / int(self.duration)
-
         super(Medicine, self).save(*args, **kwargs)
 
 class Medicine_Inventory(models.Model):
@@ -239,3 +238,8 @@ class DamagedEquipemnt(models.Model):
 
     def __str__(self):
         return self.inventory
+
+class Safety_Stock(models.Model):
+    puppy_food = models.IntegerField('puppy_food', default=0)
+    adult_food = models.IntegerField('adult_food', default=0)
+    milk = models.IntegerField('milk', default=0)

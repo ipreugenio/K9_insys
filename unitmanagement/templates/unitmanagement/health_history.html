@@ -15,6 +15,14 @@
     <a class="item{{active_3}}" data-tab="third">Health</a>
 </div>
 <div class="ui tab segment{{active_1}}" data-tab="first">
+        {%if data.source == 'Procured' %}
+        <div class="ui info message">
+            <ul class="list">
+                <li>This K9 was Procured, all vaccinations are intially Done.</li>
+            </ul>
+        </div>
+        {%endif%}   
+
         <form class="ui form" method="POST">
         {% csrf_token %}
         <input id = 'dog_days' type="hidden" value="{{dog_days.days}}">
@@ -25,9 +33,14 @@
                 <th class="two wide">K9 Age</th>
                 <th >Preventive Measure</th>
                 <th class="center aligned one wide">Status</th>
+                
+                {%if data.source == 'Breeding' %}
+
                 <th >Vaccine/Prevention Used</th>
                 <th >Date Vaccinated</th>
                 <th >Veterinarian</th>
+                
+                {% endif %}
             </tr>
             </thead>
             <tbody>
@@ -35,13 +48,37 @@
                 <td>2 Weeks</td>
                 <td>1st Deworming</td>
                 <td class="center aligned">{{form1.deworming_1}}</td>
-                {%if data_deworming_1.date_vaccinated %}
+                {%if data.source == 'Breeding' %}
+                    {%if data_deworming_1.date_vaccinated %}
                     <td>{{data_deworming_1.vaccine}}</td>
                     <td>{{data_deworming_1.date_vaccinated}}</td>
                     <td>{{data_deworming_1.veterinary}}</td>
-                {%else%}
+                    {%else%}
+                        <td>
+                            <select name="s_deworming_1" id="s_deworming_1" class="ui fluid search dropdown">
+                                <option value="">----------</option>
+                                {% for vaccine in vaccine_available %}
+                                <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    {%endif%}
+                {% endif %}
+                </tr>
+                <tr>
+                <td>4 Weeks</td>
+                <td>2nd Deworming</td>
+                <td class="center aligned">{{form1.deworming_2}}</td>
+                {%if data.source == 'Breeding' %}
+                    {%if data_deworming_2.date_vaccinated %}
+                    <td>{{data_deworming_2.vaccine}}</td>
+                    <td>{{data_deworming_2.date_vaccinated}}</td>
+                    <td>{{data_deworming_2.veterinary}}</td>
+                    {%else%}
                     <td>
-                        <select name="s_deworming_1" id="s_deworming_1" class="ui fluid search dropdown">
+                        <select name="s_deworming_2" id="s_deworming_2" class="ui fluid search dropdown">
                             <option value="">----------</option>
                             {% for vaccine in vaccine_available %}
                             <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
@@ -50,94 +87,81 @@
                     </td>
                     <td></td>
                     <td></td>
-                {%endif%}
-                </tr>
-                <tr>
-                <td>4 Weeks</td>
-                <td>2nd Deworming</td>
-                <td class="center aligned">{{form1.deworming_2}}</td>
-                {%if data_deworming_2.date_vaccinated %}
-                <td>{{data_deworming_2.vaccine}}</td>
-                <td>{{data_deworming_2.date_vaccinated}}</td>
-                <td>{{data_deworming_2.veterinary}}</td>
-                {%else%}
-                <td>
-                    <select name="s_deworming_2" id="s_deworming_2" class="ui fluid search dropdown">
-                        <option value="">----------</option>
-                        {% for vaccine in vaccine_available %}
-                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td></td>
-                <td></td>
+                    {%endif%}
                 {%endif%}
                 </tr>
                 <tr>
                 <td>6 Weeks</td>
                 <td>3rd Deworming</td>
                 <td class="center aligned">{{form1.deworming_3}}</td>
-                {%if data_deworming_3.date_vaccinated %}
-                <td>{{data_deworming_3.vaccine}}</td>
-                <td>{{data_deworming_3.date_vaccinated}}</td>
-                <td>{{data_deworming_3.veterinary}}</td>
-                {%else%}
-                <td>
-                    <select name="s_deworming_3" id="s_deworming_3" class="ui fluid search dropdown">
-                        <option value="">----------</option>
-                        {% for vaccine in vaccine_available %}
-                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td></td>
-                <td></td>
+                {%if data.source == 'Breeding' %}
+                    {%if data_deworming_3.date_vaccinated %}
+                    <td>{{data_deworming_3.vaccine}}</td>
+                    <td>{{data_deworming_3.date_vaccinated}}</td>
+                    <td>{{data_deworming_3.veterinary}}</td>
+                    {%else%}
+                    <td>
+                        <select name="s_deworming_3" id="s_deworming_3" class="ui fluid search dropdown">
+                            <option value="">----------</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    {%endif%}
                 {%endif%}
                 </tr>
                 <tr>
                 <td>6 Weeks</td>
                 <td>1st dose DHPPiL+CV Vaccination</td>
                 <td class="center aligned">{{form1.dhppil_cv_1}}</td>
-                {%if data_dhppil_cv_1.date_vaccinated %}
-                <td>{{data_dhppil_cv_1.vaccine}}</td>
-                <td>{{data_dhppil_cv_1.date_vaccinated}}</td>
-                <td>{{data_dhppil_cv_1.veterinary}}</td>
-                {%else%}
-                <td>
-                    <select name="s_dhppil_cv_1" id="s_dhppil_cv_1" class="ui fluid search dropdown">
-                        <option value="">----------</option>
-                        {% for vaccine in vaccine_available %}
-                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td></td>
-                <td></td>
+                {%if data.source == 'Breeding' %}
+                    {%if data_dhppil_cv_1.date_vaccinated %}
+                    <td>{{data_dhppil_cv_1.vaccine}}</td>
+                    <td>{{data_dhppil_cv_1.date_vaccinated}}</td>
+                    <td>{{data_dhppil_cv_1.veterinary}}</td>
+                    {%else%}
+                    <td>
+                        <select name="s_dhppil_cv_1" id="s_dhppil_cv_1" class="ui fluid search dropdown">
+                            <option value="">----------</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    {%endif%}
                 {%endif%}
                 </tr>
                 <tr> <td>6 Weeks</td>
                 <td>1st Heartworm Prevention</td>
                 <td class="center aligned">{{form1.heartworm_1}}</td>
-                {%if data_heartworm_1.date_vaccinated %}
-                <td>{{data_heartworm_1.vaccine}}</td>
-                <td>{{data_heartworm_1.date_vaccinated}}</td>
-                <td>{{data_heartworm_1.veterinary}}</td>
-                {%else%}
-                <td>
-                    <select name="s_heartworm_1" id="s_heartworm_1" class="ui fluid search dropdown">
-                        <option value="">----------</option>
-                        {% for vaccine in vaccine_available %}
-                        <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td></td>
-                <td></td>
-                {%endif%}
+                {%if data.source == 'Breeding' %}
+                    {%if data_heartworm_1.date_vaccinated %}
+                    <td>{{data_heartworm_1.vaccine}}</td>
+                    <td>{{data_heartworm_1.date_vaccinated}}</td>
+                    <td>{{data_heartworm_1.veterinary}}</td>
+                    {%else%}
+                    <td>
+                        <select name="s_heartworm_1" id="s_heartworm_1" class="ui fluid search dropdown">
+                            <option value="">----------</option>
+                            {% for vaccine in vaccine_available %}
+                            <option value="{{vaccine.medicine.medicine}}">{{vaccine.medicine.medicine}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    {%endif%}
+                {% endif %}
                 </tr>
                 <tr> <td>8 Weeks</td>
                 <td>1st dose Bordetella Bronchiseptica Bacterin</td>
                 <td class="center aligned">{{form1.bordetella_1}}</td>
+                {%if data.source == 'Breeding' %}
                 {%if data_bordetella_1.date_vaccinated %}
                 <td>{{data_bordetella_1.vaccine}}</td>
                 <td>{{data_bordetella_1.date_vaccinated}}</td>
@@ -154,9 +178,11 @@
                 <td></td>
                 <td></td>
                 {%endif%}
+                {%endif%}
                 <tr> <td>8 Weeks</td>
                     <td>1st Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_1}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_1.date_vaccinated %}
                     <td>{{data_tick_flea_1.vaccine}}</td>
                     <td>{{data_tick_flea_1.date_vaccinated}}</td>
@@ -173,10 +199,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>9 Weeks</td>
                     <td>2nd dose DHPPiL+CV</td>
                     <td class="center aligned">{{form1.dhppil_cv_2}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_dhppil_cv_2.date_vaccinated %}
                     <td>{{data_dhppil_cv_2.vaccine}}</td>
                     <td>{{data_dhppil_cv_2.date_vaccinated}}</td>
@@ -193,10 +221,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>9 Weeks</td>
                     <td>4th Deworming</td>
                     <td class="center aligned">{{form1.deworming_4}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_deworming_4.date_vaccinated %}
                     <td>{{data_deworming_4.vaccine}}</td>
                     <td>{{data_deworming_4.date_vaccinated}}</td>
@@ -213,10 +243,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>10 Weeks</td>
                     <td>2nd Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_2}}</td>
+                    {%if data.source == 'Breeding' %} 
                     {%if data_heartworm_2.date_vaccinated %}
                     <td>{{data_heartworm_2.vaccine}}</td>
                     <td>{{data_heartworm_2.date_vaccinated}}</td>
@@ -233,10 +265,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>11 Weeks</td>
                     <td>2nd dose Bordetella Bronchiseptica Bacterin</td>
                     <td class="center aligned">{{form1.bordetella_2}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_bordetella_2.date_vaccinated %}
                     <td>{{data_bordetella_2.vaccine}}</td>
                     <td>{{data_bordetella_2.date_vaccinated}}</td>
@@ -253,10 +287,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>12 Weeks</td>
                     <td>Anti-Rabies Vaccination</td>
                     <td class="center aligned">{{form1.anti_rabies}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_anti_rabies.date_vaccinated %}
                     <td>{{data_anti_rabies.vaccine}}</td>
                     <td>{{data_anti_rabies.date_vaccinated}}</td>
@@ -273,10 +309,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>12 Weeks</td>
                     <td>2nd Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_2}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_2.date_vaccinated %}
                     <td>{{data_tick_flea_2.vaccine}}</td>
                     <td>{{data_tick_flea_2.date_vaccinated}}</td>
@@ -293,10 +331,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>12 Weeks</td>
                     <td>3rd dose DHPPiL+CV Vaccination</td>
                     <td class="center aligned">{{form1.dhppil_cv_3}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_dhppil_cv_3.date_vaccinated %}
                     <td>{{data_dhppil_cv_3.vaccine}}</td>
                     <td>{{data_dhppil_cv_3.date_vaccinated}}</td>
@@ -313,10 +353,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>14 Weeks</td>
                     <td>3rd Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_3}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_heartworm_3.date_vaccinated %}
                     <td>{{data_heartworm_3.vaccine}}</td>
                     <td>{{data_heartworm_3.date_vaccinated}}</td>
@@ -333,10 +375,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>15 Weeks</td>
                     <td>1st dose DHPPiL4 Vaccination</td>
                     <td class="center aligned">{{form1.dhppil4_1}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_dhppil4_1.date_vaccinated %}
                     <td>{{data_dhppil4_1.vaccine}}</td>
                     <td>{{data_dhppil4_1.date_vaccinated}}</td>
@@ -353,10 +397,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>16 Weeks</td>
                     <td>3rd Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_3}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_3.date_vaccinated %}
                     <td>{{data_tick_flea_3.vaccine}}</td>
                     <td>{{data_tick_flea_3.date_vaccinated}}</td>
@@ -373,10 +419,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>18 Weeks</td>
                     <td>2nd dose DHPPiL4 Vaccination</td>
                     <td class="center aligned">{{form1.dhppil4_2}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_dhppil4_2.date_vaccinated %}
                     <td>{{data_dhppil4_2.vaccine}}</td>
                     <td>{{data_dhppil4_2.date_vaccinated}}</td>
@@ -393,10 +441,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>18 Weeks</td>
                     <td>4th Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_4}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_heartworm_4.date_vaccinated %}
                     <td>{{data_heartworm_4.vaccine}}</td>
                     <td>{{data_heartworm_4.date_vaccinated}}</td>
@@ -413,10 +463,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>20 Weeks</td>
                     <td>4th Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_4}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_4.date_vaccinated %}
                     <td>{{data_tick_flea_4.vaccine}}</td>
                     <td>{{data_tick_flea_4.date_vaccinated}}</td>
@@ -433,10 +485,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>22 Weeks</td>
                     <td>5th Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_5}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_heartworm_5.date_vaccinated %}
                     <td>{{data_heartworm_5.vaccine}}</td>
                     <td>{{data_heartworm_5.date_vaccinated}}</td>
@@ -453,10 +507,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>24 Weeks</td>
                     <td>5th Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_5}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_5.date_vaccinated %}
                     <td>{{data_tick_flea_5.vaccine}}</td>
                     <td>{{data_tick_flea_5.date_vaccinated}}</td>
@@ -473,10 +529,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>26 Weeks</td>
                     <td>6th Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_6}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_heartworm_6.date_vaccinated %}
                     <td>{{data_heartworm_6.vaccine}}</td>
                     <td>{{data_heartworm_6.date_vaccinated}}</td>
@@ -493,10 +551,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+
                 </tr>
                 <tr> <td>28 Weeks</td>
                     <td>6th Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_6}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_6.date_vaccinated %}
                     <td>{{data_tick_flea_6.vaccine}}</td>
                     <td>{{data_tick_flea_6.date_vaccinated}}</td>
@@ -513,10 +573,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>30 Weeks</td>
                     <td>7th Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_7}}</td>
+
                     {%if data_heartworm_7.date_vaccinated %}
                     <td>{{data_heartworm_7.vaccine}}</td>
                     <td>{{data_heartworm_7.date_vaccinated}}</td>
@@ -533,10 +595,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}
                 </tr>
                 <tr> <td>32 Weeks</td>
                     <td>7th Tick and Flea Prevention</td>
                     <td class="center aligned">{{form1.tick_flea_7}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_tick_flea_7.date_vaccinated %}
                     <td>{{data_tick_flea_7.vaccine}}</td>
                     <td>{{data_tick_flea_7.date_vaccinated}}</td>
@@ -553,10 +617,12 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}   
                 </tr>
                 <tr> <td>34 Weeks</td>
                     <td>8th Heartworm Prevention</td>
                     <td class="center aligned">{{form1.heartworm_8}}</td>
+                    {%if data.source == 'Breeding' %}
                     {%if data_heartworm_8.date_vaccinated %}
                     <td>{{data_heartworm_8.vaccine}}</td>
                     <td>{{data_heartworm_8.date_vaccinated}}</td>
@@ -573,11 +639,14 @@
                     <td></td>
                     <td></td>
                     {%endif%}
+                    {%endif%}   
                 </tr>
             </tbody>
             </table>
         <div class="ui very basic center aligned segment" style="padding: 0px;">
+            {%if data.source == 'Breeding' %}
             <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+            {%endif%}   
         </div>
     </form>
 </div>
@@ -618,7 +687,7 @@
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Problem</th>
+                <th>Duration</th>
                 <th class="center aligned">Status</th>
             </tr>
         </thead>
@@ -628,7 +697,7 @@
                 <td>
                     <a href="{% url 'unitmanagement:health_details' health_data.id %}">{{health_data.date}}</a>
                 </td>
-                <td>{{health_data.problem}}</td>
+                <td>{{health_data.duration}}</td>
                 {% if health_data.status == "Approved" %}
                 <td class="center aligned positive three column wide">
                     <i class="icon checkmark"></i>{{health_data.status}}

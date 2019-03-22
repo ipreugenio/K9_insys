@@ -8,6 +8,7 @@ from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, a
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed
 
 from training.models import Training
+from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
@@ -15,10 +16,15 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
-from .forms import ReportDateForm, add_breed_form
+from .forms import ReportDateForm, add_breed_form, k9_detail_form
 from deployment.models import Dog_Request, Team_Assignment
+
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
+
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
+from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
+
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import Avg, Count, Min, Sum, Q
 import dateutil.parser
@@ -28,8 +34,7 @@ from faker import Faker
 from math import *
 from decimal import Decimal
 from sklearn.metrics import mean_squared_error
-import pandas as pd
-import numpy as np
+
 
 from datetime import datetime as dt
 from faker import Faker
@@ -61,6 +66,25 @@ import statsmodels.api as sm
 import math
 # Create your views here.
 
+def notif(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    
+    if user_in_session.position == 'Veterinarian':
+        notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
+    elif user_in_session.position == 'Handler':
+        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
+    else:
+        notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
+   
+    return notif
+
+def user_session(request):
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    return user_in_session
 
 def index(request):
     data = [[],[],[]]
@@ -74,7 +98,7 @@ def index(request):
         date_to = request.POST.get('date_to')
 
         i = Medicine_Subtracted_Trail.objects.values('name').distinct().filter(date_subtracted__range=[date_from, date_to])
-        count=0
+        count1=0
 
         c = [] #quantity
         d = [] #price
@@ -93,31 +117,46 @@ def index(request):
         for x in i:
             print(x['name'])
             n=x['name']
-            data[count].append(n)
-            data[count].append(c[count])
-            data[count].append(d[count]*c[count])
-            total=total+d[count]*c[count]
-            count= count+1
+            data[count1].append(n)
+            data[count1].append(c[count1])
+            data[count1].append(d[count1]*c[count1])
+            total=total+d[count1]*c[count1]
+            count1= count1+1
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title' : "Medicine Used Report",
         'data': data,
         'total':total,
         'date_from': date_from,
         'date_to':date_to,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
     return render (request, 'planningandacquiring/index.html', context)
 
 def report(request):
     form = ReportDateForm()
+   #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title' : "REPORT",
         'form': form,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
         }
     return render (request, 'planningandacquiring/report.html', context)
 
 #Form format
 def add_donated_K9(request):
-    form = add_donated_K9_form(request.POST)
+    form = add_donated_K9_form(request.POST or None, request.FILES or None)
     style = "ui teal message"
     if request.method == 'POST':
         if form.is_valid():
@@ -132,6 +171,7 @@ def add_donated_K9(request):
             #Training.objects.create(k9=k9, training='NDD')
             #Training.objects.create(k9=k9, training='SAR')
 
+
             return HttpResponseRedirect('confirm_donation/')
 
         else:
@@ -139,11 +179,18 @@ def add_donated_K9(request):
             messages.warning(request, 'Invalid input data!')
             print(form)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title' : "Add New K9",
         'form' : form,
         'style': style,
-            }
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
 
     return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
@@ -176,11 +223,16 @@ def confirm_donation(request):
 
     k9_id = request.session['k9_id']
     k9= K9.objects.get(id = k9_id)
-
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': "Add New K9",
         'k9': k9,
-
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
     return render(request, 'planningandacquiring/confirm_K9_donation.html', context)
 
@@ -188,19 +240,33 @@ def donation_confirmed(request):
     k9_id = request.session['k9_id']
 
     k9 = K9.objects.get(id=k9_id)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
 
     if 'ok' in request.POST:
-        return render(request, 'planningandacquiring/donation_confirmed.html')
+        return render(request, 'planningandacquiring/donation_confirmed.html', context)
     else:
-        #delete training record
-        training = Training.objects.filter(k9=k9)
-        training.delete()
         #delete k9
         k9.delete()
 
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+        user = user_session(request)
         context = {
             'Title': "Add New K9",
             'form': add_donated_K9_form,
+            'notif_data':notif_data,
+            'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
@@ -244,14 +310,19 @@ def add_K9_parents(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-
-
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': "K9_Breeding",
         'form': form,
         'style': style,
         'mothers' : mother_list,
-        'fathers' : father_list
+        'fathers' : father_list,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
@@ -263,9 +334,16 @@ def confirm_K9_parents(request):
     mother = K9.objects.get(id=mother_id)
     father = K9.objects.get(id=father_id)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'mother': mother,
         'father': father,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/confirm_K9_parents.html', context)
@@ -286,52 +364,67 @@ def K9_parents_confirmed(request):
     if 'ok' in request.POST:
         return HttpResponseRedirect('add_K9_offspring_form/')
     else:
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+        user = user_session(request)
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
             'mothers': mother_list,
-            'fathers': father_list
+            'fathers': father_list,
+            'notif_data':notif_data,
+            'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
 
 def add_offspring_K9(request):
-     form = add_offspring_K9_form(request.POST)
-     style = "ui teal message"
+    form = add_offspring_K9_form(request.POST or None, request.FILES or None)
+    style = "ui teal message"
 
-     if request.method == 'POST':
-         if form.is_valid():
-             k9 = form.save()
-             k9.source = "Breeding"
-             mother_id = request.session['mother_id']
-             father_id = request.session['father_id']
-             mother = K9.objects.get(id=mother_id)
-             father = K9.objects.get(id=father_id)
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            k9 = form.save()
+            k9.source = "Breeding"
+            mother_id = request.session['mother_id']
+            father_id = request.session['father_id']
+            mother = K9.objects.get(id=mother_id)
+            father = K9.objects.get(id=father_id)
 
-             if mother.breed != father.breed:
+            if mother.breed != father.breed:
                 breed = "Mixed"
-             else:
+            else:
                 breed = mother.breed
 
-             k9.breed = breed
-             k9.save()
+            k9.breed = breed
+            k9.save()
 
-             request.session['offspring_id'] = k9.id
+            request.session['offspring_id'] = k9.id
 
-             return HttpResponseRedirect('confirm_breeding/')
+            return HttpResponseRedirect('confirm_breeding/')
 
-         else:
-             style = "ui red message"
-             messages.warning(request, 'Invalid input data!')
-             print(form)
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            print(form)
 
-     context = {
-         'Title': "Receive Donated K9",
-         'form': form,
-         'style': style,
-     }
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'Title': "Receive Donated K9",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
 
-     return render(request, 'planningandacquiring/add_K9_offspring.html', context)
+    return render(request, 'planningandacquiring/add_K9_offspring.html', context)
 
 def confirm_breeding(request):
     offspring_id = request.session['offspring_id']
@@ -342,11 +435,18 @@ def confirm_breeding(request):
     mother = K9.objects.get(id=mother_id)
     father = K9.objects.get(id=father_id)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': "Receive Donated K9",
         'offspring': offspring,
         'mother': mother,
         'father': father,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/confirm_breeding.html', context)
@@ -363,15 +463,22 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
+
         #Training.objects.create(k9=offspring, training='EDD')
         #Training.objects.create(k9=offspring, training='NDD')
         #Training.objects.create(k9=offspring, training='SAR')
 
-        return render(request, 'planningandacquiring/breeding_confirmed.html')
+
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+        context={
+            'notif_data':notif_data,
+            'count':count,
+        }
+
+        return render(request, 'planningandacquiring/breeding_confirmed.html', context)
     else:
-        #delete training record
-        training = Training.objects.filter(k9=offspring)
-        training.delete()
         #delete offspring
         offspring.delete()
 
@@ -387,11 +494,18 @@ def breeding_confirmed(request):
         for father in fathers:
             father_list.append(father)
 
+        #NOTIF SHOW
+        notif_data = notif(request)
+        count = notif_data.filter(viewed=False).count()
+        user = user_session(request)
         context = {
             'Title': "Receive Donated K9",
             'form': add_K9_parents_form,
             'mothers': mother_list,
             'fathers': father_list,
+            'notif_data':notif_data,
+            'count':count,
+            'user':user,
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
@@ -431,9 +545,16 @@ def K9_listview(request):
         name = fake.name()
         dog = K9(name = name, birth_date = date)
         dog.save()'''
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title' : 'K9 List',
-        'k9' : k9
+        'k9' : k9,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/K9_list.html', context)
@@ -441,19 +562,38 @@ def K9_listview(request):
 #Detailview format
 def K9_detailview(request, id):
     k9 = K9.objects.get(id = id)
-
+    form = k9_detail_form(request.POST or None, request.FILES or None, instance=k9)
     if request.method == "POST":
-        print(request.POST.get('radio'))
-        k9.training_status = request.POST.get('radio')
-        k9.save()
-        messages.success(request, 'K9 is now ' + k9.training_status + '!')
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'K9 Details Updated!')
 
+            if k9.training_status == 'For-Deployment' or k9.training_status == 'For-Breeding':
+                k9.training_status = request.POST.get('radio')
+                k9.save()
+
+            return redirect('planningandacquiring:K9_detail', id = k9.id)
+
+        # if 'change_training_status' in request.POST:
+        #     print(request.POST.get('radio'))
+        #     k9.training_status = request.POST.get('radio')
+        #     k9.save()
+        #     messages.success(request, 'K9 is now ' + k9.training_status + '!')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     try:
-        parent = K9_Parent.objects.get(offspring=k9)
+        parent = K9_Parent.objects.filter(offspring=k9)
     except K9_Parent.DoesNotExist:
         context = {
             'Title': 'K9 Details',
             'k9' : k9,
+            'notif_data':notif_data,
+            'count':count,
+            'user':user,
+            'form':form,
         }
     else:
         parent_exist = 1
@@ -461,7 +601,11 @@ def K9_detailview(request, id):
             'Title': 'K9 Details',
             'k9': k9,
             'parent': parent,
-            'parent_exist': parent_exist
+            'parent_exist': parent_exist,
+            'notif_data':notif_data,
+            'count':count,
+            'user':user,
+            'form':form,
         }
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
@@ -971,13 +1115,15 @@ def forecast_result(date_list, quantity_list, graph_title):
 
         result.append(recommended)
 
+
         context = {
             'title': 'Forecasting',
             'graph': graph,
             'models': models,
             'errors': errors,
             'predictions': predictions,
-            'recommended': recommended
+            'recommended': recommended,
+
             }
 
     return result
@@ -1866,11 +2012,18 @@ def budgeting(request):
         equipment_formset = EquipmentFormset(prefix="equipment")
         vet_supply_formset = Vet_supplyFormset(prefix="vet_supply")
 
+
     print("TEST SUPPLY FORECAST")
     print(vet_supply_forecast)
 
     print(previous_medicine_budget)
     print(medicine_ids)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
     context = {
         'title': 'Budget Estimate for January - December, ' + str(date.today().year + 1),
         'style' : style,
@@ -1970,12 +2123,18 @@ def budgeting(request):
         'equipment_formset' : equipment_formset,
         'vet_supply_formset' : vet_supply_formset,
 
+
         'medicine_spendings': medicine_spendings,
         'vaccine_spendings': vaccine_spendings,
         'food_spendings': food_spendings,
         'equipment_spendings': equipment_spendings,
         'vet_supply_spendings': vet_supply_spendings,
         'grandspendings': grandspendings,
+
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+
     }
 
     return render(request, 'planningandacquiring/budgeting.html', context)
@@ -1986,7 +2145,10 @@ def budgeting_list(request):
     budgets = Budget_allocation.objects.all()
     form = budget_date(request.POST or None)
 
-
+     #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     if request.method == 'POST':
 
         return HttpResponseRedirect('budgeting/')
@@ -1994,7 +2156,10 @@ def budgeting_list(request):
     context ={
         'budgets' : budgets,
         'date': form,
-        'Title' : "Create Budget"
+        'Title' : "Create Budget",
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/budget_list.html', context)
@@ -2033,12 +2198,19 @@ def breeding_recommendation(request):
     print(k9_list_skill)
     print(k9_list_breed_skill)
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'test': "test",
         'form': form,
         'k9_list_breed': k9_list_breed,
         'k9_list_skill': k9_list_skill,
         'k9_list_breed_skill': k9_list_breed_skill,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/breeding_recommendation.html', context)
@@ -2057,10 +2229,17 @@ def add_breed(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': "Add Breed",
         'form': form,
         'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
     print(form)
     return render(request, 'planningandacquiring/add_breed.html', context)
@@ -2069,9 +2248,16 @@ def add_breed(request):
 def breed_listview(request):
     breed = Dog_Breed.objects.all()
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'Title': 'Breed List',
-        'breed': breed
+        'breed': breed,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/view_breed.html', context)

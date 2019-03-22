@@ -12,7 +12,7 @@ from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
-
+from profiles.models import User
 from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed
 from django.forms.widgets import CheckboxSelectMultiple
 
@@ -118,9 +118,10 @@ class add_unaffiliated_K9_form(forms.ModelForm):
         }
 
 class add_donated_K9_form(forms.ModelForm):
+    image = forms.ImageField()
     class Meta:
         model = K9
-        fields = ('name', 'breed', 'sex', 'color', 'birth_date')
+        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }
@@ -183,16 +184,34 @@ class add_K9_parents_form(forms.Form):
 
 
 class add_offspring_K9_form(forms.ModelForm):
+    image = forms.ImageField()
     class Meta:
         model = K9
-        fields = ('name', 'sex', 'color', 'birth_date')
+        fields = ('image','name', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }
-
+        
 class select_breeder(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
 
+class k9_detail_form(forms.ModelForm):
+    image = forms.ImageField()
+    SOURCE = (
+        ('Procured', 'Procured'),
+        ('Breeding', 'Breeding'),
+    )
+
+    training_status = forms.ChoiceField(choices=SOURCE, widget=forms.RadioSelect(attrs={
+            'display': 'inline-block',
+        }))
+    class Meta:
+        model = K9
+        fields = ('image', 'training_status')
+    
+    def __init__(self, *args, **kwargs):
+        super(k9_detail_form, self).__init__(*args, **kwargs)
+        self.fields['training_status'].required = False
 
 #class select_date(forms.Form):
 
