@@ -19,5 +19,7 @@ urlpatterns = [
     path('k9-incident', views.k9_incident, name='k9_incident'),
     path('handler-incident', views.handler_incident, name='handler_incident'),
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
+    path('choose-date/', views.choose_date, name='choose_date'),
+    path('choose-date/um-report/', views.um_report, name='um_report'),
     #path('/<int:id>/', views., name=''),
 ];

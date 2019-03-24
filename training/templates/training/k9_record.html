@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_training.html" %}
+{% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -17,18 +17,18 @@
             <th>Sex</th>
             <th>Age</th>
             <th>Status</th>
+            <th>Daily Record</th>
         </tr>
     </thead>
     <tbody>
         {% for data in data %}
         <tr>
-            <td>
-                <a href="{% url 'training:training_details' data.id %}">{{data.name}}</a>
-            </td>
+            <td>{{data.name}}</td>
             <td>{{data.breed}}</td>
             <td>{{data.sex}}</td>
             <td>{{data.age}}</td>
             <td>{{data.training_status}}</td>
+            <td><a href="{% url 'training:choose_date' data.id %}" class="ui blue button">Select</a></td>
         </tr>
         {% endfor %}
     </tbody>

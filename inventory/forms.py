@@ -125,3 +125,7 @@ class DamagedEquipmentForm(forms.ModelForm):
     class Meta:
         model = DamagedEquipemnt
         fields = ('inventory', 'quantity', 'concern')
+
+class DateForm(forms.Form):
+    from_date = forms.DateField( widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())

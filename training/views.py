@@ -725,25 +725,6 @@ def training_details(request, id):
     }
     return render (request, 'training/training_details.html', context)
 
-def daily_record(request, id):
-    form = DateForm(request.POST or None)
-    data = K9.objects.get(id=id) # get k9
-    context = ''
-    record = ''
-
-    if request.method == 'POST':
-        if form.is_valid():
-            date = request.POST.get('choose_date')
-            record = Record_Training.objects.filter(k9=data).get(date_today = date)
-
-    context = {
-        'title': str(data),
-        'data': data,
-        'form': form,
-        'record': record,
-    }
-    return render(request, 'training/daily_record.html', context)
-
 def adoption_confirmed(request):
     return render (request, 'training/adoption_confirmed.html')
 
@@ -1517,4 +1498,75 @@ def k9_training_list(request):
         'data_ontraining': data_ontraining
     }
     return render (request, 'training/k9_training_list.html', context)
+
+def record_form(request):
+
+    handlerid = request.session["session_id"]
+    print(handlerid)
+   # data = K9.objects.get(id=id) # get k9
+   # training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
+   # form = TrainingUpdateForm(request.POST or None, instance = training)
+
+    handler = User.objects.get(id = int(handlerid))
+    data = K9_Handler.objects.get(handler = handler)
+    form2 = RecordForm(request.POST or None)
+    title = data.k9.name
+
+    if request.method == 'POST':
+        if form2.is_valid():
+            record = form2.save(commit=False)
+            record.k9 = data.k9
+            record.handler = data.handler
+            record.save()
+
+    context = {
+        'title': title,
+        'data': data,
+        'form2': form2,
+    }
+    return render(request, 'training/record_daily.html', context)
+
+def k9_record(request):
+    data = K9.objects.all()
+    context = {
+        'title': "Training Records",
+        'data': data,
+    }
+    return render(request, 'training/k9_record.html', context)
+
+def choose_date(request, id):
+    form = DateForm(request.POST or None)
+    data = K9.objects.get(id=id)  # get k9
+
+    if request.method == 'POST':
+        if form.is_valid():
+            choose_date = request.POST.get('choose_date')
+            request.session["session_date"] = choose_date
+            request.session["session_k9"] = data.id
+
+            return HttpResponseRedirect('daily-record/')
+
+    context = {
+        'title': "",
+        'form': form,
+    }
+    return render(request, 'training/choose_date.html', context)
+
+def daily_record(request):
+  #  form = DateForm(request.POST or None)
+    data = request.session["session_k9"] # get k9
+  #  context = ''
+    record = ''
+    k9 = K9.objects.get(id = data)
+
+    date = request.session["session_date"]
+    record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+
+    context = {
+        'title': str(k9),
+        'data': data,
+        #'form': form,
+        'record': record,
+    }
+    return render(request, 'training/daily_record.html', context)
 

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
+from django.db.models import Count
 import datetime
 
 from training.models import K9_Handler
@@ -11,13 +12,13 @@ from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User
 from inventory.models import Medicine
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, DateForm
 
 #Plotly
-import plotly.offline as opy
+'''import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
-import plotly.figure_factory as ff
+import plotly.figure_factory as ff'''
 
 def index(request):
     context = {
@@ -540,3 +541,43 @@ def incident_list(request):
     }
 
     return render(request, 'deployment/incident_list.html', context)
+
+def choose_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            from_date = request.POST.get('from_date')
+            to_date = request.POST.get('to_date')
+            request.session["session_fromdate"] = from_date
+            request.session["session_todate"] = to_date
+
+            return HttpResponseRedirect('deployment-report/')
+
+    context = {
+        'title': "",
+        'form': form,
+    }
+    return render(request, 'deployment/choose_date.html', context)
+
+def deployment_report(request):
+
+    from_date = request.session["session_fromdate"]
+    to_date = request.session["session_todate"]
+    requestdog = Dog_Request.objects.filter(start_date__range = [from_date, to_date])
+    incident = Incidents.objects.filter(date__range = [from_date, to_date])
+    user = request.session["session_username"]
+    team = Team_Assignment.objects.filter(date_added__range = [from_date, to_date])
+    deployed = Team_Dog_Deployed.objects.filter(date_added__range = [from_date, to_date]).filter(date_pulled__range = [from_date, to_date])
+
+    context = {
+        'title': "",
+        'requestdog': requestdog,
+        'from_date': from_date,
+        'to_date': to_date,
+        'incident': incident,
+        'user': user,
+        'team': team,
+        'deployed': deployed,
+    }
+    return render(request, 'deployment/deployment_report.html', context)

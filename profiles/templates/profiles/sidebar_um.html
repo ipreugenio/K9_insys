@@ -16,9 +16,6 @@
                                     <a href="{% url 'profiles:user_list'%}" class="item">User List
                                         <i class="address book icon"></i>
                                     </a>
-                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
-                                        <i class="clipboard list icon"></i>
-                                    </a>
                                     <a href="{% url 'unitmanagement:reassign_assets'%}" class="item">Reassign Assets
                                         <i class="retweet icon"></i>
                                     </a>
@@ -29,6 +26,13 @@
                                     <a href="{% url 'unitmanagement:handler_incident'%}" class="item">Handler-Incident Form
                                         <i class="exclamation icon"></i>
                                         <i class="male icon"></i>
+                                    </a>
+                                    <a href="{% url 'training:k9_record'%}" class="item">Refresher Records
+                                        <i class="exclamation icon"></i>
+                                        <i class="paw icon"></i>
+                                    </a>
+                                    <a href="{% url 'unitmanagement:choose_date'%}" class="item">Unit Management Report
+                                        <i class="clipboard list icon"></i>
                                     </a>
                                     {% endif %}
 
@@ -58,6 +62,14 @@
                                         <i class="exclamation icon"></i>
                                     </a>
                                     <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
+                                        <i class="exclamation icon"></i>
+                                        <i class="paw icon"></i>
+                                    </a>
+                                    <a href="{% url 'training:record_daily'%}" class="item">Record Daily Refresher
+                                        <i class="exclamation icon"></i>
+                                        <i class="paw icon"></i>
+                                    </a>
+                                    <a href="{% url 'training:k9_record'%}" class="item">Refresher Records
                                         <i class="exclamation icon"></i>
                                         <i class="paw icon"></i>
                                     </a>

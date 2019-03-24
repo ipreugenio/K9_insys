@@ -158,3 +158,6 @@ class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(status='Material Dog').filter(partnered=False))
     handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 
+class DateForm(forms.Form):
+    from_date = forms.DateField( widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())
