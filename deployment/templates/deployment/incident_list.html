@@ -15,6 +15,7 @@
             <th>Date</th>
                 <th>Location</th>
                 <th>Type</th>
+				<th></th>
           	</tr>
     		</thead>
     		<tbody>
@@ -23,6 +24,7 @@
                         <td>{{ incident.date }}</td>
                         <td>{{ incident.location }}</td>
                         <td>{{ incident.type }}</td>
+						<td><a href="{% url 'deployment:incident_detail' incident.id %}">View Details</a></td>
     				</tr>
 				{% endfor %}
         </tbody>

@@ -10,6 +10,7 @@ from unitmanagement.models import K9_Incident, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
+from django.db.models import Q
 
 def user_in_session(request):
     serial = request.session['session_serial']
@@ -130,7 +131,7 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['heartworm_8'].required = False
 
 class VaccinationUsedForm(forms.Form):
-    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").filter(med_type = "Others").order_by('medicine'))
+    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(Q (med_type = "Vaccine") | Q(med_type = "Others")).order_by('medicine'))
 
 
 class RequestForm(forms.ModelForm):

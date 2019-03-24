@@ -235,7 +235,7 @@ def login(request):
 
 def add_User(request):
 
-    form = add_User_form(request.POST)
+    form = add_User_form(request.POST, request.FILES)
     style = ""
 
     if request.method == 'POST':

@@ -118,7 +118,7 @@
         {% for form in medicine_formset.forms %}
         <tr>
             <td>{{medicine_name|list_item:forloop.counter0}}</td>
-            <td>₱{{medicine_previous_price|list_item:forloop.counter0}}</td>
+            <td style="text-align:right">₱{{medicine_previous_price|list_item:forloop.counter0}}</td>
 
             <td>
             <div class="ui right labeled input">
@@ -128,11 +128,11 @@
 </div>
 </td>
             <td><output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-forecast_quantity" id = "id_medicine-{{forloop.counter0}}-forecast_quantity">{{medicine_forecast|list_item:forloop.counter0}}</output></td>
-            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-forecast_budget" id = "id_medicine-{{forloop.counter0}}-forecast_budget"></output></td>
+            <td style="text-align:right">₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-forecast_budget" id = "id_medicine-{{forloop.counter0}}-forecast_budget"></output></td>
             <td>{{medicine_current|list_item:forloop.counter0}}</td>
             <td>{% render_field form.quantity data-medicine-id=forloop.counter0 %}</td>
-            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-previous_total" id = "id_medicine-{{forloop.counter0}}-previous_total">{{medicine_previous_total|list_item:forloop.counter0}}</output></td>
-            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-actual" id = "id_medicine-{{forloop.counter0}}-actual">{{medicine_actual|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-previous_total" id = "id_medicine-{{forloop.counter0}}-previous_total">{{medicine_previous_total|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-actual" id = "id_medicine-{{forloop.counter0}}-actual">{{medicine_actual|list_item:forloop.counter0}}</output></td>
             <td>
                 <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -140,7 +140,7 @@
                     <div class="ui basic label">.00</div>
                     </div>
             </td>
-            <td>₱<output class="medicine_difference" data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-difference" id = "id_medicine-{{forloop.counter0}}-difference"></output></td>
+            <td style="text-align:right">₱<output class="medicine_difference" data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-difference" id = "id_medicine-{{forloop.counter0}}-difference"></output></td>
         </tr>
 
         {% endfor %}
@@ -154,7 +154,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output class = "spendings_total" name = "medicine-spendings-total" id = "id_medicine-spendings-total">{{medicine_spendings}}</output></td>
+            <td style="text-align:right">₱<output class = "spendings_total" name = "medicine-spendings-total" id = "id_medicine-spendings-total">{{medicine_spendings}}</output></td>
              <td><strong>Subtotal:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -162,7 +162,7 @@
                  <div class="ui basic label">.00</div>
                     </div>
             </td>
-             <td>₱<output class = "difference_total" name = "medicine-difference-total" id = "id_medicine-difference-total"></output></td>
+             <td style="text-align:right">₱<output class = "difference_total" name = "medicine-difference-total" id = "id_medicine-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
@@ -173,7 +173,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td style="text-align:right">₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
              <td><strong>Grand total:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -181,7 +181,7 @@
                  <div class="ui basic label">.00</div>
                     </div>
             </td>
-             <td>₱<output name = "granddifference" class = "granddifference"></output></td>
+             <td style="text-align:right">₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
@@ -209,7 +209,7 @@
         {% for form in vaccine_formset.forms %}
         <tr>
             <td>{{vaccine_name|list_item:forloop.counter0}}</td>
-            <td>₱{{vaccine_previous_price|list_item:forloop.counter0}}</td>
+            <td style="text-align:right">₱{{vaccine_previous_price|list_item:forloop.counter0}}</td>
             <td><div class="ui right labeled input">
   <label class="ui label">₱</label>
  {% render_field form.price data-vaccine-id=forloop.counter0%}
@@ -217,14 +217,14 @@
 </div></td>
              <td>{{vaccine_current|list_item:forloop.counter0}}</td>
             <td>{% render_field form.quantity data-vaccine-id=forloop.counter0 %}</td>
-            <td>₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-previous_total" id = "id_vaccine-{{forloop.counter0}}-previous_total">{{vaccine_previous_total|list_item:forloop.counter0}}</output></td>
-            <td>₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-actual" id = "id_vaccine-{{forloop.counter0}}-actual">{{vaccine_actual|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-previous_total" id = "id_vaccine-{{forloop.counter0}}-previous_total">{{vaccine_previous_total|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-actual" id = "id_vaccine-{{forloop.counter0}}-actual">{{vaccine_actual|list_item:forloop.counter0}}</output></td>
             <td><div class="ui right labeled input">
                 <label class="ui label">₱</label>
                 {% render_field form.budget data-vaccine-id=forloop.counter0 readonly="true" class="vaccine_budget"%}
                     <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "vaccine_difference" data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-difference" id = "id_vaccine-{{forloop.counter0}}-difference"></output></td>
+            <td style="text-align:right">₱<output class = "vaccine_difference" data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-difference" id = "id_vaccine-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
@@ -234,14 +234,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output class = "spendings_total" name = "vaccine-spendings-total" id = "id_vaccine-spendings-total">{{vaccine_spendings}}</output></td>
+            <td style="text-align:right">₱<output class = "spendings_total" name = "vaccine-spendings-total" id = "id_vaccine-spendings-total">{{vaccine_spendings}}</output></td>
             <td><strong>Subtotal:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "subtotal" name = "vaccine_total" id = "id_vaccine_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "difference_total" name = "vaccine-difference-total" id = "id_vaccine-difference-total"></output></td>
+            <td style="text-align:right">₱<output class = "difference_total" name = "vaccine-difference-total" id = "id_vaccine-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
@@ -250,14 +250,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td style="text-align:right">₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
             <td><strong>Grand total:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "grand_total" name = "grand_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
+            <td style="text-align:right">₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </table>
 
@@ -348,7 +348,7 @@
         </tr>
         <tr>
             <td>Adult Food</td>
-            <td>₱{{adult_previous_price}}</td>
+            <td style="text-align:right">₱{{adult_previous_price}}</td>
             <td><div class="ui right labeled input">
                 <label class="ui label">₱</label>{% render_field food_form.price_adult data-food-id=0 %}
             <div class="ui basic label">.00</div>
@@ -356,8 +356,8 @@
             </td>
             <td>{{adult_food_quantity}} kg.</td>
             <td>{% render_field food_form.quantity_adult data-food-id=0 %}</td>
-            <td>₱<output data-food-id = "0" name = "adult-previous_total" id = "id_adult-previous_total">{{adult_previous_total}}</output></td>
-            <td>₱<output data-food-id = "0" name = "adult-actual" id = "id_adult-actual">{{adult_actual}}</output></td>
+            <td style="text-align:right">₱<output data-food-id = "0" name = "adult-previous_total" id = "id_adult-previous_total">{{adult_previous_total}}</output></td>
+            <td style="text-align:right">₱<output data-food-id = "0" name = "adult-actual" id = "id_adult-actual">{{adult_actual}}</output></td>
 
             <td>
                 <div class="ui right labeled input">
@@ -366,11 +366,11 @@
                <div class="ui basic label">.00</div>
                     </div>
             </td>
-            <td>₱<output class = "food_difference" data-food-id ="0" name = "adult-difference" id = "id_adult-difference"></output></td>
+            <td style="text-align:right">₱<output class = "food_difference" data-food-id ="0" name = "adult-difference" id = "id_adult-difference"></output></td>
         </tr>
          <tr>
             <td>Puppy Food</td>
-            <td>₱{{puppy_previous_price}}</td>
+            <td style="text-align:right">₱{{puppy_previous_price}}</td>
             <td>
                 <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -380,8 +380,8 @@
             </td>
             <td>{{puppy_food_quantity}} kg.</td>
             <td>{% render_field food_form.quantity_puppy data-food-id=1 %}</td>
-            <td>₱<output data-food-id = "1" name = "puppy-previous_total" id = "id_puppy-previous_total">{{puppy_previous_total}}</output></td>
-             <td>₱<output data-food-id = "1" name = "puppy-actual" id = "id_puppy-actual">{{puppy_actual}}</output></td>
+            <td style="text-align:right">₱<output data-food-id = "1" name = "puppy-previous_total" id = "id_puppy-previous_total">{{puppy_previous_total}}</output></td>
+             <td style="text-align:right">₱<output data-food-id = "1" name = "puppy-actual" id = "id_puppy-actual">{{puppy_actual}}</output></td>
             <td>
                 <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -389,12 +389,12 @@
             <div class="ui basic label">.00</div>
                     </div>
             </td>
-             <td>₱<output class = "food_difference" data-food-id ="1" name = "puppy-difference" id = "id_puppy-difference"></output></td>
+             <td style="text-align:right">₱<output class = "food_difference" data-food-id ="1" name = "puppy-difference" id = "id_puppy-difference"></output></td>
         </tr>
 
         <tr>
             <td>Milk</td>
-            <td>₱{{milk_previous_price}}</td>
+            <td style="text-align:right">₱{{milk_previous_price}}</td>
             <td><div class="ui right labeled input">
                 <label class="ui label">₱</label>
                 {% render_field food_form.price_milk data-food-id=2 %}
@@ -403,8 +403,8 @@
             </td>
             <td>{{milk_quantity}} kg.</td>
             <td>{% render_field food_form.quantity_milk data-food-id=2 %}</td>
-            <td>₱<output data-food-id = "2" name = "milk-previous_total" id = "id_milk-previous_total">{{milk_previous_total}}</output></td>
-            <td>₱<output data-food-id = "2" name = "milk-actual" id = "id_milk-actual">{{milk_actual}}</output></td>
+            <td style="text-align:right">₱<output data-food-id = "2" name = "milk-previous_total" id = "id_milk-previous_total">{{milk_previous_total}}</output></td>
+            <td style="text-align:right">₱<output data-food-id = "2" name = "milk-actual" id = "id_milk-actual">{{milk_actual}}</output></td>
             <td>
                 <div class="ui right labeled input">
                 <label class="ui label">₱</label>
@@ -412,7 +412,7 @@
             <div class="ui basic label">.00</div>
                     </div>
             </td>
-             <td>₱<output class = "food_difference" data-food-id ="2" name = "milk-difference" id = "id_milk-difference"></output></td>
+             <td style="text-align:right">₱<output class = "food_difference" data-food-id ="2" name = "milk-difference" id = "id_milk-difference"></output></td>
         </tr>
 
         <tr>
@@ -422,14 +422,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output class = "spendings_total" name = "food-spendings-total" id = "id_food-spendings-total">{{food_spendings}}</output></td>
+            <td style="text-align:right">₱<output class = "spendings_total" name = "food-spendings-total" id = "id_food-spendings-total">{{food_spendings}}</output></td>
             <td><strong>Subtotal:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "subtotal" name = "food_total" id = "id_food_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "difference_total" name = "food-difference-total" id = "id_food-difference-total"></output></td>
+            <td style="text-align:right">₱<output class = "difference_total" name = "food-difference-total" id = "id_food-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
@@ -438,14 +438,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td style="text-align:right">₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
             <td><strong>Grand total:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "grand_total" name = "grand_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
+            <td style="text-align:right">₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </table>
 
@@ -570,7 +570,7 @@
         {% for form in equipment_formset.forms %}
         <tr>
             <td>{{equipment_name|list_item:forloop.counter0}}</td>
-            <td>{{equipment_previous_price|list_item:forloop.counter0}}</td>
+            <td style="text-align:right">{{equipment_previous_price|list_item:forloop.counter0}}</td>
             <td><div class="ui right labeled input">
   <label class="ui label">₱</label>
  {% render_field form.price data-equipment-id=forloop.counter0%}
@@ -578,14 +578,14 @@
 </div></td>
             <td>{{equipment_quantity|list_item:forloop.counter0}}</td>
             <td>{% render_field form.quantity data-equipment-id=forloop.counter0 %}</td>
-            <td>₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-previous_total" id = "id_equipment-{{forloop.counter0}}-previous_total">{{equipment_previous_total|list_item:forloop.counter0}}</output></td>
-            <td>₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-actual" id = "id_equipment-{{forloop.counter0}}-actual">{{equipment_actual|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-previous_total" id = "id_equipment-{{forloop.counter0}}-previous_total">{{equipment_previous_total|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-actual" id = "id_equipment-{{forloop.counter0}}-actual">{{equipment_actual|list_item:forloop.counter0}}</output></td>
             <td><div class="ui right labeled input">
                 <label class="ui label">₱</label>
                 {% render_field form.budget data-equipment-id=forloop.counter0 readonly="true" class="equipment_budget"%}
                     <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "equipment_difference" data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-difference" id = "id_equipment-{{forloop.counter0}}-difference"></output></td>
+            <td style="text-align:right">₱<output class = "equipment_difference" data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-difference" id = "id_equipment-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
@@ -595,14 +595,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output class = "spendings_total" name = "equipment-spendings-total" id = "id_equipment-spendings-total">{{equipment_spendings}}</output></td>
+            <td style="text-align:right">₱<output class = "spendings_total" name = "equipment-spendings-total" id = "id_equipment-spendings-total">{{equipment_spendings}}</output></td>
             <td><strong>Subtotal:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "subtotal" name = "equipment_total" id = "id_equipment_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "difference_total" name = "equipment-difference-total" id = "id_equipment-difference-total"></output></td>
+            <td style="text-align:right">₱<output class = "difference_total" name = "equipment-difference-total" id = "id_equipment-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
@@ -611,14 +611,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td style="text-align:right">₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
             <td><strong>Grand total:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "grand_total" name = "grand_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
+            <td style="text-align:right">₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
@@ -646,24 +646,24 @@
         {% for form in vet_supply_formset.forms %}
         <tr>
             <td>{{vet_supply_name|list_item:forloop.counter0}}</td>
-            <td>₱{{vet_supply_previous_price|list_item:forloop.counter0}}</td>
+            <td style="text-align:right">₱{{vet_supply_previous_price|list_item:forloop.counter0}}</td>
             <td><div class="ui right labeled input">
   <label class="ui label">₱</label>
  {% render_field form.price data-vet_supply-id=forloop.counter0%}
   <div class="ui basic label">.00</div>
 </div></td>
             <td><output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-forecast_quantity" id = "id_vet_supply-{{forloop.counter0}}-forecast_quantity">{{vet_supply_forecast|list_item:forloop.counter0}}</output> {{vet_supply_uom|list_item:forloop.counter0}}</td>
-            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-forecast_budget" id = "id_vet_supply-{{forloop.counter0}}-forecast_budget"></output></td>
+            <td style="text-align:right">₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-forecast_budget" id = "id_vet_supply-{{forloop.counter0}}-forecast_budget"></output></td>
             <td>{{vet_supply_quantity|list_item:forloop.counter0}}</td>
             <td>{% render_field form.quantity data-vet_supply-id=forloop.counter0 %}</td>
-            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-previous_total" id = "id_vet_supply-{{forloop.counter0}}-previous_total">{{vet_supply_previous_total|list_item:forloop.counter0}}</output></td>
-            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-actual" id = "id_vet_supply-{{forloop.counter0}}-actual">{{vet_supply_actual|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-previous_total" id = "id_vet_supply-{{forloop.counter0}}-previous_total">{{vet_supply_previous_total|list_item:forloop.counter0}}</output></td>
+            <td style="text-align:right">₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-actual" id = "id_vet_supply-{{forloop.counter0}}-actual">{{vet_supply_actual|list_item:forloop.counter0}}</output></td>
             <td><div class="ui right labeled input">
                 <label class="ui label">₱</label>
                 {% render_field form.budget data-vet_supply-id=forloop.counter0 readonly="true" class="vet_supply_budget"%}
                     <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "vet_supply_difference" data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-difference" id = "id_vet_supply-{{forloop.counter0}}-difference"></output></td>
+            <td style="text-align:right">₱<output class = "vet_supply_difference" data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-difference" id = "id_vet_supply-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
@@ -675,14 +675,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output class = "spendings_total" name = "vet_supply-spendings-total" id = "id_vet_supply-spendings-total">{{vet_supply_spendings}}</output></td>
+            <td style="text-align:right">₱<output class = "spendings_total" name = "vet_supply-spendings-total" id = "id_vet_supply-spendings-total">{{vet_supply_spendings}}</output></td>
             <td><strong>Subtotal:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "subtotal" name = "vet_supply_total" id = "id_vet_supply_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output class = "difference_total" name = "vet_supply-difference-total" id = "id_vet_supply-difference-total"></output></td>
+            <td style="text-align:right">₱<output class = "difference_total" name = "vet_supply-difference-total" id = "id_vet_supply-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
@@ -693,14 +693,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td style="text-align:right">₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
             <td><strong>Grand total:</strong>
              <div class="ui right labeled input">
                 <label class="ui label">₱</label>
            <input class = "grand_total" name = "grand_total" readonly="true">
                  <div class="ui basic label">.00</div>
                     </div></td>
-            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
+            <td style="text-align:right">₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
@@ -1241,6 +1241,9 @@ var totalSum_grand = totalSum - totalSum_spendings
 
 </script>
 
+<style>
+
+</style>
 
 
 {% endblock %}

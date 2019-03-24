@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, Dog_Breed
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
@@ -15,6 +15,7 @@ from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, 
 import datetime
 from deployment.models import Team_Assignment
 from django.db.models import Sum
+from decimal import Decimal
 
 
 from collections import OrderedDict
@@ -298,7 +299,8 @@ def classify_k9_list(request):
     if not SAR_demand:
         SAR_demand = 0
 
-
+    print("UNCLASSIFIED DOGS")
+    print(data_unclassified)
 
     '''
     if k9 has failed 2 training records, disable reasign button
@@ -423,6 +425,8 @@ def view_graphs(request, id):
 
     return render(request, 'training/view_graph.html', context)
 
+def Average(lst):
+    return sum(lst) / len(lst)
 
 #TODO Restrict Viable dogs to be trained for those who are 6 months old
 def classify_k9_select(request, id):
@@ -432,8 +436,79 @@ def classify_k9_select(request, id):
     title = data.name
     style = ""
 
+    NDD_count = K9.objects.filter(capability='NDD').count()
+    EDD_count = K9.objects.filter(capability='EDD').count()
+    SAR_count = K9.objects.filter(capability='SAR').count()
+
+    NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+    EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+    SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+    trait_score = [0, 0, 0]
+
+    dog_trait = Dog_Breed.objects.all()
+
+    select_trait = None
+    for trait in dog_trait:
+        if trait.breed == data.breed:
+            select_trait = trait
+
+    if select_trait is not None:
+        if select_trait.skill_recommendation == "SAR" or select_trait.skill_recommendation2 == "SAR" or select_trait.skill_recommendation3 == "SAR":
+            trait_score[0] = 1
+        if select_trait.skill_recommendation == "NDD" or select_trait.skill_recommendation2 == "NDD" or select_trait.skill_recommendation2 == "EDD":
+            trait_score[1] = 1
+        if select_trait.skill_recommendation == "EDD" or select_trait.skill_recommendation2 == "EDD" or select_trait.skill_recommendation3 == "EDD":
+            trait_score[2] = 1
 
     method_arrays = []
+
+    BREED = (
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
+        ('German Sheperd', 'German Sheperd'),
+        ('Golden Retriever', 'Golden Retriever'),
+        ('Jack Russel', 'Jack Russel'),
+        ('Labrador Retriever', 'Labrador Retriever'),
+        ('Mixed', 'Mixed'),
+    )
+
+    records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed__contains = data.breed)
+
+    SAR_list = []
+    NDD_list = []
+    EDD_list = []
+
+    for record in records:
+        if record.training == "SAR":
+            SAR_list.append(round(Decimal(record.grade), 1))
+        if record.training == "NDD":
+            NDD_list.append(round(Decimal(record.grade), 1))
+        if record.training == "EDD":
+            EDD_list.append(round(Decimal(record.grade), 1))
+
+    if not SAR_list:
+        SAR_list.append(0.0)
+    if not NDD_list:
+        NDD_list.append(0.0)
+    if not EDD_list:
+        EDD_list.append(0.0)
+
+    skill_ave_sar = Average(SAR_list)
+    skill_ave_ndd = Average(NDD_list)
+    skill_ave_edd = Average(EDD_list)
+
+    print("TRAINING LIST")
+    print(skill_ave_sar)
+    print(skill_ave_ndd)
+    print(skill_ave_edd)
+
+    ave_list = []
+    ave_list.append(skill_ave_sar)
+    ave_list.append(skill_ave_ndd)
+    ave_list.append(skill_ave_edd)
+
+    max_ave = max(ave_list)
 
 
     #skill_demand() TODO Add demand score
@@ -448,11 +523,33 @@ def classify_k9_select(request, id):
         method_arrays.append(skill_in_general(id))
 
     breed_score = []
-    gene_score = []
+    #gene_score = []
+    ave_score = [0, 0, 0]
+
 
     SAR_score = 0
     NDD_score = 0
     EDD_score = 0
+
+    if trait_score[0] == 1:
+        SAR_score += 1
+    if trait_score[1] == 1:
+        NDD_score += 1
+    if trait_score[2] == 1:
+        EDD_score += 1
+
+    if max_ave == skill_ave_sar and max_ave != 0:
+        SAR_score += 1
+        ave_score[0] = 1
+    if max_ave == skill_ave_ndd and max_ave != 0:
+        NDD_score += 1
+        ave_score[1] = 1
+    if max_ave == skill_ave_edd and max_ave != 0:
+        EDD_score += 1
+        ave_score[2] = 1
+
+    print("AVE SCORE")
+    print(ave_score)
 
     skill_breed_sar = method_arrays[0][5]
     skill_breed_ndd = method_arrays[0][6]
@@ -471,6 +568,7 @@ def classify_k9_select(request, id):
 
     gene_score = [0, 0, 0]
 
+    #Run this if k9 has ancestors
     if len(method_arrays) == 2:
         skill_gene_sar = method_arrays[1][5]
         skill_gene_ndd = method_arrays[1][6]
@@ -603,6 +701,10 @@ def classify_k9_select(request, id):
             'skill_gene_sar': skill_gene_sar,
             'skill_gene_ndd': skill_gene_ndd,
             'skill_gene_edd': skill_gene_edd,
+            'skill_ave_sar': skill_ave_sar,
+            'skill_ave_ndd': skill_ave_ndd,
+            'skill_ave_edd': skill_ave_edd,
+
             'compact_score': compact_score,
             'SAR_score': SAR_score,
             'NDD_score': NDD_score,
@@ -610,11 +712,20 @@ def classify_k9_select(request, id):
 
             'breed_score': breed_score,
             'gene_score': gene_score,
+            'ave_score': ave_score,
+            'select_trait': select_trait,
+            'trait_score': trait_score,
 
             'notif_data':notif_data,
             'count':count,
             'user':user,
 
+            'EDD_count': EDD_count,
+            'NDD_count': NDD_count,
+            'SAR_count': SAR_count,
+            'NDD_demand': NDD_demand,
+            'EDD_demand': EDD_demand,
+            'SAR_demand': SAR_demand,
         }
     else:
         parent_exist = 1
@@ -642,6 +753,9 @@ def classify_k9_select(request, id):
             'skill_gene_sar': skill_gene_sar,
             'skill_gene_ndd': skill_gene_ndd,
             'skill_gene_edd': skill_gene_edd,
+            'skill_ave_sar': skill_ave_sar,
+            'skill_ave_ndd': skill_ave_ndd,
+            'skill_ave_edd': skill_ave_edd,
 
             'compact_score': compact_score,
             'SAR_score': SAR_score,
@@ -650,11 +764,20 @@ def classify_k9_select(request, id):
 
             'breed_score': breed_score,
             'gene_score': gene_score,
+            'ave_score': ave_score,
+            'select_trait': select_trait,
+            'trait_score': trait_score,
 
             'notif_data':notif_data,
             'count':count,
             'user':user,
 
+            'EDD_count': EDD_count,
+            'NDD_count': NDD_count,
+            'SAR_count': SAR_count,
+            'NDD_demand': NDD_demand,
+            'EDD_demand': EDD_demand,
+            'SAR_demand': SAR_demand,
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -779,6 +902,7 @@ def training_update_form(request, id):
 
         training.remarks = request.POST.get('remarks')
         training.grade = request.POST.get('grade')
+
         training.save()
         data.save()
 
@@ -808,6 +932,9 @@ def training_update_form(request, id):
 
         if training.stage == "Finished Training":
             data.training_status = "Trained"
+
+            if training.grade == 75.0:
+                data.training_status = "For-Adoption"
         else:
             data.training_status = "On-Training"
 
@@ -849,7 +976,7 @@ def serial_number_form(request, id):
         print(form.errors)
         if form.is_valid():
             data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
-            data.microchip = request.POST.get('microchip')
+            #data.microchip = request.POST.get('microchip')
             training_status = request.POST.get('dog_type')
             data.training_status = training_status
             data.save()
@@ -892,7 +1019,7 @@ def fail_dog(request, id):
     training = Training.objects.filter(k9=data)
 
     for training in training:
-        training.grade = '0'
+        training.grade = '75.0'
         training.save()
     return redirect('training:classify_k9_list')
 

@@ -18,10 +18,7 @@
                     {% endif %}
                     <form class = "ui inverted form" method="POST">
                         {% csrf_token %}
-                        <div class="field">
-                                <label>Microchip:</label>
-                                {{form.microchip}}
-                        </div>
+
                         <div class="field">
                                 <label>Purpose:</label>
                                 {{form.dog_type}}

@@ -238,7 +238,10 @@ def food_inventory_list(request):
     adult_inventory = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
     puppy_inventory = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
     milk_inventory = Food.objects.filter(foodtype='Milk').aggregate(sum=Sum('quantity'))['sum']
-    ss = Safety_Stock.objects.get(id=1)
+    try:
+        ss = Safety_Stock.objects.get(id=1)
+    except:
+        ss = None
 
     #NOTIF SHOW
     notif_data = notif(request)

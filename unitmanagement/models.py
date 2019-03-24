@@ -285,7 +285,7 @@ def create_medicine_inventory(sender, instance, **kwargs):
 def create_k9_vaccines(sender, instance, **kwargs):
     if kwargs.get('created', False):
         if instance.source == 'Procured':
-            cvr = VaccinceRecord.objects.create(k9=instance,  deworming_1=True, deworming_2=True, deworming_3=True,
+            cvr = VaccinceRecord.objects.create(k9=instance, deworming_1=True, deworming_2=True, deworming_3=True,
             deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True, heartworm_1=True, heartworm_2=True,
             heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True, heartworm_7=True, heartworm_8=True,
             anti_rabies=True, bordetella_1=True, bordetella_2=True, dhppil4_1=True, dhppil4_2=True, tick_flea_1=True,

@@ -27,6 +27,10 @@ urlpatterns = [
     path('budget_list/budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/', views.budgeting_list, name='budget_list'),
 
+    path('choose_date/', views.choose_date, name='choose_date'),
+    path('choose_date/detailed_budget/', views.detailed_budgeting, name='detailed_budget'),
+
+
     path('budget_report/', views.budgeting_report, name='budget_report'),
 
 

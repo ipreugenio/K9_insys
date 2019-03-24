@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'unitmanagement',
     'inventory',
 
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -64,12 +63,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     'rest_framework',
-    'profiles',
-    'planningandacquiring',
-    'deployment',
-    'training',
-    'unitmanagement',
-    'inventory',
 
 ]
 

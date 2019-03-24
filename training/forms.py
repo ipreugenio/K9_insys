@@ -43,10 +43,12 @@ class add_handler_form(forms.ModelForm):
 
 class TrainingUpdateForm(forms.ModelForm):
     GRADE = (
-        ('1.0', '1.0'),
-        ('2.0', '2.0'),
-        ('3.0', '3.0'),
-        ('4.0', '4.0'),
+        ('75.0', '75.0'),
+        ('80.0', '80.0'),
+        ('85.0', '85.0'),
+        ('90.0', '90.0'),
+        ('95.0', '95.0'),
+        ('100.0', '100.0'),
     )
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     grade = forms.CharField(widget = forms.Select(choices=GRADE))
@@ -66,7 +68,7 @@ class SerialNumberForm(forms.Form):
         ('For-Deployment', 'For-Deployment'),
         ('For-Breeding', 'For-Breeding'),
     )
-    microchip = forms.CharField(max_length=200)
+    #microchip = forms.CharField(max_length=200)
     dog_type = forms.CharField(max_length=200, widget = forms.Select(choices=DOG_TYPE))
 
 class AdoptionForms(forms.ModelForm):

@@ -806,6 +806,20 @@ def incident_list(request):
     return render(request, 'deployment/incident_list.html', context)
 
 #TODO: this
-def incident_detail(request):
+def incident_detail(request, id):
+    incident = Incidents.objects.get(id = id)
+    title = "Incident Detail View"
 
-    return None
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context ={
+        'incident' : incident,
+        'title': title,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'deployment/incident_detail.html', context)

@@ -15,10 +15,10 @@ from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
+from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed, Notification
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
 
@@ -1289,7 +1289,7 @@ def on_leave_request(request):
 def reassign_assets(request):
     style=''
     form = ReassignAssetsForm(request.POST or None)
-    k9 = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
+    k9 = K9.objects.filter(training_status='For-Deployment').filter(partnered=False).exclude(status = "Dead")
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     numh = handler.count()
     numk = k9.count()
@@ -1439,7 +1439,7 @@ def on_leave_details(request, id):
 #TODO reassign
 def load_hander(request):
     k9 = request.GET.get('k9')
-    handler = User.objects.filter(position=Handler).filter(status='Working').filter(capability=k9.capability).order_by('name')
+    handler = User.objects.filter(position='Handler').filter(status='Working').filter(capability=k9.capability).order_by('name')
     return render(request, 'unitmanagement/handler_dropdown.html', {'handler': handler})
 
 # TODO 
@@ -1500,8 +1500,8 @@ def reproductive_edit(request, id):
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
-    data = K9.objects.filter(handler_on_leave=False).filter(training_status='For-Deployment').filter(partnered=False)
-    data2 = K9.objects.filter(handler_on_leave=True).filter(training_status='For-Deployment').filter(partnered=False)
+    data = K9.objects.filter(handler_on_leave=False).filter(training_status='For-Deployment').filter(partnered=False).exclude(status="Dead")
+    data2 = K9.objects.filter(handler_on_leave=True).filter(training_status='For-Deployment').filter(partnered=False).exclude(status="Dead")
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()

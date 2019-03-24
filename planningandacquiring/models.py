@@ -266,7 +266,7 @@ class Budget_allocation(models.Model):
     vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=2,)
     grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
     date_created = models.DateField('date_created', auto_now_add=True)
-    date_tobe_budgeted = models.DateField('date_tobe_budgeted', null=True)
+    date_tobe_budgeted = models.CharField('date_tobe_budgeted', null=True, max_length=200, default="-")
 
 class Budget_food(models.Model):
     type = (
@@ -331,4 +331,9 @@ class Dog_Breed(models.Model):
     weight = models.CharField('weight', max_length=200, null=True)
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
-    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True, blank=True)
+    skill_recommendation2 = models.CharField('skill_recommendation2', choices=SKILL, max_length=200, null=True, blank=True)
+    skill_recommendation3 = models.CharField('skill_recommendation3', choices=SKILL, max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.breed)
