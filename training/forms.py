@@ -82,11 +82,13 @@ class AdoptionForms(forms.ModelForm):
         }
 
 class RecordForm(forms.ModelForm):
+
     class Meta:
         model = Record_Training
         fields = ('on_leash', 'off_leash', 'obstacle_course', 'panelling', 'port_plant', 'port_find', 'port_time', 'building_plant', 'building_find',
                   'building_time', 'vehicle_plant', 'vehicle_find', 'vehicle_time', 'baggage_plant', 'baggage_find', 'baggage_time',
                   'others_plant', 'others_find', 'others_time', 'daily_rating', 'MARSEC', 'MARLEN', 'MARSAR', 'MAREP', 'morning_feed', 'evening_feed')
+
 
 class DateForm(forms.Form):
     choose_date = forms.DateField( widget=DateInput())

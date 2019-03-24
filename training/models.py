@@ -21,11 +21,11 @@ class K9_Handler(models.Model):
     deployment_area = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="deployment_area", blank=True, null=True)
 
     def __str__(self):
-        handler = User.objects.get(id=self.handler)
-        k9 = K9.objects.get(id=self.k9)
-        handler_name = handler.name
-        k9_name = k9.name
-        return str(handler_name + " : " + k9_name)
+        # handler = User.objects.get(id=self.handler.id)
+        # k9 = K9.objects.get(id=self.k9.id)
+        # handler_name = str(handler)
+        # k9_name = k9.name
+        return str(handler) + " : " + str(k9.name)
 
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

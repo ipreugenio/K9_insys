@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_training.html" %}
+{% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -9,13 +9,6 @@
         {% endfor %}
     {% endif %}
 </div>
-
-     <form class="ui form" action="" method="POST">
-    {% csrf_token %}
-         {{form}}
-         <div class="ui basic center aligned segment">
-            <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>
-        </div>
 
         <table id="tabledata2" class="ui celled table">
             <tr>
@@ -141,8 +134,6 @@
             </tr>
         </table>
 
-
-    </form>
 
 <div class="ui basic segment">
     <a href="{% url 'training:training_records'%}" class="ui blue button">Back</a>

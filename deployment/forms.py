@@ -263,6 +263,13 @@ class IncidentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(IncidentForm, self).__init__(*args, **kwargs)
+
+        self.fields['user'].intial = current_user
+
+class DateForm(forms.Form):
+    from_date = forms.DateField( widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())
+
         #self.fields['user'].intial = current_user
 
 
@@ -359,3 +366,4 @@ class MonthYearForm(forms.Form):
         required=False,
         widget=MonthYearWidget(years=range(2017,2041))
     )
+

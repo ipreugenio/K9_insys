@@ -2,48 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c1549005-f422-45fb-b8ca-51eeca63e016" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/incident_detail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/detailed_budgeting.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/choose_date.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/inventory/templates/inventory/choose_date.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/inventory/templates/inventory/inventory_report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/choose_date.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/k9_record.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/training/templates/training/record_daily.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/choose_date.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/um_report.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/K9_insys.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/K9_insys.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/K9_insys/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/incident_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/incident_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/templatetags/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templatetags/index.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/deployment_report.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/deployment_report.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inventory/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_report.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_report.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planningandacquiring/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/add_User.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/add_User.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/genealogy.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/genealogy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/serial_number_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/serial_number_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/daily_record.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/daily_record.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_records.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_records.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_edd.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_edd.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templatetags/training_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/templatetags/training_tags.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_sar.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_sar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/migrations/0010_handler_incident_retain_last_handler.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/tasks.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_record.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_record.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_sick_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_sick_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_unpartnered_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_unpartnered_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -53,167 +49,54 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1699315325">
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="html" value="3" />
+          <entry key="py" value="8" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="HTML" value="3" />
+          <entry key="Python" value="8" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="html" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="HTML" value="1" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/unitmanagement/forms.py">
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="33" column="98" selection-start-line="33" selection-start-column="57" selection-end-line="33" selection-end-column="98" />
+            <state relative-caret-position="527">
+              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
               <folding>
-                <element signature="e#0#24#0" expanded="true" />
+                <element signature="e#0#28#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="detailed_budgeting.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/detailed_budgeting.html">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/deployment/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+            <state relative-caret-position="491">
+              <caret line="871" lean-forward="true" selection-start-line="871" selection-end-line="871" />
               <folding>
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#4;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#4;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#4;n#table#4;n#!!top" expanded="true" />
+                <element signature="e#0#58#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="budget_list.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="29" column="35" selection-start-line="29" selection-start-column="35" selection-end-line="29" selection-end-column="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="budgeting_report.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_report.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
-              <caret line="261" selection-start-line="261" selection-end-line="261" />
-              <folding>
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#1;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#3;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#1;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#2;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#3;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#4;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#7;n#tr#4;n#table#4;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#8;n#tr#4;n#table#4;n#!!top" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51306">
-              <caret line="3084" column="67" selection-start-line="3084" selection-start-column="67" selection-end-line="3084" selection-end-column="67" />
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="choose_date.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sidebar_pa.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="36" column="120" selection-start-line="36" selection-start-column="120" selection-end-line="36" selection-end-column="120" />
             </state>
           </provider>
         </entry>
@@ -287,8 +170,6 @@
         <option value="$PROJECT_DIR$/training/templatetags/training_tags.py" />
         <option value="$PROJECT_DIR$/planningandacquiring/admin.py" />
         <option value="$PROJECT_DIR$/training/templates/training/genealogy.html" />
-        <option value="$PROJECT_DIR$/deployment/urls.py" />
-        <option value="$PROJECT_DIR$/deployment/views.py" />
         <option value="$PROJECT_DIR$/deployment/templates/deployment/incident_detail.html" />
         <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
         <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" />
@@ -319,6 +200,8 @@
         <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
         <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/detailed_budgeting.html" />
         <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" />
+        <option value="$PROJECT_DIR$/deployment/urls.py" />
+        <option value="$PROJECT_DIR$/deployment/views.py" />
       </list>
     </option>
   </component>
@@ -387,6 +270,55 @@
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
               <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
               <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="profiles" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="profiles" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="profiles" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="profiles" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="training" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
+              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
+              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
@@ -504,8 +436,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11200586" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24670571" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.037037037" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Version Control" order="9" />
@@ -516,12 +449,21 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11200586" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.037037037" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.037037037" />
+      <window_info anchor="bottom" id="Python Console" order="7" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -537,13 +479,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="714">
-          <caret line="42" column="111" lean-forward="true" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="111" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1321">
@@ -740,13 +675,6 @@
     <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-40">
-          <caret line="197" column="60" lean-forward="true" selection-start-line="197" selection-start-column="30" selection-end-line="197" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/unitmanagement/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
@@ -817,30 +745,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3487">
           <caret line="352" column="34" lean-forward="true" selection-start-line="352" selection-start-column="34" selection-end-line="352" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51306">
-          <caret line="3084" column="67" selection-start-line="3084" selection-start-column="67" selection-end-line="3084" selection-end-column="67" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="36" column="120" selection-start-line="36" selection-start-column="120" selection-end-line="36" selection-end-column="120" />
         </state>
       </provider>
     </entry>
@@ -948,6 +852,50 @@
             <element signature="n#style#0;n#td#6;n#tr#4;n#table#4;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#7;n#tr#4;n#table#4;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#8;n#tr#4;n#table#4;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="508">
+          <caret line="3084" column="67" selection-start-line="3084" selection-start-column="67" selection-end-line="3084" selection-end-column="67" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="36" column="120" selection-start-line="36" selection-start-column="120" selection-end-line="36" selection-end-column="120" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="491">
+          <caret line="871" lean-forward="true" selection-start-line="871" selection-end-line="871" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
           </folding>
         </state>
       </provider>

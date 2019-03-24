@@ -24,7 +24,11 @@ urlpatterns = [
     path('view-schedule/deployment/request_dog_list/', views.request_dog_list, name='request_dog_list'),
     path('add-incident/', views.add_incident, name='add_incident'),
     path('view-incidents/', views.incident_list, name='view_incidents'),
+
     path('incident-detail/<int:id>', views.incident_detail, name='incident_detail'),
+
+    path('choose-date/', views.choose_date, name='choose_date'),
+    path('choose-date/deployment-report/', views.deployment_report, name='deployment_report'),
 
 
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
