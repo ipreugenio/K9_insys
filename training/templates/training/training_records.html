@@ -29,6 +29,8 @@
             <td>{{data.sex}}</td>
             <td>{{data.age}}</td>
             <td>{{data.training_status}}</td>
+
+            <td class="center aligned"><a href="{% url 'training:daily_record' data.id %}" class="ui blue button">Select</a></td>
         </tr>
         {% endfor %}
     </tbody>

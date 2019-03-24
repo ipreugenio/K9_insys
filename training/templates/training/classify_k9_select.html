@@ -18,7 +18,7 @@
                 <td>{{data.name}}</td>
             </tr>
             <tr>
-                <th>Age</th>
+                <th>Age (years)</th>
                 <td>{{data.age}}</td>
             </tr>
             <tr>
@@ -59,23 +59,26 @@
   </div>
   <ul class="list">
     <li>Below this is a list of suggested skill assignment based from current data.</li>
-      <li>Click on the link beside a skill to view corresponding data diagram.</li>
+      <li>The systems follows the following criteria below and adds a score to the skill that best meet the criteria. The skill cell that meets the criteria has a value highlighted in green.</li>
+      <li>The skill with the most score is the recommended assignment. The user may still check some of the other data presented in the page as basis for assigning a skill.</li>
   </ul>
 </div>
 
 <form class="ui form" method="POST">
     {% csrf_token %}
   <div class = "ui segment">
-    <table class="ui two column celled table">
-        <thead>
+    <table class="ui five column celled table">
+        <thead class="center aligned">
             <tr>
                 <th>Select</th>
-                <th>View Charts/Graphs</th>
-                <th></th>
+                <th>Most Recurring Skill Among All K9s of the Same Breed</th>
+                <th ><a data-tooltip="View K9 ancestral data" href="{% url 'training:genealogy' data.id %}">Most Recurring Skill Among Ancestors</a></th>
+                <th>Recommended Skill Based on K9 Traits</th>
+                <th>Score</th>
             </tr>
 
         </thead>
-
+        <tbody class = "center aligned">
              <tr>
             {% if sar.grade == '0' or data.capability == 'SAR' %}
             <td>
@@ -86,8 +89,28 @@
               <input type="radio" name="radio" value="SAR">SAR
         </td>
             {%endif%}
-                 <td><a href="{% url 'training:view_graph' 0 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
-                 <td>{{sar_recommended}}</td>
+
+                 {% if breed_score.0 == 1%}
+                 <td><a class="ui green circular label">{{skill_breed_sar}}</a></td>
+                 {% else %}
+                 <td>{{skill_breed_sar}}</td>
+                 {% endif %}
+
+                 {% if gene_score.0 == 1%}
+                 <td><a class="ui green circular label">{{skill_gene_sar}}</a></td>
+                 {% else %}
+                 <td>{{skill_gene_sar}}</td>
+                 {% endif %}
+                  <td><i class="large green check circle icon"></i></td>
+
+                  <td>
+                  {% for i in SAR_score|star_times %}
+                      <i class="yellow star icon"></i>
+                  {% endfor %}
+                    {% for i in SAR_score|star_left %}
+                      <i class="yellow star outline icon"></i>
+                      {% endfor %}
+                  </td>
         </tr>
 
 
@@ -101,8 +124,28 @@
               <input type="radio" name="radio" value="NDD">NDD
             </td>
             {%endif%}
-                <td><a href="{% url 'training:view_graph' 1 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
-                <td>{{ndd_recommended}}</td>
+
+               {% if breed_score.1 == 1%}
+                 <td><a class="ui green circular label">{{skill_breed_ndd}}</a></td>
+                 {% else %}
+                 <td>{{skill_breed_ndd}}</td>
+                 {% endif %}
+
+                 {% if gene_score.1 == 1%}
+                 <td><a class="ui green circular label">{{skill_gene_ndd}}</a></td>
+                 {% else %}
+                 <td>{{skill_gene_ndd}}</td>
+                 {% endif %}
+                  <td></td>
+
+                  <td>
+                  {% for i in NDD_score|star_times %}
+                      <i class="yellow star icon"></i>
+                  {% endfor %}
+                    {% for i in NDD_score|star_left %}
+                      <i class="yellow star outline icon"></i>
+                      {% endfor %}
+                  </td>
             </tr>
 
 
@@ -117,18 +160,39 @@
               <input type="radio" name="radio" value="EDD">EDD
             </td>
             {%endif%}
-                 <td><a href="{% url 'training:view_graph' 2 %}" data-tooltip="Click here to view data presentation of recommended skill" data-position="top right" >View Diagram</a></td>
-                <td>{{edd_recommended}}</td>
-             </tr>
+                 {% if breed_score.2 == 1%}
+                 <td><a class="ui green circular label">{{skill_breed_edd}}</a></td>
+                 {% else %}
+                 <td>{{skill_breed_edd}}</td>
+                 {% endif %}
 
+                 {% if gene_score.2 == 1%}
+                 <td><a class="ui green circular label">{{skill_gene_edd}}</a></td>
+                 {% else %}
+                 <td>{{skill_gene_edd}}</td>
+                 {% endif %}
+                  <td></td>
+
+                  <td>
+                  {% for i in EDD_score|star_times %}
+                      <i class="yellow star icon"></i>
+                  {% endfor %}
+                    {% for i in EDD_score|star_left %}
+                      <i class="yellow star outline icon"></i>
+                      {% endfor %}
+                  </td>
+             </tr>
+</tbody>
     </table>
-          <button class="ui green button" type="Submit">Submit</button>
+          <button class="ui green button" type="Submit">Assign Skill</button>
   </div>
 </form>
+
 
 {% if graph %}
 {{ graph|safe }}
 {% endif %}
+
 
 <script type="text/javascript">
 
@@ -138,15 +202,9 @@
     
     } );
 
-    $('.ui.basic.modal')
-    .modal('show')
-    ;
-
-
         var selected = $("input[name='radio']");
         alert(select.val)
     });
-
 
 </script>
  {% endblock %}

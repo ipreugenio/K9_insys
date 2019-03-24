@@ -1,9 +1,87 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
 {% load um_tags %}
-<h2 class="ui header">
+{% load widget_tweaks %}
+<h1 class="ui header">
  {{title}}
-  <div class="sub header">View Suggested Budgeted Here</div>
-</h2>
+  <div class="sub header">as of {% now "jS F Y H:i" %}</div>
+</h1>
+
+{% if reload %}
+<div class="ui icon message">
+  <i class="exclamation icon"></i>
+  <div class="content">
+    <div class="header">
+      Oops...
+    </div>
+    <p>Something unexpected came up. Please reload the page!</p>
+  </div>
+</div>
+{% else %}
+
+ <div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+   Welcome to Budgeting!
+  </div>
+  <ul class="list">
+    <li>Select a quantity and price for each item.</li>
+      <li>If there are no budgeting estimate made in the prior year, the latest estimate before the current year will be shown.</li>
+    <li>Use the information available on the page to define your budget!</li>
+  </ul>
+</div>
+    <div class="ui warning message">
+  <i class="close icon"></i>
+  <div class="header">
+    Forecast values may be unstable!
+  </div>
+  Foreacasting uses historical data to make reliable forecasts. The system will use viable dummy data to fill in the gaps if database is not populated enough! (recommended: at least 9 years of data)
+</div>
+{% if messages %}
+    {% for message in messages %}
+    <div class="{{ style }} row"> {{ message }}</div>
+    {% endfor %}
+    {% endif %}
+<div class = "ui segment">
+
+ <div class="ui four statistics">
+
+  <div class="ui small statistic">
+    <div class="value">
+      {{all_current_dogs}}
+    </div>
+    <div class="label">
+      All Current K9s
+    </div>
+  </div>
+  <div class="ui small statistic">
+    <div class="value">
+      {{required_dogs}}
+    </div>
+    <div class="label">
+      Additional K9s Needed <br> for Deployment (Ports)
+    </div>
+  </div>
+  <div class="ui small statistic">
+    <div class="value">
+      {{forecasted_dogs}}
+    </div>
+    <div class="label">
+      Forecasted Additional K9s<br>Required  for Requests
+    </div>
+      <button id = 'forecast_btn' class="ui blue button" type = "button">Toggle Forecast</button>
+  </div>
+        <div class="ui small statistic">
+    <div class="value">
+      {{recommended_dogs}}
+    </div>
+    <div class="label">
+      Recommended K9s to <br> Include in Budget
+    </div>
+  </div>
+
+</div>
+
+    </div>
 
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Medicine</a>
@@ -13,325 +91,630 @@
      <a class="item" data-tab="fifth">Vet Supply</a>
 </div>
 
+<form action="{% url 'planningandacquiring:budgeting' %}" method="POST">
+    {% csrf_token %}
+
+
  <div class="ui tab segment active" data-tab="first">
 
-     <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{request_forecast}}
-    </div>
-    <div class="label">
-      Request Forecast
-    </div>
-      <button id = 'forecast_btn' class="ui blue button" type = "button">Toggle Forecast</button>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_needed}}
-    </div>
-    <div class="label">
-      Dogs needed to be deployed
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
-  </div>
-
-
-</div>
-
-
-    <table id="tabledata1" class="ui four column celled table">
+    <table id="tabledata1" class="ui eleven column celled table">
         <tr>
             <thead>
             <th>Medicine</th>
+            <th>Price per Item (Last Year's Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
             <th>Forecasted Quantity</th>
-            <th>Price per Item</th>
-            <th>Total Price</th>
+            <th>Forecasted Cost</th>
+            <th>Current Inventory Quantity</th>
+            <th>Estimated Quantity (Current)</th>
+            <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in medicine_name %}
+
+        {% for form in medicine_formset.forms %}
         <tr>
-            <td>{{name}}</td>
-            <td>{{medicine_forecast|list_item:forloop.counter0}}</td>
-            <td>₱{{medicine_price|list_item:forloop.counter0}}</td>
-            <td>₱{{medicine_total|list_item:forloop.counter0}}</td>
+            <td>{{medicine_name|list_item:forloop.counter0}}</td>
+            <td>₱{{medicine_previous_price|list_item:forloop.counter0}}</td>
+
+            <td>
+            <div class="ui right labeled input">
+  <label class="ui label">₱</label>
+ {% render_field form.price data-medicine-id=forloop.counter0%}
+  <div class="ui basic label">.00</div>
+</div>
+</td>
+            <td><output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-forecast_quantity" id = "id_medicine-{{forloop.counter0}}-forecast_quantity">{{medicine_forecast|list_item:forloop.counter0}}</output></td>
+            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-forecast_budget" id = "id_medicine-{{forloop.counter0}}-forecast_budget"></output></td>
+            <td>{{medicine_current|list_item:forloop.counter0}}</td>
+            <td>{% render_field form.quantity data-medicine-id=forloop.counter0 %}</td>
+            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-previous_total" id = "id_medicine-{{forloop.counter0}}-previous_total">{{medicine_previous_total|list_item:forloop.counter0}}</output></td>
+            <td>₱<output data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-actual" id = "id_medicine-{{forloop.counter0}}-actual">{{medicine_actual|list_item:forloop.counter0}}</output></td>
+            <td>
+                <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field form.budget data-medicine-id=forloop.counter0 readonly="true" class="medicine_budget"%}
+                    <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+            <td>₱<output class="medicine_difference" data-medicine-id = "{{forloop.counter0}}" name = "medicine-{{forloop.counter0}}-difference" id = "id_medicine-{{forloop.counter0}}-difference"></output></td>
         </tr>
+
         {% endfor %}
+
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Subtotal:</strong> ₱	{{medicine_sub_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output class = "spendings_total" name = "medicine-spendings-total" id = "id_medicine-spendings-total">{{medicine_spendings}}</output></td>
+             <td><strong>Subtotal:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "subtotal" name = "medicine_total" id = "id_medicine_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+             <td>₱<output class = "difference_total" name = "medicine-difference-total" id = "id_medicine-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+             <td><strong>Grand total:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "grand_total" name = "grand_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+             <td>₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
+
  </div>
 
 <div class="ui tab segment" data-tab="second">
-    <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{request_forecast}}
-    </div>
-    <div class="label">
-      Request Forecast
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_needed}}
-    </div>
-    <div class="label">
-      Dogs needed to be deployed
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
-  </div>
-</div>
 
 
-    <table id="tabledata2" class="ui four column celled table">
+    <table id="tabledata2" class="ui nine column celled table">
     <tr>
             <thead>
             <th>Vaccine</th>
-            <th>Quantity Used Yearly</th>
-            <th>Price per Item</th>
-            <th>Total Price</th>
+            <th>Price per Item (Last Year's Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Current Inventory Quantity</th>
+            <th>Estimated Quantity (Current)</th>
+             <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
          <tbody>
-        {% for name in vaccine_name %}
+        {% for form in vaccine_formset.forms %}
         <tr>
-            <td>{{name}}</td>
-            <td>{{vaccine_used_yearly|list_item:forloop.counter0}}</td>
-            <td>₱{{vaccine_price|list_item:forloop.counter0}}</td>
-             <td>₱{{vaccine_total|list_item:forloop.counter0}}</td>
-            <td></td>
+            <td>{{vaccine_name|list_item:forloop.counter0}}</td>
+            <td>₱{{vaccine_previous_price|list_item:forloop.counter0}}</td>
+            <td><div class="ui right labeled input">
+  <label class="ui label">₱</label>
+ {% render_field form.price data-vaccine-id=forloop.counter0%}
+  <div class="ui basic label">.00</div>
+</div></td>
+             <td>{{vaccine_current|list_item:forloop.counter0}}</td>
+            <td>{% render_field form.quantity data-vaccine-id=forloop.counter0 %}</td>
+            <td>₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-previous_total" id = "id_vaccine-{{forloop.counter0}}-previous_total">{{vaccine_previous_total|list_item:forloop.counter0}}</output></td>
+            <td>₱<output data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-actual" id = "id_vaccine-{{forloop.counter0}}-actual">{{vaccine_actual|list_item:forloop.counter0}}</output></td>
+            <td><div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field form.budget data-vaccine-id=forloop.counter0 readonly="true" class="vaccine_budget"%}
+                    <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "vaccine_difference" data-vaccine-id = "{{forloop.counter0}}" name = "vaccine-{{forloop.counter0}}-difference" id = "id_vaccine-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Subtotal:</strong> ₱{{vaccine_sub_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output class = "spendings_total" name = "vaccine-spendings-total" id = "id_vaccine-spendings-total">{{vaccine_spendings}}</output></td>
+            <td><strong>Subtotal:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "subtotal" name = "vaccine_total" id = "id_vaccine_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "difference_total" name = "vaccine-difference-total" id = "id_vaccine-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td><strong>Grand total:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "grand_total" name = "grand_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </table>
-    </div>
 
-<div class="ui tab segment" data-tab="third">
-    <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{request_forecast}}
+    <button id = 'vaccination_btn' class="ui blue button" type = "button">Toggle K9 Vaccination Table</button>
+
+    <div class="ui segment" id = "vaccination_table">
+  <div class="ui two column very relaxed grid">
+    <div class="column">
+        <h2 class="ui center aligned block header">
+            Vaccination Table
+        </h2>
+     <table class="ui three column celled table">
+        <tr>
+            <thead>
+            <th>Vaccine Type</th>
+            <th>Total Vaccines Taken (All Current Dogs)</th>
+            <th>Total Vaccines Required (All Current Dogs)</th>
+            </thead>
+        </tr>
+        <tbody>
+        <tr>
+            <td>Deworming</td>
+            <td>{{deworming}}</td>
+            <td>{{deworming_req}}</td>
+        </tr>
+        <tr>
+            <td>DHPPIL CV</td>
+            <td>{{dhppil_cv}}</td>
+            <td>{{dhppil_cv_req}}</td>
+        </tr>
+        <tr>
+            <td>Heartworming</td>
+             <td>{{heartworming}}</td>
+             <td>{{heartworming_req}}</td>
+        </tr>
+        <tr>
+            <td>Antirabies</td>
+            <td>{{antirabies}}</td>
+            <td>{{antirabies_req}}</td>
+        </tr>
+        <tr>
+            <td>Bordetella</td>
+            <td>{{bordetella}}</td>
+            <td>{{bordetella_req}}</td>
+        </tr>
+        <tr>
+            <td>DHPPIL4</td>
+            <td>{{dhppil4}}</td>
+            <td>{{dhppil4_req}}</td>
+        </tr>
+        <tr>
+            <td>Tick-Flea</td>
+            <td>{{tick_flea}}</td>
+            <td>{{tick_flea_req}}</td>
+        </tr>
+        </tbody>
+
+    </table>
+
     </div>
-    <div class="label">
-      Request Forecast
+    <div class="column">
+
     </div>
   </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_needed}}
-    </div>
-    <div class="label">
-      Dogs needed to be deployed
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
+  <div class="ui vertical divider">
+
   </div>
 </div>
 
-    <table id="tabledata3" class="ui four column celled table">
+    </div>
+
+<div class="ui tab segment" data-tab="third">
+
+
+    <table id="tabledata3" class="ui nine column striped table">
       <tr>
             <thead>
             <th>Dog Food</th>
-            <th>Quantity Used Yearly</th>
-            <th>Price per Item</th>
-            <th>Total Price</th>
+            <th>Price per Item (Last Year's Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Current Inventory Quantity (per kg.)</th>
+            <th>Estimated Quantity (Current) (per kg.)</th>
+             <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
         <tr>
             <td>Adult Food</td>
-            <td>{{adult_food_quantity}}</td>
-             <td>₱{{adult_price}}</td>
-            <td>₱{{adult_food_total}}</td>
+            <td>₱{{adult_previous_price}}</td>
+            <td><div class="ui right labeled input">
+                <label class="ui label">₱</label>{% render_field food_form.price_adult data-food-id=0 %}
+            <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+            <td>{{adult_food_quantity}} kg.</td>
+            <td>{% render_field food_form.quantity_adult data-food-id=0 %}</td>
+            <td>₱<output data-food-id = "0" name = "adult-previous_total" id = "id_adult-previous_total">{{adult_previous_total}}</output></td>
+            <td>₱<output data-food-id = "0" name = "adult-actual" id = "id_adult-actual">{{adult_actual}}</output></td>
+
+            <td>
+                <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field food_form.budget_adult data-food-id=0 readonly="true" class="food_budget"%}
+               <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+            <td>₱<output class = "food_difference" data-food-id ="0" name = "adult-difference" id = "id_adult-difference"></output></td>
         </tr>
          <tr>
             <td>Puppy Food</td>
-            <td>{{puppy_food_quantity}}</td>
-             <td>₱{{puppy_price}}</td>
-             <td>₱{{puppy_food_total}}</td>
+            <td>₱{{puppy_previous_price}}</td>
+            <td>
+                <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field food_form.price_puppy data-food-id=1 %}
+            <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+            <td>{{puppy_food_quantity}} kg.</td>
+            <td>{% render_field food_form.quantity_puppy data-food-id=1 %}</td>
+            <td>₱<output data-food-id = "1" name = "puppy-previous_total" id = "id_puppy-previous_total">{{puppy_previous_total}}</output></td>
+             <td>₱<output data-food-id = "1" name = "puppy-actual" id = "id_puppy-actual">{{puppy_actual}}</output></td>
+            <td>
+                <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field food_form.budget_puppy data-food-id=1 readonly="true" class="food_budget" %}
+            <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+             <td>₱<output class = "food_difference" data-food-id ="1" name = "puppy-difference" id = "id_puppy-difference"></output></td>
+        </tr>
+
+        <tr>
+            <td>Milk</td>
+            <td>₱{{milk_previous_price}}</td>
+            <td><div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field food_form.price_milk data-food-id=2 %}
+            <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+            <td>{{milk_quantity}} kg.</td>
+            <td>{% render_field food_form.quantity_milk data-food-id=2 %}</td>
+            <td>₱<output data-food-id = "2" name = "milk-previous_total" id = "id_milk-previous_total">{{milk_previous_total}}</output></td>
+            <td>₱<output data-food-id = "2" name = "milk-actual" id = "id_milk-actual">{{milk_actual}}</output></td>
+            <td>
+                <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field food_form.budget_milk data-food-id=2 readonly="true" class="food_budget" %}
+            <div class="ui basic label">.00</div>
+                    </div>
+            </td>
+             <td>₱<output class = "food_difference" data-food-id ="2" name = "milk-difference" id = "id_milk-difference"></output></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output class = "spendings_total" name = "food-spendings-total" id = "id_food-spendings-total">{{food_spendings}}</output></td>
+            <td><strong>Subtotal:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "subtotal" name = "food_total" id = "id_food_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "difference_total" name = "food-difference-total" id = "id_food-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Subtotal:</strong> ₱{{dog_food_sub_total}}</td>
-        </tr>
-        <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td><strong>Grand total:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "grand_total" name = "grand_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </table>
+
+     <button id = 'dogfood_btn' class="ui blue button" type = "button">Toggle K9 Consumption Table</button>
+
+
+<div id = "dogfood">
+        <div class="ui placeholder segment">
+  <div class="ui two column stackable center aligned grid">
+    <div class="ui vertical divider"></div>
+
+      <div class="column">
+        <h2 class="ui block header">
+  Adult Yearly Consumption
+</h2>
+            <table class = "ui four column celled table">
+        <tr>
+            <thead>
+             <th>Breed</th>
+             <th>Current K9 Count</th>
+             <th>Estimated Consumption per month (kg.)</th>
+             <th>Monthly Total (kg.)</th>
+            </thead>
+        </tr>
+                {% for data in adult_food_data %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1}}</td>
+                    <td>{{data.2}}</td>
+                    <td>{{data.3}} - {{data.4}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>Yearly Total :</strong> {{adult_yearly_total_min}} kg. - {{adult_yearly_total_max}} kg.</td>
+                </tr>
+    </table>
+      </div>
+
+      <div class="column">
+        <h2 class="ui block header">
+  Puppy Yearly Consumption
+</h2>
+            <table class = "ui six column celled table">
+        <tr>
+            <thead>
+             <th>Age Group</th>
+             <th>K9 Count</th>
+             <th>Estimated Consumption of Milk per age group (kg.)</th>
+             <th>Estimated Consumption of Puppy Food per age group (kg.)</th>
+             <th>Total Consumption of Milk (kg.)</th>
+             <th>Total Consumption of Puppy Food (kg.)</th>
+            </thead>
+        </tr>
+                {% for data in puppy_food_data %}
+                <tr>
+                <td>{{data.0}}</td>
+                <td>{{data.1}}</td>
+                {% if data.2 is None %}
+                    <td>-</td>
+                    {% else %}
+                <td>{{data.2}}</td>
+                    {% endif %}
+                {% if data.3 is None %}
+                    <td>-</td>
+                    {% else %}
+                <td>{{data.3}}</td>
+                    {% endif %}
+                {% if data.4 is None %}
+                    <td>-</td>
+                    {% else %}
+                <td>{{data.4}}</td>
+                    {% endif %}
+                {% if data.5 is None %}
+                    <td>-</td>
+                    {% else %}
+                <td>{{data.5}}</td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+
+                <tr>
+
+                    <td><strong>Additional Puppies</strong> : <input id = "id_additional_puppies" name = "additional_puppies"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>Milk Yearly Consumption:</strong> <output id = "id_milk_yearly" name = "milk_yearly" data="{{milk_yearly_total}}">{{milk_yearly_total}} </output> kg.</td>
+                    <td><strong>Puppy Food Yearly Consumption:</strong> <output id = "id_puppy_yearly" name = "puppy_yearly" data="{{puppy_yearly_total}}">{{puppy_yearly_total}}</output> kg.</td>
+                </tr>
+
+
+    </table>
+
+      </div>
+
+  </div>
+</div>
+</div>
+
     </div>
 
 <div class="ui tab segment" data-tab="fourth">
-    <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{request_forecast}}
-    </div>
-    <div class="label">
-      Request Forecast
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_needed}}
-    </div>
-    <div class="label">
-      Dogs needed to be deployed
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
-  </div>
-</div>
 
-    <table id="tabledata4" class="ui four column celled table">
+    <table id="tabledata4" class="ui nine column celled table">
      <tr>
             <thead>
             <th>Equipment</th>
-            <th>Number of Dogs</th>
-            <th>Price per Item</th>
-            <th>Total Price</th>
+            <th>Price per Item (Last Year's Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Current Inventory Quantity</th>
+            <th>Estimated Quantity (Current)</th>
+            <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in equipment_name %}
+        {% for form in equipment_formset.forms %}
         <tr>
-            <td>{{name}}</td>
-            <td>{{equipment_quantity}}</td>
-            <td>₱{{equipment_price|list_item:forloop.counter0}}</td>
-            <td>₱{{equipment_total|list_item:forloop.counter0}}</td>
+            <td>{{equipment_name|list_item:forloop.counter0}}</td>
+            <td>{{equipment_previous_price|list_item:forloop.counter0}}</td>
+            <td><div class="ui right labeled input">
+  <label class="ui label">₱</label>
+ {% render_field form.price data-equipment-id=forloop.counter0%}
+  <div class="ui basic label">.00</div>
+</div></td>
+            <td>{{equipment_quantity|list_item:forloop.counter0}}</td>
+            <td>{% render_field form.quantity data-equipment-id=forloop.counter0 %}</td>
+            <td>₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-previous_total" id = "id_equipment-{{forloop.counter0}}-previous_total">{{equipment_previous_total|list_item:forloop.counter0}}</output></td>
+            <td>₱<output data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-actual" id = "id_equipment-{{forloop.counter0}}-actual">{{equipment_actual|list_item:forloop.counter0}}</output></td>
+            <td><div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field form.budget data-equipment-id=forloop.counter0 readonly="true" class="equipment_budget"%}
+                    <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "equipment_difference" data-equipment-id = "{{forloop.counter0}}" name = "equipment-{{forloop.counter0}}-difference" id = "id_equipment-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Subtotal:</strong> ₱{{equipment_sub_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output class = "spendings_total" name = "equipment-spendings-total" id = "id_equipment-spendings-total">{{equipment_spendings}}</output></td>
+            <td><strong>Subtotal:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "subtotal" name = "equipment_total" id = "id_equipment_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "difference_total" name = "equipment-difference-total" id = "id_equipment-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Grandtotal:</strong>₱{{grand_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td><strong>Grand total:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "grand_total" name = "grand_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
     </div>
 
 <div class="ui tab segment" data-tab="fifth">
-    <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{request_forecast}}
-    </div>
-    <div class="label">
-      Request Forecast
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_needed}}
-    </div>
-    <div class="label">
-      Dogs needed to deployed
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{dogs_to_budget}}
-    </div>
-    <div class="label">
-      Dogs to budget
-    </div>
-  </div>
-</div>
 
-    <table id="tabledata5" class="ui four column celled table">
+    <table id="tabledata5" class="ui eleven column celled table">
           <tr>
             <thead>
             <th>Vet Supply</th>
-            <th>Quantity Used Yearly</th>
-            <th>Price per Item</th>
-            <th>Total Price</th>
+            <th>Price per Item (Last Year's Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Forecasted Quantity</th>
+            <th>Forecasted Cost</th>
+            <th>Current Inventory Quantity</th>
+            <th>Estimated Quantity (Current)</th>
+            <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
         <tbody>
-        {% for name in vet_supply_name %}
+        {% for form in vet_supply_formset.forms %}
         <tr>
-            <td>{{name}}</td>
-            <td>{{vet_supply_quantity}}</td>
-            <td>₱{{vet_supply_price|list_item:forloop.counter0}}</td>
-            <td>₱{{vet_supply_total|list_item:forloop.counter0}}</td>
+            <td>{{vet_supply_name|list_item:forloop.counter0}}</td>
+            <td>₱{{vet_supply_previous_price|list_item:forloop.counter0}}</td>
+            <td><div class="ui right labeled input">
+  <label class="ui label">₱</label>
+ {% render_field form.price data-vet_supply-id=forloop.counter0%}
+  <div class="ui basic label">.00</div>
+</div></td>
+            <td><output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-forecast_quantity" id = "id_vet_supply-{{forloop.counter0}}-forecast_quantity">{{vet_supply_forecast|list_item:forloop.counter0}}</output> {{vet_supply_uom|list_item:forloop.counter0}}</td>
+            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-forecast_budget" id = "id_vet_supply-{{forloop.counter0}}-forecast_budget"></output></td>
+            <td>{{vet_supply_quantity|list_item:forloop.counter0}}</td>
+            <td>{% render_field form.quantity data-vet_supply-id=forloop.counter0 %}</td>
+            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-previous_total" id = "id_vet_supply-{{forloop.counter0}}-previous_total">{{vet_supply_previous_total|list_item:forloop.counter0}}</output></td>
+            <td>₱<output data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-actual" id = "id_vet_supply-{{forloop.counter0}}-actual">{{vet_supply_actual|list_item:forloop.counter0}}</output></td>
+            <td><div class="ui right labeled input">
+                <label class="ui label">₱</label>
+                {% render_field form.budget data-vet_supply-id=forloop.counter0 readonly="true" class="vet_supply_budget"%}
+                    <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "vet_supply_difference" data-vet_supply-id = "{{forloop.counter0}}" name = "vet_supply-{{forloop.counter0}}-difference" id = "id_vet_supply-{{forloop.counter0}}-difference"></output></td>
         </tr>
         {% endfor %}
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Subtotal:</strong> ₱{{vet_supply_sub_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output class = "spendings_total" name = "vet_supply-spendings-total" id = "id_vet_supply-spendings-total">{{vet_supply_spendings}}</output></td>
+            <td><strong>Subtotal:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "subtotal" name = "vet_supply_total" id = "id_vet_supply_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output class = "difference_total" name = "vet_supply-difference-total" id = "id_vet_supply-difference-total"></output></td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>Grandtotal:</strong> ₱{{grand_total}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>₱<output name = "grandspendings" class = "grandspendings">{{grandspendings}}</output></td>
+            <td><strong>Grand total:</strong>
+             <div class="ui right labeled input">
+                <label class="ui label">₱</label>
+           <input class = "grand_total" name = "grand_total" readonly="true">
+                 <div class="ui basic label">.00</div>
+                    </div></td>
+            <td>₱<output name = "granddifference" class = "granddifference"></output></td>
         </tr>
         </tbody>
         </table>
     </div>
 
+<div class="ui right aligned segment" style="padding: 0px;" style="border-width: 0px;">
+            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Save Budget Estimate</button>
+        </div>
+    {{medicine_formset.management_form}}
+    {{vaccine_formset.management_form}}
+    {{equipment_formset.management_form}}
+    {{vet_supply_formset.management_form}}
 
+</form>
 
 <script type="text/javascript">
 
@@ -393,6 +776,9 @@
 
 </div>
 
+
+{% endif %}
+
 <script>
     $(document).ready(function(){
         $('#forecast').hide();
@@ -400,6 +786,463 @@
         $('#forecast_btn').on("click", function(e){
                $('#forecast').toggle();
          });
+
+         $('#dogfood').hide();
+
+        $('#dogfood_btn').on("click", function(e){
+               $('#dogfood').toggle();
+         });
+
+
+        $('#vaccination_table').hide();
+
+        $('#vaccination_btn').on("click", function(e){
+               $('#vaccination_table').toggle();
+         });
      });
+
+
+
+
+     $('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  })
+;
+
 </script>
+
+
+
+<script>
+
+$(document).ready(function() {
+  var medicineCount = {{medicine_name|length}};
+  for (var i = 0; i < medicineCount; i++) {
+    $(`#id_medicine-${i}-forecast_quantity`).keyup(calcTotal);
+     $(`#id_medicine-${i}-price`).keyup(calcTotal);
+    $(`#id_medicine-${i}-quantity`).keyup(calcTotal);
+     $(`#id_medicine-${i}-budget`).keyup(calcTotal);
+     $(`#id_medicine-${i}-difference`).keyup(calcTotal);
+  }
+
+  var vaccineCount = {{vaccine_name|length}};
+  for (var i = 0; i < vaccineCount; i++) {
+     $(`#id_vaccine-${i}-price`).keyup(calcTotal);
+    $(`#id_vaccine-${i}-quantity`).keyup(calcTotal);
+     $(`#id_vaccine-${i}-budget`).keyup(calcTotal);
+     }
+
+
+    $(`#id_additional_puppies`).keyup(calcTotal);
+    $(`#id_food-price_adult`).keyup(calcTotal);
+    $(`#id_food-quantity_adult`).keyup(calcTotal);
+    $(`#id_food-budget_adult`).keyup(calcTotal);
+     $(`#id_food-price_puppy`).keyup(calcTotal);
+    $(`#id_food-quantity_puppy`).keyup(calcTotal);
+    $(`#id_food-budget_puppy`).keyup(calcTotal);
+     $(`#id_food-price_milk`).keyup(calcTotal);
+    $(`#id_food-quantity_milk`).keyup(calcTotal);
+    $(`#id_food-budget_milk`).keyup(calcTotal);
+
+    var equipmentCount = {{equipment_name|length}};
+  for (var i = 0; i < equipmentCount; i++) {
+     $(`#id_equipment-${i}-price`).keyup(calcTotal);
+    $(`#id_equipment-${i}-quantity`).keyup(calcTotal);
+     $(`#id_equipment-${i}-budget`).keyup(calcTotal);
+     }
+
+     var vet_supplyCount = {{vet_supply_name|length}};
+  for (var i = 0; i < vet_supplyCount; i++) {
+  $(`#id_vet_supply-${i}-forecast_quantity`).keyup(calcTotal);
+     $(`#id_vet_supply-${i}-price`).keyup(calcTotal);
+    $(`#id_vet_supply-${i}-quantity`).keyup(calcTotal);
+     $(`#id_vet_supply-${i}-budget`).keyup(calcTotal);
+     }
+
+});
+
+function calcTotal() {
+  var id_med = $(this).attr("data-medicine-id");
+  var priceVal_med = parseFloat($(`#id_medicine-${id_med}-price`).val(), 10);
+  var qtyVal_med = parseInt($(`#id_medicine-${id_med}-forecast_quantity`).val(), 10);
+  var est_qtyVal_med =  parseInt($(`#id_medicine-${id_med}-quantity`).val(), 10);
+  var est_budget_med = parseFloat($(`#id_medicine-${id_med}-budget`).val(), 10);
+
+  var prev_total_med = parseFloat($(`#id_medicine-${id_med}-previous_total`).val(), 10);
+  var actual_med = parseFloat($(`#id_medicine-${id_med}-actual`).val(), 10);
+  var difference_med = parseFloat($(`#id_medicine-${id_med}-difference`).val(), 10);
+
+  var spendings_total_med = parseFloat($(`#id_medicine-spendings-total`).val(), 10);
+   var difference_total_med = parseFloat($(`#id_medicine-difference-total`).val(), 10);
+   var med_total = parseFloat($(`#id_medicine_total`).val(), 10);
+
+  $(`#id_medicine-${id_med}-forecast_budget`).val((priceVal_med * qtyVal_med ? priceVal_med * qtyVal_med : 0).toFixed(2) || 0);
+  $(`#id_medicine-${id_med}-budget`).val((priceVal_med * est_qtyVal_med ? priceVal_med * est_qtyVal_med : 0) || 0);
+
+  $(`#id_medicine-${id_med}-difference`).val(( (priceVal_med * est_qtyVal_med) - actual_med ? (priceVal_med * est_qtyVal_med) - actual_med : 0).toFixed(2) || 0);
+
+   result = (priceVal_med * est_qtyVal_med) - actual_med
+
+  if (result < 0) {
+      $(`#id_medicine-${id_med}-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_medicine-${id_med}-difference`).css(`color`, `green`);
+       $(`#id_medicine-${id_med}-difference`).val((result > '0') ? ('+'+ result) : result);
+    }
+
+
+   var totalSum_med = 0
+        $('.medicine_budget').each(function(){
+            var inputVal_med = $(this).val();
+            if($.isNumeric(inputVal_med)){
+                totalSum_med += parseFloat(inputVal_med);
+            }
+        });
+        $('#id_medicine_total').val(totalSum_med);
+
+    var totalSum_med = 0
+        $('.medicine_difference').each(function(){
+            var inputVal_med = $(this).val();
+            if($.isNumeric(inputVal_med)){
+                totalSum_med += parseFloat(inputVal_med);
+            }
+        });
+        $('#id_medicine-difference-total').val(totalSum_med);
+
+    if (totalSum_med < 0) {
+      $('#id_medicine-difference-total').css(`color`, `red`);
+    }
+    else {
+      $('#id_medicine-difference-total').css(`color`, `green`);
+       $('#id_medicine-difference-total').val((totalSum_med > '0') ? ('+'+ totalSum_med) : totalSum_med);
+    }
+
+
+   var id_vac = $(this).attr("data-vaccine-id");
+  var priceVal_vac = parseFloat($(`#id_vaccine-${id_vac}-price`).val(), 10);
+  var est_qtyVal_vac =  parseInt($(`#id_vaccine-${id_vac}-quantity`).val(), 10);
+  var est_budget_vac = parseFloat($(`#id_vaccine-${id_vac}-budget`).val(), 10);
+
+  var prev_total_vac = parseFloat($(`#id_vaccine-${id_vac}-previous_total`).val(), 10);
+  var actual_vac = parseFloat($(`#id_vaccine-${id_vac}-actual`).val(), 10);
+  var difference_vac = parseFloat($(`#id_vaccine-${id_vac}-difference`).val(), 10);
+
+  var spendings_total_vac = parseFloat($(`#id_vaccine-spendings-total`).val(), 10);
+   var difference_total_vac = parseFloat($(`#id_vaccine-difference-total`).val(), 10);
+   var vac_total = parseFloat($(`#id_vaccine_total`).val(), 10);
+
+
+  $(`#id_vaccine-${id_vac}-budget`).val((priceVal_vac * est_qtyVal_vac ? priceVal_vac * est_qtyVal_vac : 0) || 0);
+
+  $(`#id_vaccine-${id_vac}-difference`).val(( (priceVal_vac * est_qtyVal_vac) - actual_vac ? (priceVal_vac * est_qtyVal_vac) - actual_vac : 0) || 0);
+
+
+   result = (priceVal_vac * est_qtyVal_vac) - actual_vac
+
+  if (result < 0) {
+      $(`#id_vaccine-${id_vac}-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_vaccine-${id_vac}-difference`).css(`color`, `green`);
+      $(`#id_vaccine-${id_vac}-difference`).val((result > '0') ? ('+'+ result) : result);
+    }
+
+var totalSum_vac = 0
+        $('.vaccine_budget').each(function(){
+            var inputVal_vac = $(this).val();
+            if($.isNumeric(inputVal_vac)){
+                totalSum_vac += parseFloat(inputVal_vac);
+            }
+        });
+        $('#id_vaccine_total').val(totalSum_vac);
+
+
+   var totalSum_vac = 0
+        $('.vaccine_difference').each(function(){
+            var inputVal_vac = $(this).val();
+            if($.isNumeric(inputVal_vac)){
+                totalSum_vac += parseFloat(inputVal_vac);
+            }
+        });
+        $('#id_vaccine-difference-total').val(totalSum_vac);
+
+    if (totalSum_vac < 0) {
+      $('#id_vaccine-difference-total').css(`color`, `red`);
+    }
+    else {
+      $('#id_vaccine-difference-total').css(`color`, `green`);
+       $('#id_vaccine-difference-total').val((totalSum_vac > '0') ? ('+'+ totalSum_vac) : totalSum_vac);
+    }
+
+    var additional_puppies = parseInt($(`#id_additional_puppies`).val(), 10);
+
+    orig_milk = parseFloat($(`#id_milk_yearly`).attr("data"));
+    orig_puppy = parseFloat($(`#id_puppy_yearly`).attr("data"));
+
+    var milk_yearly = 3.64 * additional_puppies;
+    var puppy_yearly = 55.18 * additional_puppies;
+
+    var total_milk = orig_milk;
+    var total_puppy = orig_puppy;
+    total_milk += milk_yearly;
+    total_puppy += puppy_yearly;
+
+    if (additional_puppies == 0){
+     $(`#id_milk_yearly`).val(orig_milk).toFixed(2);
+     $(`#id_puppy_yearly`).val(orig_puppy).toFixed(2);
+     }
+     else {
+      $(`#id_milk_yearly`).val(( total_milk ?  total_milk: 0) || orig_milk);
+     $(`#id_puppy_yearly`).val(( total_puppy ?  total_puppy: 0) || orig_puppy);
+     }
+
+
+  var priceVal_adult = parseFloat($(`#id_food-price_adult`).val(), 10);
+  var est_qtyVal_adult =  parseInt($(`#id_food-quantity_adult`).val(), 10);
+  var est_budget_adult = parseFloat($(`#id_food-budget_adult`).val(), 10);
+  var prev_total_adult = parseFloat($(`#id_adult-previous_total`).val(), 10);
+  var actual_adult = parseFloat($(`#id_adult-actual`).val(), 10);
+  var difference_adult = parseFloat($(`#id_adult-difference`).val(), 10);
+
+  var priceVal_puppy = parseFloat($(`#id_food-price_puppy`).val(), 10);
+  var est_qtyVal_puppy =  parseInt($(`#id_food-quantity_puppy`).val(), 10);
+  var est_budget_puppy = parseFloat($(`#id_food-budget_puppy`).val(), 10);
+   var prev_total_puppy = parseFloat($(`#id_puppy-previous_total`).val(), 10);
+   var actual_puppy = parseFloat($(`#id_puppy-actual`).val(), 10);
+  var difference_puppy = parseFloat($(`#id_puppy-difference`).val(), 10);
+
+  var priceVal_milk = parseFloat($(`#id_food-price_milk`).val(), 10);
+  var est_qtyVal_milk =  parseInt($(`#id_food-quantity_milk`).val(), 10);
+  var est_budget_milk = parseFloat($(`#id_food-budget_milk`).val(), 10);
+   var prev_total_milk = parseFloat($(`#id_milk-previous_total`).val(), 10);
+   var actual_milk = parseFloat($(`#id_milk-actual`).val(), 10);
+  var difference_milk = parseFloat($(`#id_milk-difference`).val(), 10);
+
+  var spendings_total_food = parseFloat($(`#id_food-spendings-total`).val(), 10);
+   var difference_total_food = parseFloat($(`#id_food-difference-total`).val(), 10);
+   var vac_food = parseFloat($(`#id_food_total`).val(), 10);
+
+   $(`#id_food-budget_adult`).val((priceVal_adult * est_qtyVal_adult ? priceVal_adult * est_qtyVal_adult : 0) || 0);
+    $(`#id_food-budget_puppy`).val((priceVal_puppy * est_qtyVal_puppy ? priceVal_puppy * est_qtyVal_puppy : 0) || 0);
+    $(`#id_food-budget_milk`).val((priceVal_milk * est_qtyVal_milk ? priceVal_milk * est_qtyVal_milk : 0) || 0);
+
+    $(`#id_adult-difference`).val(( (priceVal_adult * est_qtyVal_adult) - actual_adult ? (priceVal_adult * est_qtyVal_adult) - actual_adult: 0) || 0);
+    $(`#id_puppy-difference`).val(( (priceVal_puppy * est_qtyVal_puppy) - actual_puppy ? (priceVal_puppy * est_qtyVal_puppy) - actual_puppy: 0) || 0);
+    $(`#id_milk-difference`).val(( (priceVal_milk * est_qtyVal_milk) - actual_milk ? (priceVal_milk * est_qtyVal_milk) - actual_milk: 0) || 0);
+
+    var totalSum_food = 0
+        $('.food_budget').each(function(){
+            var inputVal_food = $(this).val();
+            if($.isNumeric(inputVal_food)){
+                totalSum_food += parseFloat(inputVal_food);
+            }
+        });
+        $('#id_food_total').val(totalSum_food);
+
+         var totalSum_food = 0
+        $('.food_difference').each(function(){
+            var inputVal_food = $(this).val();
+            if($.isNumeric(inputVal_food)){
+                totalSum_food += parseFloat(inputVal_food);
+            }
+        });
+        $('#id_food-difference-total').val(totalSum_food);
+
+    if (totalSum_food < 0) {
+      $('#id_food-difference-total').css(`color`, `red`);
+    }
+    else {
+      $('#id_food-difference-total').css(`color`, `green`);
+       $('#id_food-difference-total').val((totalSum_food > '0') ? ('+'+ totalSum_food) : totalSum_food);
+    }
+
+result_adult = (priceVal_adult * est_qtyVal_adult) - actual_adult
+result_puppy = (priceVal_puppy * est_qtyVal_puppy) - actual_puppy
+result_milk = (priceVal_milk * est_qtyVal_milk) - actual_milk
+
+  if (result_adult < 0) {
+      $(`#id_adult-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_adult-difference`).css(`color`, `green`);
+      $(`#id_adult-difference`).val((result_adult > '0') ? ('+'+ result_adult) : result_adult);
+    }
+
+    if (result_puppy < 0) {
+      $(`#id_puppy-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_puppy-difference`).css(`color`, `green`);
+      $(`#id_puppy-difference`).val((result_puppy > '0') ? ('+'+ result_puppy) : result_puppy);
+    }
+
+    if (result_milk < 0) {
+      $(`#id_milk-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_milk-difference`).css(`color`, `green`);
+      $(`#id_milk-difference`).val((result_milk > '0') ? ('+'+ result_milk) : result_milk);
+    }
+
+     var id_equip = $(this).attr("data-equipment-id");
+  var priceVal_equip = parseFloat($(`#id_equipment-${id_equip}-price`).val(), 10);
+  var est_qtyVal_equip =  parseInt($(`#id_equipment-${id_equip}-quantity`).val(), 10);
+  var est_budget_equip = parseFloat($(`#id_equipment-${id_equip}-budget`).val(), 10);
+
+  var prev_total_equip = parseFloat($(`#id_equipment-${id_equip}-previous_total`).val(), 10);
+  var actual_equip = parseFloat($(`#id_equipment-${id_equip}-actual`).val(), 10);
+  var difference_equip = parseFloat($(`#id_equipment-${id_equip}-difference`).val(), 10);
+
+   var spendings_total_equip = parseFloat($(`#id_equipment-spendings-total`).val(), 10);
+   var difference_total_equip = parseFloat($(`#id_equipment-difference-total`).val(), 10);
+   var equip_total = parseFloat($(`#id_equipment_total`).val(), 10);
+
+  $(`#id_equipment-${id_equip}-budget`).val((priceVal_equip * est_qtyVal_equip ? priceVal_equip * est_qtyVal_equip : 0) || 0);
+   $(`#id_equipment-${id_equip}-difference`).val(( (priceVal_equip * est_qtyVal_equip) - actual_equip ? (priceVal_equip * est_qtyVal_equip) - actual_equip : 0) || 0);
+
+result = (priceVal_equip * est_qtyVal_equip) - actual_equip
+
+  if (result < 0) {
+      $(`#id_equipment-${id_equip}-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_equipment-${id_equip}-difference`).css(`color`, `green`);
+       $(`#id_equipment-${id_equip}-difference`).val((result > '0') ? ('+'+ result) : result);
+    }
+
+
+var totalSum_equip = 0
+        $('.equipment_budget').each(function(){
+            var inputVal_equip = $(this).val();
+            if($.isNumeric(inputVal_equip)){
+                totalSum_equip += parseFloat(inputVal_equip);
+            }
+        });
+        $('#id_equipment_total').val(totalSum_equip);
+
+
+var totalSum_equip = 0
+        $('.equipment_difference').each(function(){
+            var inputVal_equip = $(this).val();
+            if($.isNumeric(inputVal_equip)){
+                totalSum_equip += parseFloat(inputVal_equip);
+            }
+        });
+        $('#id_equipment-difference-total').val(totalSum_equip);
+
+    if (totalSum_equip < 0) {
+      $('#id_equipment-difference-total').css(`color`, `red`);
+    }
+    else {
+      $('#id_equipment-difference-total').css(`color`, `green`);
+       $('#id_equipment-difference-total').val((totalSum_equip > '0') ? ('+'+ totalSum_equip) : totalSum_equip);
+    }
+
+         var id_vet = $(this).attr("data-vet_supply-id");
+  var priceVal_vet = parseFloat($(`#id_vet_supply-${id_vet}-price`).val(), 10);
+  var est_qtyVal_vet =  parseInt($(`#id_vet_supply-${id_vet}-quantity`).val(), 10);
+  var est_budget_vet = parseFloat($(`#id_vet_supply-${id_vet}-budget`).val(), 10);
+  var qtyVal_vet = parseInt($(`#id_vet_supply-${id_vet}-forecast_quantity`).val(), 10);
+
+   var prev_total_vet = parseFloat($(`#id_vet_supply-${id_vet}-previous_total`).val(), 10);
+   var actual_vet = parseFloat($(`#id_vet_supply-${id_vet}-actual`).val(), 10);
+  var difference_vet = parseFloat($(`#id_vet_supply-${id_vet}-difference`).val(), 10);
+
+   var spendings_total_vet = parseFloat($(`#id_vet_supply-spendings-total`).val(), 10);
+   var difference_total_vet = parseFloat($(`#id_vet_supply-difference-total`).val(), 10);
+   var vet_total = parseFloat($(`#id_vet_supply_total`).val(), 10);
+
+  $(`#id_vet_supply-${id_vet}-budget`).val((priceVal_vet * est_qtyVal_vet ? priceVal_vet * est_qtyVal_vet : 0) || 0);
+    $(`#id_vet_supply-${id_vet}-forecast_budget`).val((priceVal_vet * qtyVal_vet ? priceVal_vet * qtyVal_vet : 0).toFixed(2) || 0);
+
+    $(`#id_vet_supply-${id_vet}-difference`).val(( (priceVal_vet * est_qtyVal_vet ) - actual_vet ? (priceVal_vet * est_qtyVal_vet) - actual_vet : 0) || 0);
+
+
+result = (priceVal_vet * est_qtyVal_vet ) - actual_vet
+
+  if (result < 0) {
+      $(`#id_vet_supply-${id_vet}-difference`).css(`color`, `red`);
+    }
+    else {
+      $(`#id_vet_supply-${id_vet}-difference`).css(`color`, `green`);
+       $(`#id_vet_supply-${id_vet}-difference`).val((result > '0') ? ('+'+ result) : result);
+    }
+
+var totalSum_vet = 0
+        $('.vet_supply_budget').each(function(){
+            var inputVal_vet = $(this).val();
+            if($.isNumeric(inputVal_vet)){
+                totalSum_vet += parseFloat(inputVal_vet);
+            }
+        });
+        $('#id_vet_supply_total').val(totalSum_vet);
+
+
+var totalSum_vet = 0
+        $('.vet_supply_difference').each(function(){
+            var inputVal_vet = $(this).val();
+            if($.isNumeric(inputVal_vet)){
+                totalSum_vet += parseFloat(inputVal_vet);
+            }
+        });
+        $('#id_vet_supply-difference-total').val(totalSum_vet);
+
+    if (totalSum_vet < 0) {
+      $('#id_vet_supply-difference-total').css(`color`, `red`);
+    }
+
+    else {
+      $('#id_vet_supply-difference-total').css(`color`, `green`);
+       $('#id_vet_supply-difference-total').val((totalSum_vet > '0') ? ('+'+ totalSum_vet) : totalSum_vet);
+    }
+
+
+    var totalSum = 0
+        $('.subtotal').each(function(){
+            var inputVal = $(this).val();
+            if($.isNumeric(inputVal)){
+                totalSum += parseFloat(inputVal);
+            }
+        });
+        $('.grand_total').val(totalSum);
+
+
+
+
+var totalSum_spendings = 0
+        $('.spendings_total').each(function(){
+            var inputVal = $(this).val();
+            inputVal = inputVal.replace(/[^\d.-]/g, '');
+            inputVal = parseFloat(inputVal , 10);
+            if($.isNumeric(inputVal)){
+                totalSum_spendings += parseFloat(inputVal);
+            }
+        });
+
+
+
+var totalSum_grand = totalSum - totalSum_spendings
+
+    if (totalSum < 0) {
+      $('.granddifference').css(`color`, `red`);
+    }
+    else {
+      $('.granddifference').css(`color`, `green`);
+       $('.granddifference').val((totalSum_grand > '0') ? ('+'+ totalSum_grand) : totalSum_grand);
+    }
+
+
+}
+
+</script>
+
+
+
 {% endblock %}
+
+

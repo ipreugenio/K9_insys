@@ -45,13 +45,16 @@ class User(models.Model):
 
     STATUS = (
         ('Working', 'Working'),
+        ('Sick', 'Sick'),
         ('On-Leave', 'On-Leave'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead')
     )
 
+    image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
     rank = models.CharField('rank', max_length=200)
+    fullname = models.CharField('fullname', max_length=200)
     firstname = models.CharField('firstname', max_length=200)
     lastname = models.CharField('lastname', max_length=200)
     extensionname = models.CharField('extensionname', max_length=200, default="None", blank=True)
@@ -65,11 +68,10 @@ class User(models.Model):
     citizenship = models.CharField('citizenship', max_length=200)
     religion = models.CharField('religion', max_length=200)
     bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
-    distinct_feature = models.CharField('distinct_feature', max_length=200)
+    distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)
-    # profile image dito
     height = models.IntegerField('height')
     weight = models.IntegerField('weight')
     headsize = models.IntegerField('headsize')
@@ -77,6 +79,10 @@ class User(models.Model):
     bodybuild = models.CharField('bodybuild', max_length=200)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
+    capability = models.CharField('capability', max_length=200, default="None")
+    # edd = models.BooleanField(default=False)
+    # ndd = models.BooleanField(default=False)
+    # sar = models.BooleanField(default=False)
     
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date
@@ -87,6 +93,7 @@ class User(models.Model):
 
     def save(self, *args, **kwargs):
         self.age = self.calculate_age()
+        self.fullname = str(self.lastname)+ ', ' +str(self.firstname)+ ' ' + str(self.middlename) 
         super(User, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -265,8 +272,8 @@ class Education(models.Model):
     se_schoolyear = models.CharField('se_schoolyear', max_length=200)
     te_schoolyear = models.CharField('te_schoolyear', max_length=200)
     pe_degree = models.CharField('pe_degree', max_length=200)
-    se_degree = models.CharField('pe_degree', max_length=200)
-    te_degree = models.CharField('pe_degree', max_length=200)
+    se_degree = models.CharField('se_degree', max_length=200)
+    te_degree = models.CharField('te_degree', max_length=200)
 
 
 class Account(models.Model):

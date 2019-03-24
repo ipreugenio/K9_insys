@@ -1,9 +1,24 @@
 {% extends "profiles/sidebar_um.html" %} {% block content %}
 <h1 class="ui header">
-    {{k9}}
-    <div class="sub header">User details for {{user}}</div>
+    {{user_s}}
+    <div class="sub header">User details for {{user_s}}</div>
 </h1>
+{% if user_s.status == 'Dead'%}
+<div class="ui negative message">
+    <i class="close icon"></i>
+    <div class="header">
+      {{user_s}} is Dead....
+    </div>
+  </p>
+</div>
+{% endif %}
+<div class="ui basic segment">
+        
+  <center>
+      <img src="{{user_s.image.url}}" alt="" width="240">
+  </center>
 
+</div>
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">User Information</a>
     <a class="item" data-tab="second">Personal Information</a>
@@ -15,87 +30,87 @@
  <table id="tabledata1" class="ui two column celled table">
           	<tr>
                 <td>Name</td>
-                <td>{{user}}</td>
+                <td>{{user_s}}</td>
             </tr>
             <tr>
               <td>Position</td>
-                <td>{{user.position}}</td>
+                <td>{{user_s.position}}</td>
                 </tr>
             <tr>
               <td>Rank</td>
-                <td>{{user.rank}}</td>
+                <td>{{user_s.rank}}</td>
             </tr>
             <tr>
 			  <td>Nickname</td>
-                <td>{{user.nickname}}</td>
+                <td>{{user_s.nickname}}</td>
             </tr>
             <tr>
               <td>Birthdate</td>
-                <td>{{user.birthdate}}</td>
+                <td>{{user_s.birthdate}}</td>
             </tr>
             <tr>
               <td>Age</td>
-                <td>{{user.age}}</td>
+                <td>{{user_s.age}}</td>
             </tr>
             <tr>
               <td>Birthplace</td>
-                <td>{{user.birthplace}}</td>
+                <td>{{user_s.birthplace}}</td>
             </tr>
             <tr>
               <td>Gender</td>
-                <td>{{user.gender}}</td>
+                <td>{{user_s.gender}}</td>
             </tr>
             <tr>
               <td>Civil Status</td>
-                <td>{{user.civilstatus}}</td>
+                <td>{{user_s.civilstatus}}</td>
             </tr>
             <tr>
               <td>Citizenship</td>
-                <td>{{user.citizenship}}</td>
+                <td>{{user_s.citizenship}}</td>
             </tr>
             <tr>
               <td>Religion</td>
-                <td>{{user.religion}}</td>
+                <td>{{user_s.religion}}</td>
             </tr>
             <tr>
               <td>Bloodtype</td>
-                <td>{{user.bloodtype}}</td>
+                <td>{{user_s.bloodtype}}</td>
             </tr>
             <tr>
               <td>Distinct Feature</td>
-                <td>{{user.distinct_feature}}</td>
+                <td>{{user_s.distinct_feature}}</td>
             </tr>
             <tr>
               <td>Hair Color</td>
-                <td>{{user.haircolor}}</td>
+                <td>{{user_s.haircolor}}</td>
             </tr>
             <tr>
               <td>Eye Color</td>
-                <td>{{user.eyecolor}}</td>
+                <td>{{user_s.eyecolor}}</td>
             </tr>
             <tr>
               <td>Skin Color</td>
-                <td>{{user.skincolor}}</td>
+                <td>{{user_s.skincolor}}</td>
             </tr>
             <tr>
               <td>Height</td>
-                <td>{{user.height}}</td>
+                <td>{{user_s.height}}</td>
             </tr>
             <tr>
               <td>Weight</td>
-                <td>{{user.weight}}</td>
+                <td>{{user_s.weight}}</td>
             </tr>
             <tr>
               <td>Head Size</td>
-                <td>{{user.headsize}}</td>
+                <td>{{user_s.headsize}}</td>
             </tr>
             <tr>
               <td>Foot Size</td>
-                <td>{{user.footsize}}</td>
+                <td>{{user_s.footsize}}</td>
             </tr>
             <tr>
               <td>Body Build</td>
-                <td>{{user.bodybuild}}</td>
+                <td>{{user_s.bodybuild}}</td>
             </tr>
         </table>
 </div>

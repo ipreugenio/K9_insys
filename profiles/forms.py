@@ -46,10 +46,10 @@ class add_User_form(forms.ModelForm):
     rank = forms.CharField(max_length=50, label='rank', widget=forms.Select(choices=RANK))
     religion = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=RELIGION))
     citizenship = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=CITIZENSHIP))
-
+    image = forms.ImageField()
     class Meta:
         model = User
-        fields = ('firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
+        fields = ('image','firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
                   'gender', 'birthdate', 'birthplace', 'civilstatus', 'citizenship', 'religion', 'bloodtype',
                   'distinct_feature', 'haircolor', 'eyecolor', 'skincolor', 'height', 'weight',
                   'headsize', 'footsize', 'bodybuild')
@@ -60,6 +60,7 @@ class add_User_form(forms.ModelForm):
         def __init__(self, *args, **kwargs):
             super(add_User_form, self).__init__(*args, **kwargs)
             self.fields['extensionname'].required = False
+            self.fields['distinct_feature'].required = False
 
 class add_personal_form(forms.ModelForm):
     class Meta:

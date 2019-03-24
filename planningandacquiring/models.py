@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
+from dateutil.relativedelta import relativedelta
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food
 
@@ -37,11 +38,39 @@ class K9(models.Model):
 
     STATUS = (
         ('Material Dog', 'Material Dog'),
+        ('Working Dog', 'Working Dog'),
+        ('Adopted', 'Adopted'),
+        ('Due-For-Retirement', 'Due-For-Retirement'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
         ('Sick', 'Sick'), 
     )
+    
+    REPRODUCTIVE = (
+        ('Proestrus', 'Proestrus'),
+        ('Estrus', 'Estrus'),
+        ('Metestrus', 'Metestrus'),
+        ('Anestrus', 'Anestrus'), 
+    )
+    SOURCE = (
+        ('Procured', 'Procured'),
+        ('Breeding', 'Breeding'),
+    )
 
+    TRAINING = (
+        ('Puppy', 'Puppy'),
+        ('Unclassified', 'Unclassified'),
+        ('Classified', 'Classified'),
+        ('On-Training', 'On-Training'),
+        ('Trained', 'Trained'),
+        ('For-Breeding', 'For-Breeding'),
+        ('For-Deployment', 'For-Deployment'),
+        ('Deployed', 'Deployed'),
+        ('Light Duty', 'Light Duty'),
+        ('Retired', 'Retired'),
+    )
+
+    image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
@@ -50,19 +79,30 @@ class K9(models.Model):
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', null=True)
     age = models.IntegerField('age', default = 0)
-    source = models.CharField('source', max_length=200, default="Not Specified")
-    year_retired = models.DateField('year_retired', null=True)
-    assignment = models.CharField('assignment', max_length=200, default="None")
+    source = models.CharField('source', max_length=200, default="Not Specified", choices=SOURCE)
+    year_retired = models.DateField('year_retired', null=True, blank=True)
+    assignment = models.CharField('assignment', max_length=200, default="None", null=True, blank=True)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
-    training_status = models.CharField('training_status', max_length=200, default="Unclassified")
+    training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
     partnered = models.BooleanField(default=False)
+    handler_on_leave = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
-    in_heat = models.BooleanField(default=False)
+    reproductive_stage = models.CharField('reproductive_stage', choices=REPRODUCTIVE, max_length=200, default="Anestrus")
     age_days = models.IntegerField('age_days', default = 0)
     age_month = models.IntegerField('age_month', default = 0)
+    in_heat_months = models.IntegerField('in_heat_months', default = 6)
+    last_proestrus_date = models.DateField(blank=True, null=True)
+    next_proestrus_date = models.DateField(blank=True, null=True)
+    estrus_date = models.DateField(blank=True, null=True)
+    metestrus_date = models.DateField(blank=True, null=True)
+    anestrus_date = models.DateField(blank=True, null=True)
+
+    # def best_fertile_notification(self):
+    #     notif = self.estrus_date - td(days=7)
+    #     return notif
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -76,25 +116,58 @@ class K9(models.Model):
 
     def calculate_months_before(birthday):
         today = d.today()
-        birthdate = birth_date
+        birthdate = birthday
         bday = 13 - birthdate.month
         return bday
 
     def save(self, *args, **kwargs):
         days = d.today() - self.birth_date
+        self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
-        self.training_id = self.id
+        self.training_id = self.id 
+        if self.age_days == 183:
+            self.last_proestrus_date = d.today()
+        
+        if self.last_proestrus_date != None:
+            self.estrus_date = self.last_proestrus_date + td(days=7)
+            self.metestrus_date = self.estrus_date + td(days=20)
+            self.anestrus_date = self.metestrus_date + td(days=90)
+            self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
+        
+        if d.today() == self.last_proestrus_date: 
+            self.reproductive_stage = 'Proestrus'
+        elif d.today() == self.estrus_date:
+            self.reproductive_stage = 'Estrus'
+        elif d.today() == self.metestrus_date:
+            self.reproductive_stage = 'Metestrus'
+        elif d.today() == self.anestrus_date:
+            self.reproductive_stage = 'Anestrus'
+        else:
+            pass
+
         if self.age == 9:
             self.training_status = 'Due-For-Retirement'
-            self.status = 'Light Duty'
+            self.status = 'Working Dog'
+            #TODO notif 1 year
+            Notification.objects.create(message= str(k9) +' is due to retire next year.')
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))
             self.status = 'Retired'
         else:
             pass
+
+        if self.sex == 'Male':
+            self.in_heat_months = 0
+            self.last_proestrus_date = None
+            self.next_proestrus_date = None
+            self.estrus_date = None
+            self.metestrus_date = None
+            self.anestrus_date = None
+        
+
         # Serial Numbers and Microchips are given after training
         # lead_zero = str(self.id).zfill(5)
         # serial_number = '#%s' % (lead_zero)
@@ -181,31 +254,66 @@ class K9_Quantity(models.Model):
 
 
 #TODO Add inventory attr > How many dogs each item can cater
+#TODO VITAMINS
 class Budget_allocation(models.Model):
     k9_request_forecast = models.IntegerField('k9_request_forecast', default=0)
     k9_needed_for_demand = models.IntegerField('k9s_needed_for_demand', default=0)
     k9_cuurent = models.IntegerField('k9_current', default=0)
-    #training_cost
-    #grand_total
+    food_total = models.DecimalField('food_total', default=0, max_digits=50, decimal_places=2,)
+    equipment_total = models.DecimalField('equipment_total', default=0, max_digits=50, decimal_places=2,)
+    medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=2,)
+    vaccine_total = models.DecimalField('vaccine_total', default=0, max_digits=50, decimal_places=2,)
+    vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=2,)
+    grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
     date_created = models.DateField('date_created', auto_now_add=True)
     date_tobe_budgeted = models.DateField('date_tobe_budgeted', null=True)
 
 class Budget_food(models.Model):
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True) #1 sack per dog per month
+    type = (
+        ('Adult', 'Adult'),
+        ('Puppy', 'Puppy'),
+        ('Milk', 'Milk')
+    )
+
+    food = models.CharField('food', max_length=200, default="Adult")
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Budget_equipment(models.Model):
     equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Budget_medicine(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_vaccine(models.Model):
+    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default = 0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+
+# class Budget_vitamins(models.Model):
+#     vitamins = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+#     quantity = models.IntegerField('quantity', default = 0)
+#     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+#     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_vet_supply(models.Model):
+    vet_supply = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
 
 class Dog_Breed(models.Model):

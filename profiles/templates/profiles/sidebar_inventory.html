@@ -40,12 +40,14 @@
                                         <a href="{% url 'inventory:miscellaneous_inventory_list'%}" class="item">Miscellaneous Inventory List View
                                                 <i class="clipboard list icon"></i>
                                         </a>
+
                                     <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
                                         <i class="clipboard list icon"></i>
                                     </a>
                                     <a href="{% url 'inventory:choose_date'%}" class="item">Inventory Report
                                                 <i class="clipboard list icon"></i>
                                         </a>
+
                                         {% endif %}
 
                                     {% if request.session.session_user_position == "Handler" %}

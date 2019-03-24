@@ -15,7 +15,7 @@
 <div class="ui inverted segment">
     <form class="ui inverted form" method="POST">
         {% csrf_token %}
-        <div class="three fields">
+        <div class="four fields">
             <div class="field">
                 <label>Handler</label>
                 {{form.handler}}
@@ -24,7 +24,6 @@
                 <label>Incident</label>
                 {{form.incident}}
             </div>
-            <div class="field"></div>
         </div>
         <div class="field">
             <label>Additional Information</label>
