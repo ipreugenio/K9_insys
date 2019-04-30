@@ -3,13 +3,46 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
 from dateutil.relativedelta import relativedelta
-from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food
-
+from profiles.models import User
 
 class Date(models.Model):
     date_from = models.DateField('date_from', null=True)
     date_to = models.DateField('date_to', null=True)
+
+class K9_Supplier(models.Model):
+    name = models.CharField('name', max_length=200)
+    address = models.CharField('address', max_length=200)
+    contact_no = models.CharField('contact_no', max_length=200)
+
+class Dog_Breed(models.Model):
+    SKILL = (
+        ('NDD', 'NDD'),
+        ('EDD', 'EDD'),
+        ('SAR', 'SAR')
+    )
+
+    BREED = (
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
+        ('German Sheperd', 'German Sheperd'),
+        ('Golden Retriever', 'Golden Retriever'),
+        ('Jack Russel', 'Jack Russel'),
+        ('Labrador Retriever', 'Labrador Retriever'),
+        ('Mixed', 'Mixed'),
+    )
+
+    breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
+    life_span = models.CharField('life_span', max_length=200, null=True)
+    temperament = models.CharField('temperament', max_length=200, null=True)
+    colors = models.CharField('colors', max_length=200, null=True)
+    weight = models.CharField('weight', max_length=200, null=True)
+    male_height = models.CharField('male_height', max_length=200, null=True)
+    female_height = models.CharField('female_height', max_length=200, null=True)
+    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+
+    def __str__(self):
+        return str(self.breed)
 
 class K9(models.Model):
     SEX = (
@@ -24,16 +57,6 @@ class K9(models.Model):
         ('White', 'White'),
         ('Yellow', 'Yellow'),
         ('Mixed', 'Mixed')
-    )
-
-    BREED = (
-        ('Belgian Malinois', 'Belgian Malinois'),
-        ('Dutch Sheperd', 'Dutch Sheperd'),
-        ('German Sheperd', 'German Sheperd'),
-        ('Golden Retriever', 'Golden Retriever'),
-        ('Jack Russel', 'Jack Russel'),
-        ('Labrador Retriever', 'Labrador Retriever'),
-        ('Mixed', 'Mixed'),
     )
 
     STATUS = (
@@ -65,22 +88,25 @@ class K9(models.Model):
         ('Trained', 'Trained'),
         ('For-Breeding', 'For-Breeding'),
         ('For-Deployment', 'For-Deployment'),
+        ('For-Adoption', 'For-Adoption'),
         ('Deployed', 'Deployed'),
         ('Light Duty', 'Light Duty'),
         ('Retired', 'Retired'),
+        ('Dead', 'Dead'),
     )
 
     image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    breed = models.CharField('breed', choices=BREED, max_length=200)
+    breed = models.ForeignKey(Dog_Breed, on_delete=models.CASCADE)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
-    birth_date = models.DateField('birth_date', null=True)
+    birth_date = models.DateField('birth_date', null=True, blank=True)
     age = models.IntegerField('age', default = 0)
     source = models.CharField('source', max_length=200, default="Not Specified", choices=SOURCE)
     year_retired = models.DateField('year_retired', null=True, blank=True)
+    death_date = models.DateField('death_date', null=True, blank=True)
     assignment = models.CharField('assignment', max_length=200, default="None", null=True, blank=True)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
@@ -89,7 +115,7 @@ class K9(models.Model):
     handler_on_leave = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
-    microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
+    #microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
     reproductive_stage = models.CharField('reproductive_stage', choices=REPRODUCTIVE, max_length=200, default="Anestrus")
     age_days = models.IntegerField('age_days', default = 0)
     age_month = models.IntegerField('age_month', default = 0)
@@ -314,20 +340,3 @@ class Budget_vet_supply(models.Model):
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
-
-class Dog_Breed(models.Model):
-    SKILL = (
-        ('NDD', 'NDD'),
-        ('EDD', 'EDD'),
-        ('SAR', 'SAR')
-    )
-
-
-    breed = models.CharField('breed', max_length=200, null=True)
-    life_span = models.CharField('life_span', max_length=200, null=True)
-    temperament = models.CharField('temperament', max_length=200, null=True)
-    colors = models.CharField('colors', max_length=200, null=True)
-    weight = models.CharField('weight', max_length=200, null=True)
-    male_height = models.CharField('male_height', max_length=200, null=True)
-    female_height = models.CharField('female_height', max_length=200, null=True)
-    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)

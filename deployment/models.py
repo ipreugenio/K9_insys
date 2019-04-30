@@ -161,9 +161,15 @@ class Location(models.Model):
         ('Zamboanga', 'Zamboanga'),
     )
 
+    TYPE = (
+        ('Mall', 'Mall'),
+        ('Airport', 'Airport')
+    )
+
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     place = models.CharField('place', max_length=100, default='Undefined')
+    sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     status = models.CharField('status', max_length=100, default="unassigned")
 
     def __str__(self):
@@ -191,8 +197,14 @@ class Team_Assignment(models.Model):
         super(Team_Assignment, self).save(*args, **kwargs)
 
 class Dog_Request(models.Model):
+    TYPE = (
+        ('Mall', 'Mall'),
+        ('Airport', 'Airport')
+    )
+
     requester = models.CharField('requester', max_length=100)
     location = models.CharField('location', max_length=100)
+    sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     phone_number = models.CharField('phone_number', max_length=100, default="n/a")
     email_address = models.EmailField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)

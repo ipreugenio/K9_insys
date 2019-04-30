@@ -17,7 +17,7 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed, Notification
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
@@ -117,6 +117,7 @@ def index(request):
     user = user_session(request)
     form = k9_detail_form(request.POST or None, request.FILES or None, instance = user)
 
+    print (date.today())
     if request.method == "POST":
         print('post')
         print(form.errors)

@@ -6,6 +6,54 @@ from profiles.models import User
 
 #TODO inventory information before
 
+#Vaccine and Preventive
+class Vaccine_Preventive(models.Model):
+    TYPE = (
+        ('Vaccine', 'Vaccine'),
+        ('Preventive', 'Preventive'),
+    )
+    name = models.CharField(max_length=100)
+    vac_type = models.CharField('vac_type', choices=TYPE, max_length=50, default='Vaccine')
+    description = models.CharField(max_length=500, blank=True, null=True)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
+    used_yearly = models.IntegerField('used_yearly', default=0)
+    duration = models.IntegerField('duration', default=0)
+    
+    def save(self, *args, **kwargs):
+        if self.med_type == 'Vaccine':
+            self.used_yearly = 365 / int(self.duration)
+        super(Vaccine_Preventive, self).save(*args, **kwargs)
+
+class Vaccine_Preventive_Inventory_Count(models.Model):
+    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField('quantity', default=0)
+    date_counted = models.DateField('date_counted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.name
+
+class Vaccine_Preventive_Received_Trail(models.Model):
+    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField('quantity', default=0)
+    date_received = models.DateField('date_received', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.name
+
+class Vaccine_Preventive_Subtracted_Trail(models.Model):
+    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField('quantity', default=0)
+    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.inventory.name
+
 #Medicine
 class Medicine(models.Model):
     UOM = (
@@ -17,9 +65,7 @@ class Medicine(models.Model):
         ('Tablet', 'Tablet'),
         ('Capsule', 'Capsule'),
         ('Bottle', 'Bottle'),
-        ('Vaccine', 'Vaccine'),
         ('Vitamins', 'Vitamins'),
-        ('Others', 'Others'),
     )
     medicine = models.CharField(max_length=100)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
@@ -27,8 +73,6 @@ class Medicine(models.Model):
     uom = models.CharField('uom', max_length=10, default='unit', blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    used_yearly = models.IntegerField('used_yearly', default=0)
-    duration = models.IntegerField('duration', default=0)
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -39,8 +83,6 @@ class Medicine(models.Model):
 
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
-        if self.med_type == 'Vaccine':
-            self.used_yearly = 365 / int(self.duration)
         super(Medicine, self).save(*args, **kwargs)
 
 class Medicine_Inventory(models.Model):
@@ -177,6 +219,7 @@ class Miscellaneous(models.Model):
     uom = models.CharField(max_length=100, choices=UOM, default="pack")
     misc_type = models.CharField(max_length=100, choices=TYPE, default="Equipment")
     description = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
     quantity = models.IntegerField('quantity', default=0)
 

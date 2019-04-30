@@ -6,7 +6,6 @@ from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 from datetime import timedelta, date, datetime
 from decimal import Decimal
-from django.db.models import 
 from dateutil.relativedelta import relativedelta
 
 from planningandacquiring.models import K9
@@ -23,7 +22,7 @@ from profiles.serializers import NotificationSerializer
 
 # TODO UNITMANAGEMENT NOTIFS
 #8AM
-@periodic_task(run_every=crontab(hour=8, minutes=0))
+@periodic_task(run_every=crontab(hour=8, minute=0))
 def unitmanagement_notifs():
     k9 = K9.objects.all() 
     phex = PhysicalExam.objects.all()
@@ -174,7 +173,7 @@ def unitmanagement_notifs():
 
 # TODO DEPLOYMENT NOTIFS
 #8:30AM
-@periodic_task(run_every=crontab(hour=8, minutes=30))
+@periodic_task(run_every=crontab(hour=8, minute=30))
 def deployment_notifs():
     request = Dog_Request.objects.all()
 
@@ -198,7 +197,7 @@ def deployment_notifs():
 
 
 # 6AM
-@periodic_task(run_every=crontab(hour=6, minutes=0))
+@periodic_task(run_every=crontab(hour=6, minute=0))
 def auto_subtract():
     # TODO Vitamins consumption
     vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
@@ -208,7 +207,7 @@ def auto_subtract():
         if v > 0:
             if v > vitamins.quantity:
                 Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
-                v = v-food.quantity
+                v = v-vitamins.quantity
                 vitamins.quantity = 0 
                 vitamins.save()
             else: 
@@ -338,6 +337,7 @@ def auto_subtract():
         stock.milk = milk
         stock.save()
     except (stock.DoesNotExist):
+        pass 
 
     adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
     puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
@@ -352,7 +352,7 @@ def auto_subtract():
         
 
 # 9AM
-@periodic_task(run_every=crontab(hour=9, minutes=0))
+@periodic_task(run_every=crontab(hour=9, minute=0))
 def deploy_dog():
     #When Schedule is today, change training status to deployed
     sched = K9_Schedule.objects.filter(date_start=date.today())
@@ -405,22 +405,24 @@ def deploy_dog():
         
 
 # 8:50AM
-@periodic_task(run_every=crontab(hour=8, minutes=50))
+@periodic_task(run_every=crontab(hour=8, minute=50))
 def due_retired_k9():
     k9 = K9.objects.all()
     for k9 in k9:
         due_year = k9.year_retired - relativedelta(year=-1) 
-        if due_year == date.today()
+        if due_year == date.today():
             Notification.objects.create(message=str(k9) + ' is due for retirement next year!', 
             notif_type = 'retired_k9',
             position="Administrator")
 
 # 12AM
 #DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
-@periodic_task(run_every=crontab(hour=24, minutes=0))
+@periodic_task(run_every=crontab(hour=23, minute=0))
 def delete():
     notif_delete = Notification.objects.filter(datetime=date.today-timedelta(days=60))
     notif_delete.delete()
     
-    
-        
+@periodic_task(run_every=crontab(hour=9, minute=0))
+def test():
+   Notification.objects.create(message='meassage sent') 
+       
