@@ -8,6 +8,7 @@
                 <div class="ten wide column">
                     <h1 class="ui header">{{ title }}
                         <div class="sub header">{{ texthelp }}</div>
+                         {{geoform.media}}
                     </h1>
                     <div class="ui inverted segment">
                         {% if messages %}
@@ -34,6 +35,9 @@
                             <div class="ui inverted right aligned segment" style="padding: 0px;">
                                 <button class = "ui button green" type="submit" >{{actiontype}}</button>
                             </div>
+
+                            {{geoform.point}}
+
                         </form>
                     </div>
                 </div>
