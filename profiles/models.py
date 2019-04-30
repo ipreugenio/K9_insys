@@ -51,22 +51,32 @@ class User(models.Model):
         ('Dead', 'Dead')
     )
 
+    CITIZENSHIP = (
+        ('FILIPINO', 'FILIPINO'),
+    )
+
+    RELIGION = (
+        ('ROMAN CATHOLIC', 'ROMAN CATHOLIC'),
+        ('CHRISTIAN', 'CHRISTIAN'),
+        ('BORN AGAIN', 'BORN AGAIN'),
+    )
+
     image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
     rank = models.CharField('rank', max_length=200)
-    fullname = models.CharField('fullname', max_length=200)
+    fullname = models.CharField('fullname', max_length=200, null=True, blank=True)
     firstname = models.CharField('firstname', max_length=200)
     lastname = models.CharField('lastname', max_length=200)
-    extensionname = models.CharField('extensionname', max_length=200, default="None", blank=True)
+    extensionname = models.CharField('extensionname', max_length=200, null=True, blank=True)
     middlename = models.CharField('middlename', max_length=200)
-    nickname = models.CharField('nickname', max_length=200)
+    nickname = models.CharField('nickname', max_length=200, null=True, blank=True)
     birthdate = models.DateField('birthdate', blank=True)
     age = models.IntegerField('age', default=0)
     birthplace = models.CharField('birthplace', max_length=200)
     gender = models.CharField('gender', choices=SEX, max_length=200)
     civilstatus = models.CharField('civilstatus', choices=CIVILSTATUS, max_length=200)
-    citizenship = models.CharField('citizenship', max_length=200)
-    religion = models.CharField('religion', max_length=200)
+    citizenship = models.CharField('citizenship', choices=CITIZENSHIP, max_length=200)
+    religion = models.CharField('religion',choices=RELIGION, max_length=200)
     bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
     distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
@@ -79,10 +89,7 @@ class User(models.Model):
     bodybuild = models.CharField('bodybuild', max_length=200)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
-    capability = models.CharField('capability', max_length=200, default="None")
-    # edd = models.BooleanField(default=False)
-    # ndd = models.BooleanField(default=False)
-    # sar = models.BooleanField(default=False)
+    #capability = models.CharField('capability', max_length=200, default="None")
     
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date

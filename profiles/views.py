@@ -12,7 +12,7 @@ from deployment.models import Location, Team_Assignment, Dog_Request
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
-from unitmanagement.models import Requests, Notification
+from unitmanagement.models import Equipment_Request, Notification
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord
 import datetime
@@ -119,7 +119,7 @@ def dashboard(request):
     on_training = K9.objects.filter(training_level="Stage 1").count()
     trained = K9.objects.filter(training_status="Trained").count()
 
-    equipment_requests = Requests.objects.filter(request_status="Pending").count()
+    equipment_requests = Equipment_Request.objects.filter(request_status="Pending").count()
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
     #NOTIF SHOW
@@ -220,7 +220,7 @@ def login(request):
                 request.session["session_user_position"] = user.position
                 request.session["session_username"] = str(user)
                # return HttpResponseRedirect('../dashboard')
-            return HttpResponseRedirect('../training')
+            return HttpResponseRedirect('../dashboard')
 
     '''else:
         style = "ui red message"

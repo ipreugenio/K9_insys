@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed
 from unitmanagement.models import K9_Incident, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
@@ -145,7 +145,7 @@ class RequestForm(forms.ModelForm):
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
 
     class Meta:
-        model = Requests
+        model = Equipment_Request
         fields = ('handler', 'equipment', 'remarks', 'concern')
 
     def __init__(self, *args, **kwargs):

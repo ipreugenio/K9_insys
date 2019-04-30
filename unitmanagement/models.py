@@ -1,7 +1,7 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt
+from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
 from training.models import Training
 from profiles.models import User
@@ -12,6 +12,25 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
 # Create your models here.
+
+#TODO
+# either text or Fk from equipment
+# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
+class K9_Pre_Deployment_Items(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)    
+    collar = models.CharField('collar', max_length=200)
+    vest = models.CharField('vest', max_length=200)
+    leash = models.CharField('leash', max_length=200)
+    shipping_crate = models.CharField('shipping crate', max_length=200)
+    leash = models.CharField('leash', max_length=200)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True, blank=True)
+    food_quantity = models.IntegerField('quantity', default=0) 
+    vitamins = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, null=True, blank=True)
+    vitamins_quantity = models.IntegerField('quantity', default=0) 
+    
+class Handler_K9_History(models.Model):
+    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
 
 class K9_Incident(models.Model):
     INCIDENT = (
@@ -35,6 +54,7 @@ class Health(models.Model):
     duration = models.IntegerField('duration', null=True, blank=True)
     date_done = models.DateField('date_done', null=True, blank=True)
     incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
+    image = models.FileField(upload_to='prescription_image', blank=True, null=True)
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.date) +' - ' #+ str(self.dog.name)
@@ -157,13 +177,17 @@ class VaccineUsed(models.Model):
     vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE)
     vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, null=True, blank=True)
     disease = models.CharField('disease', max_length=200)
+    date = models.DateField('date', auto_now_add=True)
     date_vaccinated = models.DateField('date_vaccinated', null=True, blank=True)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-
+    image = models.FileField(upload_to='health_image', blank=True, null=True)
+    
     def __str__(self):
         return str(self.vaccine_record) + ':' + str(self.disease) +'-' + str(self.date_vaccinated)
 
-class Requests(models.Model):
+#TODO
+# Request Equipment Connect to K9_Pre_Deployment Equipments
+class Equipment_Request(models.Model):
     CONCERN = (
         ('Broken', 'Broken'),
         ('Lost', 'Lost'),
@@ -265,7 +289,7 @@ def create_k9_incident_notif(sender, instance, **kwargs):
                             message= 'Reported Sick! ' + str(instance.k9.name))
 
 #Damaged Equipment Reported
-@receiver(post_save, sender=Requests)
+@receiver(post_save, sender=Equipment_Request)
 def create_damaged_equipment_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Notification.objects.create(user = instance.handler,
