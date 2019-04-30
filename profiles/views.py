@@ -218,7 +218,9 @@ def login(request):
 
 
                 request.session["session_user_position"] = user.position
+                request.session["session_id"] = user.id
                 request.session["session_username"] = str(user)
+
                # return HttpResponseRedirect('../dashboard')
             return HttpResponseRedirect('../dashboard')
 

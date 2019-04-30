@@ -14,12 +14,18 @@ urlpatterns = [
     path('remove-dog-deployed/<int:id>', views.remove_dog_deployed, name='remove_dog_deployed'),
     path('request_form/', views.dog_request, name='request_form'),
     path('request_dog_list/', views.request_dog_list, name='request_dog_list'),
+    path('request_dog_list/$', views.request_dog_list, name='request_dog_list'), #DON"T DELETE
+    path('request_dog_list/deployment/request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),
     path('request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),
     path('remove-dog-request/<int:id>', views.remove_dog_request, name='remove_dog_request'),
     path('view-schedule/<int:id>', views.view_schedule, name='view_schedule'),
+    path('view-schedule/deployment/request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),
+    path('view-schedule/deployment/request_dog_list/deployment/request_dog_details/<int:id>', views.request_dog_details, name='request_dog_details'),
+    path('view-schedule/deployment/request_dog_list/', views.request_dog_list, name='request_dog_list'),
     path('add-incident/', views.add_incident, name='add_incident'),
     path('view-incidents/', views.incident_list, name='view_incidents'),
-
+    path('choose-date/', views.choose_date, name='choose_date'),
+    path('choose-date/deployment-report/', views.deployment_report, name='deployment_report'),
 
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),

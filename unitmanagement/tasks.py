@@ -6,11 +6,15 @@ from celery.task.schedules import crontab
 from celery.decorators import periodic_task
 from datetime import timedelta, date, datetime
 from decimal import Decimal
+from django.db.models import  Sum
 from dateutil.relativedelta import relativedelta
 
 from planningandacquiring.models import K9
-from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule
-from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail
+from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule, Team_Assignment
+from profiles.models import User
+from unitmanagement.models import Notification, PhysicalExam
+
+from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail, Medicine_Subtracted_Trail
 from inventory.models import Safety_Stock
 from unitmanagement.models import Notification, PhysicalExam, Health, Handler_Incident
 from profiles.serializers import NotificationSerializer
@@ -115,7 +119,7 @@ def unitmanagement_notifs():
 
     for h in health:
         if h.date_done == date.today():
-            Notification.objects.create(k9=h.dog, message= str(dog.name) + ' will be done with medication today!', 
+            Notification.objects.create(k9=h.dog, message= str(h.dog.name) + ' will be done with medication today!',
             notif_type='medicine_done', position='Veterinarian', other_id=h.id)        
         
         if date.today() == h.date_done:
@@ -202,7 +206,13 @@ def auto_subtract():
     # TODO Vitamins consumption
     vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
     v = K9.objects.filter(status='Working Dog').count()
-    
+
+    # FOOD CONSUMPTION EVERYDAY
+    k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).count()
+    k9_jack_russel = K9.objects.filter(breed='Jack Russel').filter(age__gte=1).count()
+    k9_others = K9.objects.filter(age__gte=1).exclude(breed='Labrador Retriever').exclude(breed='Jack Russel').count()
+    food = Food.objects.filter(foodtype='Adult Dog Food').exclude(quantity=0).order_by('quantity')
+
     for vitamins in vitamins:
         if v > 0:
             if v > vitamins.quantity:
@@ -211,16 +221,11 @@ def auto_subtract():
                 vitamins.quantity = 0 
                 vitamins.save()
             else: 
-                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
+                Medicine_Subtracted_Trail.objects.create(inventory=vitamins, quantity=v)
                 vitamins.quantity = vitamins.quantity-v
                 v=0
                 vitamins.save()
 
-    # FOOD CONSUMPTION EVERYDAY
-    k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).count()
-    k9_jack_russel = K9.objects.filter(breed='Jack Russel').filter(age__gte=1).count()
-    k9_others = K9.objects.filter(age__gte=1).exclude(breed='Labrador Retriever').exclude(breed='Jack Russel').count()
-    food = Food.objects.filter(foodtype='Adult Dog Food').exclude(quantity=0).order_by('quantity')
 
     # dog_count * food_per_day 
     lab = k9_labrador * 0.5
@@ -401,8 +406,12 @@ def deploy_dog():
             dog_deployed.date_pulled = date.today()
             dog_deployed.save()
 
-    
-        
+
+@periodic_task(run_every=timedelta(seconds=10))
+def test():
+    # TODO
+    print('Yey!')
+
 
 # 8:50AM
 @periodic_task(run_every=crontab(hour=8, minute=50))

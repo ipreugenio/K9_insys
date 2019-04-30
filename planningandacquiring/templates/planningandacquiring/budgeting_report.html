@@ -1,0 +1,51 @@
+{% extends "profiles/sidebar_pa.html" %}
+{% block content %}
+{% load static %}
+{% load um_tags %}
+<center>
+<img src="{% static 'images/k9_logo.png' %}" width="150">
+    <br>BUDGETING REPORT
+    <br>for {{year}}
+</center>
+
+<table id="tabledata1" class="ui eleven column celled table">
+        <tr>
+            <thead>
+            <th>Medicine</th>
+            <th>Price per Item (Previous Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Current Inventory Quantity</th>
+            <th>Estimated Quantity (Current)</th>
+            <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (Last Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
+            </thead>
+        </tr>
+    {% for med in budget_medicine %}
+        <tr>
+            <td>
+                {{med|get_medicine_name:forloop.counter0}}
+            </td>
+            <td>
+                 ₱{{med.price}}
+
+            </td>
+            <td>
+                ₱{{list_recent_budg_med_price|get_medicine_recent_price:forloop.counter0}}
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+    {% endfor %}
+
+</table>
+
+
+
+{% endblock %}

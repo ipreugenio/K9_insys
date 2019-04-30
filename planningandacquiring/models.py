@@ -297,7 +297,8 @@ class Budget_allocation(models.Model):
 class Budget_food(models.Model):
     type = (
         ('Adult', 'Adult'),
-        ('Puppy', 'Puppy')
+        ('Puppy', 'Puppy'),
+        ('Milk', 'Milk')
     )
 
     food = models.CharField('food', max_length=200, default="Adult")

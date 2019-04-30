@@ -12,8 +12,15 @@ urlpatterns = [
     path('assign-k9/<int:id>', views.assign_k9_select, name='assign_k9_select'),
     path('training-update/<int:id>', views.training_update_form, name='training_update_form'),
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
+
     path('training-details/<int:id>', views.training_details, name='training_details'),
-    path('daily-record/<int:id>', views.daily_record, name='daily_record'),
+
+    path('choose-date/<int:id>', views.choose_date, name='choose_date'),
+    path('choose-date/daily-record/', views.daily_record, name='daily_record'),  # the record itself
+    path('record-daily/', views.record_form, name='record_daily'), #form for recording of refresher
+
+    path('k9-record', views.k9_record, name='k9_record'), #list ng k9 with records
+
     path('fail-dog/<int:id>', views.fail_dog, name='fail_dog'),
     path('view_graph/<int:id>', views.view_graphs, name='view_graph'),
 
@@ -21,7 +28,7 @@ urlpatterns = [
     path('training/classify-k9/<int:id>', views.classify_k9_select, name='classify_k9_select'),
     path('training/training-record', views.training_records, name='training_records'),
 
-    path('training/genealogy/', views.genealogy, name='genealogy'),
+    path('training/genealogy/<int:id>', views.view_family_tree, name='genealogy'),
     path('training/assign-k9/<int:id>', views.assign_k9_select, name='assign_k9_select'),
     path('training/training-update/<int:id>', views.training_update_form, name='training_update_form'),
     path('training/training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),

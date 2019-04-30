@@ -5,5 +5,6 @@ from profiles.models import User, Personal_Info, Account, Education
 
 admin.site.register(User)
 admin.site.register(Personal_Info)
+admin.site.register(Education)
 admin.site.register(Account)
 admin.site.register(Education)

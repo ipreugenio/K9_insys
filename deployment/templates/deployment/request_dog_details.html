@@ -7,10 +7,11 @@
         <div class="ui green message"> {{ message }}</div>
     {% endfor %}
 {% endif %}
+<h1>Request Details for {{data2.requester}}</h1>
 
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Details</a>
-    <a class="item" data-tab="second">Deploy Dogs</a>
+    <a class="item" data-tab="second">Deploy K9s</a>
 </div>
 
 <div class="ui tab segment active" data-tab="first">
@@ -20,6 +21,7 @@
         <td><strong>Location: </strong>{{data2.location}}</td>
         <td><strong>Start date: </strong>{{data2.start_date}}</td>
         <td><strong>End date: </strong>{{data2.end_date}}</td>
+          <td><strong>Duration: </strong>{{data2.duration}} days</td>
         <td><strong>Contact number: </strong>{{data2.phone_number}}</td>
         <td><strong>Email Address: </strong>{{data2.email_address}}</td>
       </tr>
@@ -53,7 +55,7 @@
          </table>
        </div>
        <div class="ui basic segment" style="border-style: none;">
-         <label>No. of K9 Deployed: </label>
+         <label>No. of K9s Deployed: </label>
          {% if data2.total_dogs_deployed >= data2.total_dogs_demand %}
              <span class="ui green circular label">{{data2.total_dogs_deployed}}</span>
          {%else%}
@@ -84,9 +86,10 @@
     <h2 class="ui header">
     <i class="paw icon"></i>
     <div class="content">
-      K9's Deployed
+      K9's Scheduled/Deployed
     </div>
   </h2>
+
   {% if data2.status == "Done" %}
   <table id="tabledata1" class="ui four column celled table">
       <thead>
@@ -135,6 +138,7 @@
 </table>
  {% endif %}
 {% if data2.status == "Pending"%}
+
  <form action="" method="post">
         {% csrf_token %}
         <div class="ui very padded segment">
@@ -161,10 +165,93 @@
 </div>
 
 <div class="ui tab segment" data-tab="second">
+    <div class="ui raised segment">
+    <table class="" style="width:100%;">
+      <tr>
+        <td><strong>Location: </strong>{{data2.location}}</td>
+        <td><strong>Start date: </strong>{{data2.start_date}}</td>
+        <td><strong>End date: </strong>{{data2.end_date}}</td>
+          <td><strong>Duration: </strong>{{data2.duration}} days</td>
+        <td><strong>Contact number: </strong>{{data2.phone_number}}</td>
+        <td><strong>Email Address: </strong>{{data2.email_address}}</td>
+      </tr>
+    </table>
+  </div>
+<div class="row">
+    <div class="column">
+      <div class="ui basic horizontal segments" style="border-style: none;">
+       <div class="ui basic segment" style="border-style: none;">
+         <label>No. of K9 Demand: </label>
+         {% if data2.total_dogs_deployed >= data.total_dogs_demand %}
+             <span class="ui green circular label">{{data2.total_dogs_demand}}</span>
+         {%else%}
+             <span class="ui red circular label">{{data2.total_dogs_demand}}</span>
+         {% endif %}
+         <table class="ui three column celled red table">
+           <thead>
+             <tr>
+               <th>EDD Demand</th>
+               <th>NDD Demand</th>
+               <th>SAR Demand</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>{{data2.EDD_needed}}</td>
+               <td>{{data2.NDD_needed}}</td>
+               <td>{{data2.SAR_needed}}</td>
+             </tr>
+           </tbody>
+         </table>
+       </div>
+
+       <div class="ui basic segment" style="border-style: none;">
+         <label>No. of K9s Deployed: </label>
+         {% if data2.total_dogs_deployed >= data2.total_dogs_demand %}
+             <span class="ui green circular label">{{data2.total_dogs_deployed}}</span>
+         {%else%}
+             <span class="ui orange circular label">{{data2.total_dogs_deployed}}</span>
+         {% endif %}
+         <table class="ui three column celled orange table">
+           <thead>
+             <tr>
+               <th>EDD Deployed</th>
+               <th>NDD Deployed</th>
+               <th>SAR Deployed</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>{{data2.EDD_deployed}}</td>
+               <td>{{data2.NDD_deployed}}</td>
+               <td>{{data2.SAR_deployed}}</td>
+             </tr>
+           </tbody>
+         </table>
+       </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+    <i class="question icon"></i> Information
+  </div>
+  <ul class="list">
+    <li>Below is a list of available K9s that don't have conflicting schedules with the current request.</li>
+      <li>Currently deployed K9s can also be listed here!</li>
+    <li>Any of the K9s selected from the list will be automatically deployed when the date of request arrives.</li>
+      <li>The current location of the K9 will be listed as "PCGK9 Taguig Base" if they are currently undeployed. The current location will be listed by their last known deployment location(non-requests).</li>
+      <li>If a team has finished it's request, the team is immediately sent back to the last known deployment location.</li>
+      <li>A notification will alert you a week before and on the date of request.</li>
+  </ul>
+</div>
+
   {% if data2.status == "Approved" %}
   <form class="ui form" method="POST">
     {% csrf_token %}
-    <table id="tabledata2" class="ui four column celled table">
+    <table id="tabledata2" class="ui nine column celled table">
           <thead>
             <tr>
               <th></th>
@@ -172,6 +259,10 @@
               <th>Serial Number</th>
               <th>Capability</th>
               <th>Handler</th>
+                <th>Current Location</th>
+                <th>Distance</th>
+                <th>Incident Count (Current Location)</th>
+                <th>View Schedule</th>
             </tr>
         </thead>
         <tbody>
@@ -184,6 +275,10 @@
               <td style="width:22%;">{{can_deploy.serial_number}}</td>
               <td style="width:22%;">{{can_deploy.capability}}</td>
               <td style="width:22%;">{{can_deploy.handler}}</td>
+                <td style="width:22%;">{{can_deploy|current_location:data2.id }}</td>
+                <td style="width:22%;">{{can_deploy|calculate_distance_from_current:data2.id }} miles</td>
+                <td style="width:22%;">{{can_deploy|incident_count:data2.id }}</td>
+                <td><a href="{% url 'deployment:view_schedule' can_deploy.id %}">View Schedule</a></td>
             </tr>
               {% endfor %}
         </tbody>
@@ -219,5 +314,13 @@
         $('.menu .item').tab();
     });
 
+$('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  })
+;
 </script>
 {% endblock %}
