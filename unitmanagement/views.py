@@ -12,16 +12,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
-<<<<<<< HEAD
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, DateForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
-from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
-from deployment.models import K9_Schedule
-from profiles.models import User, Account
-=======
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
@@ -1527,46 +1517,6 @@ def k9_unpartnered_list(request):
         'user':user,
     }
     return render (request, 'unitmanagement/k9_unpartnered_list.html', context)
-
-def choose_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        if form.is_valid():
-            from_date = request.POST.get('from_date')
-            to_date = request.POST.get('to_date')
-            request.session["session_fromdate"] = from_date
-            request.session["session_todate"] = to_date
-
-            return HttpResponseRedirect('um-report/')
-
-    context = {
-        'title': "",
-        'form': form,
-    }
-    return render(request, 'unitmanagement/choose_date.html', context)
-
-def um_report(request):
-
-    from_date = request.session["session_fromdate"]
-    to_date = request.session["session_todate"]
-    user = request.session["session_username"]
-    k9_incident = K9_Incident.objects.filter(date__range = [from_date, to_date])
-    health = Health.objects.filter(date__range = [from_date, to_date])
-    physicalexam = PhysicalExam.objects.filter(date__range = [from_date, to_date])
-
-
-    context = {
-        'title': "",
-        'user': user,
-        'from_date': from_date,
-        'to_date': to_date,
-        'incident': k9_incident,
-        'health': health,
-        'physical': physicalexam,
-    }
-    return render(request, 'unitmanagement/um_report.html', context)
-
 
 # TODO 
 # choose_handler Cycle

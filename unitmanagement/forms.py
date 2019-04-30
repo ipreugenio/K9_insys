@@ -203,9 +203,6 @@ class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(partnered=False))
     handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 
-class DateForm(forms.Form):
-    from_date = forms.DateField( widget=DateInput())
-    to_date = forms.DateField(widget=DateInput())
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     self.fields['handler'].queryset = User.objects.none()
@@ -230,4 +227,4 @@ class ReproductiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReproductiveForm, self).__init__(*args, **kwargs)
         self.fields['last_proestrus_date'].required = False
-
+        

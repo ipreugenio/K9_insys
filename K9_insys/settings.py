@@ -62,14 +62,7 @@ INSTALLED_APPS = [
 
     'django.contrib.gis',
     'widget_tweaks',
-
     'rest_framework',
-    'profiles',
-    'planningandacquiring',
-    'deployment',
-    'training',
-    'unitmanagement',
-    'inventory',
 
 ]
 
@@ -130,7 +123,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '8888',
+        'PORT': '',
     }
 }
 
