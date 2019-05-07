@@ -169,10 +169,10 @@ class LocationForm(forms.ModelForm):
         ('Zamboanga', 'Zamboanga'),
     )
     city = forms.CharField(max_length=50, label = 'city', widget = forms.Select(choices=CITY))
-
+    place = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     class Meta:
         model = Location
-        fields = ('area', 'city', 'place')
+        fields = ('area', 'city', 'place', 'sector_type')
 
 class AssignTeamForm(forms.ModelForm):
     location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))

@@ -42,49 +42,50 @@
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" enctype="multipart/form-data" method="post">
+<form class = "ui inverted form" id="myForm" enctype="multipart/form-data" method="post">
     {% csrf_token %}
     
-    <div class="sixteen wide field">
-      <label>K9 Image</label>
-      {{form.image}}
-    </div>
-  
-    <div class="fields">
-        <div class="sixteen wide field">
-            <label>Name</label>
-            {{form.name}}
+    {% for form in formset %}
+    <div class="formset_class" id="{{ form.prefix }}-row">
+        <div class="five fields">
+            <div class="field">
+                <label>Name</label>
+                {{form.name}}
+            </div>    
+            <div class="field">
+                <label>Birthdate</label>
+                {{form.birth_date}}
+            </div> 
+            <div class="field">
+                <label>Color</label>
+                {{form.color}}
+            </div> 
+            <div class="field">
+                <label>Sex</label>
+                {{form.sex}}
+            </div> 
+            <div class="field">
+                <label>Image</label>
+                {{form.image}}
+            </div>    
         </div>
     </div>
-
-    <div class="fields">
-
-        <div class="six wide field">
-            <label>Sex</label>
-            {{form.sex}}
-        </div>
-        <div class="six wide field">
-            <label>Color</label>
-            {{form.color}}
-        </div>
-    </div>
-
-    <div class="fields">
-        <div class="six wide field">
-            <label>Birthdate</label>
-            {{form.birth_date}}
-        </div>
-
-    </div>
-
-
-
+    {% endfor %}
     <div class="ui inverted right aligned segment" style="padding: 0px;">
-        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Next Step</button>
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
     </div>
+    {{formset.management_form}}
 </form>
 
 </div>
 
-
+<script>
+  $(document).ready(function() {
+      $(function() {
+          $('#myForm .formset_class').formset({
+              prefix: '{{ formset.prefix }}'
+          });            
+      })
+  });
+</script>
 {% endblock %}

@@ -163,7 +163,8 @@ class Location(models.Model):
 
     TYPE = (
         ('Mall', 'Mall'),
-        ('Airport', 'Airport')
+        ('Airport', 'Airport'),
+        ('Government Building', 'Government Building')
     )
 
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)

@@ -9,7 +9,7 @@
                             <div class="ui tiny pointing vertical menu" style="width:230px;">
                                 <a class="item"> <b>Planning and Acquiring Menu</b></a>
                                 {% if request.session.session_user_position == "Veterinarian" %}
-                                <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add
+                                <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
                                         <i class="plus circle icon"></i>
                                 </a>
                                 <a href="{% url 'planningandacquiring:add_K9_parents_form'%}" class="item">Breeding Form
@@ -30,10 +30,13 @@
                                 {% endif %}
 
                                 {% if request.session.session_user_position == "Administrator" %}
+                                <a href="{% url 'planningandacquiring:add_supplier'%}" class="item">Add Supplier
+                                        <i class="plus circle icon"></i>
+                                </a>
                                 <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
                                         <i class="plus circle icon"></i>
                                 </a>
-                                <a href="{% url 'planningandacquiring:add_donated_K9_form'%}" class="item">Add K9 Data Form
+                                <a href="{% url 'planningandacquiring:add_procured_k9'%}" class="item">Add Procured K9
                                         <i class="plus circle icon"></i>
                                 </a>
                                 <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View

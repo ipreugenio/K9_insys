@@ -33,5 +33,9 @@ urlpatterns = [
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
     path('view_breed/', views.breed_listview, name='view_breed'),
 
+    path('breeding_k9_confirmed/', views.breeding_k9_confirmed, name='breeding_k9_confirmed'),
+    path('add_supplier/', views.add_supplier, name='add_supplier'),
+    path('add_procured_k9/', views.add_procured_k9, name='add_procured_k9'),
+    path('add_procured_k9/ajax_load_supplier', views.load_supplier, name='ajax_load_supplier'),
 ];
 

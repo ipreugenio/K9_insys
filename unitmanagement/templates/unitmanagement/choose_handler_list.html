@@ -11,96 +11,68 @@
 </div>
 
 <div class="ui raised segment">
-   <table class="ui celled table">
+    <center>
+            <img src="{{k9.image.url}}" alt="" width="280"> 
+    </center>
+   <table class="ui six column celled table">
        <thead>
             <tr>
                 <th>Name</th>
                 <td>{{k9.name}}</td>
                 <th>Capability</th>
                 <td>{{k9.capability}}</td>
+                <th>Age</th>
+                <td>{{k9.age}}</td>
             </tr>
             <tr>
                 <th>Sex</th>
                 <td>{{k9.sex}}</td>
                 <th>Breed</th>
                 <td>{{k9.breed}}</td>
+                <th>Source</th>
+                <td>{{k9.source}}</td>
             </tr>
        </thead>
 
    </table>
 </div>
-<div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">Recommended Handlers</a>
-    <a class="item" data-tab="second">Available Handlers</a>
-</div>
-<div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui celled table">
-    <thead>
-        <tr class="center aligned">
-            <th class="six wide">Handler</th>
-            <th class="two wide">Sex</th>
-            <th class="two wide">Age</th>
-            <th class="three wide">City</th>
-            <th class="three wide">Select</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in data %}
-            <tr>
-                <td>{{data.fullname}}</td>
-                <td class="center aligned">{{data.gender}}</td>
-                <td class="center aligned">{{data.age}}</td>
-                {% for data_pi in data_pi %}
-                    {% if data_pi.UserID == data %}
-                        <td>{{data_pi.city}}</td>
-                    {%endif%}
-                {% endfor %}
-                <td class="center aligned">
-                    <a href="{% url 'unitmanagement:choose_handler' data.id %}" class="ui blue button" onclick="return confirm('Are you sure?')" >Choose</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-    </table>
-</div>
 
-<div class="ui tab segment" data-tab="second">
-    <table id="tabledata2" class="ui celled table">
-    <thead>
-        <tr class="center aligned">
-            <th class="six wide">Handler</th>
-            <th class="two wide">Sex</th>
-            <th class="two wide">Age</th>
-            <th class="three wide">City</th>
-            <th class="three wide">Select</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in data_available %}
+<table id="tabledata1" class="ui six column celled table">
+        <thead>
             <tr>
-                <td class="six wide">{{data.fullname}}</td>
-                <td class="two wide center aligned">{{data.gender}}</td>
-                <td class="two wide center aligned">{{data.age}}</td>
-                {% for data_pi2 in data_pi2 %}
-                    {% if data_pi2.UserID == data %}
-                        <td class="three wide">{{data_pi2.city}}</td>
-                    {%endif%}
-                {% endfor %}
-                <td class="three wide center aligned">
-                    <a href="{% url 'unitmanagement:choose_handler' data.id %}" class="ui blue button" onclick="return confirm('Are you sure?')" >Choose</a>
+                <th>Handler</th>
+                <th>Sex</th>
+                <th>Age</th>
+                <th>City</th>
+                <th>{{k9.capability}} Handled</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data1, data2, data3 in zippedList %}
+            <tr>
+                <td>{{data1.fullname}}</td>
+                <td>{{data1.gender}}</td>
+                <td>{{data1.age}}</td>
+                <td>{{data2.city}}</td>
+                <td>{{data3}}</td>
+                <td style="text-align:center;">
+                    <a class="ui tiny blue button" href="{% url 'unitmanagement:choose_handler' data1.id %}">Choose</a>
                 </td>
             </tr>
-        {% endfor %}
-    </tbody>
+            
+            {% endfor %}
+        </tbody>
     </table>
-</div>
+
 
 <script type="text/javascript">
         
     $(document).ready(function() {
         $('.menu .item').tab();
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
+        $('#tabledata1').DataTable( {
+        "order": [[ 4, "desc" ]]
+        });
     });
     
 </script>

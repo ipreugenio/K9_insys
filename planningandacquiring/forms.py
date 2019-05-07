@@ -13,7 +13,7 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 from profiles.models import User
-from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed
+from .models import K9, K9_Past_Owner, K9_Parent, Date, K9_Breed, K9_Supplier
 from django.forms.widgets import CheckboxSelectMultiple
 
 
@@ -100,6 +100,31 @@ from django.forms.widgets import CheckboxSelectMultiple
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class K9SupplierForm(forms.ModelForm):
+    address = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
+    class Meta:
+        model = K9_Supplier
+        fields = ('name','organization', 'address', 'contact_no')
+
+    def __init__(self, *args, **kwargs):
+        super(K9SupplierForm, self).__init__(*args, **kwargs)
+        self.fields['organization'].required = False
+
+class SupplierForm(forms.Form):
+    supplier = forms.ModelChoiceField(queryset=K9_Supplier.objects.all())
+    class Meta:
+        model = K9_Supplier
+        fields = ('supplier',)
+
+class ProcuredK9Form(forms.ModelForm):
+    class Meta:
+        model = K9
+        fields = ('name', 'birth_date', 'breed', 'color', 'sex', 'image')
+        widgets = {
+            'birth_date': DateInput(),
+            'image': forms.ImageField()
+        }
+
 class ReportDateForm(forms.ModelForm):
     class Meta:
         model = Date
@@ -119,12 +144,18 @@ class add_unaffiliated_K9_form(forms.ModelForm):
 
 class add_donated_K9_form(forms.ModelForm):
     image = forms.ImageField()
+
     class Meta:
         model = K9
         fields = ('image','name', 'breed', 'sex', 'color', 'birth_date')
         widgets = {
             'birth_date': DateInput(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(add_donated_K9_form, self).__init__(*args, **kwargs)
+        self.fields['breed'].empty_label = None
+        self.fields['image'].required = False
 
 class add_donator_form(forms.ModelForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':'2', 'style':'resize:none;'}))
@@ -191,6 +222,10 @@ class add_offspring_K9_form(forms.ModelForm):
         widgets = {
             'birth_date': DateInput(),
         }
+    def __init__(self, *args, **kwargs):
+        super(add_offspring_K9_form, self).__init__(*args, **kwargs)
+        self.fields['birth_date'].initial = date.today()
+        self.fields['image'].required = False
         
 class select_breeder(forms.Form):
     k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
@@ -326,7 +361,7 @@ class add_breed_form(forms.ModelForm):
 
 
     class Meta:
-        model = Dog_Breed
+        model = K9_Breed
         fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
 
 

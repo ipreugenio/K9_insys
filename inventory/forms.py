@@ -15,6 +15,7 @@ class MedicineForm(forms.ModelForm):
     UOM = (
         ('mg', 'mg'),
         ('mL', 'mL'),
+        ('suspension', 'suspension'),
     )
 
     uom = forms.CharField(max_length=10, label = 'uom', widget = forms.Select(choices=UOM))
@@ -23,12 +24,15 @@ class MedicineForm(forms.ModelForm):
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'duration','immunization')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['uom'].required = False 
+        self.fields['dose'].required = False 
+        self.fields['duration'].required = False 
+        self.fields['immunization'].required = False 
 
 class MedicineCountForm(forms.ModelForm):
     class Meta:

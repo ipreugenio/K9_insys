@@ -86,6 +86,7 @@ def add_area(request):
 def add_location(request):
     form = LocationForm(request.POST or None)
     style = ""
+    form.initial['place'] = None
     if request.method == 'POST':
         if form.is_valid():
             form.save()

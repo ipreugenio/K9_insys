@@ -25,7 +25,7 @@ class K9_Handler(models.Model):
         # k9 = K9.objects.get(id=self.k9.id)
         # handler_name = str(handler)
         # k9_name = k9.name
-        return str(handler) + " : " + str(k9.name)
+        return str(self.handler.lastname) + " : " + str(self.k9.name)
 
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

@@ -30,7 +30,7 @@
                                 </div>
 
 
-                                <div class="four fields">
+                                <div class="three fields">
                                     <div class="field">
                                         <label>Dose</label>
                                         {{form.dose}}
@@ -43,12 +43,18 @@
                                         <label>Price</label>
                                         {{form.price}}
                                     </div>
+                                </div>
+                                    
+                                <div class="two fields">
+                                    <div class="field">
+                                        <label>Imminization/Prevention</label>
+                                        {{form.immunization}}
+                                    </div>
                                     <div class="field">
                                         <label>Duration(In-Days)</label>
                                         {{form.duration}}
                                     </div>
                                 </div>
-
                                 <div class="field">
                                     <label>Description</label>
                                         {{form.description}}
@@ -71,15 +77,25 @@
         $('#tabledata').DataTable();
 
         $("input[name='duration']").prop('disabled', true);
+        $("select[name='immunization']").prop('disabled', true);
 
         $("select[name='med_type']").change(function() {
             if ($("select[name='med_type']").val() == 'Vaccine'){
                 $("input[name='duration']").prop('disabled', false);
-                $("input[name='dose']").val(1).prop('readonly', true);
+                $("select[name='immunization']").prop('disabled', false);
+                $("input[name='dose']").val('').prop('disabled', true);
                 $("select[name='uom']").prop('disabled', true);
-            }else{
+            }
+            else if ($("select[name='med_type']").val() == 'Preventive'){
                 $("input[name='duration']").prop('disabled', true);
-                $("input[name='dose']").val('').prop('readonly', false);
+                $("select[name='immunization']").prop('disabled', false);
+                $("input[name='dose']").val('').prop('disabled', false);
+                $("select[name='uom']").prop('disabled', false);
+            }
+            else{
+                $("input[name='duration']").prop('disabled', true);
+                $("select[name='immunization']").prop('disabled', true);
+                $("input[name='dose']").prop('disabled', false);
                 $("select[name='uom']").prop('disabled', false);
             }
         });

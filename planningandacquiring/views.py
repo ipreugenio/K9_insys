@@ -4,19 +4,19 @@ from django.http import Http404
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, budget_food, budget_equipment, budget_medicine, budget_vaccine, budget_vet_supply, budget_date
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Budget_vaccine, Budget_vet_supply
 
-from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, K9_Breed, K9_Supplier
 
 from training.models import Training
 from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.db.models import aggregates, Sum
 from django.http import JsonResponse
 from django.contrib import messages
-from .forms import ReportDateForm, add_breed_form, k9_detail_form
+from .forms import ReportDateForm, add_breed_form, k9_detail_form, SupplierForm, ProcuredK9Form
 from deployment.models import Dog_Request, Team_Assignment
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
@@ -37,6 +37,7 @@ from sklearn.metrics import mean_squared_error
 
 
 from datetime import datetime as dt
+from datetime import date
 from faker import Faker
 
 #statistical imports
@@ -141,7 +142,7 @@ def index(request):
 
 def report(request):
     form = ReportDateForm()
-   #NOTIF SHOW
+    #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
@@ -153,6 +154,78 @@ def report(request):
         'user':user,
         }
     return render (request, 'planningandacquiring/report.html', context)
+
+def add_procured_k9(request):
+    form = SupplierForm(request.POST or None)
+    k9_formset = inlineformset_factory(K9_Supplier, K9, form=add_donated_K9_form, extra=1, can_delete=True)
+    formset = k9_formset(request.POST, request.FILES)
+    style = ""
+    if request.method == "POST":
+        if form.is_valid():
+            supplier_data = form.cleaned_data['supplier']
+            supplier = K9_Supplier.objects.get(name=supplier_data)
+
+            if formset.is_valid():
+                for form in formset:
+                   k9 = form.save(commit=False)
+                   k9.supplier = supplier
+                   k9.source = 'Procurement'
+                   k9.save()
+
+            style = "ui green message"
+            messages.success(request, 'Procured K9s has been added!')
+
+            return HttpResponseRedirect('../breeding_k9_confirmed/')
+        
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'Title' : "Procured K9",
+        'form': SupplierForm(),
+        'formset':k9_formset(),
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'style':style,
+        }
+    return render (request, 'planningandacquiring/add_procured_k9.html', context)
+
+def add_supplier(request):
+    form = K9SupplierForm(request.POST)
+    style = ''
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            form.save()
+
+            style = "ui green message"
+            messages.success(request, 'Supplier has been added!')
+            form = K9SupplierForm()
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+        form.initial['organization'] = None
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'title' : "Add K9 Supplier",
+        'texthelp' : "Please input the Supplier information below.",
+        'form': form,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'style':style,
+        }
+    return render (request, 'planningandacquiring/add_k9_supplier.html', context)
 
 #Form format
 def add_donated_K9(request):
@@ -379,37 +452,41 @@ def K9_parents_confirmed(request):
         }
         return render(request, 'planningandacquiring/add_K9_parents.html', context)
 
-
+#TODO
+#formset
 def add_offspring_K9(request):
-    form = add_offspring_K9_form(request.POST or None, request.FILES or None)
-    style = "ui teal message"
+    k9_formset = formset_factory(add_offspring_K9_form, extra=1, can_delete=True)
+    formset = k9_formset(request.POST, request.FILES)
+    style = ''
+    mother_id = request.session['mother_id']
+    father_id = request.session['father_id']
+    mother = K9.objects.get(id=mother_id)
+    father = K9.objects.get(id=father_id)
+
+    print(mother, father)
+    if mother.breed != father.breed:
+        breed = 'Mixed'
+    else:
+        breed = mother.breed
+
 
     if request.method == 'POST':
-        print(form.errors)
-        if form.is_valid():
-            k9 = form.save()
-            k9.source = "Breeding"
-            mother_id = request.session['mother_id']
-            father_id = request.session['father_id']
-            mother = K9.objects.get(id=mother_id)
-            father = K9.objects.get(id=father_id)
+        if formset.is_valid():
+            for form in formset:
+                k9 = form.save(commit=False)
+                k9.source = "Breeding"
+                k9.breed = breed
+                k9.save()
 
-            if mother.breed != father.breed:
-                breed = "Mixed"
-            else:
-                breed = mother.breed
+                #K9 parents create
+                K9_Parent.objects.create(mother=mother, father=father, offspring=k9)
 
-            k9.breed = breed
-            k9.save()
-
-            request.session['offspring_id'] = k9.id
-
-            return HttpResponseRedirect('confirm_breeding/')
-
+            return HttpResponseRedirect('../../../breeding_k9_confirmed/')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            print(form)
+
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -417,7 +494,7 @@ def add_offspring_K9(request):
     user = user_session(request)
     context = {
         'Title': "Receive Donated K9",
-        'form': form,
+        'formset': k9_formset(),
         'style': style,
         'notif_data':notif_data,
         'count':count,
@@ -425,6 +502,9 @@ def add_offspring_K9(request):
     }
 
     return render(request, 'planningandacquiring/add_K9_offspring.html', context)
+
+def breeding_k9_confirmed(request):
+    return render(request, 'planningandacquiring/breeding_confirmed.html')
 
 def confirm_breeding(request):
     offspring_id = request.session['offspring_id']
@@ -463,10 +543,6 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
-
-        #Training.objects.create(k9=offspring, training='EDD')
-        #Training.objects.create(k9=offspring, training='NDD')
-        #Training.objects.create(k9=offspring, training='SAR')
 
 
         #NOTIF SHOW
@@ -585,7 +661,7 @@ def K9_detailview(request, id):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     try:
-        parent = K9_Parent.objects.filter(offspring=k9)
+        parent = K9_Parent.objects.get(offspring=k9)
     except K9_Parent.DoesNotExist:
         context = {
             'Title': 'K9 Details',
@@ -2246,7 +2322,7 @@ def add_breed(request):
 
 
 def breed_listview(request):
-    breed = Dog_Breed.objects.all()
+    breed = K9_Breed.objects.all()
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2311,3 +2387,18 @@ def budgeting_report(request):
     }
 
     return render(request, 'planningandacquiring/budgeting_report.html', context)
+
+def load_supplier(request):
+
+    supplier = None
+
+    try:
+        supplier_id = request.GET.get('supplier')
+        supplier = K9_Supplier.objects.get(id=supplier_id)
+    except:
+        pass
+    context = {
+        'supplier': supplier,
+    }
+
+    return render(request, 'planningandacquiring/supplier_data.html', context)

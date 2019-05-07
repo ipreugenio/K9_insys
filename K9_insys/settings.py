@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'K9_insys.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'k9_db',
+        'NAME': 'k9',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

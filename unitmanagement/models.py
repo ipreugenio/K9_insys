@@ -31,6 +31,7 @@ class K9_Pre_Deployment_Items(models.Model):
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
+    date = models.DateField('date', auto_now_add=True)
 
 class K9_Incident(models.Model):
     INCIDENT = (

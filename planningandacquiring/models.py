@@ -12,10 +12,14 @@ class Date(models.Model):
 
 class K9_Supplier(models.Model):
     name = models.CharField('name', max_length=200)
+    organization = models.CharField('organization', max_length=200, default='Personal')
     address = models.CharField('address', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 
-class Dog_Breed(models.Model):
+    def __str__(self):
+        return str(self.name)
+
+class K9_Breed(models.Model):
     SKILL = (
         ('NDD', 'NDD'),
         ('EDD', 'EDD'),
@@ -32,10 +36,32 @@ class Dog_Breed(models.Model):
         ('Mixed', 'Mixed'),
     )
 
+    COLORS = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+
     breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
     life_span = models.CharField('life_span', max_length=200, null=True)
     temperament = models.CharField('temperament', max_length=200, null=True)
-    colors = models.CharField('colors', max_length=200, null=True)
+    colors = models.CharField('colors', choices=COLORS, max_length=200, null=True)
     weight = models.CharField('weight', max_length=200, null=True)
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
@@ -51,12 +77,35 @@ class K9(models.Model):
     )
 
     COLOR = (
-        ('Brown', 'Brown'),
         ('Black', 'Black'),
-        ('Gray', 'Gray'),
-        ('White', 'White'),
+        ('Chocolate', 'Chocolate'),
         ('Yellow', 'Yellow'),
-        ('Mixed', 'Mixed')
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+    
+    BREED = (
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
+        ('German Sheperd', 'German Sheperd'),
+        ('Golden Retriever', 'Golden Retriever'),
+        ('Jack Russel', 'Jack Russel'),
+        ('Labrador Retriever', 'Labrador Retriever'),
+        ('Mixed', 'Mixed'),
     )
 
     STATUS = (
@@ -99,7 +148,7 @@ class K9(models.Model):
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    breed = models.ForeignKey(Dog_Breed, on_delete=models.CASCADE)
+    breed = models.CharField('breed', choices=BREED, max_length=200, blank=True, null=True)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', null=True, blank=True)
@@ -125,7 +174,7 @@ class K9(models.Model):
     estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
-
+    supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     # def best_fertile_notification(self):
     #     notif = self.estrus_date - td(days=7)
     #     return notif

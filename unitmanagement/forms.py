@@ -131,7 +131,8 @@ class VaccinationRecordForm(forms.ModelForm):
 
 class VaccinationUsedForm(forms.Form):
     vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").filter(med_type = "Others").order_by('medicine'))
-
+    date_vaccinated = forms.DateField(widget = DateInput())
+    image = forms.ImageField()
 
 class RequestForm(forms.ModelForm):
     CONCERN = (
