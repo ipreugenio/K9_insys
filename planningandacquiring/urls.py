@@ -13,7 +13,8 @@ urlpatterns = [
     path('add_K9_parents_form/', views.add_K9_parents, name='add_K9_parents_form'),
     path('add_K9_parents_form/confirm_K9_parents/', views.confirm_K9_parents, name='confirm_K9_parents'),
     path('add_K9_parents_form/confirm_K9_parents/K9_parents_confirmed', views.K9_parents_confirmed, name='K9_parents_confirmed'),
-    path('add_K9_parents_form/confirm_K9_parents/add_K9_offspring_form/', views.add_offspring_K9, name='add_K9_offspring_form'),
+    path('add_K9_offspring/<int:id>', views.add_K9_offspring, name='add_K9_offspring'),
+    path('no_litter/<int:id>', views.no_litter, name='no_litter'),
     path('add_K9_parents_form/confirm_K9_parents/add_K9_offspring_form/confirm_breeding/', views.confirm_breeding, name='confirm_breeding'),
     path('breeding_confirmed/', views.breeding_confirmed, name='breeding_confirmed'),
     path('K9_list/', views.K9_listview, name='K9_list'),
@@ -29,13 +30,17 @@ urlpatterns = [
 
     path('budget_report/', views.budgeting_report, name='budget_report'),
 
-
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
     path('view_breed/', views.breed_listview, name='view_breed'),
+    path('mating_confirmed/', views.mating_confirmed, name='mating_confirmed'),
 
+    path('breeding_list/', views.breeding_list, name='breeding_list'),
     path('breeding_k9_confirmed/', views.breeding_k9_confirmed, name='breeding_k9_confirmed'),
+    
     path('add_supplier/', views.add_supplier, name='add_supplier'),
     path('add_procured_k9/', views.add_procured_k9, name='add_procured_k9'),
+    
     path('add_procured_k9/ajax_load_supplier', views.load_supplier, name='ajax_load_supplier'),
+    path('add_K9_parents_form/ajax_load_k9_reco', views.load_k9_reco, name='ajax_load_k9_reco'),
 ];
 

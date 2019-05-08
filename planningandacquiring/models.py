@@ -5,6 +5,7 @@ from datetime import date as d
 from dateutil.relativedelta import relativedelta
 from inventory.models import Medicine, Miscellaneous, Food
 from profiles.models import User
+from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
 
 class Date(models.Model):
     date_from = models.DateField('date_from', null=True)
@@ -175,6 +176,8 @@ class K9(models.Model):
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
+    litter_no = models.IntegerField('litter_no', default = 0)
+    last_date_mated = models.DateField(blank=True, null=True)
     # def best_fertile_notification(self):
     #     notif = self.estrus_date - td(days=7)
     #     return notif
@@ -196,6 +199,22 @@ class K9(models.Model):
         return bday
 
     def save(self, *args, **kwargs):
+        #litter
+        if self.sex == 'Female':
+            try:
+                f = K9_Litter.objects.filter(mother__id=self.id).aggregate(Max('litter_no'))
+                self.litter_no = int(f['litter_no__max'])
+            except:
+                self.litter_no = 0
+            
+        else:
+            try:
+                m = K9_Litter.objects.filter(father__id=self.id).aggregate(Max('litter_no'))
+                self.litter_no = int(m['litter_no__max'])
+            except:
+                self.litter_no = 0
+            
+
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30
@@ -253,6 +272,10 @@ class K9(models.Model):
     def __str__(self):
         return str(self.name) + " : " + str(self.serial_number)
 
+class K9_Litter(models.Model):
+    mother = models.ForeignKey(K9, related_name='dam', on_delete=models.CASCADE, blank=True, null=True)
+    father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
+    litter_no = models.IntegerField('litter_no', blank=True, null=True)
 
 class K9_Past_Owner(models.Model):
     SEX = (
@@ -286,18 +309,6 @@ class K9_New_Owner(models.Model):
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 
-    # def calculate_age(self):
-    #     today = d.today()
-    #     birthdate = self.birth_date
-    #     bday = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-    #     if bday < 1:
-    #         bday = 0
-    #     return bday
-
-    # def save(self, *args, **kwargs):
-    #     self.age = self.calculate_age()
-    #     super(K9_New_Owner, self).save(*args, **kwargs)
-
     def __str__(self):
         return str(self.first_name) + ' ' + str(self.middle_name) + ' ' + str(self.last_name)
 
@@ -322,6 +333,12 @@ class K9_Parent(models.Model):
     mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother", blank=True, null=True)
     father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
     offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
+
+class K9_Mated(models.Model):
+    mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mom", blank=True, null=True)
+    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="dad", blank=True, null=True)  
+    status = models.CharField('status', max_length=200, default = "Breeding")
+    date_mated = models.DateField('date_mated', blank=True, null=True)  
 
 class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)

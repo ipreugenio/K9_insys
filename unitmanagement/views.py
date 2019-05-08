@@ -542,42 +542,18 @@ def medicine_approve(request, id):
 
 # Vaccination form
 def vaccination_form(request):
-    form = VaccinationUsedForm(request.POST or None)
-    style=""
-    if request.method == 'POST':
-        if form.is_valid():
-            v = request.POST.get('vaccine')
-            med = Medicine_Inventory.objects.get(medicine=v)
-            if med.quantity != 0:
-                form.save()
-                new_form = form.save()
-                #get vaccine yearly-Used
-                vaccine = Medicine.objects.get(id=new_form.vaccine.id)
-                duration = 365 / vaccine.used_yearly
-                new_form.date_validity = dt.date.today() + dt.timedelta(days=duration)
-                new_form.save()
+    data = K9.objects.get(name='damn')
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
 
-                user_serial = request.session['session_serial']
-                user = Account.objects.get(serial_number=user_serial)
-                current_user = User.objects.get(id=user.UserID.id)
-
-                q = med.quantity-1
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = dt.date.today(), time = dt.datetime.now())
-                style = "ui green message"
-                messages.success(request, 'Vaccination has been successfully recorded!')
-                form = VaccinationUsedForm()
-            else:
-                style = "ui red message"
-                messages.warning(request, 'Insufficient Inventory Quantity!')
+    print('k9:',data)
+    print('vr:',vr)
+    print('vu:',vu)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'title': "Vaccination",
-        'actiontype': "Submit",
-        'form': form,
-        'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,

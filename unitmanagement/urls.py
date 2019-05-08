@@ -39,5 +39,7 @@ urlpatterns = [
     path('k9/api/<int:id>', views.K9DetailView.as_view()),
     path('user/api/<int:id>', views.UserDetailView.as_view()),
 
+    path('vaccination_form', views.vaccination_form, name='vaccination_form'),
+
     #path('/<int:id>/', views., name=''),
 ];

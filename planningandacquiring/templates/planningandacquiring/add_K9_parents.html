@@ -19,14 +19,11 @@
       <div class="description">Verify selected parents</div>
     </div>
   </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Offspring Form</div>
-      <div class="description">Provide K9 offspring data</div>
-    </div>
-  </div>
 </div>
- {% if messages %}
+
+<div id = 'recommendation'></div>
+
+    {% if messages %}
         {% for message in messages %}
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
@@ -41,43 +38,44 @@
     </div>
 
     <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui five column inverted pink celled table">
+    <table id="tabledata1" class="ui six column inverted pink celled table">
         <thead>
             <tr>
                 <th></th>
                 <th>Name</th>
+                <th>Age</th>
                 <th>Breed</th>
                 <th>Color</th>
-                <th>Age</th>
-
+                <th>Litter</th>
             </tr>
         </thead>
 
         <tbody>
 
-              {% for radio in form.mother %}
+            {% for radio in form.mother %}
             <tr>
-                <td> {{radio.tag}} </td>
+                <td class="center aligned"> {{radio.tag}} </td>
                 <td>{{mothers|name:forloop.counter0 }}</td>
+                <td>{{mothers|age:forloop.counter0 }}</td>
                 <td>{{mothers|breed:forloop.counter0 }}</td>
                 <td>{{mothers|color:forloop.counter0 }}</td>
-                <td>{{mothers|age:forloop.counter0 }}</td>
+                <td>{{mothers|litter_no:forloop.counter0 }}</td>
             </tr>
-         {% endfor %}
+            {% endfor %}
         </tbody>
     </table>
     </div>
 
     <div class="ui tab segment " data-tab="second">
-    <table id="tabledata2" class="ui five column inverted blue celled table">
+    <table id="tabledata2" class="ui six column inverted blue celled table">
         <thead>
             <tr>
                 <th></th>
                 <th>Name</th>
-                 <th>Breed</th>
-                <th>Color</th>
                 <th>Age</th>
-
+                <th>Breed</th>
+                <th>Color</th>
+                <th>Litter</th>
             </tr>
         </thead>
 
@@ -85,12 +83,12 @@
 
               {% for radio in form.father %}
             <tr>
-                <td>{{radio.tag}}</td>
+                <td class="center aligned">{{radio.tag}}</td>
                 <td>{{fathers|name:forloop.counter0 }}</td>
+                <td>{{fathers|age:forloop.counter0 }}</td>
                 <td>{{fathers|breed:forloop.counter0 }}</td>
                 <td>{{fathers|color:forloop.counter0 }}</td>
-                <td>{{fathers|age:forloop.counter0 }}</td>
-
+                <td>{{fathers|litter_no:forloop.counter0 }}</td>
             </tr>
          {% endfor %}
         </tbody>
@@ -107,14 +105,33 @@
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		$('#tabledata1').DataTable();
-		$('#tabledata2').DataTable();
+		$('#tabledata1').DataTable({
+      "order": [[ 2, "asc" ]]
+    });
+		$('#tabledata2').DataTable({
+      "order": [[ 2, "asc" ]]
+    });
+
 		$('.menu .item').tab();
+
+    $('.ui.radio.checkbox').checkbox();       
 	});
 
-    $('.ui.radio.checkbox')
-    .checkbox()
-      ;
+  $("input[name='mother']").change(function () {
+        var url = 'ajax_load_k9_reco';  
+        var id = $("input[name='mother']:checked"). val();
+
+        $.ajax({                       
+        url: url,                    
+        data: {
+            'id': id      
+        },
+        success: function (data) {   
+            $("#recommendation").html(data);  
+        }
+        });
+
+    });
 </script>
 
 {% endblock %}

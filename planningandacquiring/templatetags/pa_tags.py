@@ -37,5 +37,12 @@ def age(List, i):
 
     return age
 
+@register.filter
+def litter_no(List, i):
+    item = List[int(i)]
+    litter_no = item.litter_no
+
+    return litter_no
+
 
 

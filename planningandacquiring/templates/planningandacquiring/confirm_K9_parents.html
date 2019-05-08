@@ -17,12 +17,6 @@
       <div class="description">Verify selected parents</div>
     </div>
   </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Offspring Form</div>
-      <div class="description">Provide K9 offspring data</div>
-    </div>
-  </div>
 </div>
 
 <div class="ui placeholder segment">
@@ -87,6 +81,14 @@
             <th>Age</th>
               <td>{{mother.age}}</td>
               </tr>
+              <tr>
+                  <th>Capability</th>
+                    <td>{{mother.capability}}</td>
+              </tr>
+              <tr>
+                  <th>Litter</th>
+                    <td>{{mother.litter_no}}</td>
+              </tr>
           <tr>
             <th>Source</th>
               <td>{{mother.source}}</td>
@@ -122,6 +124,14 @@
             <th>Age</th>
               <td>{{father.age}}</td>
               </tr>
+              <tr>
+                  <th>Capability</th>
+                    <td>{{father.capability}}</td>
+              </tr>
+              <tr>
+                  <th>Litter</th>
+                    <td>{{father.litter_no}}</td>
+              </tr>
           <tr>
             <th>Source</th>
               <td>{{father.source}}</td>
@@ -130,15 +140,26 @@
       </thead>
       </table>
     </div>
+
+  </div>
+<div class="ui center aligned basic segment" style="padding: 0px;">
+<form method="post" class="ui form">
+    {% csrf_token %}
+  <div class="ui segment">
+      <div class="three inline fields">
+          <div class=field></div>
+          <div class="field">
+              <label>Date Mated</label>
+              {{form.date_mated}}
+          </div>
+          <div class=field></div>
+      </div>    
   </div>
 
-<div class="ui center aligned basic segment" style="padding: 0px;">
-<form action="{% url 'planningandacquiring:K9_parents_confirmed' %}" method="post">
- {% csrf_token %}
     <div class="ui buttons">
   <button class="ui button" name="redo" onclick="return confirm('Go back to selecting parents?')">Select Parents</button>
   <div class="or"></div>
-  <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Next Step</button>
+  <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Submit</button>
 </div>
 </form>
 </div>

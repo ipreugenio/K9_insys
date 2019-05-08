@@ -1,0 +1,76 @@
+
+{% load static %}
+{% block content %}
+{% if k9 %}
+<div class="ui segment">
+    <div class="ui info message">
+        <i class="close icon"></i>
+        <div class="header">
+            Recommended Sire(Father) to selected Dam(Mother).
+        </div>
+        <ul class="list">
+            <li>Top Sire based on Breed, Capability and Litter count.</li>
+        </ul>
+    </div>
+    <table class="ui four column celled table">
+        <thead>
+        {% if k9_arr.0 %}
+        <tr>
+            <th class="two wide center aligned">1</th>
+            <td>{{k9_arr.0}}</td>
+            <th class="two wide center aligned">Litter</th>
+            <td>{{litter_arr.0}}</td>
+        </tr>
+        {% endif %}
+        {% if k9_arr.1 %}
+        <tr>
+            <th class="two wide center aligned">2</th>
+            <td>{{k9_arr.1}}</td>
+            <th class="two wide center aligned">Litter</th>
+            <td>{{litter_arr.1}}</td>
+        </tr>
+        {% endif %}
+        {% if k9_arr.2 %}
+        <tr>
+            <th class="two wide center aligned">3</th>
+            <td>{{k9_arr.2}}</td>
+            <th class="two wide center aligned">Litter</th>
+            <td>{{litter_arr.2}}</td>
+        </tr>
+        {% endif %}
+        {% if k9_arr.3 %}
+        <tr>
+            <th class="two wide center aligned">4</th>
+            <td>{{k9_arr.3}}</td>
+            <th class="two wide center aligned">Litter</th>
+            <td>{{litter_arr.3}}</td>
+        </tr>
+        {% endif %}
+        {% if k9_arr.4 %}
+        <tr>
+            <th class="two wide center aligned">5</th>
+            <td>{{k9_arr.4}}</td>
+            <th class="two wide center aligned">Litter</th>
+            <td>{{litter_arr.4}}</td>
+        </tr>
+        {% endif %}
+        
+        </thead>
+    </table>
+</div>
+{%else%}
+<div class="ui segment">
+    <div class="ui info message">
+        <i class="close icon"></i>
+        <div class="header">
+            No Recommendation
+        </div>
+        <ul class="list">
+            <li>There is no previous record of mating on available K9's.</li>
+        </ul>
+    </div>
+
+</div>
+
+{% endif %}
+{% endblock %}
