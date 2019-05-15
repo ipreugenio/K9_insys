@@ -23,35 +23,47 @@
     <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
     <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}">
 
-    
 </head>
-<body>
+<body class="Site">
     <!--START OF TOP MENU-->
-    <div class="ui inverted top attached demo menu" style="height:30px;">
-        <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
-        <div class="item">
-            <a class="text" href="{% url 'profiles:profile'%}">
-                <img class="ui avatar image" src="{{user.image.url}}" alt="">
-                {{request.session.session_username}}
-            </a>
-        </div>
-        <div class="right menu">
-            <div class="ui item" style='border-style: none;'>
-                {% include 'profiles/global-base-ui/notification.html' %}
-            </div>
-            <div class="topdiv">
-                <img src="{% static 'images/k9_logo.png' %}" height="18" width="18" style="margin-right: 5px;">
-                <p class="topmenu">PHILIPPINE K9 COAST GUARD</p>
-            </div>
-            
-        </div>
-    </div>
-     <!--END OF TOP MENU-->
+    <main class="Site-content">
 
-    <!--sidebar_menu.html-->
-    {% block sidebar %}
-    {% endblock%}
-    <style>
+        <div class="ui inverted top attached demo menu" style="height:30px;">
+                <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
+                <div class="item">
+                    <a class="text" href="{% url 'profiles:profile'%}">
+                        <img class="ui avatar image" src="{{user.image.url}}" alt="">
+                        {{request.session.session_username}}
+                    </a>
+                </div>
+                <div class="right menu">
+                    <div class="ui item" style='border-style: none;'>
+                        {% include 'profiles/global-base-ui/notification.html' %}
+                    </div>
+                    <div class="topdiv">
+                        <img src="{% static 'images/k9_logo.png' %}" height="18" width="18" style="margin-right: 5px;">
+                        <p class="topmenu">PHILIPPINE K9 COAST GUARD</p>
+                    </div>
+                    
+                </div>
+            </div>
+                <!--END OF TOP MENU-->
+        
+            <!--sidebar_menu.html-->
+            {% block sidebar %}
+            {% endblock%}
+    </main>
+</body>
+<style>
+        .Site {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+        }
+
+        .Site-content {
+        flex: 1;
+}
         .topmenu{
             color:orangered;
             display: block;
@@ -76,7 +88,6 @@
     
     </style>
 
-</body>
   
     {% block script%}
     {% endblock%}

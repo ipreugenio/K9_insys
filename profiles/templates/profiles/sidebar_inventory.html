@@ -1,11 +1,9 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %}  
 
 {% block sidebar_module %}
-    <div class="pusher" style="background:white;">
+<div class="ui fluid container">
         <div class="ui basic segment">
-
-              <div class="ui fluid container">
-                    <div class="ui grid">
+                <div class="ui grid">
                         <div class="three wide column">
                                 <div class="ui tiny pointing vertical menu" style="width:230px;">
                                         <a class="item"> <b>Inventory Menu</b></a>
@@ -54,9 +52,8 @@
                             {% block content %}
                             {% endblock %}
                         </div>
-                    </div>
-              </div>
+                </div>
         </div>
-      </div>
+</div>
 
 {% endblock%}

@@ -1,68 +1,67 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %}  
 
 {% block sidebar_module %}
-    <div class="pusher" style="background:white;">
-        <div class="ui basic segment">
-              <div class="ui fluid container">
-                    <div class="ui grid">
-                        <div class="three wide column">
-                            <div class="ui tiny pointing vertical menu" style="width:230px;">
-                                <a class="item"> <b>Planning and Acquiring Menu</b></a>
-                                {% if request.session.session_user_position == "Veterinarian" %}
-                                <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
-                                        <i class="plus circle icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:add_K9_parents_form'%}" class="item">Breed K9
-                                        <i class="plus circle icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:breeding_list'%}" class="item">Breeding List
-                                        <i class="venus mars icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
-                                        <i class="list alternate icon"></i>
-                                </a>
+       
+        <div class="ui fluid container">
+        <div class='ui basic segment'>
+                <div class="ui grid">
+                <div class="three wide column">
+                        <div class="ui tiny pointing vertical menu" style="width:230px;">
+                        <a class="item"> <b>Planning and Acquiring Menu</b></a>
+                        {% if request.session.session_user_position == "Veterinarian" %}
+                        <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
+                                <i class="plus circle icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:add_K9_parents_form'%}" class="item">Breed K9
+                                <i class="plus circle icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:breeding_list'%}" class="item">Breeding List
+                                <i class="venus mars icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
+                                <i class="list alternate icon"></i>
+                        </a>
 
-                                <!-- <a href="{% url 'planningandacquiring:breeding_recommendation'%}" class="item">Breeding Recommendation
-                                        <i class="venus mars icon"></i>
-                                </a> -->
+                        <!-- <a href="{% url 'planningandacquiring:breeding_recommendation'%}" class="item">Breeding Recommendation
+                                <i class="venus mars icon"></i>
+                        </a> -->
 
-                                <a href="{% url 'planningandacquiring:budgeting'%}" class="item">Budgeting
-                                        <i class="money bill alternate outline icon"></i>
-                                </a>
+                        <a href="{% url 'planningandacquiring:budgeting'%}" class="item">Budgeting
+                                <i class="money bill alternate outline icon"></i>
+                        </a>
 
-                                {% endif %}
+                        {% endif %}
 
-                                {% if request.session.session_user_position == "Administrator" %}
-                                <a href="{% url 'planningandacquiring:add_supplier'%}" class="item">Add Supplier
-                                        <i class="plus circle icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
-                                        <i class="plus circle icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:add_procured_k9'%}" class="item">Add Procured K9
-                                        <i class="plus circle icon"></i>
-                                </a>
-                                <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
-                                        <i class="list alternate icon"></i>
-                                </a>
+                        {% if request.session.session_user_position == "Administrator" %}
+                        <a href="{% url 'planningandacquiring:add_supplier'%}" class="item">Add Supplier
+                                <i class="plus circle icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:add_breed_form'%}" class="item">Add Breed
+                                <i class="plus circle icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:add_procured_k9'%}" class="item">Add Procured K9
+                                <i class="plus circle icon"></i>
+                        </a>
+                        <a href="{% url 'planningandacquiring:K9_list'%}" class="item">K9 List View
+                                <i class="list alternate icon"></i>
+                        </a>
 
-                                 <a href="{% url 'planningandacquiring:budget_list'%}" class="item">Budgeting
-                                        <i class="money bill alternate outline icon"></i>
-                                </a>
+                                <a href="{% url 'planningandacquiring:budget_list'%}" class="item">Budgeting
+                                <i class="money bill alternate outline icon"></i>
+                        </a>
 
-                                {% endif %}
+                        {% endif %}
 
 
-                            </div>
                         </div>
-                        
-                        <div class="thirteen wide column">
-                            {% block content %}
-                            {% endblock %}
-                        </div>
-                    </div>
+                </div>
+                
+                <div class="thirteen wide column">
+                        {% block content %}
+                        {% endblock %}
+                </div>
                 </div>
         </div>
-    </div>
+</div>
 
 {% endblock%}

@@ -1,32 +1,63 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
-<div>
-    <div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
-        <i class="blue bell icon"></i>
-        <span style="color:red;font-size: 12px;">{{count}}</span>
-        <div class="ui vertical scrolling menu">
-            {% for notif_data in notif_data%}
-                {%if notif_data.viewed == True %}
-                <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 
-                    <br>
-                    <small>{{notif_data.datetime}}</small>
-                </a>
-                {%else%}
-                <a class="item" style='color: black;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 
-                        <br>
-                        <small>{{notif_data.datetime}}</small>
-                    </a>
-                {%endif%}
-            {% endfor%}
-        </div>
-    </div>
-</div>
 
-    
-<script>
-$('.ui.dropdown')
-  .dropdown()
+<!-- <div class="ui modal" style="height:500px;">
+        <i class="close icon"></i>
+        <div class="header">
+          Profile Picture
+        </div>
+        <div class="image content">
+          <div class="ui medium image">
+            <img src="/images/avatar/large/chris.jpg">
+          </div>
+          <div class="description">
+            <div class="ui header">We've auto-chosen a profile image for you.</div>
+            <p>We've grabbed the following image from the <a href="https://www.gravatar.com" target="_blank">gravatar</a> image associated with your registered e-mail address.</p>
+            <p>Is it okay to use this photo?</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui black deny button">
+            Nope
+          </div>
+          <div class="ui positive right labeled icon button">
+            Yep, that's me
+            <i class="checkmark icon"></i>
+          </div>
+        </div>
+      </div> -->
+
+<div>
+    background
+</div>
+<div class="modal_1">
+    something
+</div>
+<div>
+        background
+    </div>
+<style>
+    .visible.transition {
+  margin-top: auto !important;
+  position:fixed;
+  bottom:0%;
+}
+    .modal_1{
+        display: block;
+        position: absolute;
+        width: 1000px;
+        height: 550px;
+        background: red;
+        visibility: hidden;
+    }
+</style>
+      <script>
+      $(document).ready(function() {
+        $('.ui.modal')
+  .modal('show')
 ;
-</script>
-{% endblock%}
+    });
+
+      </script>
+    {% endblock%}

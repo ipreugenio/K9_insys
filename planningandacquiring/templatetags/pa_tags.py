@@ -44,5 +44,12 @@ def litter_no(List, i):
 
     return litter_no
 
+@register.filter
+def capability(List, i):
+    item = List[int(i)]
+    capability = item.capability
+
+    return capability
+
 
 

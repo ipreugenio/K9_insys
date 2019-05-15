@@ -21,10 +21,10 @@
     <thead>
       <tr>
         <th class="center aligned three wide">Mother</th>
-        <td>{{data.mother}}</td>
+        <td class="center aligned five wide">{{data.mother}}</td>
         
         <th class="center aligned three wide">Father</th>
-        <td>{{data.father}}</td>
+        <td class="center aligned five wide">{{data.father}}</td>
       </tr>
     </thead>
 </table>
@@ -35,25 +35,25 @@
     {% endif %}
 
 <div class="ui inverted segment">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="{{ style }} row"> {{ message }}</div>
-        {% endfor %}
-    {% endif %}
 <form class = "ui inverted form" id="myForm" enctype="multipart/form-data" method="post">
     {% csrf_token %}
-    
+    <div>
+        <div class="three fields">
+            <div class="field"></div>
+            <div class="field">
+                <label>Birth Date</label>
+                {{form.birth_date}}
+            </div>
+            <div class="field"></div>
+        </div>
+    </div>
     {% for form in formset %}
     <div class="formset_class" id="{{ form.prefix }}-row">
-        <div class="five fields">
+        <div class="four fields">
             <div class="field">
                 <label>Name</label>
                 {{form.name}}
             </div>    
-            <div class="field">
-                <label>Birthdate</label>
-                {{form.birth_date}}
-            </div> 
             <div class="field">
                 <label>Color</label>
                 {{form.color}}

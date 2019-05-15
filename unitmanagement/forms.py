@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed
@@ -57,16 +57,18 @@ class PhysicalExamForm(forms.ModelForm):
 
 class HealthForm(forms.ModelForm):
     treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
+    problem = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
     
     class Meta:
         model = Health
-        fields = ('dog','problem', 'treatment', 'incident_id')
+        fields = ('dog','problem', 'treatment', 'incident_id', 'image')
 
     def __init__(self, *args, **kwargs):
         super(HealthForm, self).__init__(*args, **kwargs)
         self.fields['dog'].required = False
         self.fields['problem'].required = False
         self.fields['incident_id'].required = False
+        self.fields['image'].required = False
 
 class HealthMedicineForm(forms.ModelForm):
     TIME_OF_DAY = (
@@ -83,7 +85,7 @@ class HealthMedicineForm(forms.ModelForm):
         model = HealthMedicine
         fields = ('medicine', 'quantity', 'time_of_day', 'duration')
 
-    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine').exclude(medicine__med_type='Vitamins'))
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine'))
     time_of_day = forms.CharField(label = 'Time of Day', widget = forms.Select(choices=TIME_OF_DAY))
     duration = forms.IntegerField(label = 'Duration (Days)')
 
@@ -129,10 +131,25 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['tick_flea_7'].required = False
         self.fields['heartworm_8'].required = False
 
-class VaccinationUsedForm(forms.Form):
-    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(med_type = "Vaccine").filter(med_type = "Others").order_by('medicine'))
-    date_vaccinated = forms.DateField(widget = DateInput())
+class VaccinationUsedForm(forms.ModelForm):
+    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
+    date_vaccinated = forms.DateField(widget = DateInput(), label=None)
     image = forms.ImageField()
+
+    class Meta:
+        model = VaccineUsed
+ 
+        fields=('age', 'disease', 'vaccine', 'date_vaccinated', 'image', 'veterinary', 'done')
+    
+    def __init__(self, *args, **kwargs):
+        super(VaccinationUsedForm, self).__init__(*args, **kwargs)
+        self.fields['age'].required = False
+        self.fields['disease'].required = False
+        self.fields['vaccine'].required = False
+        self.fields['date_vaccinated'].required = False
+        self.fields['image'].required = False
+        self.fields['veterinary'].required = False
+        self.fields['done'].required = False
 
 class RequestForm(forms.ModelForm):
     CONCERN = (
@@ -154,17 +171,24 @@ class RequestForm(forms.ModelForm):
         self.fields['handler'].required = False
         
 class K9IncidentForm(forms.ModelForm):
-    
-    k9 = forms.ModelChoiceField(queryset = K9.objects.all())
+    CONCERN = (
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),
+        ('Accident', 'Accident'),
+    )
 
+    k9 = forms.ModelChoiceField(queryset = K9.objects.all(), empty_label=None)
+    incident = forms.CharField(max_length=10, label='incident', widget=forms.Select(choices=CONCERN))
     class Meta:
         model = K9_Incident
-        fields = ('k9', 'incident', 'description', 'reported_by')
+        fields = ('k9', 'incident', 'description', 'reported_by', 'clinic')
 
     def __init__(self, *args, **kwargs):
         super(K9IncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['reported_by'].required = False
+        self.fields['incident'].required = False
+        self.fields['clinic'].required = False
 
 class HandlerIncidentForm(forms.ModelForm):
     INCIDENT = (

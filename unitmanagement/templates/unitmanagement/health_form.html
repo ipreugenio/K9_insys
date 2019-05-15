@@ -31,7 +31,14 @@
                 <label>Treatment</label>
                 {{form.treatment}}
             </div>
-
+            <div class="three fields">
+                <div class="field">
+                    <label>Prescription Image (if any)</label>
+                    {{form.image}}
+                </div>
+                <div class="field"></div>
+                <div class="field"></div>
+            </div>
             <table>
                 <tbody>
                 {% for form in formset %}

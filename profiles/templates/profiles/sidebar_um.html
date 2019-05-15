@@ -1,90 +1,93 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %}
 
 {% block sidebar_module %}
-    <div class="pusher" style="background:white;">
+    <div class="ui fluid container">
         <div class="ui basic segment">
+            <div class="ui grid">
+                <div class="three wide column">
+                        <div class="ui tiny pointing vertical menu" style="width:230px;">
+                            <a class="item"> <b>Unit Management Menu</b></a>
+                            {% if request.session.session_user_position == "Administrator" %}
+                            <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
+                                <i class="user plus icon"></i>
+                            </a>
+                            <a href="{% url 'profiles:user_list'%}" class="item">User List
+                                <i class="address book icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
+                                <i class="clipboard list icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">Reallocate Assets
+                                <i class="retweet icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
+                                <i class="exclamation icon"></i>
+                                <i class="paw icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:handler_incident'%}" class="item">Handler-Incident Form
+                                <i class="exclamation icon"></i>
+                                <i class="male icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">On-Leave Request list
+                                <i class="clipboard list icon"></i>
+                            </a>
+                            {% endif %}
 
-              <div class="ui fluid container">
-                    <div class="ui grid">
-                        <div class="three wide column">
-                                <div class="ui tiny pointing vertical menu" style="width:230px;">
-                                    <a class="item"> <b>Unit Management Menu</b></a>
-                                    {% if request.session.session_user_position == "Administrator" %}
-                                    <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
-                                        <i class="user plus icon"></i>
-                                    </a>
-                                    <a href="{% url 'profiles:user_list'%}" class="item">User List
-                                        <i class="address book icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
-                                        <i class="clipboard list icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">Reallocate Assets
-                                        <i class="retweet icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
-                                        <i class="exclamation icon"></i>
-                                        <i class="paw icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:handler_incident'%}" class="item">Handler-Incident Form
-                                        <i class="exclamation icon"></i>
-                                        <i class="male icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">On-Leave Request list
-                                        <i class="clipboard list icon"></i>
-                                    </a>
-                                    {% endif %}
+                            {% if request.session.session_user_position == "Veterinarian" %}
+                            <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
+                                <i class="user plus icon"></i>
+                            </a>
+                            <a href="{% url 'profiles:user_list'%}" class="item">User List
+                                <i class="address book icon"></i>
+                            </a>
+                            <!-- <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
+                                <i class="first aid icon"></i>
+                            </a> -->
+                            <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
+                                <i class="heartbeat icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_sick_list'%}" class="item">Sick K9's List
+                                <i class="ambulance icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
+                                <i class="h square icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:reproductive_list'%}" class="item">Reproductive Cycle
+                                <i class="venus icon"></i>
+                            </a>
+                            {% endif %}
 
-                                    {% if request.session.session_user_position == "Veterinarian" %}
-                                    <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
-                                        <i class="user plus icon"></i>
-                                    </a>
-                                    <a href="{% url 'profiles:user_list'%}" class="item">User List
-                                        <i class="address book icon"></i>
-                                    </a>
-                                    <!-- <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
-                                        <i class="first aid icon"></i>
-                                    </a> -->
-                                    <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
-                                        <i class="heartbeat icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:k9_sick_list'%}" class="item">Sick K9's List
-                                        <i class="ambulance icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
-                                        <i class="h square icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:reproductive_list'%}" class="item">Reproductive Cycle
-                                        <i class="venus icon"></i>
-                                    </a>
-                                    {% endif %}
-
-                                    {% if request.session.session_user_position == "Handler" %}
-                                    <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
-                                        <i class="h square icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
-                                        <i class="exclamation icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
-                                        <i class="exclamation icon"></i>
-                                        <i class="paw icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">On-Leave Request Form
-                                        <i class="question icon"></i>
-                                    </a>
-                                    {% endif %}
-                                </div>
+                            {% if request.session.session_user_position == "Handler" %}
+                            <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
+                                <i class="h square icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">Health Concern List
+                                <i class="clipboard list icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
+                                <i class="exclamation icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_sick_form'%}" class="item">K9 Health Form
+                                <i class="medkit icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_incident'%}" class="item">K9-Incident Form
+                                <i class="exclamation icon"></i>
+                                <i class="paw icon"></i>
+                            </a>
+                            <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">On-Leave Request Form
+                                <i class="question icon"></i>
+                            </a>
+                            {% endif %}
                         </div>
-                        <!>
-                        <div class="thirteen wide column">
-                            {% block content %}
-                            {% endblock %}
-                        </div>
-                    </div>
-              </div>
+                </div>
+                <!>
+                <div class="thirteen wide column">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
         </div>
-      </div>
+</div>
 
       <style>
           .submenu{

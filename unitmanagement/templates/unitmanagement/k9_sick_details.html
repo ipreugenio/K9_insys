@@ -19,20 +19,41 @@
                 <td>{{data.date}}</td>
             </tr>
             <tr>
-                <th>Problem</th>
+                <th>Remarks</th>
                 <td class="nine wide">{{data.description}}</td>
-                <td>Reported by:</td>
+                <th>Reported by:</th>
                 <td>{{data.reported_by}}</td>
             </tr>
         </thead>
     </table>
+    <br>
+    <div class="ui grid">
+        {% for image in image%}
+            <div class="five wide column center aligned">
+                <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+            </div>
+        {%endfor%}
+    </div>
 </div>
+{% if user.position == 'Veterinarian' %}
 <div class="ui inverted segment">
-    <form class="ui inverted form" method="POST" id="myForm"  data-url="{% url 'unitmanagement:health_form' %}" enctype="multipart/form-data">
+    <form class="ui inverted form" method="POST" id="myForm" enctype="multipart/form-data">
         {% csrf_token %}
+        <div class="field">
+                <label>Problem</label>
+                {{form.problem}}
+            </div>
         <div class="field">
             <label>Treatment</label>
             {{form.treatment}}
+        </div>
+        <div class="three fields">
+            <div class="field">
+                <label>Prescription Image (if any)</label>
+                {{form.image}}
+            </div>
+            <div class="field"></div>
+            <div class="field"></div>
         </div>
         <table>
             <tbody>
@@ -60,6 +81,7 @@
         {{formset.management_form}}
     </form>
 </div>
+{% endif %}
 <script type="text/javascript">
 
     $(document).ready(function() {

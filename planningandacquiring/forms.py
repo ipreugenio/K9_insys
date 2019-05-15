@@ -4,7 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
 from .models import K9, K9_Past_Owner, K9_Parent, Date, Budget_allocation, Budget_medicine,Budget_food,Budget_equipment,Budget_vaccine,Budget_vet_supply
-
+from .models import K9_Mated
 import datetime
 import re
 
@@ -100,6 +100,19 @@ from django.forms.widgets import CheckboxSelectMultiple
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class DateForm(forms.ModelForm):
+    class Meta:
+        model = K9
+        fields = ('birth_date',)
+        widgets = {
+            'birth_date': DateInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(DateForm, self).__init__(*args, **kwargs)
+        self.fields['birth_date'].initial = date.today()
+
+
 class K9SupplierForm(forms.ModelForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     class Meta:
@@ -169,8 +182,8 @@ class add_donator_form(forms.ModelForm):
 
 class add_K9_parents_form(forms.Form):
     try:
-        females = K9.objects.filter(sex = "Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
-        males = K9.objects.filter(sex = "Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
+        females = K9.objects.filter(sex = "Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
+        males = K9.objects.filter(sex = "Male").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
 
         mother_list = []
         father_list = []
@@ -196,8 +209,8 @@ class add_K9_parents_form(forms.Form):
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
 
-        females = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1)
-        males = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1)
+        females = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
+        males = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
 
         mother_list = []
         father_list = []
@@ -218,17 +231,22 @@ class add_offspring_K9_form(forms.ModelForm):
     image = forms.ImageField()
     class Meta:
         model = K9
-        fields = ('image','name', 'sex', 'color', 'birth_date')
-        widgets = {
-            'birth_date': DateInput(),
-        }
+        fields = ('image','name', 'sex', 'color')
+
     def __init__(self, *args, **kwargs):
         super(add_offspring_K9_form, self).__init__(*args, **kwargs)
-        self.fields['birth_date'].initial = date.today()
         self.fields['image'].required = False
         
 class select_breeder(forms.Form):
-    k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding'))
+    k9 = forms.ModelChoiceField(queryset=K9.objects.filter(training_status = 'For-Breeding').filter(status='Working Dog'))
+
+class date_mated_form(forms.ModelForm):
+    class Meta:
+        model = K9_Mated
+        fields = ('date_mated',)
+        widgets = {
+            'date_mated': DateInput(),
+        }
 
 class k9_detail_form(forms.ModelForm):
     image = forms.ImageField()

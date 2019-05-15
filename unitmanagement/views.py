@@ -1,12 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime as dt
 from datetime import timedelta, date
 from decimal import Decimal
+import itertools
 from django.db.models import Sum, Avg, Max
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -17,10 +18,11 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
+from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -112,26 +114,36 @@ def redirect_notif(request, id):
     
 
 def index(request):
+    data = K9.objects.get(name='damn')
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
+    m = get_object_or_404(VaccinceRecord, pk=vr.id)
+    print(m)
+
+    if request.method == 'POST':
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save()
+                else:
+                    print(forms)
+        else:
+            print(formset)
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    form = k9_detail_form(request.POST or None, request.FILES or None, instance = user)
-
-    print (date.today())
-    if request.method == "POST":
-        print('post')
-        print(form.errors)
-        if form.is_valid():
-            print('Valid')   
-            a = form['image'].value() 
-            print(a)
-            form.save()
 
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
-        'form':form,
+        'formset':formset,
     }        
 
     return render (request, 'unitmanagement/index.html', context)
@@ -140,7 +152,6 @@ def index(request):
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
-    form = HealthForm(request.POST or None)
 
     if request.method == "POST":
         #print(form)
@@ -291,10 +302,9 @@ def health_record(request):
 
         number = Account.objects.get(serial_number=serial)
         handler = User.objects.get(id=number.UserID.id)
-        k9 = K9_Handler.objects.get(handler_id=handler.id)
-        data = K9.objects.get(id = int(k9.id))
+        data = K9.objects.get(handler=handler)
 
-    elif position == "Veterinarian":
+    else:
         data = K9.objects.all()
 
 
@@ -317,148 +327,155 @@ def health_history(request, id):
     user_s = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user_s.UserID.id)
 
-
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data).order_by('-date')
     phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
-    vaccine_record = VaccinceRecord.objects.get(k9 = data)
-    dtoday = dt.date.today()
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    style = 'ui green message'
 
-    vaccine_record_form = VaccinationRecordForm(request.POST or None, instance = vaccine_record)
-    vaccine_used_form = VaccinationUsedForm(request.POST or None)
-    vaccines = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine')
-    vaccine_available = Medicine_Inventory.objects.filter(medicine__in = vaccines).exclude(quantity=0)
-   
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
     active_1 = ' active'
     active_2 = ''
     active_3 = ''
-    style='ui green message'
 
-    # GET DOG AGE
-    # 2weeks=14days, 4Weeks=28days, 6weeks=42days, 8Weeks=56days, 9weeks=63days, 10weeks=70days
-    # 14weeks=98days, 15weeks=105days, 16weeks=112days, 18weeks=126days, 20weeks=140days, 22weeks=154days
-    # 24weeks=168days, 26weeks=183days, 28weeks=196days, 30weeks=210days, 32weeks=224days, 34weeks=238days
-    dog_days =  dtoday - data.birth_date
-
-    data_deworming_1 = ''
-    data_deworming_2 = ''
-    data_deworming_3 = ''
-    data_dhppil_cv_1 = ''
-    data_heartworm_1 = ''
-    data_bordetella_1 = ''
-    data_tick_flea_1 = ''
-    data_dhppil_cv_2 = ''
-    data_deworming_4 = ''
-    data_heartworm_2 = ''
-    data_bordetella_2 = ''
-    data_anti_rabies = ''
-    data_tick_flea_2 = ''
-    data_dhppil_cv_3 = ''
-    data_heartworm_3 = ''
-    data_dhppil4_1 = ''
-    data_tick_flea_3 = ''
-    data_dhppil4_2 = ''
-    data_heartworm_4 = ''
-    data_tick_flea_4 = ''
-    data_heartworm_5 = ''
-    data_tick_flea_5 = ''
-    data_heartworm_6 = ''
-    data_tick_flea_6 = ''
-    data_heartworm_7 = ''
-    data_tick_flea_7 = ''
-    data_heartworm_8 = ''
-
-
-    #data of vaccines used
-    if data.source == 'Breeding':
-        data_deworming_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_1')
-        data_deworming_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_2')
-        data_deworming_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_3')
-        data_dhppil_cv_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_1')
-        data_heartworm_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_1')
-        data_bordetella_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='bordetella_1')
-        data_tick_flea_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_1')
-        data_dhppil_cv_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_2')
-        data_deworming_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_4')
-        data_heartworm_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_2')
-        data_bordetella_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='bordetella_2')
-        data_anti_rabies = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='anti_rabies')
-        data_tick_flea_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_2')
-        data_dhppil_cv_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_3')
-        data_heartworm_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_3')
-        data_dhppil4_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil4_1')
-        data_tick_flea_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_3')
-        data_dhppil4_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil4_2')
-        data_heartworm_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_4')
-        data_tick_flea_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_4')
-        data_heartworm_5 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_5')
-        data_tick_flea_5 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_5')
-        data_heartworm_6 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_6')
-        data_tick_flea_6 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_6')
-        data_heartworm_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_7')
-        data_tick_flea_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_7')
-        data_heartworm_8 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_8')
-
-
+    ctr=0
+    ctr1=0
     if request.method == 'POST':
-       
-    #    if vaccine_record.heartworm_6 == True and request.POST.get('s_heartworm_6') !=''
-      
-        messages.success(request, 'Preventive Health Program Updated!')
-        return redirect('unitmanagement:health_history', id = id)
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
+        
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save(commit=False)
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                        ctr1=ctr1+1
+                        f.veterinary = current_user
+                        f.done = True
+                        f.save()
+                       
+                        if f.disease == '1st Deworming':
+                            vr.deworming_1 = True
+                        elif f.disease == '2nd Deworming':
+                            vr.deworming_2 = True
+                        elif f.disease == '3rd Deworming':
+                            vr.deworming_3 = True
+                        elif f.disease == '1st dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_1 = True
+                        elif f.disease == '1st Heartworm Prevention':
+                            vr.heartworm_1 = True
+                        elif f.disease == '1st dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_1 = True
+                        elif f.disease == '1st Tick and Flea Prevention':
+                            vr.tick_flea_1 = True
+                        elif f.disease == '2nd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_2 = True
+                        elif f.disease == '4th Deworming':
+                            vr.deworming_4 = True
+                        elif f.disease == '2nd Heartworm Prevention':
+                            vr.heartworm_2 = True
+                        elif f.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_2 = True
+                        elif f.disease == 'Anti-Rabies Vaccination	':
+                            vr.anti_rabies = True
+                        elif f.disease == '2nd Tick and Flea Prevention':
+                            vr.tick_flea_2 = True
+                        elif f.disease == '3rd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_3 = True
+                        elif f.disease == '3rd Heartworm Prevention':
+                            vr.heartworm_3 = True
+                        elif f.disease == '1st dose DHPPiL4 Vaccination':
+                            vr.dhppil4_1 = True
+                        elif f.disease == '3rd Tick and Flea Prevention':
+                            vr.tick_flea_3 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.dhppil4_2 = True
+                        elif f.disease == '4th Heartworm Prevention':
+                            vr.heartworm_4 = True
+                        elif f.disease == '4th Tick and Flea Prevention':
+                            vr.tick_flea_4 = True
+                        elif f.disease == '5th Heartworm Prevention':
+                            vr.heartworm_5 = True
+                        elif f.disease == '6th Heartworm Prevention':
+                            vr.heartworm_6 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.bordetella_2 = True
+                        elif f.disease == '6th Tick and Flea Prevention':
+                            vr.tick_flea_6 = True
+                        elif f.disease == '7th Heartworm Prevention':
+                            vr.heartworm_7 = True
+                        elif f.disease == '7th Tick and Flea Prevention':
+                            vr.tick_flea_7 = True
+                        elif f.disease == '8th Heartworm Prevention':
+                            vr.heartworm_8 = True
+                        vr.save()
+                        
+                        
+                    else: 
+                        pass
+                    
+                    if f.image != None:
+                        ctr1=ctr1+1
+                        f.save(update_fields=["image"])
 
+                    if f.done == False and f.vaccine != None and f.date_vaccinated == None:
+                        ctr = ctr+1
+                    elif f.done == False and f.vaccine == None and f.date_vaccinated != None:
+                        ctr = ctr+1
+
+            print('ctr1: ',ctr1)
+            print('ctr: ',ctr)
+            if ctr1>27:
+                messages.success(request, 'Prevention Updated!')
+                return redirect('unitmanagement:health_history', id=data.id)
+
+            if ctr>0:
+                messages.success(request, 'Incomplete input. Please check again.')
+                style='ui red message'
+
+    for forms in formset:
+        if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
+           
+        if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
+
+        if forms.initial['disease'] == '1st Heartworm Prevention' or forms.initial['disease'] == '2nd Heartworm Prevention' or forms.initial['disease'] == '3rd Heartworm Prevention' or forms.initial['disease'] == '4th Heartworm Prevention' or forms.initial['disease'] == '5th Heartworm Prevention' or forms.initial['disease'] == '6th Heartworm Prevention' or forms.initial['disease'] == '7th Heartworm Prevention' or forms.initial['disease'] == '8th Heartworm Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').exclude(quantity=0)
+
+        if forms.initial['disease'] == 'Anti-Rabies Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'dog_days': dog_days,
-        'style': style,
-        'title': "Health History of ",
-        'name': data.name,
-        'actiontype': "Submit",
-        'data': data,
-        'health_data': health_data,
-        'phyexam_data': phyexam_data,
-        'vaccine_record': vaccine_record,
-        'dtoday':dtoday,
-        'form1': vaccine_record_form,
-        'form2': vaccine_used_form,
-        'vaccine_available':vaccine_available,
-        'active_1':active_1,
-        'active_2':active_2,
-        'active_3':active_3,
-        'data_deworming_1':data_deworming_1,
-        'data_deworming_2':data_deworming_2,
-        'data_deworming_3':data_deworming_3,
-        'data_dhppil_cv_1':data_dhppil_cv_1,
-        'data_heartworm_1':data_heartworm_1,
-        'data_bordetella_1':data_bordetella_1,
-        'data_tick_flea_1':data_tick_flea_1,
-        'data_dhppil_cv_2':data_dhppil_cv_2,
-        'data_deworming_4':data_deworming_4,
-        'data_heartworm_2':data_heartworm_2,
-        'data_bordetella_2':data_bordetella_2,
-        'data_anti_rabies':data_anti_rabies,
-        'data_tick_flea_2':data_tick_flea_2,
-        'data_dhppil_cv_3':data_dhppil_cv_3,
-        'data_heartworm_3':data_heartworm_3,
-        'data_dhppil4_1':data_dhppil4_1,
-        'data_tick_flea_3':data_tick_flea_3,
-        'data_dhppil4_2':data_dhppil4_2,
-        'data_heartworm_4':data_heartworm_4,
-        'data_tick_flea_4':data_tick_flea_4,
-        'data_heartworm_5':data_heartworm_5,
-        'data_tick_flea_5':data_tick_flea_5,
-        'data_heartworm_6':data_heartworm_6,
-        'data_tick_flea_6':data_tick_flea_6,
-        'data_heartworm_7':data_heartworm_7,
-        'data_tick_flea_7':data_tick_flea_7,
-        'data_heartworm_8':data_heartworm_8,
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'health_data':health_data,
+        'phyexam_data':phyexam_data,
+        'formset':formset,
+        'age': data.age_days,
+        'vu':vu,
+        'style':style,
+        'active_1':active_1,
+        'active_2':active_2,
+        'active_3':active_3,
+        'title':'Health Record of ' + str(data),
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -542,21 +559,141 @@ def medicine_approve(request, id):
 
 # Vaccination form
 def vaccination_form(request):
-    data = K9.objects.get(name='damn')
+    user = user_session(request)
+    data = K9.objects.get(name='Testing')
     vr = VaccinceRecord.objects.get(k9=data)
     vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    style = 'ui green message'
 
-    print('k9:',data)
-    print('vr:',vr)
-    print('vu:',vu)
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
+    ctr=0
+    ctr1=0
+    for forms in formset:
+        if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
+           
+        if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
+
+        if forms.initial['disease'] == '1st Heartworm Prevention' or forms.initial['disease'] == '2nd Heartworm Prevention' or forms.initial['disease'] == '3rd Heartworm Prevention' or forms.initial['disease'] == '4th Heartworm Prevention' or forms.initial['disease'] == '5th Heartworm Prevention' or forms.initial['disease'] == '6th Heartworm Prevention' or forms.initial['disease'] == '7th Heartworm Prevention' or forms.initial['disease'] == '8th Heartworm Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').exclude(quantity=0)
+
+        if forms.initial['disease'] == 'Anti-Rabies Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
+
+    if request.method == 'POST':
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
+        
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save(commit=False)
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                        f.veterinary = user
+                        f.done = True
+                        f.save()
+
+                        ctr1=ctr1+1
+                        
+                        if f.disease == '1st Deworming':
+                            vr.deworming_1 = True
+                        elif f.disease == '2nd Deworming':
+                            vr.deworming_2 = True
+                        elif f.disease == '3rd Deworming':
+                            vr.deworming_3 = True
+                        elif f.disease == '1st dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_1 = True
+                        elif f.disease == '1st Heartworm Prevention':
+                            vr.heartworm_1 = True
+                        elif f.disease == '1st dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_1 = True
+                        elif f.disease == '1st Tick and Flea Prevention':
+                            vr.tick_flea_1 = True
+                        elif f.disease == '2nd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_2 = True
+                        elif f.disease == '4th Deworming':
+                            vr.deworming_4 = True
+                        elif f.disease == '2nd Heartworm Prevention':
+                            vr.heartworm_2 = True
+                        elif f.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_2 = True
+                        elif f.disease == 'Anti-Rabies Vaccination	':
+                            vr.anti_rabies = True
+                        elif f.disease == '2nd Tick and Flea Prevention':
+                            vr.tick_flea_2 = True
+                        elif f.disease == '3rd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_3 = True
+                        elif f.disease == '3rd Heartworm Prevention':
+                            vr.heartworm_3 = True
+                        elif f.disease == '1st dose DHPPiL4 Vaccination':
+                            vr.dhppil4_1 = True
+                        elif f.disease == '3rd Tick and Flea Prevention':
+                            vr.tick_flea_3 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.dhppil4_2 = True
+                        elif f.disease == '4th Heartworm Prevention':
+                            vr.heartworm_4 = True
+                        elif f.disease == '4th Tick and Flea Prevention':
+                            vr.tick_flea_4 = True
+                        elif f.disease == '5th Heartworm Prevention':
+                            vr.heartworm_5 = True
+                        elif f.disease == '6th Heartworm Prevention':
+                            vr.heartworm_6 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.bordetella_2 = True
+                        elif f.disease == '6th Tick and Flea Prevention':
+                            vr.tick_flea_6 = True
+                        elif f.disease == '7th Heartworm Prevention':
+                            vr.heartworm_7 = True
+                        elif f.disease == '7th Tick and Flea Prevention':
+                            vr.tick_flea_7 = True
+                        elif f.disease == '8th Heartworm Prevention':
+                            vr.heartworm_8 = True
+                        vr.save()
+                        
+                    else: 
+                        pass
+                        
+                    if f.image != None:
+                        ctr1=ctr1+1
+                        f.save(update_fields=["image"])
+
+                    if f.done == False and f.vaccine != None and f.date_vaccinated == None:
+                        ctr = ctr+1
+                    elif f.done == False and f.vaccine == None and f.date_vaccinated != None:
+                        ctr = ctr+1
+
+            print(ctr1)
+            if ctr1>0:
+                messages.success(request, 'Prevention Updated!')
+                return redirect('unitmanagement:vaccination_form')
+
+            if ctr>0:
+                messages.success(request, 'Incomplete input. Please check again.')
+                style='ui red message'
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'formset':formset,
+        'vu':vu,
+        'style':style,
+        'title':'Health Record of ' + str(data),
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 
@@ -660,50 +797,26 @@ def change_equipment(request, id):
 
 # TODO
 def k9_incident(request):
+    user = user_session(request)
     form = K9IncidentForm(request.POST or None)
+    dog = K9.objects.get(handler=user)
+    form.fields['k9'].queryset = K9.objects.filter(handler=user)
     style=''
-    
-    serial = request.session['session_serial']
-    account = Account.objects.get(serial_number=serial)
-    user_in_session = User.objects.get(id=account.UserID.id)
+
+    num = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick').count()
+    incident = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick')
 
     if request.method == "POST":
         if form.is_valid():
-            incident_save = form.save()
-            incident_save.reported_by = str(user_in_session.fullname)
-            incident_save.save()
-            
-            # get k9 object
-            k9 =incident_save.k9
-            k9_obj=K9.objects.get(id=k9.id)
+            f = form.save(commit=False)
+            f.reported_by = user
+            f.save()
 
-            #if k9 has a partner handler and died
-            if k9_obj.partnered==True and incident_save.incident=='Died' :
-                handler = User.objects.get(id=k9_obj.handler.id)
-                k9_obj.status = 'Dead'
-                k9_obj.handler = None
-                k9_obj.partnered= False
-                handler.partnered = False
-                k9_obj.save()
-                handler.save()
-            elif k9_obj.partnered==False and incident_save.incident=='Died' :
-                k9_obj.status = 'Dead'
-                k9_obj.save()
-            elif incident_save.incident=='Sick' :
-                k9_obj.status = 'Sick'
-                k9_obj.save()
-
-            form = K9IncidentForm()
-            style = "ui green message"
-            messages.success(request, 'Incident has been successfully Reported!')
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
+            return redirect('unitmanagement:k9_incident')
     
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': "K9 Incident",
         'actiontype': "Submit",
@@ -712,8 +825,88 @@ def k9_incident(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'num':num,
+        'incident':incident,
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
+
+# TODO
+def k9_sick_form(request):
+    user = user_session(request)
+    form = K9IncidentForm(request.POST or None, request.FILES or None)
+    style='ui green message'
+
+    handler = K9.objects.filter(handler=user)
+    form.fields['k9'].queryset =  handler
+
+    if request.method == "POST":
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.incident = 'Sick'
+            form.reported_by = user
+            form.save()
+
+            files = request.FILES.getlist('image_file')
+
+            for f in files:
+                Image.objects.create(incident_id=form, image=f)
+
+            style = "ui green message"
+            messages.success(request, 'Health Concern has been successfully Reported!')
+            return redirect('unitmanagement:k9_sick_form') 
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "K9 Health Form",
+        'actiontype': "Submit",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'handler': handler,
+    }
+    return render (request, 'unitmanagement/k9_sick_form.html', context)
+
+def health_list_handler(request):
+    user = user_session(request)
+    style = "ui green message"
+    k9 = K9.objects.get(handler=user)
+    date = dt.date.today()
+    data_arr = []
+
+    if user.position == 'Handler':
+        data = K9_Incident.objects.filter(reported_by=user).filter(status='Pending')
+        data2 = Health.objects.filter(dog=k9).filter(status='On-Going')
+
+    for da in data2:
+        d =  da.date_done - dt.date.today()
+        d = d.days
+        data_arr.append(d)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "Health Concern List",
+        'actiontype': "Submit",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data':data,
+        'data2':data2,
+        'date':date,
+        'data_arr':data_arr,
+    }
+    return render (request, 'unitmanagement/health_list_handler.html', context)
 
 def handler_incident(request):
     form = HandlerIncidentForm(request.POST or None)
@@ -1016,8 +1209,7 @@ def reproductive_edit(request, id):
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
-    data = K9.objects.filter(handler_on_leave=False).filter(training_status='For-Deployment').filter(partnered=False)
-    data2 = K9.objects.filter(handler_on_leave=True).filter(training_status='For-Deployment').filter(partnered=False)
+    data = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1025,7 +1217,6 @@ def k9_unpartnered_list(request):
     context = {
         'title': "Unpartnered K9 List",
         'data':data,
-        'data2':data2,
         'style':style,
         'notif_data':notif_data,
         'count':count,
@@ -1036,35 +1227,54 @@ def k9_unpartnered_list(request):
 # TODO 
 # choose_handler Cycle
 def choose_handler_list(request, id):
-    style=''
-    k9 = K9.objects.get(id=id)
-    data = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False) #available
-    print(data)
-    cap = []
-    for d in data:    
-        skill = Handler_K9_History.objects.filter(handler=d).filter(k9__capability=k9.capability).count()
-        cap.append(skill)
+    form = assign_handler_form(request.POST or None)
+    style = ""
+    k9 = K9.objects.get(id=id)  
 
-    data_pi = Personal_Info.objects.filter(UserID__in=data) 
+    handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
+    g = []
+    for h in handler:
+        c = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+        g.append(c)
 
-    request.session["k9_id_partnered"] = k9.id 
-    zippedList = zip(data, data_pi, cap)
-    print(data_pi)
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.save()
+            
+            #K9 Update
+            k9.training_status = 'On-Training'
+            k9.partnered = True
+            k9.handler = f.handler
+            k9.save()
+
+            #Handler Update
+            h = User.objects.get(id= f.handler.id)
+            h.partnered = True
+            h.save()
+
+            messages.success(request, str(k9) + ' has been assigned to ' + str(h))
+            return redirect('unitmanagement:k9_unpartnered_list')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
     context = {
-        'title': k9,
-        'data':data,
-        'k9':k9,
-        'style':style,
-        'data_pi': data_pi,
-        'cap':cap,
+        'Title': "K9 Assignment for " + k9.name,
+        'form': form,
+        'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,
-        'zippedList':zippedList,
+        'k9':k9,
+        'g':g,
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
 
@@ -1115,6 +1325,7 @@ def k9_sick_list(request):
 def k9_sick_details(request, id):
     
     data = K9_Incident.objects.get(id=id)
+    image = Image.objects.filter(incident_id=data)
 
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
@@ -1129,9 +1340,8 @@ def k9_sick_details(request, id):
             #get treatment
             request.session['treatment'] = form['treatment'].value()
 
-            m = form.save()
+            m = form.save(commit=False)
             m.dog = data.k9
-            m.problem  = data.description
             m.incident_id = data
             m.veterinary = user_in_session
             m.save()
@@ -1187,8 +1397,6 @@ def k9_sick_details(request, id):
                     style = "ui red message"
                     messages.warning(request, msg)        
                 else:
-                    m.duration =  max(days)
-                    m.save()
 
                     for form in formset:
                         f = form.save()
@@ -1196,6 +1404,9 @@ def k9_sick_details(request, id):
                         m.quantity = m.quantity - f.quantity
                         m.save()
                         #Medicine_Subtracted_Trail.objects.create(inventory = m, user=current_user(), quantity = f.quantity)
+                        
+                    m.duration =  max(days)
+                    m.save()
                     dog.status = 'Sick'
                     data.status= 'Done'
                     dog.save()
@@ -1210,6 +1421,7 @@ def k9_sick_details(request, id):
     user = user_session(request)
     context = {
         'title': data.k9,
+        'image':image,
         'data':data,
         'form':HealthForm,
         'formset':medicine_formset(),
@@ -1275,3 +1487,47 @@ class UserDetailView(APIView):
         notif = get_object_or_404(User, id=id)
         notif.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+def load_handler(request):
+
+    handler = None
+
+    try:
+        handler_id = request.GET.get('handler')
+        handler = User.objects.get(id=handler_id)
+        pi = Personal_Info.objects.get(UserID=handler)
+        edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
+        
+    except:
+        pass
+
+    context = {
+        'handler': handler,
+        'pi':pi,
+        'ndd':ndd,
+        'edd':edd,
+        'sar':sar,
+    }
+
+    return render(request, 'training/handler_data.html', context)
+
+def load_stamp(request):
+
+    stamp = None
+
+    try:
+        stamp_id = request.GET.get('stamp')
+        stamp = VaccineUsed.objects.get(id=stamp_id)
+
+        print(stamp)
+      
+    except:
+        pass
+
+    context = {
+        'stamp': stamp,
+    }
+
+    return render(request, 'unitmanagement/stamp_data.html', context)

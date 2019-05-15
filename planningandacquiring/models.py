@@ -137,6 +137,7 @@ class K9(models.Model):
         ('On-Training', 'On-Training'),
         ('Trained', 'Trained'),
         ('For-Breeding', 'For-Breeding'),
+        ('Breeding', 'Breeding'),
         ('For-Deployment', 'For-Deployment'),
         ('For-Adoption', 'For-Adoption'),
         ('Deployed', 'Deployed'),

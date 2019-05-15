@@ -52,6 +52,19 @@
             <a class="item" data-tab="second">Classified</a>
             <a class="item" data-tab="third">On-Training</a>
             <a class="item active" data-tab="fourth">Trained</a>
+
+            {% elif message.message == 'On-Training' %}
+            <a class="item" data-tab="first">Unclassified</a>
+            <a class="item" data-tab="second">Classified</a>
+            <a class="item active" data-tab="third">On-Training</a>
+            <a class="item" data-tab="fourth">Trained</a>
+
+            {% else %}
+            <a class="item" data-tab="first">Unclassified</a>
+            <a class="item active" data-tab="second">Classified</a>
+            <a class="item" data-tab="third">On-Training</a>
+            <a class="item" data-tab="fourth">Trained</a>
+            
             {% endif %}
         {% endif %}
     {% endfor %}
@@ -68,6 +81,8 @@
 {% for message in messages %}
 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
     {% if message.message == 'Trained' %}
+    <div class="ui tab segment" data-tab="first">
+    {% else %}
     <div class="ui tab segment" data-tab="first">
     {% endif %}
 {% endif %}
@@ -140,7 +155,22 @@
         </tbody>
     </table>
 </div>
+
+{% if messages %}
+{% for message in messages %}
+{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+    {% if message.message == 'On-Training' %}
+    <div class="ui tab segment active" data-tab="third">
+    {% else %}
+    <div class="ui tab segment" data-tab="third">
+    {% endif %}
+{% endif %}
+{% endfor %}
+
+{%else%}
 <div class="ui tab segment" data-tab="third">
+{%endif%}   
+
 <table id="tabledata3" class="ui celled table">
     <thead>
         <tr>
@@ -183,6 +213,8 @@
 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
     {% if message.message == 'Trained' %}
     <div class="ui tab segment active" data-tab="fourth">
+    {% else %}
+    <div class="ui tab segment" data-tab="fourth">
     {% endif %}
 {% endif %}
 {% endfor %}

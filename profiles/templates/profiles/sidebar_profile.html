@@ -1,51 +1,47 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %}
 
 {% block sidebar_module %}
-    <div class="pusher" style="background:white;">
-        <div class="ui basic segment">
+<div class="ui fluid container">    
+    <div class="ui basic segment">
+        <div class="ui grid">
+            <div class="three wide column">
+                <!-- <div class="ui tiny pointing vertical menu" style="width:230px;">
+                    <a class="item"> <b>Unit Management Menu</b></a>
 
-          <!--    <div class="ui fluid container">
-                    <div class="ui grid">
-                        <div class="three wide column">
-                                <div class="ui tiny pointing vertical menu" style="width:230px;">
-                                    <a class="item"> <b>Unit Management Menu</b></a>
-
-                                    <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
-                                        <i class="user plus icon"></i>
-                                    </a>
-                                    <a href="{% url 'profiles:user_list'%}" class="item">User List
-                                        <i class="address book icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
-                                        <i class="first aid icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
-                                        <i class="heartbeat icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:vaccination_form'%}" class="item">Vaccination Form
-                                        <i class="syringe icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
-                                        <i class="h square icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
-                                        <i class="exclamation icon"></i>
-                                    </a>
-                                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
-                                        <i class="clipboard list icon"></i>
-                                    </a>
-                                </div>
-                        </div>-->
-                        <!>
-                        <div class="thirteen wide column">
-                            {% block content %}
-                            {% endblock %}
-                        </div>
-                    </div>
-              </div>
+                    <a href="{% url 'profiles:add_User_form'%}" class="item">Add User Form
+                        <i class="user plus icon"></i>
+                    </a>
+                    <a href="{% url 'profiles:user_list'%}" class="item">User List
+                        <i class="address book icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
+                        <i class="first aid icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">Physical Exam Form
+                        <i class="heartbeat icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:vaccination_form'%}" class="item">Vaccination Form
+                        <i class="syringe icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:health_record'%}" class="item">Health Records
+                        <i class="h square icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:request_form'%}" class="item">Damaged Equipment
+                        <i class="exclamation icon"></i>
+                    </a>
+                    <a href="{% url 'unitmanagement:request_list'%}" class="item">Damaged Equipment List
+                        <i class="clipboard list icon"></i>
+                    </a>
+                </div> -->
+            </div>
+            <!>
+            <div class="thirteen wide column">
+                {% block content %}
+                {% endblock %}
+            </div>
         </div>
-      </div>
-
+    </div>
+</div>
       <style>
           .submenu{
                 color: #666666;

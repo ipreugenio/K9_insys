@@ -1,7 +1,7 @@
 {% extends "profiles/global-base-ui/global_base_ui.html" %}
 
 {% block sidebar%}
-    <div class="ui inverted bottom attached segment pushable">
+    <div class="ui bottom attached segment pushable">
         <div class="ui inverted labeled icon left inline vertical sidebar menu" id = "sidebar" >
             {% if request.session.session_user_position == "Handler" %}
             <a class="item" href="{% url 'profiles:dashboard'%}"><i class="chart line icon"></i>Homepage</a>

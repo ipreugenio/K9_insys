@@ -1,529 +1,140 @@
 $(document).ready(function() {
+    alert($('#handler').val());
+
     $('#tabledata1').DataTable();
-    $('#tabledata2').DataTable({
-    "order": [[ 0, "desc" ]]
-    });
-    $('#tabledata3').DataTable();
+    $('#tabledata2').DataTable();
+    
     $('.menu .item').tab();
 
-    // disabled all vaccine used initial
-    $('#s_deworming_1').prop('disabled', 'disabled');
-    $('#s_deworming_2').prop('disabled', 'disabled');
-    $('#s_deworming_3').prop('disabled', 'disabled');
-    $('#s_dhppil_cv_1').prop('disabled', 'disabled');
-    $('#s_heartworm_1').prop('disabled', 'disabled');
-    $('#s_bordetella_1').prop('disabled', 'disabled');
-    $('#s_tick_flea_1').prop('disabled', 'disabled');
-    $('#s_dhppil_cv_2').prop('disabled', 'disabled');
-    $('#s_deworming_4').prop('disabled', 'disabled');
-    $('#s_heartworm_2').prop('disabled', 'disabled');
-    $('#s_bordetella_2').prop('disabled', 'disabled');
-    $('#s_anti_rabies').prop('disabled', 'disabled');
-    $('#s_tick_flea_2').prop('disabled', 'disabled');
-    $('#s_dhppil_cv_3').prop('disabled', 'disabled');
-    $('#s_heartworm_3').prop('disabled', 'disabled');
-    $('#s_dhppil4_1').prop('disabled', 'disabled');
-    $('#s_tick_flea_3').prop('disabled', 'disabled');
-    $('#s_dhppil4_2').prop('disabled', 'disabled');
-    $('#s_heartworm_4').prop('disabled', 'disabled');
-    $('#s_tick_flea_4').prop('disabled', 'disabled');
-    $('#s_heartworm_5').prop('disabled', 'disabled');
-    $('#s_tick_flea_5').prop('disabled', 'disabled');
-    $('#s_heartworm_6').prop('disabled', 'disabled');
-    $('#s_tick_flea_6').prop('disabled', 'disabled');
-    $('#s_heartworm_7').prop('disabled', 'disabled');
-    $('#s_tick_flea_7').prop('disabled', 'disabled');
-    $('#s_heartworm_8').prop('disabled', 'disabled');
-
-    // if checkbox is checked -> vaccine is enabled
-    // else if checkbox is not checked -> vaccine is disabled
-
-    $("input[name='s_deworming_1']").change(function() {   
-        if ($('#dog_days').val() < 14){
-            alert('K9 is less than 2 weeks')
-            $("input[name='deworming_1']").prop('checked', false)
-            $('#s_deworming_1').prop('disabled', 'disabled');
-        }
-        
-        if ($("input[name='deworming_1']").is(':checked')){
-            $('#s_deworming_1').prop('disabled', false);
-        }else{
-            $('#s_deworming_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='deworming_2']").change(function() {   
-        if ($('#dog_days').val() < 28){
-            alert('K9 is less than 4 weeks')
-            $("input[name='deworming_2']").prop('checked', false)
-            $('#s_deworming_2').prop('disabled', 'disabled');
-        }
-        
-        if ($("input[name='deworming_2']").is(':checked')){
-            $('#s_deworming_2').prop('disabled', false);
-        }else{
-            $('#s_deworming_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='deworming_3']").change(function() {   
-        if ($('#dog_days').val() < 42){
-            alert('K9 is less than 6 weeks')
-            $("input[name='deworming_3']").prop('checked', false)
-            $('#s_deworming_3').prop('disabled', 'disabled');
-        }
-        if ($("input[name='deworming_3']").is(':checked')){
-            $('#s_deworming_3').prop('disabled', false);
-        }else{
-            $('#s_deworming_3').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='dhppil_cv_1']").change(function() {   
-        if ($('#dog_days').val() < 42){
-            alert('K9 is less than 6 weeks')
-            $("input[name='dhppil_cv_1']").prop('checked', false)
-            $('#s_dhppil_cv_1').prop('disabled', 'disabled');
-        }
-        if ($("input[name='dhppil_cv_1']").is(':checked')){
-            $('#s_dhppil_cv_1').prop('disabled', false);
-        }else{
-            $('#s_dhppil_cv_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_1']").change(function() {   
-        if ($('#dog_days').val() < 42){
-            alert('K9 is less than 6 weeks')
-            $("input[name='heartworm_1']").prop('checked', false)
-            $('#s_heartworm_1').prop('disabled', 'disabled');
-        }
-        if ($("input[name='heartworm_1']").is(':checked')){
-            $('#s_heartworm_1').prop('disabled', false);
-        }else{
-            $('#s_heartworm_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='bordetella_1']").change(function() {   
-        if ($('#dog_days').val() < 56){
-            alert('K9 is less than 8 weeks')
-            $("input[name='bordetella_1']").prop('checked', false)
-            $('#s_bordetella_1').prop('disabled', 'disabled');
-        }
-        if ($("input[name='bordetella_1']").is(':checked')){
-            $('#s_bordetella_1').prop('disabled', false);
-        }else{
-            $('#s_bordetella_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_1']").change(function() {  
-        if ($('#dog_days').val() < 56){
-            alert('K9 is less than 8 weeks')
-            $("input[name='tick_flea_1']").prop('checked', false)
-            $('#s_tick_flea_1').prop('disabled', 'disabled');
-        } 
-        if ($("input[name='tick_flea_1']").is(':checked')){
-            $('#s_tick_flea_1').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='dhppil_cv_2']").change(function() {  
-        if ($('#dog_days').val() < 63){
-            alert('K9 is less than 9 weeks')
-            $("input[name='dhppil_cv_2']").prop('checked', false)
-            $('#s_dhppil_cv_2').prop('disabled', 'disabled');
-        }  
-        if ($("input[name='dhppil_cv_2']").is(':checked')){
-            $('#s_dhppil_cv_2').prop('disabled', false);
-        }else{
-            $('#s_dhppil_cv_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='deworming_4']").change(function() {  
-        if ($('#dog_days').val() < 63){
-            alert('K9 is less than 9 weeks')
-            $("input[name='deworming_4']").prop('checked', false)
-            $('#s_deworming_4').prop('disabled', 'disabled');
-        }  
-        if ($("input[name='deworming_4']").is(':checked')){
-            $('#s_deworming_4').prop('disabled', false);
-        }else{
-            $('#s_deworming_4').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_2']").change(function() {   
-        if ($('#dog_days').val() < 70){
-            alert('K9 is less than 10 weeks')
-            $("input[name='heartworm_2']").prop('checked', false)
-            $('#s_heartworm_2').prop('disabled', 'disabled');
-        }  
-        if ($("input[name='heartworm_2']").is(':checked')){
-            $('#s_heartworm_2').prop('disabled', false);
-        }else{
-            $('#s_heartworm_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='bordetella_2']").change(function() {   
-        if ($('#dog_days').val() < 77){
-            alert('K9 is less than 11 weeks')
-            $("input[name='bordetella_2']").prop('checked', false)
-            $('#s_bordetella_2').prop('disabled', 'disabled');
-        }  
-        if ($("input[name='bordetella_2']").is(':checked')){
-            $('#s_bordetella_2').prop('disabled', false);
-        }else{
-            $('#s_bordetella_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_2']").change(function() {  
-        if ($('#dog_days').val() < 84){
-            alert('K9 is less than 12 weeks')
-            $("input[name='tick_flea_2']").prop('checked', false)
-            $('#s_tick_flea_2').prop('disabled', 'disabled');
-        }   
-        if ($("input[name='tick_flea_2']").is(':checked')){
-            $('#s_tick_flea_2').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='anti_rabies']").change(function() {  
-        if ($('#dog_days').val() < 84){
-            alert('K9 is less than 12 weeks')
-            $("input[name='anti_rabies']").prop('checked', false)
-            $('#s_anti_rabies').prop('disabled', 'disabled');
-        }    
-        if ($("input[name='anti_rabies']").is(':checked')){
-            $('#s_anti_rabies').prop('disabled', false);
-        }else{
-            $('#s_anti_rabies').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='dhppil_cv_3']").change(function() { 
-        if ($('#dog_days').val() < 84){
-            alert('K9 is less than 12 weeks')
-            $("input[name='dhppil_cv_3']").prop('checked', false)
-            $('#s_dhppil_cv_3').prop('disabled', 'disabled');
-        }     
-        if ($("input[name='dhppil_cv_3']").is(':checked')){
-            $('#s_dhppil_cv_3').prop('disabled', false);
-        }else{
-            $('#s_dhppil_cv_3').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_3']").change(function() {  
-        if ($('#dog_days').val() < 98){
-            alert('K9 is less than 14 weeks')
-            $("input[name='heartworm_3']").prop('checked', false)
-            $('#s_heartworm_3').prop('disabled', 'disabled');
-        }      
-        if ($("input[name='heartworm_3']").is(':checked')){
-            $('#s_heartworm_3').prop('disabled', false);
-        }else{
-            $('#s_heartworm_3').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='dhppil4_1']").change(function() {   
-        if ($('#dog_days').val() < 105){
-            alert('K9 is less than 15 weeks')
-            $("input[name='dhppil4_1']").prop('checked', false)
-            $('#s_dhppil4_1').prop('disabled', 'disabled');
-        }     
-        if ($("input[name='dhppil4_1']").is(':checked')){
-            $('#s_dhppil4_1').prop('disabled', false);
-        }else{
-            $('#s_dhppil4_1').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_3']").change(function() {   
-        if ($('#dog_days').val() < 112){
-            alert('K9 is less than 16 weeks')
-            $("input[name='tick_flea_3']").prop('checked', false)
-            $('#s_tick_flea_3').prop('disabled', 'disabled');
-        }     
-        if ($("input[name='tick_flea_3']").is(':checked')){
-            $('#s_tick_flea_3').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_3').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='dhppil4_2']").change(function() {   
-        if ($('#dog_days').val() < 126){
-            alert('K9 is less than 18 weeks')
-            $("input[name='dhppil4_2']").prop('checked', false)
-            $('#s_dhppil4_2').prop('disabled', 'disabled');
-        }     
-        if ($("input[name='dhppil4_2']").is(':checked')){
-            $('#s_dhppil4_2').prop('disabled', false);
-        }else{
-            $('#s_dhppil4_2').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_4']").change(function() {   
-        if ($('#dog_days').val() < 126){
-            alert('K9 is less than 18 weeks')
-            $("input[name='heartworm_4']").prop('checked', false)
-            $('#s_heartworm_4').prop('disabled', 'disabled');
-        }     
-        if ($("input[name='heartworm_4']").is(':checked')){
-            $('#s_heartworm_4').prop('disabled', false);
-        }else{
-            $('#s_heartworm_4').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_4']").change(function() {   
-        if ($('#dog_days').val() < 140){
-            alert('K9 is less than 20 weeks')
-            $("input[name='tick_flea_4']").prop('checked', false)
-            $('#s_tick_flea_4').prop('disabled', 'disabled');
-        }    
-        if ($("input[name='tick_flea_4']").is(':checked')){
-            $('#s_tick_flea_4').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_4').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_5']").change(function() {   
-        if ($('#dog_days').val() < 154){
-            alert('K9 is less than 22 weeks')
-            $("input[name='heartworm_5']").prop('checked', false)
-            $('#s_heartworm_5').prop('disabled', 'disabled');
-        }    
-        if ($("input[name='heartworm_5']").is(':checked')){
-            $('#s_heartworm_5').prop('disabled', false);
-        }else{
-            $('#s_heartworm_5').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_5']").change(function() {   
-        if ($('#dog_days').val() < 168){
-            alert('K9 is less than 24 weeks')
-            $("input[name='tick_flea_5']").prop('checked', false)
-            $('#s_tick_flea_5').prop('disabled', 'disabled');
-        }    
-        if ($("input[name='tick_flea_5']").is(':checked')){
-            $('#s_tick_flea_5').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_5').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_6']").change(function() { 
-        if ($('#dog_days').val() < 183){
-            alert('K9 is less than 26 weeks')
-            $("input[name='heartworm_6']").prop('checked', false)
-            $('#s_heartworm_6').prop('disabled', 'disabled');
-        }      
-        if ($("input[name='heartworm_6']").is(':checked')){
-            $('#s_heartworm_6').prop('disabled', false);
-        }else{
-            $('#s_heartworm_6').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_6']").change(function() {   
-        if ($('#dog_days').val() < 196){
-            alert('K9 is less than 28 weeks')
-            $("input[name='tick_flea_6']").prop('checked', false)
-            $('#s_tick_flea_6').prop('disabled', 'disabled');
-        }      
-        if ($("input[name='tick_flea_6']").is(':checked')){
-            $('#s_tick_flea_6').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_6').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_7']").change(function() { 
-        if ($('#dog_days').val() < 210){
-            alert('K9 is less than 30 weeks')
-            $("input[name='heartworm_7']").prop('checked', false)
-            $('#s_heartworm_7').prop('disabled', 'disabled');
-        }        
-        if ($("input[name='heartworm_7']").is(':checked')){
-            $('#s_heartworm_7').prop('disabled', false);
-        }else{
-            $('#s_heartworm_7').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='tick_flea_7']").change(function() { 
-        if ($('#dog_days').val() < 224){
-            alert('K9 is less than 32 weeks')
-            $("input[name='tick_flea_7']").prop('checked', false)
-            $('#s_tick_flea_7').prop('disabled', 'disabled');
-        }      
-        if ($("input[name='tick_flea_7']").is(':checked')){
-            $('#s_tick_flea_7').prop('disabled', false);
-        }else{
-            $('#s_tick_flea_7').prop('disabled', 'disabled');
-        }
-    });
-
-    $("input[name='heartworm_8']").change(function() { 
-        if ($('#dog_days').val() < 238){
-            alert('K9 is less than 34 weeks')
-            $("input[name='heartworm_8']").prop('checked', false)
-            $('#s_heartworm_8').prop('disabled', 'disabled');
-        }        
-        if ($("input[name='heartworm_8']").is(':checked')){
-            $('#s_heartworm_8').prop('disabled', false);
-        }else{
-            $('#s_heartworm_8').prop('disabled', 'disabled');
-        }
-    });
-
-    //if checkbox and vaccine used is checked  
-    if ($("input[name='deworming_1']").is(':checked') && $("input[name='deworming_1']").val() != ''){
-        $('#s_deworming_1').prop('disabled', true);
-        $("input[name='deworming_1']").prop('disabled', true);
-    }   
+    age = $('#age').val()
     
-    if ($("input[name='deworming_2']").is(':checked') && $("input[name='deworming_2']").val() != ''){
-        $('#s_deworming_2').prop('disabled', true);
-        $("input[name='deworming_2']").prop('disabled', true);
-    }   
+    if (age < 14) {
+        $('#id_record-0-vaccine').prop('disabled', 'disabled');
+        $('#id_record-0-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-0-image').prop('disabled', 'disabled');
+    }
+    if (age < 28) {
+        $('#id_record-1-vaccine').prop('disabled', 'disabled');
+        $('#id_record-1-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-1-image').prop('disabled', 'disabled');
+    }
+    if (age < 42) {
+        $('#id_record-2-vaccine').prop('disabled', 'disabled');
+        $('#id_record-2-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-2-image').prop('disabled', 'disabled');
 
-    if ($("input[name='deworming_3']").is(':checked') && $("input[name='deworming_3']").val() != ''){
-        $('#s_deworming_3').prop('disabled', true);
-        $("input[name='deworming_3']").prop('disabled', true);
-    }   
+        $('#id_record-3-vaccine').prop('disabled', 'disabled');
+        $('#id_record-3-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-3-image').prop('disabled', 'disabled');
 
-    if ($("input[name='dhppil_cv_1']").is(':checked') && $("input[name='dhppil_cv_1']").val() != ''){
-        $('#s_dhppil_cv_1').prop('disabled', true);
-        $("input[name='dhppil_cv_1']").prop('disabled', true);
-    }   
+        $('#id_record-4-vaccine').prop('disabled', 'disabled');
+        $('#id_record-4-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-4-image').prop('disabled', 'disabled');
+    }
+    if (age < 56) {
+        $('#id_record-5-vaccine').prop('disabled', 'disabled');
+        $('#id_record-5-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-5-image').prop('disabled', 'disabled');
 
-    if ($("input[name='heartworm_1']").is(':checked') && $("input[name='heartworm_1']").val() != ''){
-        $('#s_heartworm_1').prop('disabled', true);
-        $("input[name='heartworm_1']").prop('disabled', true);
-    }   
+        $('#id_record-6-vaccine').prop('disabled', 'disabled');
+        $('#id_record-6-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-6-image').prop('disabled', 'disabled');
+    }
+    if (age < 63) {
+        $('#id_record-7-vaccine').prop('disabled', 'disabled');
+        $('#id_record-7-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-7-image').prop('disabled', 'disabled');
 
-    if ($("input[name='bordetella_1']").is(':checked') && $("input[name='bordetella_1']").val() != ''){
-        $('#s_bordetella_1').prop('disabled', true);
-        $("input[name='bordetella_1']").prop('disabled', true);
-    }   
+        $('#id_record-8-vaccine').prop('disabled', 'disabled');
+        $('#id_record-8-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-8-image').prop('disabled', 'disabled');
+    }
+    if (age < 70) {
+        $('#id_record-9-vaccine').prop('disabled', 'disabled');
+        $('#id_record-9-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-9-image').prop('disabled', 'disabled');
+    }
+    if (age < 77) {
+        $('#id_record-10-vaccine').prop('disabled', 'disabled');
+        $('#id_record-10-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-10-image').prop('disabled', 'disabled');
+    }
+    if (age < 84) {
+        $('#id_record-11-vaccine').prop('disabled', 'disabled');
+        $('#id_record-11-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-11-image').prop('disabled', 'disabled');
 
-    if ($("input[name='tick_flea_1']").is(':checked') && $("input[name='tick_flea_1']").val() != ''){
-        $('#s_tick_flea_1').prop('disabled', true);
-        $("input[name='tick_flea_1']").prop('disabled', true);
-    }   
+        $('#id_record-12-vaccine').prop('disabled', 'disabled');
+        $('#id_record-12-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-12-image').prop('disabled', 'disabled');
 
-    if ($("input[name='dhppil_cv_2']").is(':checked') && $("input[name='dhppil_cv_2']").val() != ''){
-        $('#s_dhppil_cv_2').prop('disabled', true);
-        $("input[name='dhppil_cv_2']").prop('disabled', true);
-    }   
+        $('#id_record-13-vaccine').prop('disabled', 'disabled');
+        $('#id_record-13-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-13-image').prop('disabled', 'disabled');
+    }
+    if (age < 98) {
+        $('#id_record-14-vaccine').prop('disabled', 'disabled');
+        $('#id_record-14-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-14-image').prop('disabled', 'disabled');
+    }
+    if (age < 105) {
+        $('#id_record-15-vaccine').prop('disabled', 'disabled');
+        $('#id_record-15-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-15-image').prop('disabled', 'disabled');
+    }
+    if (age < 112) {
+        $('#id_record-16-vaccine').prop('disabled', 'disabled');
+        $('#id_record-16-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-16-image').prop('disabled', 'disabled');
+    }
+    if (age < 126) {
+        $('#id_record-17-vaccine').prop('disabled', 'disabled');
+        $('#id_record-17-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-17-image').prop('disabled', 'disabled');
 
-    if ($("input[name='deworming_4']").is(':checked') && $("input[name='deworming_4']").val() != ''){
-        $('#s_deworming_4').prop('disabled', true);
-        $("input[name='deworming_4']").prop('disabled', true);
-    }   
+        $('#id_record-18-vaccine').prop('disabled', 'disabled');
+        $('#id_record-18-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-18-image').prop('disabled', 'disabled');
+    }
+    if (age < 140) {
+        $('#id_record-19-vaccine').prop('disabled', 'disabled');
+        $('#id_record-19-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-19-image').prop('disabled', 'disabled');
+    }
+    if (age < 154) {
+        $('#id_record-20-vaccine').prop('disabled', 'disabled');
+        $('#id_record-20-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-20-image').prop('disabled', 'disabled');
+    }
+    if (age < 168) {
+        $('#id_record-21-vaccine').prop('disabled', 'disabled');
+        $('#id_record-21-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-21-image').prop('disabled', 'disabled');
+    }
+    if (age < 182) {
+        $('#id_record-22-vaccine').prop('disabled', 'disabled');
+        $('#id_record-22-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-22-image').prop('disabled', 'disabled');
+    }
+    if (age < 196) {
+        $('#id_record-23-vaccine').prop('disabled', 'disabled');
+        $('#id_record-23-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-23-image').prop('disabled', 'disabled');
+    }
+    if (age < 210) {
+        $('#id_record-24-vaccine').prop('disabled', 'disabled');
+        $('#id_record-24-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-24-image').prop('disabled', 'disabled');
+    }
+    if (age < 224) {
+        $('#id_record-25-vaccine').prop('disabled', 'disabled');
+        $('#id_record-25-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-25-image').prop('disabled', 'disabled');
+    }
+    if (age < 238) {
+        $('#id_record-26-vaccine').prop('disabled', 'disabled');
+        $('#id_record-26-date_vaccinated').prop('disabled', 'disabled');
+        $('#id_record-26-image').prop('disabled', 'disabled');
+    }
 
-    if ($("input[name='heartworm_2']").is(':checked') && $("input[name='heartworm_2']").val() != ''){
-        $('#s_heartworm_2').prop('disabled', true);
-        $("input[name='heartworm_2']").prop('disabled', true);
-    }   
-
-    if ($("input[name='bordetella_2']").is(':checked') && $("input[name='bordetella_2']").val() != ''){
-        $('#s_bordetella_2').prop('disabled', true);
-        $("input[name='bordetella_2']").prop('disabled', true);
-    }   
-
-    if ($("input[name='anti_rabies']").is(':checked') && $("input[name='anti_rabies']").val() != ''){
-        $('#s_anti_rabies').prop('disabled', true);
-        $("input[name='anti_rabies']").prop('disabled', true);
-    }   
-
-    if ($("input[name='tick_flea_2']").is(':checked') && $("input[name='tick_flea_2']").val() != ''){
-        $('#tick_flea_2').prop('disabled', true);
-        $("input[name='tick_flea_2']").prop('disabled', true);
-    }   
-
-    if ($("input[name='dhppil_cv_3']").is(':checked') && $("input[name='dhppil_cv_3']").val() != ''){
-        $('#s_dhppil_cv_3').prop('disabled', true);
-        $("input[name='dhppil_cv_3']").prop('disabled', true);
-    }   
-
-    if ($("input[name='heartworm_3']").is(':checked') && $("input[name='heartworm_3']").val() != ''){
-        $('#s_heartworm_3').prop('disabled', true);
-        $("input[name='heartworm_3']").prop('disabled', true);
-    }   
-
-    if ($("input[name='dhppil4_1']").is(':checked') && $("input[name='dhppil4_1']").val() != ''){
-        $('#s_dhppil4_1').prop('disabled', true);
-        $("input[name='dhppil4_1']").prop('disabled', true);
-    }   
-
-    if ($("input[name='tick_flea_3']").is(':checked') && $("input[name='tick_flea_3']").val() != ''){
-        $('#s_tick_flea_3').prop('disabled', true);
-        $("input[name='tick_flea_3']").prop('disabled', true);
-    }   
-
-    if ($("input[name='dhppil4_2']").is(':checked') && $("input[name='dhppil4_2']").val() != ''){
-        $('#s_dhppil4_2').prop('disabled', true);
-        $("input[name='dhppil4_2']").prop('disabled', true);
-    }   
-    
-    if ($("input[name='heartworm_4']").is(':checked') && $("input[name='heartworm_4']").val() != ''){
-        $('#s_heartworm_4').prop('disabled', true);
-        $("input[name='heartworm_4']").prop('disabled', true);
-    }   
-
-    if ($("input[name='tick_flea_4']").is(':checked') && $("input[name='tick_flea_4']").val() != ''){
-        $('#s_tick_flea_4').prop('disabled', true);
-        $("input[name='tick_flea_4']").prop('disabled', true);
-    }   
-
-    if ($("input[name='heartworm_5']").is(':checked') && $("input[name='heartworm_5']").val() != ''){
-        $('#s_heartworm_5').prop('disabled', true);
-        $("input[name='heartworm_5']").prop('disabled', true);
-    }   
-    
-    if ($("input[name='tick_flea_5']").is(':checked') && $("input[name='tick_flea_5']").val() != ''){
-        $('#s_tick_flea_5').prop('disabled', true);
-        $("input[name='tick_flea_5']").prop('disabled', true);
-    }   
-
-    if ($("input[name='heartworm_6']").is(':checked') && $("input[name='heartworm_6']").val() != ''){
-        $('#s_heartworm_6').prop('disabled', true);
-        $("input[name='heartworm_6']").prop('disabled', true);
-    }   
-    
-    if ($("input[name='tick_flea_6']").is(':checked') && $("input[name='tick_flea_6']").val() != ''){
-        $('#s_tick_flea_6').prop('disabled', true);
-        $("input[name='tick_flea_6']").prop('disabled', true);
-    }   
-
-    if ($("input[name='heartworm_7']").is(':checked') && $("input[name='heartworm_7']").val() != ''){
-        $('#s_heartworm_7').prop('disabled', true);
-        $("input[name='heartworm_7']").prop('disabled', true);
-    }   
-
-    if ($("input[name='tick_flea_7']").is(':checked') && $("input[name='tick_flea_7']").val() != ''){
-        $('#s_tick_flea_7').prop('disabled', true);
-        $("input[name='tick_flea_7']").prop('disabled', true);
-    }   
-
-    if ($("input[name='heartworm_8']").is(':checked') && $("input[name='heartworm_8']").val() != ''){
-        $('#s_heartworm_8').prop('disabled', true);
-        $("input[name='heartworm_8']").prop('disabled', true);
-    }   
 });

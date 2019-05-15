@@ -38,7 +38,7 @@
     </div>
 
     <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui six column inverted pink celled table">
+    <table id="tabledata1" class="ui seven column inverted pink celled table">
         <thead>
             <tr>
                 <th></th>
@@ -46,6 +46,7 @@
                 <th>Age</th>
                 <th>Breed</th>
                 <th>Color</th>
+                <th>Capability</th>
                 <th>Litter</th>
             </tr>
         </thead>
@@ -59,6 +60,7 @@
                 <td>{{mothers|age:forloop.counter0 }}</td>
                 <td>{{mothers|breed:forloop.counter0 }}</td>
                 <td>{{mothers|color:forloop.counter0 }}</td>
+                <td>{{mothers|capability:forloop.counter0 }}</td>
                 <td>{{mothers|litter_no:forloop.counter0 }}</td>
             </tr>
             {% endfor %}
@@ -75,6 +77,7 @@
                 <th>Age</th>
                 <th>Breed</th>
                 <th>Color</th>
+                <th>Capability</th>
                 <th>Litter</th>
             </tr>
         </thead>
@@ -88,6 +91,7 @@
                 <td>{{fathers|age:forloop.counter0 }}</td>
                 <td>{{fathers|breed:forloop.counter0 }}</td>
                 <td>{{fathers|color:forloop.counter0 }}</td>
+                <td>{{fathers|capability:forloop.counter0 }}</td>
                 <td>{{fathers|litter_no:forloop.counter0 }}</td>
             </tr>
          {% endfor %}

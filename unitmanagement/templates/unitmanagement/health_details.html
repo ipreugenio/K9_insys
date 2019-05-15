@@ -11,14 +11,14 @@
 </div>
 <div class="ui segment">
     <div class="ui raised segment">
-        <table class="ui collapse celled table">
+        <table class="ui collapse green celled table">
             <thead>
                 <tr>
-                    <th>K9</th>
+                    <th class="two wide">K9</th>
                     <td>{{data.dog}}</td>
-                    <th>Reported by:</th>
+                    <th class="two wide">Reported by:</th>
                     <td>{{data.incident_id.reported_by}}</td>
-                    <th>Reported on:</th>
+                    <th class="two wide">Reported on:</th>
                     <td>{{data.incident_id.date}}</td>
                 </tr>
                 <tr>
@@ -26,12 +26,26 @@
                     <td>{{data.veterinary}}</td>
                     <th>Prescribed on:</th>
                     <td>{{data.date}}</td>
+                    <th>Duration:</th>
+                    <td>{{data.duration}}</td>
+                </tr>
+            </thead>
+        </table>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th class="two wide">Problem:</th>
+                    <td class="fourteen wide">{{data.problem}}</td>
+                </tr>
+                <tr>
+                    <th>Treatment:</th>
+                    <td>{{data.treatment}}</td>
                 </tr>
             </thead>
         </table>
     </div>
 
-    <table class="ui celled table" id = 'tabledata'>
+    <table class="ui inverted green celled table" id = 'tabledata'>
         <thead>
           <th>Medicine</th>
           <th>Quantity</th>
@@ -49,7 +63,13 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <center>
+        <a href="" class="ui blue button">Follow Up</a>
+    </center>
+    
 </div>
+
 <script type="text/javascript">
 
     $(document).ready(function() {

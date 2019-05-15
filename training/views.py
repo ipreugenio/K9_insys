@@ -10,14 +10,14 @@ from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
 from unitmanagement.models import Handler_K9_History
 from training.models import Training, K9_Adopted_Owner, Record_Training
-from .forms import TestForm, add_handler_form
+from .forms import TestForm, add_handler_form, assign_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm, RecordForm, DateForm
 import datetime
 from deployment.models import Team_Assignment
 from django.db.models import Sum
 from decimal import Decimal
-
+import itertools
 
 from collections import OrderedDict
 
@@ -822,36 +822,46 @@ def classify_k9_select(request, id):
 
 # TODO 
 def assign_k9_select(request, id):
-    form = add_handler_form(request.POST)
+    form = assign_handler_form(request.POST or None)
     style = ""
-    k9 = K9.objects.get(id=id)
+    k9 = K9.objects.get(id=id)  
+
+    handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
+    g = []
+    for h in handler:
+        c = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+        g.append(c)
 
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
-            handler = User.objects.get(id=form.data['handler'])
-            handler.capability = k9.capability
-            handler.partnered=True
-
-            handler.save()
-
-            k9.partnered=True
-            k9.training_status = "On-Training"
-            k9.handler = handler
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.save()
+            
+            #K9 Update
+            k9.training_status = 'On-Training'
+            k9.partnered = True
+            k9.handler = f.handler
             k9.save()
 
-            #Create K9_Handler Model
-            K9_Handler.objects.create(k9 = k9, handler = handler)
-            #Create History
-            Handler_K9_History.objects.create(k9 = k9, handler = handler)
-            messages.success(request, 'K9 has been assigned to a handler!')
+            #Handler Update
+            h = User.objects.get(id= f.handler.id)
+            h.partnered = True
+            h.save()
+
+            messages.success(request, str(k9) + ' has been assigned to ' + str(h) + ' and is ready for Training!')
+            messages.info(request, 'On-Training')
+            return redirect('training:classify_k9_list')
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            print(form)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
     context = {
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
@@ -859,6 +869,8 @@ def assign_k9_select(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'k9':k9,
+        'g':g,
     }
     return render (request, 'training/assign_k9_select.html', context)
 
@@ -2026,11 +2038,20 @@ def load_handler(request):
     try:
         handler_id = request.GET.get('handler')
         handler = User.objects.get(id=handler_id)
+        pi = Personal_Info.objects.get(UserID=handler)
+        edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
+        
     except:
         pass
 
     context = {
         'handler': handler,
+        'pi':pi,
+        'ndd':ndd,
+        'edd':edd,
+        'sar':sar,
     }
 
     return render(request, 'training/handler_data.html', context)

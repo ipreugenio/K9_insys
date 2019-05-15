@@ -25,11 +25,15 @@ urlpatterns = [
     path('k9-unpartnered-list', views.k9_unpartnered_list, name='k9_unpartnered_list'),
     path('choose-handler-list/<int:id>', views.choose_handler_list, name='choose_handler_list'),
     path('choose-handler/<int:id>', views.choose_handler, name='choose_handler'),
+    path('k9-sick-form', views.k9_sick_form, name='k9_sick_form'),
     path('k9-sick-list', views.k9_sick_list, name='k9_sick_list'),
     path('k9-sick-details/<int:id>', views.k9_sick_details, name='k9_sick_details'),
     path('on-leave-request', views.on_leave_request, name='on_leave_request'),
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),
     path('on-leave-details/<int:id>', views.on_leave_details, name='on_leave_details'),
+
+    path('health-list', views.health_list_handler, name='health_list_handler'),
+
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),
@@ -39,6 +43,8 @@ urlpatterns = [
     path('k9/api/<int:id>', views.K9DetailView.as_view()),
     path('user/api/<int:id>', views.UserDetailView.as_view()),
 
+    path('choose-handler-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
+    path('health-history/ajax_load_stamp', views.load_stamp, name='ajax_load_stamp'),
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
 
     #path('/<int:id>/', views., name=''),

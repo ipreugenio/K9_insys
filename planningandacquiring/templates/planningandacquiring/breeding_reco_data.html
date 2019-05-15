@@ -1,7 +1,6 @@
-
 {% load static %}
 {% block content %}
-{% if k9 %}
+{% if k9_arr|length > 0  %}
 <div class="ui segment">
     <div class="ui info message">
         <i class="close icon"></i>
@@ -65,9 +64,6 @@
         <div class="header">
             No Recommendation
         </div>
-        <ul class="list">
-            <li>There is no previous record of mating on available K9's.</li>
-        </ul>
     </div>
 
 </div>

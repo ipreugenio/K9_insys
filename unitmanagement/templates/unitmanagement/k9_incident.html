@@ -27,6 +27,10 @@
             <div class="field"></div>
         </div>
         <div class="field">
+            <label>Vet Clinic Address</label>
+            {{form.clinic}}
+        </div>
+        <div class="field">
             <label>Additional Information</label>
             {{form.description}}
         </div>
@@ -36,11 +40,21 @@
         </div>
     </form>
 </div>
+{% if num > 0 %}
+<h1>Here</h1>
+{%endif%}
 
 <script type="text/javascript">
         
     $(document).ready(function() {
-      
+        $("input[name='clinic']").prop('disabled', 'disabled');
+
+        $("select[name='incident']").change(function() {
+            if( $("select[name='incident']").val() == 'Accident'){
+                $("input[name='clinic']").prop('disabled', false);
+            }
+        });
+
     });
     
 </script>

@@ -11,23 +11,24 @@
 </div>
 
 <div class="ui segment" data-tab="first">
-    <table id="tabledata1" class="ui three column celled table">
+    <table id="tabledata1" class="ui four column celled table">
         <thead>
             <tr>
+                <th>Date Reported</th>
                 <th>K9</th>
                 <th>Reported By:</th>
-                <th>Date Reported</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in data %}
             <tr>
+                <td>{{data.date}}</td>
                 <td>{{data.k9}}</td>
                 <td>{{data.reported_by}}</td>
-                <td>{{data.date}}</td>
-                <td class="center aligned">
-                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}" class="ui blue button">Select</a>
+                <td class="center aligned three wide">
+                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}"
+                    class="ui basic blue button">Select</a>
                 </td>
             </tr>
             
@@ -39,7 +40,9 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
+        $('#tabledata1').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
         $('.menu .item').tab();
     });
 
