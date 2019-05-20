@@ -116,7 +116,10 @@ class K9(models.Model):
         ('Due-For-Retirement', 'Due-For-Retirement'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
-        ('Sick', 'Sick'), 
+        ('Sick', 'Sick'),
+        ('Stolen', 'Stolen'), 
+        ('Lost', 'Lost'), 
+        ('Accident', 'Accident'), 
     )
     
     REPRODUCTIVE = (
@@ -162,8 +165,6 @@ class K9(models.Model):
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
-    partnered = models.BooleanField(default=False)
-    handler_on_leave = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     #microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
@@ -179,6 +180,7 @@ class K9(models.Model):
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
+    #partnered = models.BooleanField(default=False)
     # def best_fertile_notification(self):
     #     notif = self.estrus_date - td(days=7)
     #     return notif
@@ -216,6 +218,7 @@ class K9(models.Model):
                 self.litter_no = 0
             
 
+        self.last_proestrus_date = self.birth_date + relativedelta(months=+6)
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30

@@ -176,10 +176,11 @@ class LocationForm(forms.ModelForm):
 
 class AssignTeamForm(forms.ModelForm):
     location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
+    team_leader = forms.ModelChoiceField(queryset = User.objects.filter(position='Team Leader').filter(assigned=False))
 
     class Meta:
         model = Team_Assignment
-        fields = ('location', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
+        fields = ('location', 'team_leader', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
 class EditTeamForm(forms.ModelForm):
     class Meta:
@@ -240,15 +241,14 @@ class RequestForm(forms.ModelForm):
 
 
 class IncidentForm(forms.ModelForm):
+    location = forms.ModelChoiceField(queryset = Location.objects.none(), empty_label=None)
     class Meta:
         model = Incidents
         fields = '__all__'
 
         widgets = {
             'date': DateInput(),
-            #'date_time': forms.widgets.DateTimeInput(format="%d %b %Y %H:%M:%S %Z")
         }
 
     def __init__(self, *args, **kwargs):
         super(IncidentForm, self).__init__(*args, **kwargs)
-        self.fields['user'].intial = current_user

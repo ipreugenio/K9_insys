@@ -169,7 +169,7 @@ class Location(models.Model):
 
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
-    place = models.CharField('place', max_length=100, default='Undefined')
+    place = models.CharField('place', max_length=200, default='Undefined')
     sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     status = models.CharField('status', max_length=100, default="unassigned")
 
@@ -177,11 +177,12 @@ class Location(models.Model):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
 
 class Team_Assignment(models.Model):
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, default='None')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    team_leader =  models.ForeignKey(User, on_delete=models.CASCADE,  null=True, blank=True)
     team = models.CharField('team', max_length=100)
-    EDD_demand = models.IntegerField('EDD_demand', default=0)
-    NDD_demand = models.IntegerField('NDD_demand', default=0)
-    SAR_demand = models.IntegerField('SAR_demand', default=0)
+    EDD_demand = models.IntegerField('EDD_demand', default=2)
+    NDD_demand = models.IntegerField('NDD_demand', default=2)
+    SAR_demand = models.IntegerField('SAR_demand', default=2)
     EDD_deployed = models.IntegerField('EDD_deployed', default=0)
     NDD_deployed = models.IntegerField('NDD_deployed', default=0)
     SAR_deployed = models.IntegerField('SAR_deployed', default=0)
@@ -199,8 +200,10 @@ class Team_Assignment(models.Model):
 
 class Dog_Request(models.Model):
     TYPE = (
-        ('Mall', 'Mall'),
-        ('Airport', 'Airport')
+        ('Disaster', 'Disaster'),
+        ('Government Request', 'Government Request'),
+        ('Annual Event', 'Annual Event'),
+        ('Event', 'Event'),
     )
 
     requester = models.CharField('requester', max_length=100)
@@ -209,7 +212,7 @@ class Dog_Request(models.Model):
     phone_number = models.CharField('phone_number', max_length=100, default="n/a")
     email_address = models.EmailField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
-    area = models.ForeignKey(Location, on_delete=models.CASCADE)
+    area = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     EDD_needed = models.IntegerField('EDD_needed', default=0)
     NDD_needed = models.IntegerField('NDD_needed', default=0)
     SAR_needed = models.IntegerField('SAR_needed', default=0)
@@ -238,17 +241,26 @@ class Dog_Request(models.Model):
         self.total_dogs_deployed = int(self.EDD_deployed) + int(self.NDD_deployed) + int(self.SAR_deployed)
         super(Dog_Request, self).save(*args, **kwargs)
 
+#TODO retain or remove deployed
 class Team_Dog_Deployed(models.Model):
     team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
     team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True) #Dog Rquest
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
-    handler = models.CharField('handler', max_length=100, null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
     date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
     date_pulled = models.DateField('date_pulled' , null=True, blank=True)
 
     def __str__(self):
         return str(self.k9) + ' - ' + str(self.team_assignment)
+
+    def save(self, *args, **kwargs):
+        self.handler = self.k9.handler
+        if self.status == 'Deployed':
+            k9 = K9.objects.get(id=self.k9.id)
+            k9.training_status = 'Deployed'
+            k9.save()
+        super(Team_Dog_Deployed, self).save(*args, **kwargs)
 
 class K9_Schedule(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -274,6 +286,7 @@ class Incidents(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', null=True, blank=True)
+    incident = models.CharField('incident', max_length=100, null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField('type', choices=TYPE, max_length=100, default='Others')
     remarks = models.TextField('remarks', max_length=200, blank=True, null=True)

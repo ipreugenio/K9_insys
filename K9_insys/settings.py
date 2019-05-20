@@ -136,13 +136,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Manila'
 CELER_IGNORE_RESULT = False
 
-# CELERY_BEAT_SCHEDULE = {
-#     'every-10-seconds':{
-#         'task': 'unitmanagement.tasks.what',
-#         'schedule': timedelta(seconds=10),
-#     },
-# }
-
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 

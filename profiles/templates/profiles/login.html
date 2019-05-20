@@ -10,57 +10,60 @@
     <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
     <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}">
 </head>
-<body>
+<body style="background-color: orangered;">
     <!--START OF TOP MENU-->
-        <div class="ui top attached menu">
+        <div class="ui inverted top attached menu" style="padding:5px;">
             <div class="right menu">
-                <a class="ui item" href="{% url 'profiles:register'%}" style="font-weight: bold;">SIGN-UP</a>
-                <a class="ui item" href="{% url 'profiles:login'%}" style="font-weight: bold;">LOGIN</a>
+                <a class="ui item" href="{% url 'profiles:register'%}" style="font-weight: bold;color: orangered;">SIGN-UP</a>
+                <a class="ui item" href="{% url 'profiles:login'%}" style="font-weight: bold;color: orangered;">LOGIN</a>
             </div>
         </div>
     <!--END OF TOP MENU-->
 
-    <div class="ui centered container">
-        <div class="ui center aligned grid">
-            <div class="row">
-                    <div class="eight wide computer column" style="margin-top: 20px;">
-                            <img src="{% static 'images/k9_logo.png' %}">
-                    </div>
-            </div>
-            <div class="row">
-                <div class="ui container">
-                       <div class = "ui two column centered grid">
-                            <div class="six wide column">               
-                                <div class="ui inverted segment">
-                                    <div class="ui left aligned inverted form">
-                                        <form class="ui inverted equal width form" action="{% url 'profiles:login' %}" method="POST">
-                                            {% csrf_token %}
-                                        <div class="field">
-                                            <label>Serial Number</label>
-                                            <input name="serial_number" placeholder="Serial Number" type="text">
-                                        </div>
-                                        <div class="field">
-                                            <label>Password</label>
-                                            <input name="password" placeholder="Password" type="password">
-                                        </div>
-                                     
-                                        <div class="ui inverted center aligned segment" style="padding: 0px;">
-                                            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Login</button>
-                                        </div>
-                                        </form>
-                                    </div>
-                                </div>           
-                            </div>
-                       </div>
+    <div class="ui bottom attached segment" id = 'bg' style="height:89%;">
+        <div class="ui three column centered grid">
+            <div class="column center aligned" style="background:transparent;border-radius:20px;margin-top: 3%;" class ='screen_centered'>
+                <img src="{% static 'images/k9_logo.png' %}">
+                <div class="ui inverted segment">
+                    <form class="ui inverted equal width form" action="{%url 'profiles:login' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="field">
+                            <label>SERIAL NUMBER</label>
+                            <input name="serial_number" placeholder="Serial Number" type="text">
+                        </div>
+                        <div class="field">
+                            <label>PASSWORD</label>
+                            <input name="password" placeholder="Password" type="password">
+                        </div>
+                    
+                        <div class="center aligned">
+                            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Login</button>
+                        </div>
+                    </form>
                 </div>
-                
             </div>
-             
-        </div>
+        </div>  
     </div>
-
 </body>
-    
+<style>
+    #bg{
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+        background-image: url('{% static "images/qwe2.jpg"%}');
+        background-size: 100% 100%;
+    }
+
+    .screen_centered {
+        position: fixed;
+        margin-top: 10%;
+        left: 50%;
+        /* bring your own prefixes */
+        transform: translate(-50%, -50%);
+    }
+  
+</style>
+  
     <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script src="{% static 'semantic/semantic.min.js' %}"></script>

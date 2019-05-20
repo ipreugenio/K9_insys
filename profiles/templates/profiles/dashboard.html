@@ -1,111 +1,34 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
-<div class = 'pusher' style="background:white;">
-<div class="ui segment" style="position:relative; margin-top: 10px;">
-<div class="ui three statistics">
-  <div class="ui red statistic">
-    <div class="value">
-      <i class="paw icon"></i> {{can_deploy}}
-    </div>
-    <div class="label">
-      Dogs that can be deployed
-    </div>
-  </div>
-  <div class="ui orange statistic">
-    <div class="value">
-      <i class="paw icon"></i> {{k9_deployed}} / {{k9_demand}}
-    </div>
-    <div class="label">
-      Deployed Dogs over Demand
-    </div>
-  </div>
-  <div class="ui yellow statistic">
-    <div class="value">
-       <i class="paw icon"></i> {{k9_deployed_request}} / {{k9_demand_request}}
-    </div>
-    <div class="label">
-      Deployed Dogs over Requests
-    </div>
-  </div>
-</div>
+<div class="pusher">
+
+{% if request.session.session_user_position == "Administrator" %}
+  <h1>Administrator</h1>
+  <ul>
+      <li>Recommended Supplier??</li>
+      <li>k9s to Breed and procured</li>
+      <li>On Leave Approval?</li>
+      <li>Incidents that needs user interaction</li>
+    </ul>
+{% elif request.session.session_user_position == "Veterinarian" %}
+  <h1>Veterinarian Dashboard</h1>
+  <ul>
+	 <li>Follow Up</li>
+    <li>Physical Exam Scheduled</li>
+    <li>Health Medicine On Going</li>
+    <li>Vaccinations not yet done</li>
+  </ul>
+{% elif request.session.session_user_position == "Handler"%}
+  <h1>Handler Dashboard</h1>
+{% else %}
+  <h1>Team Leader Dashboard</h1>
+  <ul>
+    <li>On leave</li>
+    <li>Incidents</li>
+  </ul>
+{% endif %}
+
 </div>
 
-<div class="ui segment" style="width: 50%; margin-left: 50%; position: absolute;">
-    <div class="ui tiny statistic">
-        <div class="value">
-            <center>Training</center>
-        </div>
-    </div><br>
-    <div class="ui horizontal yellow statistic">
-    <div class="value">
-       <i class="paw icon"></i> {{untrained_k9}}
-    </div>
-    <div class="label">
-      Untrained K9
-    </div>
-  </div>
-     <div class="ui horizontal orange statistic">
-    <div class="value">
-       <i class="paw icon"></i> {{unclassified_k9}}
-    </div>
-    <div class="label">
-      Unclassified K9
-    </div>
-  </div><br>
-     <div class="ui horizontal green statistic">
-    <div class="value">
-       <i class="paw icon"></i> {{on_training}}
-    </div>
-    <div class="label">
-      On-training
-    </div>
-  </div>
-       <div class="ui horizontal blue statistic">
-    <div class="value">
-       <i class="paw icon"></i> {{trained}}
-    </div>
-    <div class="label">
-      Trained K9
-    </div>
-  </div>
-    <a href="{% url 'training:classify_k9_list' %}"><button class="fluid ui button">Go to training</button></a>
-</div>
-
-<div class="ui segment" style="width: 50%; position: absolute;">
-    <div class="ui tiny statistic">
-        <div class="value">
-            <center>Unit Management</center>
-        </div>
-    </div><br>
-<div class="ui horizontal red statistic">
-    <div class="value">
-       <i class="wrench icon"></i> {{equipment_requests}}
-    </div>
-    <div class="label">
-      Pending request of equipments
-    </div>
-  </div><br>
-<a href="{% url 'unitmanagement:request_list' %}"><button class="fluid ui button" style="position: relative; margin-top: 11%;">Go to Unit Management</button></a>
-</div>
-
-<div class="ui segment" style="width: 100%; margin-top: 22%; position: absolute;">
-    <hr style="border: 3px solid white;">
-    <div class="ui tiny statistic">
-        <div class="value">
-            <center>Planning and Acquiring</center>
-        </div>
-    </div><br>
-<div class="ui horizontal blue statistic">
-    <div class="value">
-       <i class="plus square icon"></i> {{for_breeding}}
-    </div>
-    <div class="label">
-        For breeding
-    </div>
-  </div><br>
-<a href="{% url 'planningandacquiring:K9_list' %}"><button class="fluid ui button">Go to Planning and Acquiring</button></a>
-</div>
-</div>
-</div>
 {% endblock%}

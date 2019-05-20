@@ -6,14 +6,14 @@
     <div class="ui basic segment">
         <div class="ui grid">
             <div class="three wide column">
-                <div class="ui tiny pointing vertical menu" style="width:230px;">
+                <div class="ui pointing vertical menu">
                     {% if request.session.session_user_position == "Administrator" %}
                         <a class="item"> <b>Training Menu</b></a>
-                        <a href="{% url 'training:training_records'%}" class="item">Training Records
-                            <i class="folder open icon"></i>
+                        <a href="{% url 'training:training_records'%}" class="item">
+                            <i class="folder open icon"></i>Training Records
                         </a>
-                        <a href="{% url 'training:classify_k9_list'%}" class="item">Classify K9's
-                            <i class="clipboard check icon"></i>
+                        <a href="{% url 'training:classify_k9_list'%}" class="item">
+                            <i class="clipboard check icon"></i>Classify K9's
                         </a>
                     {% endif %}
                 </div>

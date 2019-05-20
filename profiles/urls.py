@@ -11,6 +11,7 @@ urlpatterns = [
     path('notifications/', views.notif_list, name='notif_list'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
     path('add_User_form/', views.add_User, name='add_User_form'),
     path('add_User_form/add_personal_form/', views.add_personal_info, name='add_personal_form'),
     path('add_User_form/add_personal_form/add_education/', views.add_education, name='add_education'),

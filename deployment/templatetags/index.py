@@ -140,16 +140,23 @@ def calculate_distance_from_current_team(K9, team_id):
     pcg_lat = 1632299.5848436863
 
     current_coordinates = convert_to_geographic(pcg_lon, pcg_lat)
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
+    
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
 
-    if(team_dog_deployed.date_pulled is None):
-        team_assignment_id = team_dog_deployed.team_assignment.id
-        team_assignment = Team_Assignment.objects.get(id = team_assignment_id)
-        location = team_assignment.location
-        print("TEAM DOG DEPLOYED ID")
-        print(team_dog_deployed.id)
-        current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
-        deployed = 1
+        if(team_dog_deployed.date_pulled is None):
+            team_assignment_id = team_dog_deployed.team_assignment.id
+            team_assignment = Team_Assignment.objects.get(id = team_assignment_id)
+            location = team_assignment.location
+            print("TEAM DOG DEPLOYED ID")
+            print(team_dog_deployed.id)
+            current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
+            deployed = 1
+        
+        else:
+            pass
+    except:
+        pass
 
     team = Team_Assignment.objects.get(id = team_id)
     team_location = team.location

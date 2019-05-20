@@ -86,8 +86,8 @@ def add_area(request):
 def add_location(request):
     form = LocationForm(request.POST or None)
     style = ""
-    form.initial['place'] = None
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
             form.save()
             style = "ui green message"
@@ -118,14 +118,12 @@ def assign_team_location(request):
     style = ""
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            location = form.cleaned_data['location']
-            l = Location.objects.get(id=location.id)
+            f = form.save(commit=False)
+            f.team_leader.assigned=True
+            f.location.status='assigned'
+            f.save()
 
-            #change the status of the location
-            data = Location.objects.get(id=l.id)
-            data.status = 'assigned'
-            data.save()
+            print(f)
 
             style = "ui green message"
             messages.success(request, 'Location has been successfully Added!')
@@ -203,38 +201,26 @@ def assigned_location_list(request):
 
 def team_location_details(request, id):
     data = Team_Assignment.objects.get(id=id)
-    k9 = Team_Dog_Deployed.objects.filter(team_assignment=data)
     incidents = Incidents.objects.filter(location = data.location)
     edd_inc = Incidents.objects.filter(location = data.location).filter(type = "Explosives Related").count()
     ndd_inc = Incidents.objects.filter(location=data.location).filter(type="Narcotics Related").count()
     sar_inc = Incidents.objects.filter(location=data.location).filter(type="Search and Rescue Related").count()
     style = ""
+
     #filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data.location.city)
-
-    handler_can_deploy=[] # append the id of the handlers
+    
+    user_deploy = [] 
     for h in handlers:
-        handler_can_deploy.append(h.id)
-    #print(handler_can_deploy)
-
-    #get instance of user using personal_info.id
-    #id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy)
+       user_deploy.append(h.UserID)
     #print(user)
-
-    user_deploy=[] # append the user itself
-    for u in user:
-        user_deploy.append(u.id)
-
     # print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
-    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
-    #print(can_deploy)
-
-
-    #dogs deployed
+    can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
+    
     dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
+  
 
 
     if request.method == 'POST':
@@ -271,9 +257,8 @@ def team_location_details(request, id):
     context = {
         'title' : data,
         'data' : data,
-        'k9' : k9,
-        'can_deploy':can_deploy,
         'style': style,
+        'can_deploy':can_deploy,
         'dogs_deployed':dogs_deployed,
         'dogs_pulled': dogs_pulled,
         'sar_inc': sar_inc,
@@ -607,32 +592,65 @@ def view_schedule(request, id):
 
     return render(request, 'deployment/k9_schedule.html', context)
 
-'''
-def load_teams(request):
-    area_id = request.GET.get('area')
-    area = Area.objects.get(id = area_id)
-    teams = Team.objects.filter(area=area).order_by('name')
+def deployment_area_details(request):
+    user = user_session(request)
 
-    return render(request, 'deployment/ajax_load_teams.html', {'teams': teams})
-'''
+    data = Team_Assignment.objects.get(team_leader=user)
+
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+    
+    sar_inc = Incidents.objects.filter(location=data.location).filter(type='Search and Rescue Related').count()
+    ndd_inc = Incidents.objects.filter(location=data.location).filter(type='Narcotics Related').count()
+    edd_inc = Incidents.objects.filter(location=data.location).filter(type='Explosives Related').count()
+    incidents = Incidents.objects.filter(location=data.location).filter(type='Others').count()
+
+    mn = []
+    for td in tdd:
+        pi = Personal_Info.objects.get(UserID=td.handler)
+        mn.append(pi.mobile_number)
+
+    print(mn)
+
+    data_list = zip(tdd, mn)
+    
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data':data,
+        'tdd':tdd,
+        'sar_inc':sar_inc,
+        'ndd_inc':ndd_inc,
+        'edd_inc':edd_inc,
+        'incidents':incidents,
+        'data_list':data_list,
+    }
+
+    return render(request, 'deployment/deployment_area_details.html', context)
 
 def add_incident(request):
+    user = user_session(request)
     form = IncidentForm(request.POST or None)
-    style = ""
+    style = "ui green message"
 
-    user_serial = request.session['session_serial']
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
+    ta = Team_Assignment.objects.get(team_leader=user)
 
+    form.initial['date'] = date.today() 
+    form.fields['location'].queryset = Location.objects.filter(id=ta.location.id)
+    
     if request.method == 'POST':
         if form.is_valid():
-            incident = form.save()
-            incident.user = current_user
-            incident.save()
-            
+            f = form.save(commit=False)
+            f.user = user
+            f.save() 
+
             style = "ui green message"
             messages.success(request, 'Incident has been successfully added!')
-            form = IncidentForm()
+            return redirect('deployment:add_incident')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -640,7 +658,6 @@ def add_incident(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': 'Report Incident Form',
         'texthelp': 'Input Incident Details Here',

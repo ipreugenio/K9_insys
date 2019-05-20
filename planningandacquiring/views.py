@@ -563,7 +563,16 @@ def add_K9_offspring(request, id):
     return render(request, 'planningandacquiring/add_K9_offspring.html', context)
 
 def breeding_k9_confirmed(request):
-    return render(request, 'planningandacquiring/breeding_confirmed.html')
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render(request, 'planningandacquiring/breeding_confirmed.html', context)
 
 def confirm_breeding(request):
     offspring_id = request.session['offspring_id']

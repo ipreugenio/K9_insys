@@ -6,7 +6,7 @@ from django.forms import formset_factory, inlineformset_factory, modelformset_fa
 from django.contrib.sessions.models import Session
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed
-from unitmanagement.models import K9_Incident, Handler_Incident
+from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
@@ -191,27 +191,21 @@ class K9IncidentForm(forms.ModelForm):
         self.fields['clinic'].required = False
 
 class HandlerIncidentForm(forms.ModelForm):
-    INCIDENT = (
-        #('Accident', 'Accident'),
-        ('Died', 'Died'),
-    )
-    
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
-    incident = forms.CharField(widget = forms.Select(choices=INCIDENT))
-    
     class Meta:
         model = Handler_Incident
-        fields = ('handler', 'incident', 'description')
+        fields = ('handler', 'incident', 'description', 'reported_by', 'k9')
 
     def __init__(self, *args, **kwargs):
         super(HandlerIncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+        self.fields['reported_by'].required = False
+        self.fields['k9'].required = False
 
 class HandlerOnLeaveForm(forms.ModelForm):
     incident = forms.CharField()
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
+    handler = forms.ModelChoiceField(queryset = User.objects.none(), empty_label=None)
     class Meta:
-        model = Handler_Incident
+        model = Handler_On_Leave
         fields = ('handler', 'incident', 'description', 'date_from', 'date_to')
 
         widgets = {
@@ -225,20 +219,8 @@ class HandlerOnLeaveForm(forms.ModelForm):
        
 
 class ReassignAssetsForm(forms.Form):
-    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(partnered=False))
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['handler'].queryset = User.objects.none()
-    #     if 'k9' in self.data:
-    #         try:
-    #             k9_capability = str(self.data.get('k9').capability)
-    #             self.fields['handler'].queryset = User.objects.filter(handler_id=k9_capability).filter(status='Working').filter(position='Handler').filter(partnered=False)
-    #         except (ValueError, TypeError):
-    #             pass  # invalid input from the client; ignore and fallback to empty City queryset
-    #     elif self.instance.pk:
-    #          self.fields['handler'].queryset = self.k9.handler.order_by('name')
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(handler=None))
 
 class ReproductiveForm(forms.ModelForm):
     class Meta:

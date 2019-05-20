@@ -1,6 +1,19 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
+{% if num > 0 %}
+    {% for data in incident %}
+    <div class="ui info icon message">
+        <i class="exclamation icon"></i>
+        <div class="content">
+            <div class="header">
+                You have reported {{data.k9}} as {{data.incident}} at {{data.date}}!
+            </div>
+            <p>{{data.description}}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
@@ -40,8 +53,7 @@
         </div>
     </form>
 </div>
-{% if num > 0 %}
-<h1>Here</h1>
+
 {%endif%}
 
 <script type="text/javascript">

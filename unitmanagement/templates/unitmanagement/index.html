@@ -1,63 +1,36 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
+<ul>
+  {% for notif in notif_data %}
+  <li>{{notif}}</li>
+  {% endfor %}
+</ul>
 
-<!-- <div class="ui modal" style="height:500px;">
-        <i class="close icon"></i>
-        <div class="header">
-          Profile Picture
-        </div>
-        <div class="image content">
-          <div class="ui medium image">
-            <img src="/images/avatar/large/chris.jpg">
-          </div>
-          <div class="description">
-            <div class="ui header">We've auto-chosen a profile image for you.</div>
-            <p>We've grabbed the following image from the <a href="https://www.gravatar.com" target="_blank">gravatar</a> image associated with your registered e-mail address.</p>
-            <p>Is it okay to use this photo?</p>
-          </div>
-        </div>
-        <div class="actions">
-          <div class="ui black deny button">
-            Nope
-          </div>
-          <div class="ui positive right labeled icon button">
-            Yep, that's me
-            <i class="checkmark icon"></i>
-          </div>
-        </div>
-      </div> -->
+<div class="load_data">
+  {% if n %}
+    <ul>
+      {% for n in n %}
+      <li>{{n}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+<input type="hidden" value="{{user.id}}" id = 'here'>
+<script>
+    var url = 'index';  
+    var id = $("#here"). val();
 
-<div>
-    background
-</div>
-<div class="modal_1">
-    something
-</div>
-<div>
-        background
-    </div>
-<style>
-    .visible.transition {
-  margin-top: auto !important;
-  position:fixed;
-  bottom:0%;
-}
-    .modal_1{
-        display: block;
-        position: absolute;
-        width: 1000px;
-        height: 550px;
-        background: red;
-        visibility: hidden;
-    }
-</style>
-      <script>
-      $(document).ready(function() {
-        $('.ui.modal')
-  .modal('show')
-;
+    $.ajax({                       
+      url: url,                    
+      data: {
+        'id': id       
+      },
+      success: function (data) {   
+        $("#load_data").html(data);  
+      }
     });
 
-      </script>
-    {% endblock%}
+</script>
+
+{% endblock%}

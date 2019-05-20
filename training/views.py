@@ -841,7 +841,6 @@ def assign_k9_select(request, id):
             
             #K9 Update
             k9.training_status = 'On-Training'
-            k9.partnered = True
             k9.handler = f.handler
             k9.save()
 

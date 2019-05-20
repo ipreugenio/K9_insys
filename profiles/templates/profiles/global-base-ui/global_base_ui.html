@@ -27,8 +27,7 @@
 <body class="Site">
     <!--START OF TOP MENU-->
     <main class="Site-content">
-
-        <div class="ui inverted top attached demo menu" style="height:30px;">
+        <div class="ui inverted top attached menu" style="height:50px;">
                 <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
                 <div class="item">
                     <a class="text" href="{% url 'profiles:profile'%}">
@@ -36,13 +35,13 @@
                         {{request.session.session_username}}
                     </a>
                 </div>
-                <div class="right menu">
+                <div class="ui right borderless inverted menu">
                     <div class="ui item" style='border-style: none;'>
                         {% include 'profiles/global-base-ui/notification.html' %}
                     </div>
-                    <div class="topdiv">
-                        <img src="{% static 'images/k9_logo.png' %}" height="18" width="18" style="margin-right: 5px;">
-                        <p class="topmenu">PHILIPPINE K9 COAST GUARD</p>
+                    <div class="ui item">
+                        <img  class="ui avatar image" src="{% static 'images/k9_logo.png' %}">
+                        <span style="color: orangered;">PHILIPPINE K9 COAST GUARD</span>
                     </div>
                     
                 </div>
@@ -63,29 +62,7 @@
 
         .Site-content {
         flex: 1;
-}
-        .topmenu{
-            color:orangered;
-            display: block;
-            font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            display: list-item;
-            table-layout: fixed;
-            background-color: transparent;
-            list-style-type: none;
-            list-style-position: outside;
-            line-height: 1.14285714em;
-            font-weight: bold;
         }
-        
-        .topdiv{
-            display: flex; 
-            flex-wrap: wrap;
-            justify-content: center;
-            border: 5px;
-            padding: 10px;
-            border-left: 1px solid #262626;
-        }
-    
     </style>
 
   

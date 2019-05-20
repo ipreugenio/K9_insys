@@ -177,6 +177,15 @@ def profile(request):
             if pform.is_valid():
                 print(eform.errors)
                 if eform.is_valid():
+                    if uform.status == 'No Longer Employed':
+                        uform.partnered = False
+                        try:
+                            k9 = K9.objects.get(handler=uform)
+                            k9.handler = None
+                            k9.save()
+                        except:
+                            pass
+
                     uform.save()
                     pform.save()
                     eform.save()
@@ -234,6 +243,12 @@ def login(request):
     }
 
     return render (request, 'profiles/login.html', context)
+
+def logout(request):
+    session_keys = list(request.session.keys())
+    for key in session_keys:
+        del request.session[key]
+    return redirect('profiles:login')
 
 def add_User(request):
 

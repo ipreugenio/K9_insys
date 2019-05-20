@@ -13,13 +13,13 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident, Handler_K9_History
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
 from training.forms import assign_handler_form
@@ -114,38 +114,22 @@ def redirect_notif(request, id):
     
 
 def index(request):
-    data = K9.objects.get(name='damn')
-    vr = VaccinceRecord.objects.get(k9=data)
-    vu = VaccineUsed.objects.filter(vaccine_record=vr)
-    
-    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
-    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
-
-    m = get_object_or_404(VaccinceRecord, pk=vr.id)
-    print(m)
-
-    if request.method == 'POST':
-        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
-        if formset.is_valid():
-            for forms in formset:
-                if forms.is_valid():
-                    f = forms.save()
-                else:
-                    print(forms)
-        else:
-            print(formset)
-
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    n = None
+    try:
+        n = Notification.objects.filter(user__id=id)
+        print(n)
+    except:
+        pass
 
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
-        'formset':formset,
+        'n':n,
     }        
-
     return render (request, 'unitmanagement/index.html', context)
 
 #TODO Initialize treatment
@@ -812,6 +796,9 @@ def k9_incident(request):
             f.reported_by = user
             f.save()
 
+            dog.status = f.incident
+            dog.save()
+
             return redirect('unitmanagement:k9_incident')
     
     #NOTIF SHOW
@@ -831,6 +818,23 @@ def k9_incident(request):
     return render (request, 'unitmanagement/k9_incident.html', context)
 
 # TODO
+def k9_incident_list(request):
+    style='ui green message'
+    data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+    
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'title': "K9 Incident List",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data':data,
+    }
+    return render (request, 'unitmanagement/k9_incident_list.html', context)
+
 def k9_sick_form(request):
     user = user_session(request)
     form = K9IncidentForm(request.POST or None, request.FILES or None)
@@ -844,6 +848,7 @@ def k9_sick_form(request):
             form = form.save(commit=False)
             form.incident = 'Sick'
             form.reported_by = user
+            form.k9.status = form.incident
             form.save()
 
             files = request.FILES.getlist('image_file')
@@ -874,6 +879,14 @@ def k9_sick_form(request):
         'handler': handler,
     }
     return render (request, 'unitmanagement/k9_sick_form.html', context)
+
+def k9_retreived(request, id):
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.k9.status = 'Working Dog'
+    data.save()
+    messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
+    return redirect('unitmanagement:k9_incident_list') 
 
 def health_list_handler(request):
     user = user_session(request)
@@ -908,46 +921,36 @@ def health_list_handler(request):
     }
     return render (request, 'unitmanagement/health_list_handler.html', context)
 
-def handler_incident(request):
+def handler_incident_form(request):
+    user = user_session(request)
     form = HandlerIncidentForm(request.POST or None)
-    style=''
-    user_serial = request.session['session_serial']
-    user_s = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user_s.UserID.id)
+    style='ui green message'
+    
+    data = Team_Assignment.objects.get(team_leader=user)
 
-    if current_user.position == 'Handler':
-        form.initial['handler'] = current_user
+    team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+    handler = []
+    for team in team:
+        handler.append(team.handler.id)
+
+    form.fields['handler'].queryset = User.objects.filter(id__in=handler)
     if request.method == "POST":
         if form.is_valid():
-            incident_save = form.save()
-            incident_save.status='Done'
-            incident_save.save()
-            # get k9 object
-            handler =incident_save.handler
-            handler_obj=User.objects.get(id=handler.id)
-            
-            #if k9 has a partner handler and died
-            if handler_obj.partnered==True and incident_save.incident=='Died' :
-                k9 = K9.objects.get(handler_id=handler_obj.id)
-                handler_obj.partnered = False
-                handler_obj.status = 'Dead'
-                k9.partnered = False
-                k9.handler = None
-                print(k9, k9.handler)
-                k9.save()
-                handler_obj.save()
-            else:
-                handler_obj.status = 'Dead'
-                handler_obj.save()
+            a = request.POST['k9_select']
+            b = K9.objects.get(name = a)
+            f = form.save(commit=False)
+            f.reported_by = user
+            f.k9 = b
+            f.save()
 
-            form = HandlerIncidentForm()
             style = "ui green message"
             messages.success(request, 'Incident has been successfully Reported!')
-        
+            return redirect('unitmanagement:handler_incident_form') 
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-
+            
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -961,13 +964,17 @@ def handler_incident(request):
         'count':count,
         'user':user,
     }
-    return render (request, 'unitmanagement/handler_incident.html', context)
+    return render (request, 'unitmanagement/handler_incident_form.html', context)
 
 def on_leave_request(request):
+    user = user_session(request)
     form = HandlerOnLeaveForm(request.POST or None)
     style=''
-  
-    form.initial['handler'] = user_session(request)
+    form.fields['handler'].queryset = User.objects.filter(id=user.id)
+    
+    data = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave')
+    num = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave').count()
+
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
@@ -975,6 +982,7 @@ def on_leave_request(request):
             form = HandlerOnLeaveForm()
             style = "ui green message"
             messages.success(request, 'Request has been successfully Submited!')
+            return redirect('unitmanagement:on_leave_request')
         
         else:
             style = "ui red message"
@@ -983,7 +991,6 @@ def on_leave_request(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': "On-Leave Form",
         'actiontype': "Submit",
@@ -992,13 +999,15 @@ def on_leave_request(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'data':data,
+        'num':num,
     }
     return render (request, 'unitmanagement/on_leave_form.html', context)
 
 def reassign_assets(request):
     style=''
     form = ReassignAssetsForm(request.POST or None)
-    k9 = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
+    k9 = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     numh = handler.count()
     numk = k9.count()
@@ -1010,7 +1019,6 @@ def reassign_assets(request):
 
             #save status
             k9.handler = handler
-            k9.partnered = True
             k9.save()
 
             handler.partnered = True
@@ -1045,9 +1053,10 @@ def reassign_assets(request):
 # TODO 
 # On Leave List
 def on_leave_list(request):
-    style=''
-    data1 = Handler_Incident.objects.filter(status='Pending').filter(incident='On-Leave') 
-    data2 = Handler_Incident.objects.filter(status='Approved').filter(incident='On-Leave') 
+    style='ui green message'
+    data1 = Handler_On_Leave.objects.filter(status='Pending').filter(incident='On-Leave') 
+    data2 = Handler_On_Leave.objects.filter(status='Approved').filter(incident='On-Leave') 
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1064,92 +1073,22 @@ def on_leave_list(request):
 
 #TODO
 # what to do if on-leave
-def on_leave_details(request, id):
-    style=''
-    data = Handler_Incident.objects.get(id=id)
-    #get k9 
-    days = data.date_to - data.date_from
-    #get user
-    u = User.objects.get(id=data.handler.id)
-    try:
-        k9 = K9.objects.get(handler=data.handler)
-        data.k9 = k9
-        data.save()
-    except K9.DoesNotExist:
-        k9 = None
-
-    if request.method == 'POST':
-        #get checkbox
-        c = request.POST.get("return_k9")
-        if 'approve' in request.POST:
-            data.status = "Approved"
-            data.save()
-            if c == None:
-                k9.handler_on_leave = False
-                k9.save()
-            elif c == 'on':
-                k9.handler_on_leave = True
-                k9.save()
-            # change status of handler to On leave
-            u.status = 'On-Leave'
-            u.partnered = False
-            u.save()
-            # What to do with k9?
-            k9.training_status = 'For-Deployment'
-            k9.assignment = None
-            k9.partnered = False
-            k9.save()
-
-            # If deployed, pull out
-            try:
-                td = Team_Dog_Deployed.objects.filter(k9=k9).filter(status='Deployed').latest()
-                td.status = 'Done'
-                td.date_pulled = date.today()
-                td.save()
-
-                try:
-                    ta = Team_Assignment.objects.get(id=td.team_assignment.id)
-                    if k9.capability == 'EDD':
-                        ta.EDD_deployed = ta.EDD_deployed-1
-                    elif k9.capability == 'NDD':
-                        ta.NDD_deployed = ta.NDD_deployed-1
-                    elif k9.capability == 'SAR':
-                        ta.SAR_deployed = ta.SAR_deployed-1
-
-                    ta.save()
-                except Team_Assignment.DoesNotExist:
-                    pass
-            except Team_Dog_Deployed.DoesNotExist:
-                pass
-
-            #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
-        elif 'deny' in request.POST:
-            data.status = "Denied"
-            data.save()
-            #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
+def on_leave_decision(request, id):
     user = user_session(request)
-    context = {
-        'title': str(data.handler) + ' On-Leave Request',
-        'data': data,
-        'k9': k9,
-        'days': days,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'unitmanagement/on_leave_details.html', context)
+    data = Handler_On_Leave.objects.get(id=id)
+    leave = request.GET.get('leave')
 
-#TODO reassign
-def load_hander(request):
-    k9 = request.GET.get('k9')
-    handler = User.objects.filter(position=Handler).filter(status='Working').filter(capability=k9.capability).order_by('name')
-    return render(request, 'unitmanagement/handler_dropdown.html', {'handler': handler})
+    if leave == 'approve':
+        data.status = 'Approved'
+        data.handler.status = 'On-Leave'
+        data.approved_by = user
+    elif leave == 'deny':
+        data.status = 'Denied'
+    
+    data.save()
+
+    messages.success(request, 'You have ' + str(data.status) + ' ' + str(data.handler) + 's Leave Request.')
+    return redirect('unitmanagement:on_leave_list')
 
 # TODO 
 # Reproductive Cycle
@@ -1209,7 +1148,7 @@ def reproductive_edit(request, id):
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
-    data = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
+    data = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1246,7 +1185,6 @@ def choose_handler_list(request, id):
             
             #K9 Update
             k9.training_status = 'On-Training'
-            k9.partnered = True
             k9.handler = f.handler
             k9.save()
 
@@ -1286,7 +1224,6 @@ def choose_handler(request, id):
     handler = User.objects.get(id=id)
 
     k9.handler = handler
-    k9.partnered = True
     k9.save()
 
     handler.partnered = True
@@ -1340,14 +1277,14 @@ def k9_sick_details(request, id):
             #get treatment
             request.session['treatment'] = form['treatment'].value()
 
-            m = form.save(commit=False)
-            m.dog = data.k9
-            m.incident_id = data
-            m.veterinary = user_in_session
-            m.save()
-            new_form = m.pk
+            health = form.save(commit=False)
+            health.dog = data.k9
+            health.incident_id = data
+            health.veterinary = user_in_session
+            health.save()
+            new_form = health.pk
             form_instance = Health.objects.get(id=new_form)
-            dog = K9.objects.get(id=form_instance.dog.id)
+            dog = K9.objects.get(id=health.dog.id)
             
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
@@ -1400,19 +1337,22 @@ def k9_sick_details(request, id):
 
                     for form in formset:
                         f = form.save()
-                        m = Medicine_Inventory.objects.get(id=f.medicine.id)
-                        m.quantity = m.quantity - f.quantity
-                        m.save()
-                        #Medicine_Subtracted_Trail.objects.create(inventory = m, user=current_user(), quantity = f.quantity)
+                        med = Medicine_Inventory.objects.get(id=f.medicine.id)
+                        print('Med: ', med)
+                        med.quantity = med.quantity - f.quantity
+                        med.save()
+                        Medicine_Subtracted_Trail.objects.create(inventory = med, user=user_in_session, quantity = f.quantity)
                         
-                    m.duration =  max(days)
-                    m.save()
+                    print('Days: ',max(days))
+                    print('Health: ', health)
+                    health.duration =  max(days)
+                    health.save() #health instance
                     dog.status = 'Sick'
                     data.status= 'Done'
-                    dog.save()
-                    data.save()
+                    dog.save() #k9 instance
+                    data.save() #incident instance
                     style = "ui green message"
-                    messages.success(request, 'Health Form has been successfully recorded!')
+                    messages.success(request, 'You have replied to a health concern!')
                     return redirect('unitmanagement:k9_sick_list')
 
     #NOTIF SHOW
@@ -1436,7 +1376,7 @@ def k9_sick_details(request, id):
 #TODO
 class K9ListView(APIView):
     def get(self, request):
-        data = K9.objects.filter(partnered=False).exclude(status='Dead').filter(training_status='For-Deployment')
+        data = K9.objects.filter(training_status='For-Deployment').exclude(status='Dead')
         serializer = K9Serializer(data, many=True)
         return Response(serializer.data)
 
@@ -1465,7 +1405,7 @@ class K9DetailView(APIView):
 #TODO
 class UserListView(APIView):
     def get(self, request):
-        data = User.objects.filter(partnered=False).filter(position='Handler').filter(status='Working')
+        data = User.objects.filter(status='Working').filter(position='Handler')
         serializer = UserSerializer(data, many=True)
         return Response(serializer.data)
 
@@ -1521,8 +1461,6 @@ def load_stamp(request):
         stamp_id = request.GET.get('stamp')
         stamp = VaccineUsed.objects.get(id=stamp_id)
 
-        print(stamp)
-      
     except:
         pass
 
@@ -1531,3 +1469,19 @@ def load_stamp(request):
     }
 
     return render(request, 'unitmanagement/stamp_data.html', context)
+
+def load_k9(request):
+
+    k9 = None
+
+    try:
+        handler_id = request.GET.get('handler')
+        k9 = K9.objects.get(handler__id=handler_id) 
+    except:
+        pass
+
+    context = {
+        'k9': k9,
+    }
+
+    return render(request, 'unitmanagement/k9_data.html', context)

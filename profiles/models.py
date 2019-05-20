@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import date as d
-
 # Create your models here.
 class User(models.Model):
     SEX = (
@@ -11,7 +10,8 @@ class User(models.Model):
     POSITION = (
         ('Handler', 'Handler'),
         ('Veterinarian', 'Veterinarian'),
-        ('Administrator', 'Administrator')
+        ('Administrator', 'Administrator'),
+        ('Team Leader', 'Team Leader'),
     )
 
     CIVILSTATUS = (
@@ -45,10 +45,8 @@ class User(models.Model):
 
     STATUS = (
         ('Working', 'Working'),
-        ('Sick', 'Sick'),
         ('On-Leave', 'On-Leave'),
-        ('Retired', 'Retired'),
-        ('Dead', 'Dead')
+        ('No Longer Employed', 'No Longer Employed'),
     )
 
     CITIZENSHIP = (
@@ -89,6 +87,8 @@ class User(models.Model):
     bodybuild = models.CharField('bodybuild', max_length=200)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
+    assigned = models.BooleanField(default=False)
+   
     #capability = models.CharField('capability', max_length=200, default="None")
     
     def calculate_age(self):
