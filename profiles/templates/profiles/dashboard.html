@@ -1,8 +1,6 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
-<div class="pusher">
-
 {% if request.session.session_user_position == "Administrator" %}
   <h1>Administrator</h1>
   <ul>
@@ -29,6 +27,23 @@
   </ul>
 {% endif %}
 
-</div>
+<script>
+    $(document).ready(function() {
 
+      var endpoint = '../../unitmanagement/k9/api'
+
+      $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+          console.log(data)
+        },
+        error: function(error_data){
+          console.log("error")
+          console.log(error_data)
+        }
+      });
+
+    });
+</script>
 {% endblock%}

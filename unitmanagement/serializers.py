@@ -9,7 +9,7 @@ class K9Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = K9
-        fields = 'id', 'name', 'capability', 'handler', 'partnered'
+        fields = 'id', 'name', 'capability', 'handler'
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -18,6 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = 'id', 'fullname', 'capability', 'partnered'
+        fields = 'id', 'fullname', 'capability'
 
    

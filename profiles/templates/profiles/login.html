@@ -8,7 +8,10 @@
     <title>K9 Coast Guard</title>
 
     <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
-    <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}">
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'Semantic-UI/semantic.min.js' %}"></script>
+    <!-- <script src="{% static 'custome/custom_jquery.js' %}"></script> -->
+    <!-- <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}"> -->
 </head>
 <body style="background-color: orangered;">
     <!--START OF TOP MENU-->
@@ -63,11 +66,6 @@
     }
   
 </style>
-  
-    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
-    <script src="{% static 'js/jquery.formset.js' %}"></script>
-    <script src="{% static 'semantic/semantic.min.js' %}"></script>
-    <script src="{% static 'custome/custom_jquery.js' %}"></script>
       
     {% block script%}
     {% endblock%}

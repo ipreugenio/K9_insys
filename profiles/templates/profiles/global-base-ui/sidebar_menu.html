@@ -38,12 +38,15 @@
         </div>
         
         <!--html pages-->
-        {% block sidebar_module %}
-        {% endblock%}
+       
+        <div class="pusher">
+                {% block sidebar_module %}
+                {% endblock%}
+                {% block dashboard %}
+                {% endblock%}
 
-        {% block dashboard %}
-        {% endblock%}
-
+        </div>
+        
     </div>
 {% endblock%}
 

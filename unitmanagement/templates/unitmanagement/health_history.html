@@ -149,7 +149,7 @@
     </table>
 </div>
 
-<div class="ui modal" style='height:550px;'>
+<div class="ui modal">
         <i class="close icon"></i>
         <div class="header">
           Stamp Image
@@ -161,24 +161,5 @@
 </div>
 <input type="hidden" value="{{age}}" id = 'age'>
 <input type="hidden" value="{{user.position}}" id = 'handler'>
-<style>
-    .visible.transition {
-    margin-top: auto !important;
-    position:fixed;
-    bottom:0%;
-    }
-</style>
-
-<script src="{% static 'js/health.js' %}"></script>
-<script>
-    $(document).ready(function() {
-        position = $('#handler').val()
-        if (position == 'Handler'){
-            $('#id_record-0-vaccine').prop('disabled', 'disabled');
-            $('#id_record-0-date_vaccinated').prop('disabled', 'disabled');
-            $('#id_record-0-image').prop('disabled', 'disabled');
-        }
-    });
-
-</script>
+<script src="{% static 'js/health_history.js' %}"></script>
 {% endblock %}

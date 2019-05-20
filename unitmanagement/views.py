@@ -1376,7 +1376,7 @@ def k9_sick_details(request, id):
 #TODO
 class K9ListView(APIView):
     def get(self, request):
-        data = K9.objects.filter(training_status='For-Deployment').exclude(status='Dead')
+        data = K9.objects.all()
         serializer = K9Serializer(data, many=True)
         return Response(serializer.data)
 
@@ -1405,7 +1405,7 @@ class K9DetailView(APIView):
 #TODO
 class UserListView(APIView):
     def get(self, request):
-        data = User.objects.filter(status='Working').filter(position='Handler')
+        data = User.objects.all()
         serializer = UserSerializer(data, many=True)
         return Response(serializer.data)
 
