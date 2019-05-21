@@ -21,7 +21,7 @@ urlpatterns = [
     path('view-incidents/', views.incident_list, name='view_incidents'),
     path('deployment-area-details/', views.deployment_area_details, name='deployment_area_details'),
     path('fou-details/', views.fou_details, name='fou_details'),
-    path('daily-refresher-form/', views.daily_refresher_form, name='daily_refresher_form'),
+    path('daily-refresher-form', views.daily_refresher_form, name='daily_refresher_form'),
 
 
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),

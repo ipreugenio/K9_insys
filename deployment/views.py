@@ -714,25 +714,25 @@ def fou_details(request):
 def daily_refresher_form(request):
     user = user_session(request)
     k9 = K9.objects.get(handler=user)
-    form = DailyRefresherForm(request or None)
+    form = DailyRefresherForm(request.POST or None)
 
-    # if request.method == 'POST':
-    #     if form.is_valid():
-    #         f = form.save(commit=False)
-    #         f.k9 = k9
-    #         f.handler = user
-    #         #TODO Formula for Rating
+    if request.method == 'POST':
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.handler = user
+            #TODO Formula for Rating
 
             
-    #         ######################
-    #         f.save()
+            ######################
+            f.save()
             
-    #         style = "ui green message"
-    #         messages.success(request, 'Refresher Form has been Recorded!')
-    #         return redirect('deployment:daily_refresher_form')
-    #     else:
-    #         style = "ui red message"
-    #         messages.warning(request, 'Invalid input data!')
+            style = "ui green message"
+            messages.success(request, 'Refresher Form has been Recorded!')
+            return redirect('deployment:daily_refresher_form')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
 
     #NOTIF SHOW
     notif_data = notif(request)
