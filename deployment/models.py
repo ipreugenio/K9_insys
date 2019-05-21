@@ -1,7 +1,7 @@
 from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 # Create your models here.
 
@@ -248,7 +248,7 @@ class Team_Dog_Deployed(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
-    date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
+    date_added = models.DateField('date_added', auto_now_add=True)
     date_pulled = models.DateField('date_pulled' , null=True, blank=True)
 
     def __str__(self):
@@ -291,3 +291,39 @@ class Incidents(models.Model):
     type = models.CharField('type', choices=TYPE, max_length=100, default='Others')
     remarks = models.TextField('remarks', max_length=200, blank=True, null=True)
 
+class Daily_Refresher(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField('date', auto_now_add = True)
+    rating = models.DecimalField('rating', max_length=200, blank=True, null=True, decimal_places=2, max_digits=10)
+    on_leash = models.BooleanField(default=False)
+    off_leash = models.BooleanField(default=False)
+    obstacle_course = models.BooleanField(default=False)
+    panelling = models.BooleanField(default=False)
+    morning_feed_cups = models.IntegerField('morning_feed_cups', blank=True, null=True)
+    evening_feed_cups = models.IntegerField('evening_feed_cups', blank=True, null=True)
+    # plant and find
+    port_plant = models.IntegerField('port_plant', default= 0)
+    port_find = models.IntegerField('port_find', default= 0)
+    port_time = models.TimeField('port_time', blank=True, null=True)
+    building_plant = models.IntegerField('building_plant',default= 0)
+    building_find = models.IntegerField('building_find', default= 0)
+    building_time = models.TimeField('building_time', blank=True, null=True)
+    vehicle_plant = models.IntegerField('vehicle_plant', default= 0)
+    vehicle_find = models.IntegerField('vehicle_find', default= 0)
+    vehicle_time = models.TimeField('vehicle_time', blank=True, null=True)
+    baggage_plant = models.IntegerField('baggage_plant', default= 0)
+    baggage_find = models.IntegerField('baggage_find', default= 0)
+    baggage_time = models.TimeField('baggage_time', blank=True, null=True)
+    others_plant = models.IntegerField('others_plant', default= 0)
+    others_find = models.IntegerField('others_find',default= 0)
+    others_time = models.TimeField('others_time', blank=True, null=True)
+    # What is this??
+    MARSEC = models.BooleanField(default=False)
+    MARLEN = models.BooleanField(default=False)
+    MARSAR = models.BooleanField(default=False)
+    MAREP = models.BooleanField(default=False)
+
+
+   
+   

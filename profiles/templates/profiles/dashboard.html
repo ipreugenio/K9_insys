@@ -1,49 +1,7 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
-{% if request.session.session_user_position == "Administrator" %}
-  <h1>Administrator</h1>
-  <ul>
-      <li>Recommended Supplier??</li>
-      <li>k9s to Breed and procured</li>
-      <li>On Leave Approval?</li>
-      <li>Incidents that needs user interaction</li>
-    </ul>
-{% elif request.session.session_user_position == "Veterinarian" %}
-  <h1>Veterinarian Dashboard</h1>
-  <ul>
-	 <li>Follow Up</li>
-    <li>Physical Exam Scheduled</li>
-    <li>Health Medicine On Going</li>
-    <li>Vaccinations not yet done</li>
-  </ul>
-{% elif request.session.session_user_position == "Handler"%}
-  <h1>Handler Dashboard</h1>
-{% else %}
-  <h1>Team Leader Dashboard</h1>
-  <ul>
-    <li>On leave</li>
-    <li>Incidents</li>
-  </ul>
-{% endif %}
-
-<script>
-    $(document).ready(function() {
-
-      var endpoint = '../../unitmanagement/k9/api'
-
-      $.ajax({
-        method: "GET",
-        url: endpoint,
-        success: function(data){
-          console.log(data)
-        },
-        error: function(error_data){
-          console.log("error")
-          console.log(error_data)
-        }
-      });
-
-    });
-</script>
+<div class="container fluid">
+  <h1>dashboard</h1>
+</div>
 {% endblock%}

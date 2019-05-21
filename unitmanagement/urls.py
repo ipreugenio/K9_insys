@@ -45,6 +45,8 @@ urlpatterns = [
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
     path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     
+    path('chart/api', views.IncidentView.as_view()),
+
     path('k9/api', views.K9ListView.as_view()), 
     path('user/api', views.UserListView.as_view()),
     path('k9/api/<int:id>', views.K9DetailView.as_view()),

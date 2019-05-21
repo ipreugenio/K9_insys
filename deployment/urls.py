@@ -20,6 +20,7 @@ urlpatterns = [
     path('add-incident/', views.add_incident, name='add_incident'),
     path('view-incidents/', views.incident_list, name='view_incidents'),
     path('deployment-area-details/', views.deployment_area_details, name='deployment_area_details'),
+    path('fou-details/', views.fou_details, name='fou_details'),
 
 
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),

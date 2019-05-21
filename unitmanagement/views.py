@@ -5,7 +5,7 @@ from django.forms import formset_factory, inlineformset_factory, modelformset_fa
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime as dt
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from decimal import Decimal
 import itertools
 from django.db.models import Sum, Avg, Max
@@ -19,7 +19,7 @@ from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, Vaccinatio
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
 from training.forms import assign_handler_form
@@ -1392,15 +1392,121 @@ class K9ListView(APIView):
         super(K9, self).save()
 
 class K9DetailView(APIView):
-    def get(self, request, id):
-        notif = get_object_or_404(K9, id=id)
-        serializer = K9Serializer(notif)
-        return Response(serializer.data)
+    def get(self, request, format=None):
+        k9_count = K9.objects.all().count()
+        labels= ['K9','label1', 'label2', 'label3']
+        default_items = [k9_count, 123, 321, 421]
+        data = {
+            "labels":labels,
+            "default":default_items,
+        }
+        return Response(data)
 
     def delete(self, request, id):
         notif = get_object_or_404(K9, id=id)
         notif.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class IncidentView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        ta = Team_Assignment.objects.get(team_leader=user)
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+        
+        # Incident
+        er = Incidents.objects.filter(location = ta.location).filter(type='Explosives Related').count()
+        nr = Incidents.objects.filter(location = ta.location).filter(type='Narcotics Related').count()
+        sarr = Incidents.objects.filter(location = ta.location).filter(type='Search and Rescue Related').count()
+        otr = Incidents.objects.filter(location = ta.location).filter(type='Others').count()
+
+        labels= ['Explosive','Narcotics', 'Search and Rescue', 'Others']
+        default_items = [er, nr, sarr, otr]
+
+        # K9 Demand and Supply
+        d_edd = ta.EDD_demand
+        d_ndd = ta.NDD_demand
+        d_sar = ta.SAR_demand
+
+        s_edd = ta.EDD_deployed
+        s_ndd = ta.NDD_deployed
+        s_sar = ta.SAR_deployed      
+
+       
+        demand_items = [d_edd, d_ndd, d_sar]
+        supply_items = [s_edd, s_ndd, s_sar]
+
+        # Perfromance
+
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+
+        k9_id = []
+
+        for td in tdd:
+            k9_id.append(td.k9.id)
+
+        k9 = K9.objects.filter(id__in=k9_id)
+        
+        k9_perf = []
+
+        #get all k9s 
+        for k in k9:
+        
+            jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+            feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+            mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+            apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+            may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+            jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+            jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+            aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+            sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+            oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+            nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+            dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+
+            if jan == None:
+                jan = 0
+            if feb == None:
+                feb = 0
+            if mar == None:
+                mar = 0
+            if apr == None:
+                apr = 0
+            if may == None:
+                may = 0
+            if jun == None:
+                jun = 0
+            if jul == None:
+                jul = 0
+            if aug == None:
+                aug = 0
+            if sep == None:
+                sep = 0
+            if oct == None:
+                oct = 0
+            if nov == None:
+                nov = 0
+            if dec == None:
+                dec = 0
+            
+
+            perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+            k9_perf.append(perf_items)
+            
+        fou = []
+
+        for td in tdd:
+            fou.append(str(td.k9.name) + ' - ' + str(td.handler.lastname))
+
+        data = {
+            "labels":labels,
+            "default":default_items,
+            "demand":demand_items,
+            "supply":supply_items,
+            "performance":k9_perf,
+            "fou":fou,
+        }
+        return Response(data)
 
 #TODO
 class UserListView(APIView):

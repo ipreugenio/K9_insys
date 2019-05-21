@@ -8,14 +8,14 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord
-import datetime
+from datetime import datetime
 import calendar
 
 from rest_framework.views import APIView
@@ -58,6 +58,7 @@ def user_session(request):
     return user_in_session
 
 def dashboard(request):
+    user = user_session(request)
 
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
     NDD_count = K9.objects.filter(capability='NDD').count()
@@ -122,10 +123,7 @@ def dashboard(request):
     equipment_requests = Equipment_Request.objects.filter(request_status="Pending").count()
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
+
     context = {
         'can_deploy': can_deploy,
         'k9_demand': k9_demand,
@@ -138,6 +136,7 @@ def dashboard(request):
         'trained': trained,
         'equipment_requests': equipment_requests,
         'for_breeding': for_breeding,
+
         'notif_data':notif_data,
         'count':count,
         'user':user,
@@ -145,6 +144,32 @@ def dashboard(request):
 
     return render (request, 'profiles/dashboard.html', context)
 
+def team_leader_dashboard(request):
+    user = user_session(request)
+    ta = Team_Assignment.objects.get(team_leader=user)
+
+    incident_count = Incidents.objects.filter(location = ta.location).count()
+
+    tdd_count = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').count()
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+
+    year = datetime.now().year
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'incident_count':incident_count,
+        'ta':ta,
+        'tdd_count':tdd_count,
+        'tdd':tdd,
+        'year':year,
+
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/team_leader_dashboard.html', context)
 def profile(request):
    
     first_day = datetime.date.today().replace(day=1)
@@ -231,7 +256,13 @@ def login(request):
                 request.session["session_username"] = str(user)
 
                # return HttpResponseRedirect('../dashboard')
-            return HttpResponseRedirect('../dashboard')
+
+            user = user_session(request)
+
+            if user.position == 'Team Leader':
+                return HttpResponseRedirect('../team-leader-dashboard')
+            else:
+                return HttpResponseRedirect('../dashboard')
 
     '''else:
         style = "ui red message"

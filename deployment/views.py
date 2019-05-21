@@ -213,8 +213,7 @@ def team_location_details(request, id):
     user_deploy = [] 
     for h in handlers:
        user_deploy.append(h.UserID)
-    #print(user)
-    # print(user_deploy)
+
     # #filter K9 where handler = person_info and k9 assignment = None
     can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
     
@@ -609,8 +608,6 @@ def deployment_area_details(request):
         pi = Personal_Info.objects.get(UserID=td.handler)
         mn.append(pi.mobile_number)
 
-    print(mn)
-
     data_list = zip(tdd, mn)
     
 
@@ -688,4 +685,29 @@ def incident_list(request):
 
     return render(request, 'deployment/incident_list.html', context)
 
+def fou_details(request):
+    user = user_session(request)
+    data = Team_Assignment.objects.get(team_leader=user)
 
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+    
+    a = []
+    for td in tdd:
+        a.append(td.handler)
+
+    #a =User.objects.filter(id=tdd.handler.id)
+    pi = Personal_Info.objects.filter(UserID__in = a)
+
+    data_list = zip(tdd,pi)
+   
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data_list':data_list,
+    }
+
+    return render(request, 'deployment/fou_details.html', context)

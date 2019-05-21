@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 
 app_name='profiles'
 urlpatterns = [
+    path('team-leader-dashboard/', views.team_leader_dashboard, name='team_leader_dashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
     path('notifications/', views.notif_list, name='notif_list'),

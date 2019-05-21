@@ -9,12 +9,12 @@ from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
 from unitmanagement.models import Handler_K9_History
-from training.models import Training, K9_Adopted_Owner, Record_Training
+from training.models import Training, K9_Adopted_Owner 
 from .forms import TestForm, add_handler_form, assign_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm, RecordForm, DateForm
 import datetime
-from deployment.models import Team_Assignment
+from deployment.models import Team_Assignment, Daily_Refresher
 from django.db.models import Sum
 from decimal import Decimal
 import itertools
@@ -1105,7 +1105,7 @@ def daily_record(request, id):
     if request.method == 'POST':
         if form.is_valid():
             date = request.POST.get('choose_date')
-            record = Record_Training.objects.filter(k9=data).get(date_today = date)
+            record = Daily_Refresher.objects.filter(k9=data).get(date_today = date)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2018,7 +2018,7 @@ def daily_record_mult(request):
 
     date = request.session["session_date"]
     try:
-        record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+        record = Daily_Refresher.objects.filter(k9 = k9).get(date_today = date)
     except:
         record = None
 
