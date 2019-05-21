@@ -1965,14 +1965,14 @@ def record_form(request):
 
 
     handler = User.objects.get(id = int(handlerid))
-    data = K9_Handler.objects.get(handler = handler)
+    data = K9.objects.get(handler=handler)
     form2 = RecordForm(request.POST or None)
-    title = data.k9.name
+    title = data.name
 
     if request.method == 'POST':
         if form2.is_valid():
             record = form2.save(commit=False)
-            record.k9 = data.k9
+            record.k9 = data
             record.handler = data.handler
             record.save()
 

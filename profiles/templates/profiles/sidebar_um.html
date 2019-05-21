@@ -51,14 +51,9 @@
                             </a>
 
                             {% elif request.session.session_user_position == "Handler" %}
-                            <a href="{% url 'unitmanagement:health_record'%}" class="item">
-                                <i class="h square icon"></i>Health Records
-                            </a>
-                            <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">
-                                <i class="clipboard list icon"></i>Health Concern List
-                            </a>
-                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
-                                <i class="exclamation icon"></i>Damaged Equipment
+                            
+                            <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
+                                <i class="sync alternate icon"></i>Daily Refresher Form
                             </a>
                             <a href="{% url 'unitmanagement:k9_sick_form'%}" class="item">
                                 <i class="medkit icon"></i>K9 Health Form
@@ -66,6 +61,15 @@
                             <a href="{% url 'unitmanagement:k9_incident'%}" class="item">
                                 <i class="exclamation icon"></i>
                                 <i class="paw icon"></i>K9-Incident Form
+                            </a>
+                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
+                                <i class="exclamation icon"></i>Damaged Equipment
+                            </a>
+                            <a href="{% url 'unitmanagement:health_history'%}" class="item">
+                                <i class="h square icon"></i>Health Records
+                            </a>
+                            <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">
+                                <i class="clipboard list icon"></i>Health Concern List
                             </a>
                             <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
                                 <i class="question icon"></i>On-Leave Request

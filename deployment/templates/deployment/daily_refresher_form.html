@@ -1,0 +1,47 @@
+{% extends "profiles/sidebar_deployment.html" %}
+
+{% block content %}
+<div class="ui fluid container">
+    <h1 class="ui header">Daily Refresher
+        <div class="sub header" id = 'texthelp'>{{ texthelp }}</div>
+    </h1>
+    <div class="ui inverted segment">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{{ style }} row"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form class = "ui inverted form" method="POST">
+                    {% csrf_token %}
+                    <div class="four inline fields">
+                        <div class="field">
+                            {{form.on_leash}}
+                            <label for="">On Leash</label>
+                        </div>
+                        <div class="field">
+                            {{form.off_leash}}
+                            <label for="">Off Leash</label>
+                        </div>
+                        <div class="field">
+                            {{form.obstacle_course}}
+                            <label for="">Obstacle Course</label>
+                        </div>
+                        <div class="field">
+                            {{form.panelling}}
+                            <label for="">Panelling</label>
+                        </div>
+                    </div>
+
+                   
+                       
+                            {{form.port_plant}}
+                          
+                    
+                    <div class="ui inverted right aligned segment" style="padding: 0px;">
+                        <button class = "ui button green" type="submit" >Submit</button>
+                    </div>
+            </form>
+      </div>
+</div>
+
+{% endblock%}

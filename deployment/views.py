@@ -17,8 +17,7 @@ from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
 from inventory.models import Medicine
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm
-
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, DailyRefresherForm
 #Plotly
 import plotly.offline as opy
 import plotly.graph_objs as go
@@ -711,3 +710,38 @@ def fou_details(request):
     }
 
     return render(request, 'deployment/fou_details.html', context)
+
+def daily_refresher_form(request):
+    user = user_session(request)
+    k9 = K9.objects.get(handler=user)
+    form = DailyRefresherForm(request or None)
+
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         f = form.save(commit=False)
+    #         f.k9 = k9
+    #         f.handler = user
+    #         #TODO Formula for Rating
+
+            
+    #         ######################
+    #         f.save()
+            
+    #         style = "ui green message"
+    #         messages.success(request, 'Refresher Form has been Recorded!')
+    #         return redirect('deployment:daily_refresher_form')
+    #     else:
+    #         style = "ui red message"
+    #         messages.warning(request, 'Invalid input data!')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'form':form,
+    }
+
+    return render(request, 'deployment/daily_refresher_form.html', context)

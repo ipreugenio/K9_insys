@@ -7,7 +7,7 @@ from django.forms import fields
 
 import re
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher
 from planningandacquiring.models import K9
 from profiles.models import Account, User
 from django.contrib.sessions.models import Session
@@ -187,26 +187,6 @@ class EditTeamForm(forms.ModelForm):
         model = Team_Assignment
         fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
-'''
-class assign_team_form(forms.ModelForm):
-    class Meta:
-        model = Team_Assignment
-        fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['team'].queryset = Team.objects.none()
-
-            if 'area' in self.data:
-                try:
-                    area_id = int(self.data.get('area'))
-                    self.fields['team'].queryset = Team.objects.filter(area_id=area_id).order_by('name')
-                except (ValueError, TypeError):
-                    pass  # invalid input from the client; ignore and fallback to empty City queryset
-            elif self.instance.pk:
-                self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
-'''
-
 class RequestForm(forms.ModelForm):
     
     area = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
@@ -252,3 +232,12 @@ class IncidentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(IncidentForm, self).__init__(*args, **kwargs)
+
+class DailyRefresherForm(forms.ModelForm):
+
+    class Meta:
+        model = Daily_Refresher
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(DailyRefresherForm, self).__init__(*args, **kwargs)

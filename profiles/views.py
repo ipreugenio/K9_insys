@@ -124,6 +124,9 @@ def dashboard(request):
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
         'can_deploy': can_deploy,
         'k9_demand': k9_demand,
@@ -170,6 +173,21 @@ def team_leader_dashboard(request):
         'user':user,
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
+
+def handler_dashboard(request):
+    user = user_session(request)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/handler_dashboard.html', context)
+
 def profile(request):
    
     first_day = datetime.date.today().replace(day=1)
@@ -261,6 +279,8 @@ def login(request):
 
             if user.position == 'Team Leader':
                 return HttpResponseRedirect('../team-leader-dashboard')
+            elif user.position == 'Handler':
+                return HttpResponseRedirect('../handler-dashboard')
             else:
                 return HttpResponseRedirect('../dashboard')
 
