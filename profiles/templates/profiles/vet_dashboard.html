@@ -1,0 +1,198 @@
+{% extends "profiles/global-base-ui/sidebar_menu.html" %} 
+
+{% block dashboard %}
+<div class="container fluid">
+    <div class="ui two column grid">
+      <div class="streched row">
+        <div class="ten wide column"  style="padding-right: 0%;">
+          <div class="ui basic segment">
+            <div class="ui stackable grid">
+
+                <div class="sixteen wide column">
+                    <div class="ui equal width grid">
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge syringe blue icon pop">{{vac_pending}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="#">UNFINISHED VACCINATIONS</a>
+                                        </strong>
+                                    </div>
+                                </div>                                         
+                            </div>     
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge first aid green icon">{{health_pending}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="#">PENDING HEALTH CONCERNS</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge heartbeat red icon">{{cv1}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="#">PENDING PHYSICAL EXAMS</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>            
+                </div>
+               
+                <div class="sixteen wide column">
+                    <div class="ui raised segment">
+                        <canvas id="myChart4"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="six wide column" style="padding: 0%;padding-right: 1%;">
+            <div class="ui basic segment" style="padding-left: 0%;">
+                
+                    <div class="ui black floating message">
+                        <p>Request</p>
+                      </div>
+                    <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
+    
+                        <table class="ui basic table">
+                          <tr>
+                            <td>You Have a Pending Request</td>
+                            <td class="center aligned three wide">
+                              <a href="#" class="ui tiny blue button">Go</a>
+                            </td>
+                          </tr>
+                        </table>
+                    </div>
+            </div>
+          </div>
+        </div>
+    </div>    
+</div>
+<div class="ui flowing popup transition hidden">
+    <table class="ui very basic table">
+        <tr>
+            <th>1st dose DHPPiL+CV</th>
+            <td>{{cv1}}</td>
+        </tr>
+        <tr>
+            <th>2nd dose DHPPiL+CV</th>
+            <td>{{cv2}}</td>
+        </tr>
+        <tr>
+            <th>3rd dose DHPPiL+CV</th>
+            <td>{{cv3}}</td>
+        </tr>
+        <tr>
+            <th>1st dose Bordetella</th>
+            <td>{{bd1}}</td>
+        </tr>
+        <tr>
+            <th>2nd dose Bordetella</th>
+            <td>{{bd2}}</td>
+        </tr>
+        <tr>
+            <th>Anti-Rabies</th>
+            <td>{{rabies}}</td>
+        </tr>
+        <tr>
+            <th>1st dose DHPPiL4</th>
+            <td>{{dh1}}</td>
+        </tr>
+        <tr>
+            <th>2nd dose DHPPiL4</th>
+            <td>{{dh2}}</td>
+        </tr>
+    </table>
+</div>
+
+    <script>
+        $(document).ready(function() {
+            $('.pop').popup({
+                position : 'bottom center',
+                inline: false,
+                hoverable  : true,
+                popup: '.flowing.popup'
+            });
+
+            var endpoint = '../../unitmanagement/vet/api'
+            var in_heat = [];
+        
+            $.ajax({
+                method: "GET",
+                url: endpoint,
+                success: function(data){
+                    in_heat = data.in_heat
+                    console.log(in_heat)
+                    setChart()         
+                },
+                error: function(error_data){
+                    console.log("error")
+                    console.log(error_data)
+                }
+            })
+        
+            function setChart(){
+                var ctx = document.getElementById('myChart');
+                var ctx2 = document.getElementById('myChart2');
+                var ctx3 = document.getElementById('myChart3');
+                var ctx4 = document.getElementById('myChart4');
+        
+                var myChart4 = new Chart(ctx4, {
+                    type: 'line',
+                    data: {
+                        labels:["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                        datasets: [{
+                            label: "In Heat K9's",
+                            data: in_heat,
+                            backgroundColor: ['rgba(255, 99, 132, 0.5)','rgba(54, 162, 235, 0.5)','rgba(255, 206, 86, 0.5)','rgba(75, 192, 192, 0.5)'],
+                            borderColor: ['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)',],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                    animation: {
+                        animateScale: true,
+                    },
+                    title: {
+                        display: true,
+                        text: "K9's In Heat"
+                    },
+                        scales: {
+                        xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                        }],
+                        yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            step:1,
+                            suggestedMax:10,
+                        }
+                        }]
+                    },
+                    }
+                });
+            }
+        
+            
+        });
+        </script>
+{% endblock%}

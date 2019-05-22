@@ -8,6 +8,7 @@ app_name='profiles'
 urlpatterns = [
     path('team-leader-dashboard/', views.team_leader_dashboard, name='team_leader_dashboard'),
     path('handler-dashboard/', views.handler_dashboard, name='handler_dashboard'),
+    path('vet-dashboard/', views.vet_dashboard, name='vet_dashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
     path('notifications/', views.notif_list, name='notif_list'),

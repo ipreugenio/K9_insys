@@ -18,7 +18,7 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
@@ -464,7 +464,7 @@ def health_history(request, id):
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
-def health_history(request):
+def health_history_handler(request):
     user_serial = request.session['session_serial']
     user_s = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user_s.UserID.id)
@@ -1532,41 +1532,8 @@ def k9_sick_details(request, id):
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 
-#TODO
-class K9ListView(APIView):
-    def get(self, request):
-        data = K9.objects.all()
-        serializer = K9Serializer(data, many=True)
-        return Response(serializer.data)
 
-    def put(self, request):
-        serializer = K9Serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def save(self, *args, **kwargs):
-        super(K9, self).save()
-
-class K9DetailView(APIView):
-    def get(self, request, format=None):
-        k9_count = K9.objects.all().count()
-        labels= ['K9','label1', 'label2', 'label3']
-        default_items = [k9_count, 123, 321, 421]
-        data = {
-            "labels":labels,
-            "default":default_items,
-        }
-        return Response(data)
-
-    def delete(self, request, id):
-        notif = get_object_or_404(K9, id=id)
-        notif.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class IncidentView(APIView):
+class TeamLeaderView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
         ta = Team_Assignment.objects.get(team_leader=user)
@@ -1667,31 +1634,106 @@ class IncidentView(APIView):
         }
         return Response(data)
 
-#TODO
-class UserListView(APIView):
-    def get(self, request):
-        data = User.objects.all()
-        serializer = UserSerializer(data, many=True)
-        return Response(serializer.data)
+class HandlerView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        k = K9.objects.get(handler=user)
 
-    def put(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+        feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+        mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+        apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+        may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+        jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+        jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+        aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+        sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+        oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+        nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+        dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
 
-class UserDetailView(APIView):
-    def get(self, request, id):
-        notif = get_object_or_404(User, id=id)
-        serializer = UserSerializer(notif)
-        return Response(serializer.data)
+        if jan == None:
+            jan = 0
+        if feb == None:
+            feb = 0
+        if mar == None:
+            mar = 0
+        if apr == None:
+            apr = 0
+        if may == None:
+            may = 0
+        if jun == None:
+            jun = 0
+        if jul == None:
+            jul = 0
+        if aug == None:
+            aug = 0
+        if sep == None:
+            sep = 0
+        if oct == None:
+            oct = 0
+        if nov == None:
+            nov = 0
+        if dec == None:
+            dec = 0
+        
 
-    def delete(self, request, id):
-        notif = get_object_or_404(User, id=id)
-        notif.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+
+        data = {
+            "performance":perf_items,
+        }
+        return Response(data)
+
+class VetView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        # In heat K9 per Month
+        jan = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=1).count()
+        feb = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=2).count()
+        mar = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=3).count()
+        apr = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=4).count()
+        may = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=5).count()
+        jun = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=6).count()
+        jul = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=7).count()
+        aug = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=8).count()
+        sep = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=9).count()
+        oct = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=10).count()
+        nov = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=11).count()
+        dec = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=11).count()
+
+        if jan == None:
+            jan = 0
+        if feb == None:
+            feb = 0
+        if mar == None:
+            mar = 0
+        if apr == None:
+            apr = 0
+        if may == None:
+            may = 0
+        if jun == None:
+            jun = 0
+        if jul == None:
+            jul = 0
+        if aug == None:
+            aug = 0
+        if sep == None:
+            sep = 0
+        if oct == None:
+            oct = 0
+        if nov == None:
+            nov = 0
+        if dec == None:
+            dec = 0
+        
+
+        in_heat_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        
+        data = {
+            "in_heat":in_heat_items,
+        }
+        return Response(data)
 
 def load_handler(request):
 

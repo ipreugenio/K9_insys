@@ -67,7 +67,7 @@
         <div class="ui basic segment" style="padding-left: 0%;">
             
                 <div class="ui black floating message">
-                    <p>Way to go!</p>
+                    <p>Reminder</p>
                   </div>
                 <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
 
@@ -89,7 +89,7 @@
 <script>
 
 $(document).ready(function() {
-    var endpoint = '../../unitmanagement/chart/api'
+    var endpoint = '../../unitmanagement/team-leader/api'
     var defaultData = [];
     var labels = [];
     var demand = [];
@@ -100,18 +100,18 @@ $(document).ready(function() {
         method: "GET",
         url: endpoint,
         success: function(data){
-        labels = data.labels
-        defaultData = data.default
-        demand = data.demand
-        supply = data.supply
-        performance = data.performance
-        fou = data.fou
-        console.log(performance)
+          labels = data.labels
+          defaultData = data.default
+          demand = data.demand
+          supply = data.supply
+          performance = data.performance
+          fou = data.fou
+          console.log(performance)
         setChart()         
         },
         error: function(error_data){
-        console.log("error")
-        console.log(error_data)
+          console.log("error")
+          console.log(error_data)
         }
     })
 

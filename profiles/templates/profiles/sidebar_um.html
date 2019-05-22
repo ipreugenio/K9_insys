@@ -28,15 +28,15 @@
                             </a>
                            
                             {% elif request.session.session_user_position == "Veterinarian" %}
-                            <a href="{% url 'profiles:add_User_form'%}" class="item">
+                            <!-- <a href="{% url 'profiles:add_User_form'%}" class="item">
                                 <i class="user plus icon"></i>Add User Form
                             </a>
                             <a href="{% url 'profiles:user_list'%}" class="item">
                                 <i class="address book icon"></i>User List
-                            </a>
-                            <!-- <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
-                                <i class="first aid icon"></i>
                             </a> -->
+                            <a href="{% url 'unitmanagement:health_form'%}" class="item">Health Form
+                                <i class="first aid icon"></i>
+                            </a>
                             <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">
                                 <i class="heartbeat icon"></i>Physical Exam Form
                             </a>
@@ -65,7 +65,7 @@
                             <a href="{% url 'unitmanagement:request_form'%}" class="item">
                                 <i class="exclamation icon"></i>Damaged Equipment
                             </a>
-                            <a href="{% url 'unitmanagement:health_history'%}" class="item">
+                            <a href="{% url 'unitmanagement:health_history_handler'%}" class="item">
                                 <i class="h square icon"></i>Health Records
                             </a>
                             <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">

@@ -260,6 +260,17 @@ class Team_Dog_Deployed(models.Model):
             k9 = K9.objects.get(id=self.k9.id)
             k9.training_status = 'Deployed'
             k9.save()
+            try:
+                ta = Team_Assignment.objects.get(id=self.team_assignment)
+                if self.k9.capability == 'EDD':
+                    ta.EDD_deployed = ta.EDD_deployed + 1
+                elif self.k9.capability == 'NDD':
+                    ta.EDD_deployed = ta.NDD_deployed + 1
+                else:
+                    ta.EDD_deployed = ta.SAR_deployed + 1
+                ta.save()
+            except:
+                pass
         super(Team_Dog_Deployed, self).save(*args, **kwargs)
 
 class K9_Schedule(models.Model):

@@ -11,7 +11,7 @@ urlpatterns = [
     path('physical-exam-form', views.physical_exam_form, name='physical_exam_form'),
     path('health-record', views.health_record, name='health_record'),
     path('health-history/<int:id>', views.health_history, name='health_history'),
-    path('health-history', views.health_history, name='health_history'),
+    path('health-history-handler', views.health_history_handler, name='health_history_handler'),
     path('health-details/<int:id>', views.health_details, name='health_details'),
     path('physical-exam-details/<int:id>', views.physical_exam_details, name='physical_exam_details'),
     path('approve-medicine/<int:id>', views.medicine_approve, name='medicine_approve'),
@@ -46,12 +46,9 @@ urlpatterns = [
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
     path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     
-    path('chart/api', views.IncidentView.as_view()),
-
-    path('k9/api', views.K9ListView.as_view()), 
-    path('user/api', views.UserListView.as_view()),
-    path('k9/api/<int:id>', views.K9DetailView.as_view()),
-    path('user/api/<int:id>', views.UserDetailView.as_view()),
+    path('team-leader/api', views.TeamLeaderView.as_view()),
+    path('handler/api', views.HandlerView.as_view()),
+    path('vet/api', views.VetView.as_view()),
 
     #path('/<int:id>/', views., name=''),
 ];

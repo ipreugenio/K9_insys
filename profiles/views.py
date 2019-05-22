@@ -6,6 +6,7 @@ from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
 from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed
@@ -14,7 +15,7 @@ from planningandacquiring.models import K9
 from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification
 
-from unitmanagement.models import PhysicalExam, VaccinceRecord
+from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
 from datetime import datetime
 import calendar
 
@@ -176,6 +177,7 @@ def team_leader_dashboard(request):
 
 def handler_dashboard(request):
     user = user_session(request)
+    k9 = K9.objects.get(handler=user)
     
     #NOTIF SHOW
     notif_data = notif(request)
@@ -185,8 +187,50 @@ def handler_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'k9':k9,
     }
     return render (request, 'profiles/handler_dashboard.html', context)
+
+def vet_dashboard(request):
+    user = user_session(request)
+    
+    cv1 = VaccinceRecord.objects.filter(dhppil_cv_1=False).count() #dhppil_cv_1
+    cv2 = VaccinceRecord.objects.filter(dhppil_cv_2=False).count() #dhppil_cv_2
+    cv3 = VaccinceRecord.objects.filter(dhppil_cv_3=False).count() #dhppil_cv_3
+
+    rabies = VaccinceRecord.objects.filter(anti_rabies=False).count() #anti_rabies
+    
+    bd1 = VaccinceRecord.objects.filter(bordetella_1=False).count() #bordetella_1
+    bd2 = VaccinceRecord.objects.filter(bordetella_2=False).count() #bordetella_2
+
+    dh1 = VaccinceRecord.objects.filter(dhppil4_1=False).count() #dhppil4_1
+    dh2 = VaccinceRecord.objects.filter(dhppil4_2=False).count() #dhppil4_2
+
+    vac_pending = VaccinceRecord.objects.filter(Q(dhppil_cv_1=False) | Q(dhppil_cv_2=False) | Q(dhppil_cv_3=False) | Q(anti_rabies=False) | Q(bordetella_1=False) | Q(bordetella_2=False) | Q(dhppil4_1=False) | Q(dhppil4_2=False)).count()
+    
+    #TODO Physical Exam
+    # phex_pending = 
+    health_pending = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'vac_pending':vac_pending,
+        'health_pending':health_pending,
+        'cv1':cv1,
+        'cv2':cv2,
+        'cv3':cv3,
+        'rabies':rabies,
+        'bd1':bd1,
+        'bd2':bd2,
+        'dh1':dh1,
+        'dh2':dh2,
+    }
+    return render (request, 'profiles/vet_dashboard.html', context)
 
 def profile(request):
    
@@ -281,6 +325,8 @@ def login(request):
                 return HttpResponseRedirect('../team-leader-dashboard')
             elif user.position == 'Handler':
                 return HttpResponseRedirect('../handler-dashboard')
+            elif user.position == 'Veterinarian':
+                return HttpResponseRedirect('../vet-dashboard')
             else:
                 return HttpResponseRedirect('../dashboard')
 

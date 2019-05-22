@@ -155,9 +155,9 @@ class VaccinceRecord(models.Model):
     deworming_3 = models.BooleanField(default=False)     #6weeks
     deworming_4 = models.BooleanField(default=False)     #9weeks
    
-    dhppil_cv_1 = models.BooleanField(default=False)     #6weeks
-    dhppil_cv_2 = models.BooleanField(default=False)     #9weeks
-    dhppil_cv_3 = models.BooleanField(default=False)     #12weeks
+    dhppil_cv_1 = models.BooleanField(default=False)     #6weeks *
+    dhppil_cv_2 = models.BooleanField(default=False)     #9weeks *
+    dhppil_cv_3 = models.BooleanField(default=False)     #12weeks *
     
     heartworm_1 = models.BooleanField(default=False)     #6weeks
     heartworm_2 = models.BooleanField(default=False)     #10weeks
@@ -168,13 +168,13 @@ class VaccinceRecord(models.Model):
     heartworm_7 = models.BooleanField(default=False)     #30weeks
     heartworm_8 = models.BooleanField(default=False)     #34weeks
    
-    anti_rabies = models.BooleanField(default=False)     #12weeks
+    anti_rabies = models.BooleanField(default=False)     #12weeks *
 
-    bordetella_1 = models.BooleanField(default=False)    #8weeks
-    bordetella_2 = models.BooleanField(default=False)    #11weeks
+    bordetella_1 = models.BooleanField(default=False)    #8weeks *
+    bordetella_2 = models.BooleanField(default=False)    #11weeks *
 
-    dhppil4_1 = models.BooleanField(default=False)       #15weeks
-    dhppil4_2 = models.BooleanField(default=False)       #18weeks
+    dhppil4_1 = models.BooleanField(default=False)       #15weeks *
+    dhppil4_2 = models.BooleanField(default=False)       #18weeks *
 
     tick_flea_1 = models.BooleanField(default=False)     #8weeks
     tick_flea_2 = models.BooleanField(default=False)     #12weeks
