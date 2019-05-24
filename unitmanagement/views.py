@@ -8,17 +8,17 @@ import datetime as dt
 from datetime import timedelta, date, datetime
 from decimal import Decimal
 import itertools
-from django.db.models import Sum, Avg, Max
+from django.db.models import Sum, Avg, Max, Q
 from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
+from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
@@ -627,7 +627,15 @@ def health_details(request, id):
     i = K9_Incident.objects.get(id=data.incident_id.id)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
-   
+    
+
+    th = Transaction_Health.objects.filter(health=data).filter(status='Pending')
+
+    image = None
+    for t in th:
+        image = Image.objects.filter(incident_id=t.follow_up)
+
+    print(data.follow_up_done, data.follow_up)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -642,6 +650,8 @@ def health_details(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'th':th,
+        'image':image,
     }
     return render (request, 'unitmanagement/health_details.html', context)
 
@@ -994,14 +1004,41 @@ def k9_incident_list(request):
     }
     return render (request, 'unitmanagement/k9_incident_list.html', context)
 
+def follow_up(request, id):
+    data = Health.objects.get(id=id)
+    i = K9_Incident.objects.get(id=data.incident_id.id)
+    medicine = HealthMedicine.objects.filter(health=data)
+    dog = K9.objects.get(id = data.dog.id)
+
+    th = Transaction_Health.objects.create(health=data, incident=i)
+    data.follow_up = True
+    data.save()
+     
+    request.session['health'] = th.id
+
+    return redirect('unitmanagement:k9_sick_form')
+
 def k9_sick_form(request):
     user = user_session(request)
     form = K9IncidentForm(request.POST or None, request.FILES or None)
     style='ui green message'
-
+    form2 = DateForm(request.POST or None)
     handler = K9.objects.filter(handler=user)
     form.fields['k9'].queryset =  handler
+    
+    h = request.session['health']
+    health = None
+    print(h)
 
+    try:
+        th = Transaction_Health.objects.filter(status='Pending').get(id=h)
+        health = Health.objects.get(id=th.health.id)
+        print(th)
+    except ObjectDoesNotExist:
+        th =  None
+
+    print(health)
+  
     if request.method == "POST":
         if form.is_valid():
             form = form.save(commit=False)
@@ -1012,12 +1049,25 @@ def k9_sick_form(request):
 
             files = request.FILES.getlist('image_file')
 
+            #Images
             for f in files:
                 Image.objects.create(incident_id=form, image=f)
 
+            #Follow up Handler side
+            if th != None:
+                th.follow_up = form
+                th.health.follow_up_done=True
+                th.save()
+
+            if health != None:
+                health.follow_up = True
+                health.save()
+
+            #what happens to the previous health if nag follow-up and handler?
+
             style = "ui green message"
             messages.success(request, 'Health Concern has been successfully Reported!')
-            return redirect('unitmanagement:k9_sick_form') 
+            return redirect('unitmanagement:health_list_handler') 
 
         else:
             style = "ui red message"
@@ -1036,6 +1086,8 @@ def k9_sick_form(request):
         'count':count,
         'user':user,
         'handler': handler,
+        'form2':form2,
+        'health':health,
     }
     return render (request, 'unitmanagement/k9_sick_form.html', context)
 
@@ -1059,7 +1111,7 @@ def health_list_handler(request):
         data2 = Health.objects.filter(dog=k9).filter(status='On-Going')
 
     for da in data2:
-        d =  da.date_done - dt.date.today()
+        d =  (da.date_done - date)
         d = d.days
         data_arr.append(d)
 
@@ -1397,8 +1449,24 @@ def choose_handler(request, id):
 #sick list
 def k9_sick_list(request):
     
-    data = K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
+    t = Transaction_Health.objects.filter(incident__status='Pending').exclude(health__follow_up=True)
+    a = []
+    for t in t:
+        t.append(t.incident.id)
+
+
+    data =K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
     data2 = K9_Incident.objects.filter(incident='Sick').filter(status='Done')
+
+    d = Transaction_Health.objects.filter(incident__status='Pending').filter(health__follow_up=True).exclude(health__follow_up_done=True)
+    f = []
+
+    for d in d:
+        f.append(d.health.id)
+
+    th = Health.objects.filter(follow_up_date__gte=dt.date.today()).exclude(follow_up_done=True)
+    
+    print(th)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1413,6 +1481,7 @@ def k9_sick_list(request):
         'count':count,
         'style':style,
         'user':user,
+        'th':th,
     }
     return render (request, 'unitmanagement/k9_sick_list.html', context)
 
@@ -1422,9 +1491,30 @@ def k9_sick_details(request, id):
     
     data = K9_Incident.objects.get(id=id)
     image = Image.objects.filter(incident_id=data)
-
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
+
+    th = None
+    h = None
+    hh = None
+    try:
+        th = Transaction_Health.objects.filter(status='Pending').get(incident=data)
+        hh = Health.objects.filter(id=th.health.id).latest('id')
+        h = HealthMedicine.objects.filter(health=hh)
+    except ObjectDoesNotExist:
+        th = Transaction_Health.objects.filter(status='Pending').get(follow_up=data)
+        if (th != None):
+            hh = Health.objects.filter(id=th.health.id).latest('id')
+            h = HealthMedicine.objects.filter(health=hh)
+        else:
+            th = None
+            h = None
+            hh = None
+
+    print(h)
+    print(hh)
+    print(th)
+
 
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
@@ -1433,9 +1523,6 @@ def k9_sick_details(request, id):
     form = HealthForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
-            #get treatment
-            request.session['treatment'] = form['treatment'].value()
-
             health = form.save(commit=False)
             health.dog = data.k9
             health.incident_id = data
@@ -1444,7 +1531,19 @@ def k9_sick_details(request, id):
             new_form = health.pk
             form_instance = Health.objects.get(id=new_form)
             dog = K9.objects.get(id=health.dog.id)
-            
+
+            # transaction health
+            if th != None:
+                th.status = 'Done'
+                th.health = health
+                th.save()
+
+                hh.follow_up_done = True
+                hh.save()
+
+            if health.follow_up == True:
+                Transaction_Health.objects.create(health=health, incident=data)
+
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
             form_med = []
@@ -1529,6 +1628,8 @@ def k9_sick_details(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'th':th,
+        'h':h,
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 

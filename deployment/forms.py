@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
-from django.contrib.admin.widgets import AdminDateWidget
+from django.contrib.admin.widgets import AdminDateWidget, AdminTimeWidget
 from datetime import date, datetime
 from django.core.validators import validate_integer
 from django.forms import fields
@@ -239,5 +239,24 @@ class DailyRefresherForm(forms.ModelForm):
         model = Daily_Refresher
         fields = '__all__'
 
+        widgets = {
+            'port_time': AdminTimeWidget(attrs={'class':'timepicker'}),
+            'building_time': AdminTimeWidget(),
+            'vehicle_time': AdminTimeWidget(),
+            'baggage_time': AdminTimeWidget(),
+            'others_time': AdminTimeWidget(),
+        }
+
     def __init__(self, *args, **kwargs):
         super(DailyRefresherForm, self).__init__(*args, **kwargs)
+        self.fields['rating'].required = False
+        self.fields['MARSEC'].required = False
+        self.fields['MARLEN'].required = False
+        self.fields['MARSAR'].required = False
+        self.fields['MAREP'].required = False
+        self.fields['on_leash'].required = False
+        self.fields['off_leash'].required = False
+        self.fields['obstacle_course'].required = False
+        self.fields['panelling'].required = False
+        self.fields['k9'].required = False
+        self.fields['handler'].required = False

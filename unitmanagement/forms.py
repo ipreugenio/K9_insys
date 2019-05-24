@@ -56,12 +56,21 @@ class PhysicalExamForm(forms.ModelForm):
         # self.fields['dog'].initial = a
 
 class HealthForm(forms.ModelForm):
+    CHOICE = (
+        (True,'Yes'),
+        (False,'No')
+    )
+
     treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
     problem = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
+    follow_up =forms.ChoiceField(choices=CHOICE,widget=forms.RadioSelect)
+    follow_up_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
     
     class Meta:
         model = Health
-        fields = ('dog','problem', 'treatment', 'incident_id', 'image')
+        fields = ('dog','problem', 'treatment', 'incident_id', 'image', 'follow_up', 'follow_up_date')
+        
 
     def __init__(self, *args, **kwargs):
         super(HealthForm, self).__init__(*args, **kwargs)
@@ -69,6 +78,7 @@ class HealthForm(forms.ModelForm):
         self.fields['problem'].required = False
         self.fields['incident_id'].required = False
         self.fields['image'].required = False
+        self.fields['follow_up_date'].required = False
 
 class HealthMedicineForm(forms.ModelForm):
     TIME_OF_DAY = (
@@ -216,6 +226,13 @@ class HandlerOnLeaveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
+
+class DateForm(forms.Form):
+    date = forms.DateField()
+
+    widgets = {
+        'date': DateInput(),
+    }
        
 
 class ReassignAssetsForm(forms.Form):

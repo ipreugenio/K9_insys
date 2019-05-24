@@ -63,9 +63,63 @@
             {% endfor %}
         </tbody>
     </table>
-
+    {% if th%}
+        {% for th in th %}
+        <div class="ui raised segment">
+                    <h2>Follow-Up</h2>
+            <table class="ui collapse table">
+                <thead>
+                    <tr>
+                        <th>K9</th>
+                        <td>{{th.follow_up.k9}}</td>
+                        <th>Date</th>
+                        <td>{{th.follow_up.date}}</td>
+                    </tr>
+                    <tr>
+                        <th>Remarks</th>
+                        <td class="nine wide">{{th.follow_up.description}}</td>
+                        <th>Reported by:</th>
+                        <td>{{th.follow_up.reported_by}}</td>
+                    </tr>
+                </thead>
+            </table>
+            <br>
+            <div class="ui grid">
+                {% for image in image%}
+                    <div class="five wide column center aligned">
+                        <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                    </div>
+                {%endfor%}
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+    <br>
+    
     <center>
-        <a href="" class="ui blue button">Follow Up</a>
+        {% if data.follow_up == True %}
+            {% if th%}
+               {% for th in th %}
+                    {% if th.health.follow_up == True and th.health.follow_up_date == None%}
+                    <h3>You already requested a follow-up last {{th.incident.date}}.</h3>
+                    {%else%}
+                    <h3>You have a Follow Up Check-up on {{th.health.follow_up_date}}</h3>
+                    {% endif %}
+                {% endfor %}
+            {%else%}
+            <div class="ui info message">
+                <div class="content">
+                    <div class="header">
+                        The Vet had already prescribed you for this particular follow-up. Please
+                        check your most recent Concern. This is just a reminder that you
+                        still have an on-going medication.
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+        <a href="{% url 'unitmanagement:follow_up' data.id %}" class="ui blue button">Follow Up</a>
+        {% endif %}
     </center>
     
 </div>

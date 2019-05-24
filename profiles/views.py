@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.db.models import Q
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
@@ -183,11 +183,20 @@ def handler_dashboard(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
 
+    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+    
+    dr = None
+    if drf.exists():
+        dr = 1
+    else:
+        dr = 0
+
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
         'k9':k9,
+        'dr':dr,
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 

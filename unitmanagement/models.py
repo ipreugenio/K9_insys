@@ -66,6 +66,9 @@ class Health(models.Model):
     date_done = models.DateField('date_done', null=True, blank=True)
     incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
     image = models.FileField(upload_to='prescription_image', blank=True, null=True)
+    follow_up = models.BooleanField(default=False)
+    follow_up_date = models.DateField('follow_up_date', null=True, blank=True)
+    follow_up_done = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id) + ': ' + str(self.date) #+' - ' + str(self.dog.name)
@@ -109,7 +112,11 @@ class HealthMedicine(models.Model):
 
 
 class Transaction_Health(models.Model):
-    health = models.ForeignKey(Health, on_delete=models.CASCADE, null=True, blank=True)
+    health = models.ForeignKey(Health, on_delete=models.CASCADE, null=True, blank=True, related_name='initial_health')
+    health2 = models.ForeignKey(Health, on_delete=models.CASCADE, null=True, blank=True,  related_name='follow_health')
+    incident = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='initial')
+    follow_up = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='follow_up')
+    status = models.CharField('status', max_length=200, default="Pending")
     
 class PhysicalExam(models.Model):
     EXAMSTATUS = (

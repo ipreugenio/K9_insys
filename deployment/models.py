@@ -311,8 +311,8 @@ class Daily_Refresher(models.Model):
     off_leash = models.BooleanField(default=False)
     obstacle_course = models.BooleanField(default=False)
     panelling = models.BooleanField(default=False)
-    morning_feed_cups = models.IntegerField('morning_feed_cups', blank=True, null=True)
-    evening_feed_cups = models.IntegerField('evening_feed_cups', blank=True, null=True)
+    morning_feed_cups = models.DecimalField('morning_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
+    evening_feed_cups = models.DecimalField('evening_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
     # plant and find
     port_plant = models.IntegerField('port_plant', default= 0)
     port_find = models.IntegerField('port_find', default= 0)

@@ -9,50 +9,22 @@
     {% endfor %}
     {% endif %}
 </div>
-<div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">Pending</a>
-    <a class="item" data-tab="second">On-Going</a>
-</div>
-<div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui four column celled table">
-        <thead class="center aligned">
-            <tr>
-                <th>Date Reported</th>
-                <th>K9</th>
-                <th>Concern</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody class="center aligned">
-            {% for data in data %}
-            <tr>
-                <td>{{data.date}}</td>
-                <td>{{data.k9}}</td>
-                <td>{{data.incident}}</td>
-                <td class="center aligned three wide">
-                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}"
-                    class="ui basic blue button">Select</a>
-                </td>
-            </tr>
-            
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="ui tab segment" data-tab="second">
+
+<div class="ui segment" data-tab="first">
     <div class="ui info message">
         <ul class="list">
             <li>Items that are Done with no action to Follow-up will expire in 1
            week (7 Days). </li>
         </ul>
     </div>
-    <table id="tabledata2" class="ui five column celled table">
+    <table id="tabledata1" class="ui six column celled table">
         <thead class="center aligned">
             <tr>
                 <th>Date</th>
                 <th>K9</th>
                 <th>Duration</th>
                 <th>Veterinarian</th>
+                <th>Follow-Up</th>
                 <th></th>
             </tr>
         </thead>
@@ -77,6 +49,15 @@
                                 {% endif %}
                             {% endif %}
                             <td>{{data.veterinary}}</td>
+                            {% if data.follow_up == True and data.follow_up_done == True %}
+                            <td>Done</td>
+                            {% elif data.follow_up == True and data.follow_up_date == None and data.follow_up_done == False%}
+                            <td>Follow-up Requested</td>
+                            {% elif data.follow_up_date == None %}
+                            <td>No Follow-Up</td>
+                            {% else %}
+                            <td>{{data.follow_up_date}}</td>
+                            {% endif %}
                             <td class="center aligned three wide">
                                 <a href="{% url 'unitmanagement:health_details' data.id %}"
                                 class="ui basic blue button">Select</a>
@@ -100,6 +81,15 @@
                                 {% endif %}
                             {% endif %}
                             <td>{{data.veterinary}}</td>
+                            {% if data.follow_up == True and data.follow_up_done == True %}
+                            <td>Done</td>
+                            {% elif data.follow_up == True and data.follow_up_date == None and data.follow_up_done == False%}
+                            <td>Follow-up Requested</td>
+                            {% elif data.follow_up_date == None %}
+                            <td>No Follow-Up</td>
+                            {% else %}
+                            <td>{{data.follow_up_date}}</td>
+                            {% endif %}
                             <td class="center aligned three wide">
                                 <a href="{% url 'unitmanagement:health_details' data.id %}"
                                 class="ui basic blue button">Select</a>
@@ -112,17 +102,12 @@
         </tbody>
     </table>
 </div>
-
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata1').DataTable({
-            "order": [[ 0, "desc" ]]
+            "order": [[ 4, "desc" ]]
         });
-        $('#tabledata2').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
-        $('#tabledata2').DataTable();
         $('.menu .item').tab();
     });
 

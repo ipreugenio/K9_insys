@@ -16,7 +16,7 @@ from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
 from inventory.models import Medicine
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, DailyRefresherForm
 #Plotly
 import plotly.offline as opy
@@ -716,7 +716,16 @@ def daily_refresher_form(request):
     k9 = K9.objects.get(handler=user)
     form = DailyRefresherForm(request.POST or None)
 
+    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.date.today())
+    
+    dr = None
+    if drf.exists():
+        dr = 1
+    else:
+        dr = 0
+
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
             f = form.save(commit=False)
             f.k9 = k9
@@ -742,6 +751,7 @@ def daily_refresher_form(request):
         'count':count,
         'user':user,
         'form':form,
+        'dr':dr,
     }
 
     return render(request, 'deployment/daily_refresher_form.html', context)

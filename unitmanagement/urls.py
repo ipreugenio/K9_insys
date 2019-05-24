@@ -34,6 +34,7 @@ urlpatterns = [
     path('health-list', views.health_list_handler, name='health_list_handler'),
     path('k9-incident-list', views.k9_incident_list, name='k9_incident_list'),
     path('k9-retrieved/<int:id>', views.k9_retreived, name='k9_retreived'),
+    path('follow-up/<int:id>', views.follow_up, name='follow_up'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),
