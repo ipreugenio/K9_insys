@@ -327,7 +327,7 @@ class add_breed_form(forms.ModelForm):
 
     class Meta:
         model = Dog_Breed
-        fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
+        fields = ('breed', 'life_span', 'litter_number', 'value', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
 
 
 

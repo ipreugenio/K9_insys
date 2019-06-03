@@ -40,6 +40,8 @@ class Dog_Breed(models.Model):
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
     skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+    litter_number = models.IntegerField('litter_number', null=True)
+    value = models.FloatField('value', max_length=200, null=True)
 
     def __str__(self):
         return str(self.breed)

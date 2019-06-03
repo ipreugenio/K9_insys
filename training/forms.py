@@ -42,23 +42,35 @@ class add_handler_form(forms.ModelForm):
     #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)
 
 class TrainingUpdateForm(forms.ModelForm):
-    GRADE = (
-        ('1.0', '1.0'),
-        ('2.0', '2.0'),
-        ('3.0', '3.0'),
-        ('4.0', '4.0'),
-    )
+   # GRADE = (
+   #     ('75', '75'),
+   #     ('80', '80'),
+   #     ('85', '85'),
+   #     ('90', '90'),
+   #     ('95', '95'),
+   #     ('100', '100'),
+   # )
+
+
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
-    grade = forms.CharField(widget = forms.Select(choices=GRADE))
+   # stage1_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage1_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage1_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage2_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage2_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage2_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage3_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage3_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+   # stage3_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
+
 
     class Meta:
         model = Training
         fields = ('stage1_1', 'stage1_2', 'stage1_3', 'stage2_1', 'stage2_2', 'stage2_3', 'stage3_1',
-        'stage3_2', 'stage3_3', 'grade', 'remarks')
+        'stage3_2', 'stage3_3', 'remarks')
 
     def __init__(self, *args, **kwargs):
         super(TrainingUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['grade'].required = False
         self.fields['remarks'].required = False
 
 class SerialNumberForm(forms.Form):

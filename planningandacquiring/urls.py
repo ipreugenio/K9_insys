@@ -31,7 +31,9 @@ urlpatterns = [
 
 
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
-    path('view_breed/', views.breed_listview, name='view_breed'),
+
+    path('breed_list/', views.breed_list, name='breed_list'),
+    path('breed_detail/<int:id>', views.breed_detail, name='breed_detail'),
 
 ];
 

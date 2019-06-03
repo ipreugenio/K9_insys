@@ -20,11 +20,11 @@ from django.db.models import Sum
 from collections import OrderedDict
 
 #graphing imports
-import igraph
+'''import igraph
 from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
+import plotly.graph_objs.layout as lout'''
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -731,6 +731,7 @@ def training_update_form(request, id):
     form = TrainingUpdateForm(request.POST or None, instance = training)
     handlerID = K9_Handler.objects.filter(k9=data)
     form2 = RecordForm(request.POST or None)
+    average = 0
 
     if request.method == 'POST':
         if form2.is_valid():
@@ -740,67 +741,89 @@ def training_update_form(request, id):
             record.save()
 
         #save training status
-        if training.stage1_1 == True:
+        if training.stage1_1 != 0:
             training.stage1_1 = training.stage1_1
         else:
-            training.stage1_1 = bool(request.POST.get('stage1_1'))
-        if training.stage1_2 == True:
+            training.stage1_1 = request.POST.get('stage1_1')
+            stage1_1 = request.POST.get('stage1_1')
+            print(stage1_1)
+            print(average)
+            average = average + stage1_1
+        if training.stage1_2 != 0:
             training.stage1_2 = training.stage1_2
         else:
-            training.stage1_2 = bool(request.POST.get('stage1_2'))
-        if training.stage1_3 == True:
+            training.stage1_2 = request.POST.get('stage1_2')
+            stage1_2 = request.POST.get('stage1_2')
+            average = average + stage1_2
+        if training.stage1_3 != 0:
             training.stage1_3 = training.stage1_3
         else:
-            training.stage1_3 = bool(request.POST.get('stage1_3'))
-        if training.stage2_1 == True:
+            training.stage1_3 = request.POST.get('stage1_3')
+            stage1_3 = request.POST.get('stage1_3')
+            average = average + stage1_3
+        if training.stage2_1 != 0:
             training.stage2_1 = training.stage2_1
         else:
-            training.stage2_1 = bool(request.POST.get('stage2_1'))
-        if training.stage2_2 == True:
+            training.stage2_1 = request.POST.get('stage2_1')
+            stage2_1 = request.POST.get('stage2_1')
+            average = average + stage2_1
+        if training.stage2_2 != 0:
             training.stage2_2 = training.stage2_2
         else:
-            training.stage2_2 = bool(request.POST.get('stage2_2'))
-        if training.stage2_3 == True:
+            training.stage2_2 = request.POST.get('stage2_2')
+            stage2_2 = request.POST.get('stage2_2')
+            average = average + stage2_2
+        if training.stage2_3 != 0:
             training.stage2_3 = training.stage2_3
         else:
-            training.stage2_3 = bool(request.POST.get('stage2_3'))
-        if training.stage3_1 == True:
+            training.stage2_3 = request.POST.get('stage2_3')
+            stage2_3 = request.POST.get('stage2_3')
+            average = average + stage2_3
+        if training.stage3_1 != 0:
             training.stage3_1 = training.stage3_1
         else:
-            training.stage3_1 = bool(request.POST.get('stage3_1'))
-        if training.stage3_2 == True:
+            training.stage3_1 = request.POST.get('stage3_1')
+            stage3_1 = request.POST.get('stage3_1')
+            average = average + stage3_1
+        if training.stage3_2 != 0:
             training.stage3_2 = training.stage3_2
         else:
-            training.stage3_2 = bool(request.POST.get('stage3_2'))
-        if training.stage3_3 == True:
+            training.stage3_2 = request.POST.get('stage3_2')
+            stage3_2 = request.POST.get('stage3_2')
+            average = average + stage3_2
+        if training.stage3_3 != 0:
             training.stage3_3 = training.stage3_3
         else:
-            training.stage3_3 = bool(request.POST.get('stage3_3'))
+            training.stage3_3 = request.POST.get('stage3_3')
+            stage3_3 = request.POST.get('stage3_3')
+            average = average + stage3_3
 
         training.remarks = request.POST.get('remarks')
-        training.grade = request.POST.get('grade')
+        if training.stage == "Finished Training":
+            average = average / 9
+            training.grade = average
         training.save()
         data.save()
 
         stage = "Stage 0"
 
-        if training.stage3_3 == True:
+        if training.stage3_3 != 0:
             stage = "Finished Training"
-        elif training.stage3_2 == True:
+        elif training.stage3_2 != 0:
             stage = "Stage 3.2"
-        elif training.stage3_1 == True:
+        elif training.stage3_1 != 0:
             stage= "Stage 3.1"
-        elif training.stage2_3 == True:
+        elif training.stage2_3 != 0:
             stage = "Stage 2.3"
-        elif training.stage2_2 == True:
+        elif training.stage2_2 != 0:
             stage = "Stage 2.2"
-        elif training.stage2_1 == True:
+        elif training.stage2_1 != 0:
             stage = "Stage 2.1"
-        elif training.stage1_3 == True:
+        elif training.stage1_3 != 0:
             stage = "Stage 1.3"
-        elif training.stage1_2 == True:
+        elif training.stage1_2 != 0:
             stage = "Stage 1.2"
-        elif training.stage1_1 == True:
+        elif training.stage1_1 != 0:
             stage = "Stage 1.1"
 
         training.stage = stage
