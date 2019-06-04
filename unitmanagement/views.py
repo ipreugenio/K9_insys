@@ -1,31 +1,33 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 import datetime as dt
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from decimal import Decimal
-from django.db.models import Sum, Avg, Max
+import itertools
+from django.db.models import Sum, Avg, Max, Q
 from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
+from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler
+from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from unitmanagement.serializers import K9Serializer, UserSerializer
+from unitmanagement.serializers import K9Serializer
 
 # Create your views here.
 
@@ -115,32 +117,22 @@ def index(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    form = k9_detail_form(request.POST or None, request.FILES or None, instance = user)
-
-    print (date.today())
-    if request.method == "POST":
-        print('post')
-        print(form.errors)
-        if form.is_valid():
-            print('Valid')   
-            a = form['image'].value() 
-            print(a)
-            form.save()
+    n = None
+   
+    Handler_K9_History.objects.get()
 
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
-        'form':form,
+        'n':n,
     }        
-
     return render (request, 'unitmanagement/index.html', context)
 
 #TODO Initialize treatment
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
-    form = HealthForm(request.POST or None)
 
     if request.method == "POST":
         #print(form)
@@ -291,10 +283,9 @@ def health_record(request):
 
         number = Account.objects.get(serial_number=serial)
         handler = User.objects.get(id=number.UserID.id)
-        k9 = K9_Handler.objects.get(handler_id=handler.id)
-        data = K9.objects.get(id = int(k9.id))
+        data = K9.objects.get(handler=handler)
 
-    elif position == "Veterinarian":
+    else:
         data = K9.objects.all()
 
 
@@ -317,609 +308,314 @@ def health_history(request, id):
     user_s = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user_s.UserID.id)
 
-
     data = K9.objects.get(id=id)
     health_data = Health.objects.filter(dog = data).order_by('-date')
     phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
-    vaccine_record = VaccinceRecord.objects.get(k9 = data)
-    dtoday = dt.date.today()
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    style = 'ui green message'
 
-    vaccine_record_form = VaccinationRecordForm(request.POST or None, instance = vaccine_record)
-    vaccine_used_form = VaccinationUsedForm(request.POST or None)
-    vaccines = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine')
-    vaccine_available = Medicine_Inventory.objects.filter(medicine__in = vaccines).exclude(quantity=0)
-   
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
     active_1 = ' active'
     active_2 = ''
     active_3 = ''
-    style='ui green message'
 
-    # GET DOG AGE
-    # 2weeks=14days, 4Weeks=28days, 6weeks=42days, 8Weeks=56days, 9weeks=63days, 10weeks=70days
-    # 14weeks=98days, 15weeks=105days, 16weeks=112days, 18weeks=126days, 20weeks=140days, 22weeks=154days
-    # 24weeks=168days, 26weeks=183days, 28weeks=196days, 30weeks=210days, 32weeks=224days, 34weeks=238days
-    dog_days =  dtoday - data.birth_date
-
-    data_deworming_1 = ''
-    data_deworming_2 = ''
-    data_deworming_3 = ''
-    data_dhppil_cv_1 = ''
-    data_heartworm_1 = ''
-    data_bordetella_1 = ''
-    data_tick_flea_1 = ''
-    data_dhppil_cv_2 = ''
-    data_deworming_4 = ''
-    data_heartworm_2 = ''
-    data_bordetella_2 = ''
-    data_anti_rabies = ''
-    data_tick_flea_2 = ''
-    data_dhppil_cv_3 = ''
-    data_heartworm_3 = ''
-    data_dhppil4_1 = ''
-    data_tick_flea_3 = ''
-    data_dhppil4_2 = ''
-    data_heartworm_4 = ''
-    data_tick_flea_4 = ''
-    data_heartworm_5 = ''
-    data_tick_flea_5 = ''
-    data_heartworm_6 = ''
-    data_tick_flea_6 = ''
-    data_heartworm_7 = ''
-    data_tick_flea_7 = ''
-    data_heartworm_8 = ''
-
-
-    #data of vaccines used
-    if data.source == 'Breeding':
-        data_deworming_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_1')
-        data_deworming_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_2')
-        data_deworming_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_3')
-        data_dhppil_cv_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_1')
-        data_heartworm_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_1')
-        data_bordetella_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='bordetella_1')
-        data_tick_flea_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_1')
-        data_dhppil_cv_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_2')
-        data_deworming_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='deworming_4')
-        data_heartworm_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_2')
-        data_bordetella_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='bordetella_2')
-        data_anti_rabies = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='anti_rabies')
-        data_tick_flea_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_2')
-        data_dhppil_cv_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil_cv_3')
-        data_heartworm_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_3')
-        data_dhppil4_1 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil4_1')
-        data_tick_flea_3 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_3')
-        data_dhppil4_2 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='dhppil4_2')
-        data_heartworm_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_4')
-        data_tick_flea_4 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_4')
-        data_heartworm_5 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_5')
-        data_tick_flea_5 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_5')
-        data_heartworm_6 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_6')
-        data_tick_flea_6 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_6')
-        data_heartworm_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_7')
-        data_tick_flea_7 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='tick_flea_7')
-        data_heartworm_8 = VaccineUsed.objects.filter(vaccine_record=vaccine_record).get(disease='heartworm_8')
-
-
+    ctr=0
+    ctr1=0
     if request.method == 'POST':
-        # if is changed to TRUE, it cannot be changed back to FALSE 
-        if vaccine_record.deworming_1 == True:
-            vaccine_record.deworming_1 = vaccine_record.deworming_1
-        else:
-            vaccine_record.deworming_1 = bool(request.POST.get('deworming_1'))
-        if vaccine_record.deworming_2 == True:
-            vaccine_record.deworming_2 = vaccine_record.deworming_2
-        else:
-            vaccine_record.deworming_2 = bool(request.POST.get('deworming_2'))
-        if vaccine_record.deworming_3 == True:
-            vaccine_record.deworming_3 = vaccine_record.deworming_3
-        else:
-            vaccine_record.deworming_3 = bool(request.POST.get('deworming_3'))
-        if vaccine_record.dhppil_cv_1 == True:
-            vaccine_record.dhppil_cv_1 = vaccine_record.dhppil_cv_1
-        else:
-            vaccine_record.dhppil_cv_1 = bool(request.POST.get('dhppil_cv_1'))
-        if vaccine_record.heartworm_1 == True:
-            vaccine_record.heartworm_1 = vaccine_record.heartworm_1
-        else:
-            vaccine_record.heartworm_1 = bool(request.POST.get('heartworm_1'))
-        if vaccine_record.bordetella_1 == True:
-            vaccine_record.bordetella_1 = vaccine_record.bordetella_1
-        else:
-            vaccine_record.bordetella_1 = bool(request.POST.get('bordetella_1'))
-        if vaccine_record.tick_flea_1 == True:
-            vaccine_record.tick_flea_1 = vaccine_record.tick_flea_1
-        else:
-            vaccine_record.tick_flea_1 = bool(request.POST.get('tick_flea_1'))
-        if vaccine_record.dhppil_cv_2 == True:
-            vaccine_record.dhppil_cv_2 = vaccine_record.dhppil_cv_2
-        else:
-            vaccine_record.dhppil_cv_2 = bool(request.POST.get('dhppil_cv_2'))
-        if vaccine_record.deworming_4 == True:
-            vaccine_record.deworming_4 = vaccine_record.deworming_4
-        else:
-            vaccine_record.deworming_4 = bool(request.POST.get('deworming_4'))
-        if vaccine_record.heartworm_2 == True:
-            vaccine_record.heartworm_2 = vaccine_record.heartworm_2
-        else:
-            vaccine_record.heartworm_2 = bool(request.POST.get('heartworm_2'))
-        if vaccine_record.bordetella_2 == True:
-            vaccine_record.bordetella_2 = vaccine_record.bordetella_2
-        else:
-            vaccine_record.bordetella_2 = bool(request.POST.get('bordetella_2'))
-        if vaccine_record.anti_rabies == True:
-            vaccine_record.anti_rabies = vaccine_record.anti_rabies
-        else:
-            vaccine_record.anti_rabies = bool(request.POST.get('anti_rabies'))
-        if vaccine_record.tick_flea_2 == True:
-            vaccine_record.tick_flea_2 = vaccine_record.tick_flea_2
-        else:
-            vaccine_record.tick_flea_2 = bool(request.POST.get('tick_flea_2'))
-        if vaccine_record.dhppil_cv_3 == True:
-            vaccine_record.dhppil_cv_3 = vaccine_record.dhppil_cv_3
-        else:
-            vaccine_record.dhppil_cv_3 = bool(request.POST.get('dhppil_cv_3'))
-        if vaccine_record.heartworm_3 == True:
-            vaccine_record.heartworm_3 = vaccine_record.heartworm_3
-        else:
-            vaccine_record.heartworm_3 = bool(request.POST.get('heartworm_3'))
-        if vaccine_record.dhppil4_1 == True:
-            vaccine_record.dhppil4_1 = vaccine_record.dhppil4_1
-        else:
-            vaccine_record.dhppil4_1 = bool(request.POST.get('dhppil4_1'))
-        if vaccine_record.tick_flea_3 == True:
-            vaccine_record.tick_flea_3 = vaccine_record.tick_flea_3
-        else:
-            vaccine_record.tick_flea_3 = bool(request.POST.get('tick_flea_3'))
-        if vaccine_record.dhppil4_2 == True:
-            vaccine_record.dhppil4_2 = vaccine_record.dhppil4_2
-        else:
-            vaccine_record.dhppil4_2 = bool(request.POST.get('dhppil4_2'))
-        if vaccine_record.heartworm_4 == True:
-            vaccine_record.heartworm_4 = vaccine_record.heartworm_4
-        else:
-            vaccine_record.heartworm_4 = bool(request.POST.get('heartworm_4'))
-        if vaccine_record.tick_flea_4 == True:
-            vaccine_record.tick_flea_4 = vaccine_record.tick_flea_4
-        else:
-            vaccine_record.tick_flea_4 = bool(request.POST.get('tick_flea_4'))
-        if vaccine_record.heartworm_5 == True:
-            vaccine_record.heartworm_5 = vaccine_record.heartworm_5
-        else:
-            vaccine_record.heartworm_5 = bool(request.POST.get('heartworm_5'))
-        if vaccine_record.tick_flea_5 == True:
-            vaccine_record.tick_flea_5 = vaccine_record.tick_flea_5
-        else:
-            vaccine_record.tick_flea_5 = bool(request.POST.get('tick_flea_5'))
-        if vaccine_record.heartworm_6 == True:
-            vaccine_record.heartworm_6 = vaccine_record.heartworm_6
-        else:
-            vaccine_record.heartworm_6 = bool(request.POST.get('heartworm_6'))
-        if vaccine_record.tick_flea_6 == True:
-            vaccine_record.tick_flea_6 = vaccine_record.tick_flea_6
-        else:
-            vaccine_record.tick_flea_6 = bool(request.POST.get('tick_flea_6'))
-        if vaccine_record.heartworm_7 == True:
-            vaccine_record.heartworm_7 = vaccine_record.heartworm_7
-        else:
-            vaccine_record.heartworm_7 = bool(request.POST.get('heartworm_7'))
-        if vaccine_record.tick_flea_7 == True:
-            vaccine_record.tick_flea_7 = vaccine_record.tick_flea_7
-        else:
-            vaccine_record.tick_flea_7 = bool(request.POST.get('tick_flea_7'))
-        if vaccine_record.heartworm_8 == True:
-            vaccine_record.heartworm_8 = vaccine_record.heartworm_8
-        else:
-            vaccine_record.heartworm_8 = bool(request.POST.get('heartworm_8'))
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
         
-       
-        # ERASE ELSE when everything is WORKING
-        if vaccine_record.deworming_1 == True and request.POST.get('s_deworming_1') !='' and request.POST.get('s_deworming_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save(commit=False)
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                        ctr1=ctr1+1
+                        f.veterinary = current_user
+                        f.done = True
+                        f.save()
+                       
+                        if f.disease == '1st Deworming':
+                            vr.deworming_1 = True
+                        elif f.disease == '2nd Deworming':
+                            vr.deworming_2 = True
+                        elif f.disease == '3rd Deworming':
+                            vr.deworming_3 = True
+                        elif f.disease == '1st dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_1 = True
+                        elif f.disease == '1st Heartworm Prevention':
+                            vr.heartworm_1 = True
+                        elif f.disease == '1st dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_1 = True
+                        elif f.disease == '1st Tick and Flea Prevention':
+                            vr.tick_flea_1 = True
+                        elif f.disease == '2nd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_2 = True
+                        elif f.disease == '4th Deworming':
+                            vr.deworming_4 = True
+                        elif f.disease == '2nd Heartworm Prevention':
+                            vr.heartworm_2 = True
+                        elif f.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_2 = True
+                        elif f.disease == 'Anti-Rabies Vaccination	':
+                            vr.anti_rabies = True
+                        elif f.disease == '2nd Tick and Flea Prevention':
+                            vr.tick_flea_2 = True
+                        elif f.disease == '3rd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_3 = True
+                        elif f.disease == '3rd Heartworm Prevention':
+                            vr.heartworm_3 = True
+                        elif f.disease == '1st dose DHPPiL4 Vaccination':
+                            vr.dhppil4_1 = True
+                        elif f.disease == '3rd Tick and Flea Prevention':
+                            vr.tick_flea_3 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.dhppil4_2 = True
+                        elif f.disease == '4th Heartworm Prevention':
+                            vr.heartworm_4 = True
+                        elif f.disease == '4th Tick and Flea Prevention':
+                            vr.tick_flea_4 = True
+                        elif f.disease == '5th Heartworm Prevention':
+                            vr.heartworm_5 = True
+                        elif f.disease == '6th Heartworm Prevention':
+                            vr.heartworm_6 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.bordetella_2 = True
+                        elif f.disease == '6th Tick and Flea Prevention':
+                            vr.tick_flea_6 = True
+                        elif f.disease == '7th Heartworm Prevention':
+                            vr.heartworm_7 = True
+                        elif f.disease == '7th Tick and Flea Prevention':
+                            vr.tick_flea_7 = True
+                        elif f.disease == '8th Heartworm Prevention':
+                            vr.heartworm_8 = True
+                        vr.save()
+                        
+                        
+                    else: 
+                        pass
+                    
+                    if f.image != None:
+                        ctr1=ctr1+1
+                        f.save(update_fields=["image"])
 
-            if med.quantity > 0:
-                data_deworming_1.vaccine = m
-                data_deworming_1.date_vaccinated = dtoday
-                data_deworming_1.veterinary = current_user
-                data_deworming_1.save()
-                vaccine_record.save(update_fields=["deworming_1"]) 
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+                    if f.done == False and f.vaccine != None and f.date_vaccinated == None:
+                        ctr = ctr+1
+                    elif f.done == False and f.vaccine == None and f.date_vaccinated != None:
+                        ctr = ctr+1
 
-        if vaccine_record.deworming_2 == True and request.POST.get('s_deworming_2') !='' and request.POST.get('s_deworming_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_deworming_2.vaccine = m
-                data_deworming_2.date_vaccinated = dtoday
-                data_deworming_2.veterinary = current_user
-                data_deworming_2.save()
-                vaccine_record.save(update_fields=["deworming_2"]) 
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-       
-        if vaccine_record.deworming_3 == True and request.POST.get('s_deworming_3') !='' and request.POST.get('s_deworming_3') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_3'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_deworming_3.vaccine = m
-                data_deworming_3.date_vaccinated = dtoday
-                data_deworming_3.veterinary = current_user
-                data_deworming_3.save()
-                vaccine_record.save(update_fields=["deworming_3"]) 
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+            print('ctr1: ',ctr1)
+            print('ctr: ',ctr)
+            if ctr1>27:
+                messages.success(request, 'Prevention Updated!')
+                return redirect('unitmanagement:health_history', id=data.id)
 
-        if vaccine_record.dhppil_cv_1 == True and request.POST.get('s_dhppil_cv_1') != '' and request.POST.get('s_dhppil_cv_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_dhppil_cv_1.vaccine = m
-                data_dhppil_cv_1.date_vaccinated = dtoday
-                data_dhppil_cv_1.veterinary = current_user
-                data_dhppil_cv_1.save()
-                vaccine_record.save(update_fields=["dhppil_cv_1"]) 
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+            if ctr>0:
+                messages.success(request, 'Incomplete input. Please check again.')
+                style='ui red message'
 
-        if vaccine_record.heartworm_1 == True and request.POST.get('s_heartworm_1') !='' and request.POST.get('s_heartworm_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_1.vaccine = m
-                data_heartworm_1.date_vaccinated = dtoday
-                data_heartworm_1.veterinary = current_user
-                data_heartworm_1.save()
-                vaccine_record.save(update_fields=["heartworm_1"]) 
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+    for forms in formset:
+        if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
+           
+        if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
 
-        if vaccine_record.bordetella_1 == True and request.POST.get('s_bordetella_1') !='' and request.POST.get('s_bordetella_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_bordetella_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_bordetella_1.vaccine = m
-                data_bordetella_1.date_vaccinated = dtoday
-                data_bordetella_1.veterinary = current_user
-                data_bordetella_1.save()
-                vaccine_record.save(update_fields=["bordetella_1"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+        if forms.initial['disease'] == '1st Heartworm Prevention' or forms.initial['disease'] == '2nd Heartworm Prevention' or forms.initial['disease'] == '3rd Heartworm Prevention' or forms.initial['disease'] == '4th Heartworm Prevention' or forms.initial['disease'] == '5th Heartworm Prevention' or forms.initial['disease'] == '6th Heartworm Prevention' or forms.initial['disease'] == '7th Heartworm Prevention' or forms.initial['disease'] == '8th Heartworm Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').exclude(quantity=0)
 
-        if vaccine_record.tick_flea_1 == True and request.POST.get('s_tick_flea_1') !='' and request.POST.get('s_tick_flea_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_1.vaccine = m
-                data_tick_flea_1.date_vaccinated = dtoday
-                data_tick_flea_1.veterinary = current_user
-                data_tick_flea_1.save()
-                vaccine_record.save(update_fields=["tick_flea_1"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.dhppil_cv_2 == True and request.POST.get('s_dhppil_cv_2') !='' and request.POST.get('s_dhppil_cv_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_dhppil_cv_2.vaccine = m
-                data_dhppil_cv_2.date_vaccinated = dtoday
-                data_dhppil_cv_2.veterinary = current_user
-                data_dhppil_cv_2.save()
-                vaccine_record.save(update_fields=["dhppil_cv_2"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
+        if forms.initial['disease'] == 'Anti-Rabies Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
             
-        if vaccine_record.deworming_4 == True and request.POST.get('s_deworming_4') !='' and request.POST.get('s_deworming_4') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_deworming_4'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_deworming_4.vaccine = m
-                data_deworming_4.date_vaccinated = dtoday
-                data_deworming_4.veterinary = current_user
-                data_deworming_4.save()
-                vaccine_record.save(update_fields=["deworming_4"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_2 == True and request.POST.get('s_heartworm_2') !='' and request.POST.get('s_heartworm_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_2.vaccine = m
-                data_heartworm_2.date_vaccinated = dtoday
-                data_heartworm_2.veterinary = current_user
-                data_heartworm_2.save()
-                vaccine_record.save(update_fields=["heartworm_2"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.bordetella_2 == True and request.POST.get('s_bordetella_2') !='' and request.POST.get('s_bordetella_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_bordetella_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_bordetella_2.vaccine = m
-                data_bordetella_2.date_vaccinated = dtoday
-                data_bordetella_2.veterinary = current_user
-                data_bordetella_2.save()
-                vaccine_record.save(update_fields=["bordetella_2"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.anti_rabies == True and request.POST.get('s_anti_rabies') !='' and request.POST.get('s_anti_rabies') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_anti_rabies'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_anti_rabies.vaccine = m
-                data_anti_rabies.date_vaccinated = dtoday
-                data_anti_rabies.veterinary = current_user
-                data_anti_rabies.save()
-                vaccine_record.save(update_fields=["anti_rabies"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_2 == True and request.POST.get('s_tick_flea_2') !='' and request.POST.get('s_tick_flea_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_2.vaccine = m
-                data_tick_flea_2.date_vaccinated = dtoday
-                data_tick_flea_2.veterinary = current_user
-                data_tick_flea_2.save()
-                vaccine_record.save(update_fields=["anti_rabies"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.dhppil_cv_3 == True and request.POST.get('s_dhppil_cv_3') !='' and request.POST.get('s_dhppil_cv_3') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil_cv_3'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_dhppil_cv_3.vaccine = m
-                data_dhppil_cv_3.date_vaccinated = dtoday
-                data_dhppil_cv_3.veterinary = current_user
-                data_dhppil_cv_3.save()
-                vaccine_record.save(update_fields=["dhppil_cv_3"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_3 == True and request.POST.get('s_heartworm_3') !='' and request.POST.get('s_heartworm_3') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_3'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_3.vaccine = m
-                data_heartworm_3.date_vaccinated = dtoday
-                data_heartworm_3.veterinary = current_user
-                data_heartworm_3.save()
-                vaccine_record.save(update_fields=["dhppil_cv_3"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.dhppil4_1 == True and request.POST.get('s_dhppil4_1') !='' and request.POST.get('s_dhppil4_1') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil4_1'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_dhppil4_1.vaccine = m
-                data_dhppil4_1.date_vaccinated = dtoday
-                data_dhppil4_1.veterinary = current_user
-                data_dhppil4_1.save()
-                vaccine_record.save(update_fields=["dhppil4_1"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_3 == True and request.POST.get('s_tick_flea_3') !='' and request.POST.get('s_tick_flea_3') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_3'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_3.vaccine = m
-                data_tick_flea_3.date_vaccinated = dtoday
-                data_tick_flea_3.veterinary = current_user
-                data_tick_flea_3.save()
-                vaccine_record.save(update_fields=["tick_flea_3"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.dhppil4_2 == True and request.POST.get('s_dhppil4_2') !='' and request.POST.get('s_dhppil4_2') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_dhppil4_2'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_dhppil4_2.vaccine = m
-                data_dhppil4_2.date_vaccinated = dtoday
-                data_dhppil4_2.veterinary = current_user
-                data_dhppil4_2.save()
-                vaccine_record.save(update_fields=["dhppil4_2"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_4 == True and request.POST.get('s_heartworm_4') !='' and request.POST.get('s_heartworm_4') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_4'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_4.vaccine = m
-                data_heartworm_4.date_vaccinated = dtoday
-                data_heartworm_4.veterinary = current_user
-                data_heartworm_4.save()
-                vaccine_record.save(update_fields=["heartworm_4"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_4 == True and request.POST.get('s_tick_flea_4') !='' and request.POST.get('s_tick_flea_4') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_4'))
-            if med.quantity > 0:
-                med = Medicine_Inventory.objects.get(medicine=m)
-                data_tick_flea_4.vaccine = m
-                data_tick_flea_4.date_vaccinated = dtoday
-                data_tick_flea_4.veterinary = current_user
-                data_tick_flea_4.save()
-                vaccine_record.save(update_fields=["tick_flea_4"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_5 == True and request.POST.get('s_heartworm_5') !='' and request.POST.get('s_heartworm_5') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_5'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_5.vaccine = m
-                data_heartworm_5.date_vaccinated = dtoday
-                data_heartworm_5.veterinary = current_user
-                data_heartworm_5.save()
-                vaccine_record.save(update_fields=["heartworm_5"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_5 == True and request.POST.get('s_tick_flea_5') !='' and request.POST.get('s_tick_flea_5') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_5'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_5.vaccine = m
-                data_tick_flea_5.date_vaccinated = dtoday
-                data_tick_flea_5.veterinary = current_user
-                data_tick_flea_5.save()
-                vaccine_record.save(update_fields=["tick_flea_5"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_6 == True and request.POST.get('s_heartworm_6') !='' and request.POST.get('s_heartworm_6') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_6'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_6.vaccine = m
-                data_heartworm_6.date_vaccinated = dtoday
-                data_heartworm_6.veterinary = current_user
-                data_heartworm_6.save()
-                vaccine_record.save(update_fields=["heartworm_6"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_6 == True and request.POST.get('s_tick_flea_6') !='' and request.POST.get('s_tick_flea_6') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_6'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_6.vaccine = m
-                data_tick_flea_6.date_vaccinated = dtoday
-                data_tick_flea_6.veterinary = current_user
-                data_tick_flea_6.save()
-                vaccine_record.save(update_fields=["tick_flea_6"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_7 == True and request.POST.get('s_heartworm_7') !='' and request.POST.get('s_heartworm_7') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_7'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_7.vaccine = m
-                data_heartworm_7.date_vaccinated = dtoday
-                data_heartworm_7.veterinary = current_user
-                data_heartworm_7.save()
-                vaccine_record.save(update_fields=["heartworm_7"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.tick_flea_7 == True and request.POST.get('s_tick_flea_7') !='' and request.POST.get('s_tick_flea_7') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_7'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_tick_flea_7.vaccine = m
-                data_tick_flea_7.date_vaccinated = dtoday
-                data_tick_flea_7.veterinary = current_user
-                data_tick_flea_7.save()
-                vaccine_record.save(update_fields=["tick_flea_7"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        if vaccine_record.heartworm_8 == True and request.POST.get('s_heartworm_8') !='' and request.POST.get('s_heartworm_8') !=None:
-            m = Medicine.objects.get(medicine=request.POST.get('s_heartworm_8'))
-            med = Medicine_Inventory.objects.get(medicine=m)
-            if med.quantity > 0:
-                data_heartworm_8.vaccine = m
-                data_heartworm_8.date_vaccinated = dtoday
-                data_heartworm_8.veterinary = current_user
-                data_heartworm_8.save()
-                vaccine_record.save(update_fields=["heartworm_8"])
-                med.quantity = med.quantity - 1
-                med.save()
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
-
-        messages.success(request, 'Preventive Health Program Updated!')
-        return redirect('unitmanagement:health_history', id = id)
-
+        if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'dog_days': dog_days,
-        'style': style,
-        'title': "Health History of ",
-        'name': data.name,
-        'actiontype': "Submit",
-        'data': data,
-        'health_data': health_data,
-        'phyexam_data': phyexam_data,
-        'vaccine_record': vaccine_record,
-        'dtoday':dtoday,
-        'form1': vaccine_record_form,
-        'form2': vaccine_used_form,
-        'vaccine_available':vaccine_available,
-        'active_1':active_1,
-        'active_2':active_2,
-        'active_3':active_3,
-        'data_deworming_1':data_deworming_1,
-        'data_deworming_2':data_deworming_2,
-        'data_deworming_3':data_deworming_3,
-        'data_dhppil_cv_1':data_dhppil_cv_1,
-        'data_heartworm_1':data_heartworm_1,
-        'data_bordetella_1':data_bordetella_1,
-        'data_tick_flea_1':data_tick_flea_1,
-        'data_dhppil_cv_2':data_dhppil_cv_2,
-        'data_deworming_4':data_deworming_4,
-        'data_heartworm_2':data_heartworm_2,
-        'data_bordetella_2':data_bordetella_2,
-        'data_anti_rabies':data_anti_rabies,
-        'data_tick_flea_2':data_tick_flea_2,
-        'data_dhppil_cv_3':data_dhppil_cv_3,
-        'data_heartworm_3':data_heartworm_3,
-        'data_dhppil4_1':data_dhppil4_1,
-        'data_tick_flea_3':data_tick_flea_3,
-        'data_dhppil4_2':data_dhppil4_2,
-        'data_heartworm_4':data_heartworm_4,
-        'data_tick_flea_4':data_tick_flea_4,
-        'data_heartworm_5':data_heartworm_5,
-        'data_tick_flea_5':data_tick_flea_5,
-        'data_heartworm_6':data_heartworm_6,
-        'data_tick_flea_6':data_tick_flea_6,
-        'data_heartworm_7':data_heartworm_7,
-        'data_tick_flea_7':data_tick_flea_7,
-        'data_heartworm_8':data_heartworm_8,
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'data':data,
+        'health_data':health_data,
+        'phyexam_data':phyexam_data,
+        'formset':formset,
+        'age': data.age_days,
+        'vu':vu,
+        'style':style,
+        'active_1':active_1,
+        'active_2':active_2,
+        'active_3':active_3,
+        'title':'Health Record of ' + str(data),
+    }
+    return render (request, 'unitmanagement/health_history.html', context)
+
+def health_history_handler(request):
+    user_serial = request.session['session_serial']
+    user_s = Account.objects.get(serial_number=user_serial)
+    current_user = User.objects.get(id=user_s.UserID.id)
+
+    data = K9.objects.get(handler=current_user)
+    health_data = Health.objects.filter(dog = data).order_by('-date')
+    phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
+
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    style = 'ui green message'
+
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
+    active_1 = ' active'
+    active_2 = ''
+    active_3 = ''
+
+    ctr=0
+    ctr1=0
+    if request.method == 'POST':
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
+        
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save(commit=False)
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                        ctr1=ctr1+1
+                        f.veterinary = current_user
+                        f.done = True
+                        f.save()
+                       
+                        if f.disease == '1st Deworming':
+                            vr.deworming_1 = True
+                        elif f.disease == '2nd Deworming':
+                            vr.deworming_2 = True
+                        elif f.disease == '3rd Deworming':
+                            vr.deworming_3 = True
+                        elif f.disease == '1st dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_1 = True
+                        elif f.disease == '1st Heartworm Prevention':
+                            vr.heartworm_1 = True
+                        elif f.disease == '1st dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_1 = True
+                        elif f.disease == '1st Tick and Flea Prevention':
+                            vr.tick_flea_1 = True
+                        elif f.disease == '2nd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_2 = True
+                        elif f.disease == '4th Deworming':
+                            vr.deworming_4 = True
+                        elif f.disease == '2nd Heartworm Prevention':
+                            vr.heartworm_2 = True
+                        elif f.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_2 = True
+                        elif f.disease == 'Anti-Rabies Vaccination	':
+                            vr.anti_rabies = True
+                        elif f.disease == '2nd Tick and Flea Prevention':
+                            vr.tick_flea_2 = True
+                        elif f.disease == '3rd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_3 = True
+                        elif f.disease == '3rd Heartworm Prevention':
+                            vr.heartworm_3 = True
+                        elif f.disease == '1st dose DHPPiL4 Vaccination':
+                            vr.dhppil4_1 = True
+                        elif f.disease == '3rd Tick and Flea Prevention':
+                            vr.tick_flea_3 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.dhppil4_2 = True
+                        elif f.disease == '4th Heartworm Prevention':
+                            vr.heartworm_4 = True
+                        elif f.disease == '4th Tick and Flea Prevention':
+                            vr.tick_flea_4 = True
+                        elif f.disease == '5th Heartworm Prevention':
+                            vr.heartworm_5 = True
+                        elif f.disease == '6th Heartworm Prevention':
+                            vr.heartworm_6 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.bordetella_2 = True
+                        elif f.disease == '6th Tick and Flea Prevention':
+                            vr.tick_flea_6 = True
+                        elif f.disease == '7th Heartworm Prevention':
+                            vr.heartworm_7 = True
+                        elif f.disease == '7th Tick and Flea Prevention':
+                            vr.tick_flea_7 = True
+                        elif f.disease == '8th Heartworm Prevention':
+                            vr.heartworm_8 = True
+                        vr.save()
+                        
+                        
+                    else: 
+                        pass
+                    
+                    if f.image != None:
+                        ctr1=ctr1+1
+                        f.save(update_fields=["image"])
+
+                    if f.done == False and f.vaccine != None and f.date_vaccinated == None:
+                        ctr = ctr+1
+                    elif f.done == False and f.vaccine == None and f.date_vaccinated != None:
+                        ctr = ctr+1
+
+            print('ctr1: ',ctr1)
+            print('ctr: ',ctr)
+            if ctr1>27:
+                messages.success(request, 'Prevention Updated!')
+                return redirect('unitmanagement:health_history', id=data.id)
+
+            if ctr>0:
+                messages.success(request, 'Incomplete input. Please check again.')
+                style='ui red message'
+
+    for forms in formset:
+        if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
+           
+        if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
+
+        if forms.initial['disease'] == '1st Heartworm Prevention' or forms.initial['disease'] == '2nd Heartworm Prevention' or forms.initial['disease'] == '3rd Heartworm Prevention' or forms.initial['disease'] == '4th Heartworm Prevention' or forms.initial['disease'] == '5th Heartworm Prevention' or forms.initial['disease'] == '6th Heartworm Prevention' or forms.initial['disease'] == '7th Heartworm Prevention' or forms.initial['disease'] == '8th Heartworm Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').exclude(quantity=0)
+
+        if forms.initial['disease'] == 'Anti-Rabies Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'health_data':health_data,
+        'phyexam_data':phyexam_data,
+        'formset':formset,
+        'data':data,
+        'age': data.age_days,
+        'vu':vu,
+        'style':style,
+        'active_1':active_1,
+        'active_2':active_2,
+        'active_3':active_3,
+        'title':'Health Record of ' + str(data),
     }
     return render (request, 'unitmanagement/health_history.html', context)
 
@@ -928,7 +624,15 @@ def health_details(request, id):
     i = K9_Incident.objects.get(id=data.incident_id.id)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
-   
+    
+
+    th = Transaction_Health.objects.filter(health=data).filter(status='Pending')
+
+    image = None
+    for t in th:
+        image = Image.objects.filter(incident_id=t.follow_up)
+
+    print(data.follow_up_done, data.follow_up)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -943,6 +647,8 @@ def health_details(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'th':th,
+        'image':image,
     }
     return render (request, 'unitmanagement/health_details.html', context)
 
@@ -1003,45 +709,141 @@ def medicine_approve(request, id):
 
 # Vaccination form
 def vaccination_form(request):
-    form = VaccinationUsedForm(request.POST or None)
-    style=""
+    user = user_session(request)
+    data = K9.objects.get(name='Testing')
+    vr = VaccinceRecord.objects.get(k9=data)
+    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    style = 'ui green message'
+
+    VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
+    formset = VaccinationUsedFormset(request.POST or None, request.FILES or None, prefix='record', instance=vr)
+
+    ctr=0
+    ctr1=0
+    for forms in formset:
+        if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
+           
+        if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
+
+        if forms.initial['disease'] == '1st Heartworm Prevention' or forms.initial['disease'] == '2nd Heartworm Prevention' or forms.initial['disease'] == '3rd Heartworm Prevention' or forms.initial['disease'] == '4th Heartworm Prevention' or forms.initial['disease'] == '5th Heartworm Prevention' or forms.initial['disease'] == '6th Heartworm Prevention' or forms.initial['disease'] == '7th Heartworm Prevention' or forms.initial['disease'] == '8th Heartworm Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').exclude(quantity=0)
+
+        if forms.initial['disease'] == 'Anti-Rabies Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
+            
+        if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
+            forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
+
     if request.method == 'POST':
-        if form.is_valid():
-            v = request.POST.get('vaccine')
-            med = Medicine_Inventory.objects.get(medicine=v)
-            if med.quantity != 0:
-                form.save()
-                new_form = form.save()
-                #get vaccine yearly-Used
-                vaccine = Medicine.objects.get(id=new_form.vaccine.id)
-                duration = 365 / vaccine.used_yearly
-                new_form.date_validity = dt.date.today() + dt.timedelta(days=duration)
-                new_form.save()
+        formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
+        
+        if formset.is_valid():
+            for forms in formset:
+                if forms.is_valid():
+                    f = forms.save(commit=False)
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                        f.veterinary = user
+                        f.done = True
+                        f.save()
 
-                user_serial = request.session['session_serial']
-                user = Account.objects.get(serial_number=user_serial)
-                current_user = User.objects.get(id=user.UserID.id)
+                        ctr1=ctr1+1
+                        
+                        if f.disease == '1st Deworming':
+                            vr.deworming_1 = True
+                        elif f.disease == '2nd Deworming':
+                            vr.deworming_2 = True
+                        elif f.disease == '3rd Deworming':
+                            vr.deworming_3 = True
+                        elif f.disease == '1st dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_1 = True
+                        elif f.disease == '1st Heartworm Prevention':
+                            vr.heartworm_1 = True
+                        elif f.disease == '1st dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_1 = True
+                        elif f.disease == '1st Tick and Flea Prevention':
+                            vr.tick_flea_1 = True
+                        elif f.disease == '2nd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_2 = True
+                        elif f.disease == '4th Deworming':
+                            vr.deworming_4 = True
+                        elif f.disease == '2nd Heartworm Prevention':
+                            vr.heartworm_2 = True
+                        elif f.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
+                            vr.bordetella_2 = True
+                        elif f.disease == 'Anti-Rabies Vaccination	':
+                            vr.anti_rabies = True
+                        elif f.disease == '2nd Tick and Flea Prevention':
+                            vr.tick_flea_2 = True
+                        elif f.disease == '3rd dose DHPPiL+CV Vaccination':
+                            vr.dhppil_cv_3 = True
+                        elif f.disease == '3rd Heartworm Prevention':
+                            vr.heartworm_3 = True
+                        elif f.disease == '1st dose DHPPiL4 Vaccination':
+                            vr.dhppil4_1 = True
+                        elif f.disease == '3rd Tick and Flea Prevention':
+                            vr.tick_flea_3 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.dhppil4_2 = True
+                        elif f.disease == '4th Heartworm Prevention':
+                            vr.heartworm_4 = True
+                        elif f.disease == '4th Tick and Flea Prevention':
+                            vr.tick_flea_4 = True
+                        elif f.disease == '5th Heartworm Prevention':
+                            vr.heartworm_5 = True
+                        elif f.disease == '6th Heartworm Prevention':
+                            vr.heartworm_6 = True
+                        elif f.disease == '2nd dose DHPPiL4 Vaccination':
+                            vr.bordetella_2 = True
+                        elif f.disease == '6th Tick and Flea Prevention':
+                            vr.tick_flea_6 = True
+                        elif f.disease == '7th Heartworm Prevention':
+                            vr.heartworm_7 = True
+                        elif f.disease == '7th Tick and Flea Prevention':
+                            vr.tick_flea_7 = True
+                        elif f.disease == '8th Heartworm Prevention':
+                            vr.heartworm_8 = True
+                        vr.save()
+                        
+                    else: 
+                        pass
+                        
+                    if f.image != None:
+                        ctr1=ctr1+1
+                        f.save(update_fields=["image"])
 
-                q = med.quantity-1
-                Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = q, date_subtracted = dt.date.today(), time = dt.datetime.now())
-                style = "ui green message"
-                messages.success(request, 'Vaccination has been successfully recorded!')
-                form = VaccinationUsedForm()
-            else:
-                style = "ui red message"
-                messages.warning(request, 'Insufficient Inventory Quantity!')
+                    if f.done == False and f.vaccine != None and f.date_vaccinated == None:
+                        ctr = ctr+1
+                    elif f.done == False and f.vaccine == None and f.date_vaccinated != None:
+                        ctr = ctr+1
+
+            print(ctr1)
+            if ctr1>0:
+                messages.success(request, 'Prevention Updated!')
+                return redirect('unitmanagement:vaccination_form')
+
+            if ctr>0:
+                messages.success(request, 'Incomplete input. Please check again.')
+                style='ui red message'
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
-        'title': "Vaccination",
-        'actiontype': "Submit",
-        'form': form,
-        'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'formset':formset,
+        'vu':vu,
+        'style':style,
+        'title':'Health Record of ' + str(data),
     }
     return render (request, 'unitmanagement/vaccination_form.html', context)
 
@@ -1145,50 +947,29 @@ def change_equipment(request, id):
 
 # TODO
 def k9_incident(request):
+    user = user_session(request)
     form = K9IncidentForm(request.POST or None)
+    dog = K9.objects.get(handler=user)
+    form.fields['k9'].queryset = K9.objects.filter(handler=user)
     style=''
-    
-    serial = request.session['session_serial']
-    account = Account.objects.get(serial_number=serial)
-    user_in_session = User.objects.get(id=account.UserID.id)
+
+    num = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick').count()
+    incident = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick')
 
     if request.method == "POST":
         if form.is_valid():
-            incident_save = form.save()
-            incident_save.reported_by = str(user_in_session.fullname)
-            incident_save.save()
-            
-            # get k9 object
-            k9 =incident_save.k9
-            k9_obj=K9.objects.get(id=k9.id)
+            f = form.save(commit=False)
+            f.reported_by = user
+            f.save()
 
-            #if k9 has a partner handler and died
-            if k9_obj.partnered==True and incident_save.incident=='Died' :
-                handler = User.objects.get(id=k9_obj.handler.id)
-                k9_obj.status = 'Dead'
-                k9_obj.handler = None
-                k9_obj.partnered= False
-                handler.partnered = False
-                k9_obj.save()
-                handler.save()
-            elif k9_obj.partnered==False and incident_save.incident=='Died' :
-                k9_obj.status = 'Dead'
-                k9_obj.save()
-            elif incident_save.incident=='Sick' :
-                k9_obj.status = 'Sick'
-                k9_obj.save()
+            dog.status = f.incident
+            dog.save()
 
-            form = K9IncidentForm()
-            style = "ui green message"
-            messages.success(request, 'Incident has been successfully Reported!')
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
+            return redirect('unitmanagement:k9_incident')
     
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': "K9 Incident",
         'actiontype': "Submit",
@@ -1197,49 +978,199 @@ def k9_incident(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'num':num,
+        'incident':incident,
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
 
-def handler_incident(request):
-    form = HandlerIncidentForm(request.POST or None)
-    style=''
-    user_serial = request.session['session_serial']
-    user_s = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user_s.UserID.id)
+# TODO
+def k9_incident_list(request):
+    user = user_session(request)
+    style='ui blue message'
+    if user.position == 'Team Leader':
+        ta = Team_Assignment.objects.get(team_leader=user)
 
-    if current_user.position == 'Handler':
-        form.initial['handler'] = current_user
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+        
+        k9 = []
+        for td in tdd:
+            k9.append(td.k9)
+        data = K9_Incident.objects.filter(k9__in=k9).filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+
+    elif user.position == 'Veterinarian':
+        data = K9_Incident.objects.filter(status='Pending').filter(incident='Accident')
+    else:
+        data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+   
+    
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "K9 Incident List",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data':data,
+    }
+    return render (request, 'unitmanagement/k9_incident_list.html', context)
+
+def follow_up(request, id):
+    data = Health.objects.get(id=id)
+    i = K9_Incident.objects.get(id=data.incident_id.id)
+    medicine = HealthMedicine.objects.filter(health=data)
+    dog = K9.objects.get(id = data.dog.id)
+
+    th = Transaction_Health.objects.create(health=data, incident=i)
+    data.follow_up = True
+    data.save()
+     
+    request.session['health'] = th.id
+
+    return redirect('unitmanagement:k9_sick_form')
+
+def k9_sick_form(request):
+    user = user_session(request)
+    form = K9IncidentForm(request.POST or None, request.FILES or None)
+    style='ui green message'
+    form2 = DateForm(request.POST or None)
+    handler = K9.objects.filter(handler=user)
+    form.fields['k9'].queryset =  handler
+    health = None
+    h = None
+    
+    if 'health' in request.session:
+        h = request.session['health']
+
+    try:
+        th = Transaction_Health.objects.filter(status='Pending').get(id=h)
+        health = Health.objects.get(id=th.health.id)
+    except ObjectDoesNotExist:
+        th =  None
+
     if request.method == "POST":
         if form.is_valid():
-            incident_save = form.save()
-            incident_save.status='Done'
-            incident_save.save()
-            # get k9 object
-            handler =incident_save.handler
-            handler_obj=User.objects.get(id=handler.id)
-            
-            #if k9 has a partner handler and died
-            if handler_obj.partnered==True and incident_save.incident=='Died' :
-                k9 = K9.objects.get(handler_id=handler_obj.id)
-                handler_obj.partnered = False
-                handler_obj.status = 'Dead'
-                k9.partnered = False
-                k9.handler = None
-                print(k9, k9.handler)
-                k9.save()
-                handler_obj.save()
-            else:
-                handler_obj.status = 'Dead'
-                handler_obj.save()
+            form = form.save(commit=False)
+            form.incident = 'Sick'
+            form.reported_by = user
+            form.k9.status = form.incident
+            form.save()
 
-            form = HandlerIncidentForm()
+            files = request.FILES.getlist('image_file')
+
+            #Images
+            for f in files:
+                Image.objects.create(incident_id=form, image=f)
+
+            #Follow up Handler side
+            if th != None:
+                th.follow_up = form
+                th.health.follow_up_done=True
+                th.save()
+
+            if health != None:
+                health.follow_up = True
+                health.save()
+
+            #what happens to the previous health if nag follow-up and handler?
+
             style = "ui green message"
-            messages.success(request, 'Incident has been successfully Reported!')
-        
+            messages.success(request, 'Health Concern has been successfully Reported!')
+            return redirect('unitmanagement:health_list_handler') 
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
+            
 
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "K9 Health Form",
+        'actiontype': "Submit",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'handler': handler,
+        'form2':form2,
+        'health':health,
+    }
+    return render (request, 'unitmanagement/k9_sick_form.html', context)
+
+def k9_retreived(request, id):
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.k9.status = 'Working Dog'
+    data.save()
+    messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
+    return redirect('unitmanagement:k9_incident_list') 
+
+def health_list_handler(request):
+    user = user_session(request)
+    style = "ui green message"
+    k9 = K9.objects.get(handler=user)
+    date = dt.date.today()
+    data_arr = []
+
+    if user.position == 'Handler':
+        data = K9_Incident.objects.filter(reported_by=user).filter(status='Pending')
+        data2 = Health.objects.filter(dog=k9).filter(status='On-Going')
+
+    for da in data2:
+        d =  (da.date_done - date)
+        d = d.days
+        data_arr.append(d)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'title': "Health Concern List",
+        'actiontype': "Submit",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'data':data,
+        'data2':data2,
+        'date':date,
+        'data_arr':data_arr,
+    }
+    return render (request, 'unitmanagement/health_list_handler.html', context)
+
+def handler_incident_form(request):
+    user = user_session(request)
+    form = HandlerIncidentForm(request.POST or None)
+    style='ui green message'
+    
+    data = Team_Assignment.objects.get(team_leader=user)
+
+    team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+    handler = []
+    for team in team:
+        handler.append(team.handler.id)
+
+    form.fields['handler'].queryset = User.objects.filter(id__in=handler)
+    if request.method == "POST":
+        if form.is_valid():
+            a = request.POST['k9_select']
+            b = K9.objects.get(name = a)
+            f = form.save(commit=False)
+            f.reported_by = user
+            f.k9 = b
+            f.save()
+
+            style = "ui green message"
+            messages.success(request, 'Incident has been successfully Reported!')
+            return redirect('unitmanagement:handler_incident_form') 
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+            
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1253,13 +1184,17 @@ def handler_incident(request):
         'count':count,
         'user':user,
     }
-    return render (request, 'unitmanagement/handler_incident.html', context)
+    return render (request, 'unitmanagement/handler_incident_form.html', context)
 
 def on_leave_request(request):
+    user = user_session(request)
     form = HandlerOnLeaveForm(request.POST or None)
     style=''
-  
-    form.initial['handler'] = user_session(request)
+    form.fields['handler'].queryset = User.objects.filter(id=user.id)
+    
+    data = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave')
+    num = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave').count()
+
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
@@ -1267,6 +1202,7 @@ def on_leave_request(request):
             form = HandlerOnLeaveForm()
             style = "ui green message"
             messages.success(request, 'Request has been successfully Submited!')
+            return redirect('unitmanagement:on_leave_request')
         
         else:
             style = "ui red message"
@@ -1275,7 +1211,6 @@ def on_leave_request(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': "On-Leave Form",
         'actiontype': "Submit",
@@ -1284,13 +1219,15 @@ def on_leave_request(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'data':data,
+        'num':num,
     }
     return render (request, 'unitmanagement/on_leave_form.html', context)
 
 def reassign_assets(request):
     style=''
     form = ReassignAssetsForm(request.POST or None)
-    k9 = K9.objects.filter(training_status='For-Deployment').filter(partnered=False)
+    k9 = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     numh = handler.count()
     numk = k9.count()
@@ -1302,7 +1239,6 @@ def reassign_assets(request):
 
             #save status
             k9.handler = handler
-            k9.partnered = True
             k9.save()
 
             handler.partnered = True
@@ -1337,9 +1273,10 @@ def reassign_assets(request):
 # TODO 
 # On Leave List
 def on_leave_list(request):
-    style=''
-    data1 = Handler_Incident.objects.filter(status='Pending').filter(incident='On-Leave') 
-    data2 = Handler_Incident.objects.filter(status='Approved').filter(incident='On-Leave') 
+    style='ui green message'
+    data1 = Handler_On_Leave.objects.filter(status='Pending').filter(incident='On-Leave') 
+    data2 = Handler_On_Leave.objects.filter(status='Approved').filter(incident='On-Leave') 
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1356,92 +1293,22 @@ def on_leave_list(request):
 
 #TODO
 # what to do if on-leave
-def on_leave_details(request, id):
-    style=''
-    data = Handler_Incident.objects.get(id=id)
-    #get k9 
-    days = data.date_to - data.date_from
-    #get user
-    u = User.objects.get(id=data.handler.id)
-    try:
-        k9 = K9.objects.get(handler=data.handler)
-        data.k9 = k9
-        data.save()
-    except K9.DoesNotExist:
-        k9 = None
-
-    if request.method == 'POST':
-        #get checkbox
-        c = request.POST.get("return_k9")
-        if 'approve' in request.POST:
-            data.status = "Approved"
-            data.save()
-            if c == None:
-                k9.handler_on_leave = False
-                k9.save()
-            elif c == 'on':
-                k9.handler_on_leave = True
-                k9.save()
-            # change status of handler to On leave
-            u.status = 'On-Leave'
-            u.partnered = False
-            u.save()
-            # What to do with k9?
-            k9.training_status = 'For-Deployment'
-            k9.assignment = None
-            k9.partnered = False
-            k9.save()
-
-            # If deployed, pull out
-            try:
-                td = Team_Dog_Deployed.objects.filter(k9=k9).filter(status='Deployed').latest()
-                td.status = 'Done'
-                td.date_pulled = date.today()
-                td.save()
-
-                try:
-                    ta = Team_Assignment.objects.get(id=td.team_assignment.id)
-                    if k9.capability == 'EDD':
-                        ta.EDD_deployed = ta.EDD_deployed-1
-                    elif k9.capability == 'NDD':
-                        ta.NDD_deployed = ta.NDD_deployed-1
-                    elif k9.capability == 'SAR':
-                        ta.SAR_deployed = ta.SAR_deployed-1
-
-                    ta.save()
-                except Team_Assignment.DoesNotExist:
-                    pass
-            except Team_Dog_Deployed.DoesNotExist:
-                pass
-
-            #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
-        elif 'deny' in request.POST:
-            data.status = "Denied"
-            data.save()
-            #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
+def on_leave_decision(request, id):
     user = user_session(request)
-    context = {
-        'title': str(data.handler) + ' On-Leave Request',
-        'data': data,
-        'k9': k9,
-        'days': days,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'unitmanagement/on_leave_details.html', context)
+    data = Handler_On_Leave.objects.get(id=id)
+    leave = request.GET.get('leave')
 
-#TODO reassign
-def load_hander(request):
-    k9 = request.GET.get('k9')
-    handler = User.objects.filter(position=Handler).filter(status='Working').filter(capability=k9.capability).order_by('name')
-    return render(request, 'unitmanagement/handler_dropdown.html', {'handler': handler})
+    if leave == 'approve':
+        data.status = 'Approved'
+        data.handler.status = 'On-Leave'
+        data.approved_by = user
+    elif leave == 'deny':
+        data.status = 'Denied'
+    
+    data.save()
+
+    messages.success(request, 'You have ' + str(data.status) + ' ' + str(data.handler) + 's Leave Request.')
+    return redirect('unitmanagement:on_leave_list')
 
 # TODO 
 # Reproductive Cycle
@@ -1501,8 +1368,7 @@ def reproductive_edit(request, id):
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
-    data = K9.objects.filter(handler_on_leave=False).filter(training_status='For-Deployment').filter(partnered=False)
-    data2 = K9.objects.filter(handler_on_leave=True).filter(training_status='For-Deployment').filter(partnered=False)
+    data = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1510,7 +1376,6 @@ def k9_unpartnered_list(request):
     context = {
         'title': "Unpartnered K9 List",
         'data':data,
-        'data2':data2,
         'style':style,
         'notif_data':notif_data,
         'count':count,
@@ -1521,33 +1386,77 @@ def k9_unpartnered_list(request):
 # TODO 
 # choose_handler Cycle
 def choose_handler_list(request, id):
-    style=''
-    k9 = K9.objects.get(id=id)
-    data = User.objects.filter(status='Working').filter(position='Handler').filter(capability=k9.capability).filter(partnered=False)
-    data_available = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False).exclude(capability=k9.capability)
-    print(data_available)
-    data_pi = Personal_Info.objects.filter(UserID__in=data)
-    data_pi2 = Personal_Info.objects.filter(UserID__in=data_available)
+    form = assign_handler_form(request.POST or None)
+    style = ""
+    k9 = K9.objects.get(id=id)  
 
-    request.session["k9_id_partnered"] = k9.id 
-    
+    handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
+    g = []
+    for h in handler:
+        edd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='SAR').count()
+        f = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='None').filter(Q(k9__status='Adopted') | Q(k9__training_status="For-Adoption") | Q(k9__status="Dead")).count()
+        
+        s = [edd, ndd, sar, f]
+        g.append(s)
+
+    print(g)
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.save()
+            
+            #K9 Update
+            k9.training_status = 'On-Training'
+            k9.handler = f.handler
+            k9.save()
+
+            #Handler Update
+            h = User.objects.get(id= f.handler.id)
+            h.partnered = True
+            h.save()
+
+            messages.success(request, str(k9) + ' has been assigned to ' + str(h))
+            return redirect('unitmanagement:k9_unpartnered_list')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
     context = {
-        'title': k9,
-        'data':data,
-        'k9':k9,
-        'style':style,
-        'data_pi': data_pi,
-        'data_pi2':data_pi2,
-        'data_available': data_available,
+        'Title': "K9 Assignment for " + k9.name,
+        'form': form,
+        'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'k9':k9,
+        'g':g,
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
+
+# TODO 
+# K9 Died
+def confirm_death(request, id):
+    i = K9_Incident.objects.get(id=id)
+    i.status = 'Done'
+    i.save()
+
+    k9 = K9.objects.get(id=i.k9.id)
+    k9.status = "Dead"
+    k9.training_status = "Dead"
+    k9.save()
+
+    messages.success(request, i.k9.name + 'has been confirmed dead...')
+
+    return redirect('unitmanagement:k9_incident_list')
 
 # TODO 
 # choose_handler Cycle
@@ -1557,14 +1466,13 @@ def choose_handler(request, id):
     handler = User.objects.get(id=id)
 
     k9.handler = handler
-    k9.partnered = True
     k9.save()
 
     handler.partnered = True
-    handler.capability = k9.capability
     handler.save()
 
-    messages.success(request, 'Assets has been successfully Partnered!')
+    Handler_K9_History.objects.create(k9=k9, handler=handler)
+    messages.success(request, k9.name + ' and ' + handler.fullname + ' has been successfully Partnered!')
      
     return redirect('unitmanagement:k9_unpartnered_list')
 
@@ -1572,8 +1480,24 @@ def choose_handler(request, id):
 #sick list
 def k9_sick_list(request):
     
-    data = K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
+    t = Transaction_Health.objects.filter(incident__status='Pending').exclude(health__follow_up=True)
+    a = []
+    for t in t:
+        t.append(t.incident.id)
+
+
+    data =K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
     data2 = K9_Incident.objects.filter(incident='Sick').filter(status='Done')
+
+    d = Transaction_Health.objects.filter(incident__status='Pending').filter(health__follow_up=True).exclude(health__follow_up_done=True)
+    f = []
+
+    for d in d:
+        f.append(d.health.id)
+
+    th = Health.objects.filter(follow_up_date__gte=dt.date.today()).exclude(follow_up_done=True)
+    
+    print(th)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1588,6 +1512,7 @@ def k9_sick_list(request):
         'count':count,
         'style':style,
         'user':user,
+        'th':th,
     }
     return render (request, 'unitmanagement/k9_sick_list.html', context)
 
@@ -1597,8 +1522,27 @@ def k9_sick_details(request, id):
     
     data = K9_Incident.objects.get(id=id)
 
+    health_id = Health.objects.filter(dog=data.k9)
+    image = Image.objects.filter(incident_id=data)
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
+
+    th = None
+    h = None
+    hh = None
+    try:
+        th = Transaction_Health.objects.filter(status='Pending').get(incident=data)
+        hh = Health.objects.filter(id=th.health.id).latest('id')
+        h = HealthMedicine.objects.filter(health=hh)
+    except ObjectDoesNotExist:
+        th = Transaction_Health.objects.filter(status='Pending').get(follow_up=data)
+        if (th != None):
+            hh = Health.objects.filter(id=th.health.id).latest('id')
+            h = HealthMedicine.objects.filter(health=hh)
+        else:
+            th = None
+            h = None
+            hh = None
 
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
@@ -1607,19 +1551,27 @@ def k9_sick_details(request, id):
     form = HealthForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
-            #get treatment
-            request.session['treatment'] = form['treatment'].value()
-
-            m = form.save()
-            m.dog = data.k9
-            m.problem  = data.description
-            m.incident_id = data
-            m.veterinary = user_in_session
-            m.save()
-            new_form = m.pk
+            health = form.save(commit=False)
+            health.dog = data.k9
+            health.incident_id = data
+            health.veterinary = user_in_session
+            health.save()
+            new_form = health.pk
             form_instance = Health.objects.get(id=new_form)
-            dog = K9.objects.get(id=form_instance.dog.id)
-            
+            dog = K9.objects.get(id=health.dog.id)
+
+            # transaction health
+            if th != None:
+                th.status = 'Done'
+                th.health = health
+                th.save()
+
+                hh.follow_up_done = True
+                hh.save()
+
+            if health.follow_up == True:
+                Transaction_Health.objects.create(health=health, incident=data)
+
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
             form_med = []
@@ -1668,21 +1620,22 @@ def k9_sick_details(request, id):
                     style = "ui red message"
                     messages.warning(request, msg)        
                 else:
-                    m.duration =  max(days)
-                    m.save()
 
                     for form in formset:
                         f = form.save()
-                        m = Medicine_Inventory.objects.get(id=f.medicine.id)
-                        m.quantity = m.quantity - f.quantity
-                        m.save()
-                        #Medicine_Subtracted_Trail.objects.create(inventory = m, user=current_user(), quantity = f.quantity)
+                        med = Medicine_Inventory.objects.get(id=f.medicine.id)
+                        med.quantity = med.quantity - f.quantity
+                        med.save()
+                        Medicine_Subtracted_Trail.objects.create(inventory = med, user=user_in_session, quantity = f.quantity)
+                        
+                    health.duration =  max(days)
+                    health.save() #health instance
                     dog.status = 'Sick'
                     data.status= 'Done'
-                    dog.save()
-                    data.save()
+                    dog.save() #k9 instance
+                    data.save() #incident instance
                     style = "ui green message"
-                    messages.success(request, 'Health Form has been successfully recorded!')
+                    messages.success(request, 'You have replied to a health concern!')
                     return redirect('unitmanagement:k9_sick_list')
 
     #NOTIF SHOW
@@ -1691,6 +1644,7 @@ def k9_sick_details(request, id):
     user = user_session(request)
     context = {
         'title': data.k9,
+        'image':image,
         'data':data,
         'form':HealthForm,
         'formset':medicine_formset(),
@@ -1699,60 +1653,304 @@ def k9_sick_details(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'th':th,
+        'h':h,
+        'health_id':health_id,
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 
-#TODO
-class K9ListView(APIView):
-    def get(self, request):
-        data = K9.objects.filter(partnered=False).exclude(status='Dead').filter(training_status='For-Deployment')
-        serializer = K9Serializer(data, many=True)
-        return Response(serializer.data)
 
-    def put(self, request):
-        serializer = K9Serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TeamLeaderView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        ta = Team_Assignment.objects.get(team_leader=user)
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+        
+        # Incident
+        er = Incidents.objects.filter(location = ta.location).filter(type='Explosives Related').count()
+        nr = Incidents.objects.filter(location = ta.location).filter(type='Narcotics Related').count()
+        sarr = Incidents.objects.filter(location = ta.location).filter(type='Search and Rescue Related').count()
+        otr = Incidents.objects.filter(location = ta.location).filter(type='Others').count()
 
-    def save(self, *args, **kwargs):
-        super(K9, self).save()
+        labels= ['Explosive','Narcotics', 'Search and Rescue', 'Others']
+        default_items = [er, nr, sarr, otr]
 
-class K9DetailView(APIView):
-    def get(self, request, id):
-        notif = get_object_or_404(K9, id=id)
-        serializer = K9Serializer(notif)
-        return Response(serializer.data)
+        # K9 Demand and Supply
+        d_edd = ta.EDD_demand
+        d_ndd = ta.NDD_demand
+        d_sar = ta.SAR_demand
 
-    def delete(self, request, id):
-        notif = get_object_or_404(K9, id=id)
-        notif.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        s_edd = ta.EDD_deployed
+        s_ndd = ta.NDD_deployed
+        s_sar = ta.SAR_deployed      
 
-#TODO
-class UserListView(APIView):
-    def get(self, request):
-        data = User.objects.filter(partnered=False).filter(position='Handler').filter(status='Working')
-        serializer = UserSerializer(data, many=True)
-        return Response(serializer.data)
+       
+        demand_items = [d_edd, d_ndd, d_sar]
+        supply_items = [s_edd, s_ndd, s_sar]
 
-    def put(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Perfromance
 
-class UserDetailView(APIView):
-    def get(self, request, id):
-        notif = get_object_or_404(User, id=id)
-        serializer = UserSerializer(notif)
-        return Response(serializer.data)
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
 
-    def delete(self, request, id):
-        notif = get_object_or_404(User, id=id)
-        notif.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        k9_id = []
+
+        for td in tdd:
+            k9_id.append(td.k9.id)
+
+        k9 = K9.objects.filter(id__in=k9_id)
+        
+        k9_perf = []
+
+        #get all k9s 
+        for k in k9:
+        
+            jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+            feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+            mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+            apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+            may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+            jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+            jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+            aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+            sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+            oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+            nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+            dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+
+            if jan == None:
+                jan = 0
+            if feb == None:
+                feb = 0
+            if mar == None:
+                mar = 0
+            if apr == None:
+                apr = 0
+            if may == None:
+                may = 0
+            if jun == None:
+                jun = 0
+            if jul == None:
+                jul = 0
+            if aug == None:
+                aug = 0
+            if sep == None:
+                sep = 0
+            if oct == None:
+                oct = 0
+            if nov == None:
+                nov = 0
+            if dec == None:
+                dec = 0
+            
+
+            perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+            k9_perf.append(perf_items)
+            
+        fou = []
+
+        for td in tdd:
+            fou.append(str(td.k9.name) + ' - ' + str(td.handler.lastname))
+
+        data = {
+            "labels":labels,
+            "default":default_items,
+            "demand":demand_items,
+            "supply":supply_items,
+            "performance":k9_perf,
+            "fou":fou,
+        }
+        return Response(data)
+
+class HandlerView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        k = K9.objects.get(handler=user)
+
+        jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+        feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+        mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+        apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+        may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+        jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+        jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+        aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+        sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+        oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+        nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+        dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+
+        if jan == None:
+            jan = 0
+        if feb == None:
+            feb = 0
+        if mar == None:
+            mar = 0
+        if apr == None:
+            apr = 0
+        if may == None:
+            may = 0
+        if jun == None:
+            jun = 0
+        if jul == None:
+            jul = 0
+        if aug == None:
+            aug = 0
+        if sep == None:
+            sep = 0
+        if oct == None:
+            oct = 0
+        if nov == None:
+            nov = 0
+        if dec == None:
+            dec = 0
+        
+
+        perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+
+        data = {
+            "performance":perf_items,
+        }
+        return Response(data)
+
+class VetView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        # In heat K9 per Month
+        jan = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=1).count()
+        feb = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=2).count()
+        mar = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=3).count()
+        apr = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=4).count()
+        may = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=5).count()
+        jun = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=6).count()
+        jul = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=7).count()
+        aug = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=8).count()
+        sep = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=9).count()
+        oct = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=10).count()
+        nov = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=11).count()
+        dec = K9.objects.filter(sex='Female').filter(last_proestrus_date__month=11).count()
+
+        if jan == None:
+            jan = 0
+        if feb == None:
+            feb = 0
+        if mar == None:
+            mar = 0
+        if apr == None:
+            apr = 0
+        if may == None:
+            may = 0
+        if jun == None:
+            jun = 0
+        if jul == None:
+            jul = 0
+        if aug == None:
+            aug = 0
+        if sep == None:
+            sep = 0
+        if oct == None:
+            oct = 0
+        if nov == None:
+            nov = 0
+        if dec == None:
+            dec = 0
+        
+
+        in_heat_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
+        
+        data = {
+            "in_heat":in_heat_items,
+        }
+        return Response(data)
+
+def load_handler(request):
+
+    handler = None
+    pi = None
+
+    try:
+        handler_id = request.GET.get('handler')
+        handler = User.objects.get(id=handler_id)
+        pi = Personal_Info.objects.get(UserID=handler)
+        edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
+        
+    except:
+        pass
+
+    context = {
+        'handler': handler,
+        'pi':pi,
+        'ndd':ndd,
+        'edd':edd,
+        'sar':sar,
+    }
+
+    return render(request, 'unitmanagement/handler_data.html', context)
+
+def load_stamp(request):
+
+    stamp = None
+
+    try:
+        stamp_id = request.GET.get('stamp')
+        stamp = VaccineUsed.objects.get(id=stamp_id)
+
+    except:
+        pass
+
+    context = {
+        'stamp': stamp,
+    }
+
+    return render(request, 'unitmanagement/stamp_data.html', context)
+
+def load_k9(request):
+
+    k9 = None
+
+    try:
+        handler_id = request.GET.get('handler')
+        k9 = K9.objects.get(handler__id=handler_id) 
+    except:
+        pass
+
+    context = {
+        'k9': k9,
+    }
+
+    return render(request, 'unitmanagement/k9_data.html', context)
+
+def load_health(request):
+
+    health = None
+    try:
+        health_id = request.GET.get('health')
+        health = Health.objects.get(id=health_id) 
+
+        h = HealthMedicine.objects.filter(health=health)
+
+    except:
+        pass
+   
+    context = {
+        'health': health,
+        'h': h,
+    }
+
+    return render(request, 'unitmanagement/health_data.html', context)
+
+def load_incident(request):
+
+    data_load = None
+    try:
+        id = request.GET.get('id')
+        data_load = K9_Incident.objects.get(id=id) 
+    except:
+        pass
+   
+    context = {
+        'data_load': data_load,
+    }
+
+    return render(request, 'unitmanagement/incident_data.html', context)

@@ -1,0 +1,24 @@
+{% if handler %}
+
+{% load static %}
+{% block content %}
+
+<div class="image">
+        <center>
+            <img src="{{handler.image.url}}" style="max-width: 250px;">
+        </center>
+            
+    </div>
+    <div class="content">
+            <a class="header">{{handler.fullname}}</a>
+            <div class="meta">
+                <strong>Rank: {{handler.rank}}</strong><br>
+                <strong>Age: {{handler.age}}</strong><br>
+                <strong>Sex: {{handler.gender}}</strong><br>
+                <strong>City: {{pi.city}}</strong><br>
+                <strong>Mobile: {{pi.mobile_number}}</strong>
+            </div>
+        </div>
+ {% endblock %}
+
+{% endif %}

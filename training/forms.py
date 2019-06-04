@@ -3,8 +3,10 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from planningandacquiring.models import K9
-from training.models import K9_Handler, Training, K9_Adopted_Owner, Record_Training
+from training.models import K9_Handler, Training, K9_Adopted_Owner
+from deployment.models import Daily_Refresher
 from profiles.models import User
+from unitmanagement.models import Handler_K9_History
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -41,36 +43,40 @@ class add_handler_form(forms.ModelForm):
     #         assigned_handler_list.append(handler.id)
     #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)
 
+class assign_handler_form(forms.ModelForm): 
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False),
+    widget=forms.RadioSelect(), empty_label=None)
+    
+    class Meta:
+        model = Handler_K9_History
+        fields = ('handler','k9')
+
+    def __init__(self, *args, **kwargs):
+        super(assign_handler_form, self).__init__(*args, **kwargs)
+        self.fields['handler'].required = False
+        self.fields['k9'].required = False
+
+
 class TrainingUpdateForm(forms.ModelForm):
-   # GRADE = (
-   #     ('75', '75'),
-   #     ('80', '80'),
-   #     ('85', '85'),
-   #     ('90', '90'),
-   #     ('95', '95'),
-   #     ('100', '100'),
-   # )
-
-
+    GRADE = (
+        ('75.0', '75.0'),
+        ('80.0', '80.0'),
+        ('85.0', '85.0'),
+        ('90.0', '90.0'),
+        ('95.0', '95.0'),
+        ('100.0', '100.0'),
+    )
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
-   # stage1_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage1_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage1_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage2_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage2_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage2_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage3_1 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage3_2 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-   # stage3_3 = forms.IntegerField(widget=forms.Select(choices=GRADE))
-
+    grade = forms.CharField(widget = forms.Select(choices=GRADE))
 
     class Meta:
         model = Training
         fields = ('stage1_1', 'stage1_2', 'stage1_3', 'stage2_1', 'stage2_2', 'stage2_3', 'stage3_1',
-        'stage3_2', 'stage3_3', 'remarks')
+        'stage3_2', 'stage3_3', 'grade', 'remarks')
 
     def __init__(self, *args, **kwargs):
         super(TrainingUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['grade'].required = False
         self.fields['remarks'].required = False
 
 class SerialNumberForm(forms.Form):
@@ -78,7 +84,7 @@ class SerialNumberForm(forms.Form):
         ('For-Deployment', 'For-Deployment'),
         ('For-Breeding', 'For-Breeding'),
     )
-    microchip = forms.CharField(max_length=200)
+    #microchip = forms.CharField(max_length=200)
     dog_type = forms.CharField(max_length=200, widget = forms.Select(choices=DOG_TYPE))
 
 class AdoptionForms(forms.ModelForm):
@@ -94,10 +100,8 @@ class AdoptionForms(forms.ModelForm):
 class RecordForm(forms.ModelForm):
 
     class Meta:
-        model = Record_Training
-        fields = ('on_leash', 'off_leash', 'obstacle_course', 'panelling', 'port_plant', 'port_find', 'port_time', 'building_plant', 'building_find',
-                  'building_time', 'vehicle_plant', 'vehicle_find', 'vehicle_time', 'baggage_plant', 'baggage_find', 'baggage_time',
-                  'others_plant', 'others_find', 'others_time', 'daily_rating', 'MARSEC', 'MARLEN', 'MARSAR', 'MAREP', 'morning_feed', 'evening_feed')
+        model = Daily_Refresher
+        fields = '__all__'
 
 
 class DateForm(forms.Form):

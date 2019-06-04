@@ -9,15 +9,6 @@ class K9Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = K9
-        fields = 'id', 'name', 'capability', 'handler', 'partnered'
-
-class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-    fullname = serializers.CharField(required=False)
-    capability = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = 'id', 'fullname', 'capability', 'partnered'
+        fields = 'id', 'name', 'capability', 'handler'
 
    

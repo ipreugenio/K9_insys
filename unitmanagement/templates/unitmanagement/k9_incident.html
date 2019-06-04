@@ -1,6 +1,19 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
+{% if num > 0 %}
+    {% for data in incident %}
+    <div class="ui info icon message">
+        <i class="exclamation icon"></i>
+        <div class="content">
+            <div class="header">
+                You have reported {{data.k9}} as {{data.incident}} at {{data.date}}!
+            </div>
+            <p>{{data.description}}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
@@ -21,10 +34,21 @@
                 {{form.k9}}
             </div>
             <div class="field">
-                <label>Incident</label>
+                <label>Type</label>
                 {{form.incident}}
             </div>
             <div class="field"></div>
+        </div>
+        <div class="two fields">
+            <div class="sixteen wide field">
+                <label>Incident</label>
+                {{form.title}}
+            </div>
+            <div class="field"></div>
+        </div>
+        <div class="field">
+            <label>Vet Clinic Address</label>
+            {{form.clinic}}
         </div>
         <div class="field">
             <label>Additional Information</label>
@@ -37,10 +61,21 @@
     </form>
 </div>
 
+{%endif%}
+
 <script type="text/javascript">
         
     $(document).ready(function() {
-      
+        $("input[name='clinic']").prop('disabled', 'disabled');
+
+        $("select[name='incident']").change(function() {
+            if( $("select[name='incident']").val() == 'Accident'){
+                $("input[name='clinic']").prop('disabled', false);
+            }else{
+                $("input[name='clinic']").prop('disabled', true);
+            }
+        });
+
     });
     
 </script>

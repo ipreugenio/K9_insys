@@ -5,6 +5,7 @@ from datetime import date as d
 from dateutil.relativedelta import relativedelta
 from inventory.models import Medicine, Miscellaneous, Food
 from profiles.models import User
+from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
 
 class Date(models.Model):
     date_from = models.DateField('date_from', null=True)
@@ -12,10 +13,14 @@ class Date(models.Model):
 
 class K9_Supplier(models.Model):
     name = models.CharField('name', max_length=200)
+    organization = models.CharField('organization', max_length=200, default='Personal')
     address = models.CharField('address', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 
-class Dog_Breed(models.Model):
+    def __str__(self):
+        return str(self.name)
+
+class K9_Breed(models.Model):
     SKILL = (
         ('NDD', 'NDD'),
         ('EDD', 'EDD'),
@@ -32,16 +37,36 @@ class Dog_Breed(models.Model):
         ('Mixed', 'Mixed'),
     )
 
+    COLORS = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+
     breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
     life_span = models.CharField('life_span', max_length=200, null=True)
     temperament = models.CharField('temperament', max_length=200, null=True)
-    colors = models.CharField('colors', max_length=200, null=True)
+    colors = models.CharField('colors', choices=COLORS, max_length=200, null=True)
     weight = models.CharField('weight', max_length=200, null=True)
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
     skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
-    litter_number = models.IntegerField('litter_number', null=True)
-    value = models.FloatField('value', max_length=200, null=True)
 
     def __str__(self):
         return str(self.breed)
@@ -53,12 +78,35 @@ class K9(models.Model):
     )
 
     COLOR = (
-        ('Brown', 'Brown'),
         ('Black', 'Black'),
-        ('Gray', 'Gray'),
-        ('White', 'White'),
+        ('Chocolate', 'Chocolate'),
         ('Yellow', 'Yellow'),
-        ('Mixed', 'Mixed')
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+    
+    BREED = (
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
+        ('German Sheperd', 'German Sheperd'),
+        ('Golden Retriever', 'Golden Retriever'),
+        ('Jack Russel', 'Jack Russel'),
+        ('Labrador Retriever', 'Labrador Retriever'),
+        ('Mixed', 'Mixed'),
     )
 
     STATUS = (
@@ -68,7 +116,10 @@ class K9(models.Model):
         ('Due-For-Retirement', 'Due-For-Retirement'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
-        ('Sick', 'Sick'), 
+        ('Sick', 'Sick'),
+        ('Stolen', 'Stolen'), 
+        ('Lost', 'Lost'), 
+        ('Accident', 'Accident'), 
     )
     
     REPRODUCTIVE = (
@@ -89,6 +140,7 @@ class K9(models.Model):
         ('On-Training', 'On-Training'),
         ('Trained', 'Trained'),
         ('For-Breeding', 'For-Breeding'),
+        ('Breeding', 'Breeding'),
         ('For-Deployment', 'For-Deployment'),
         ('For-Adoption', 'For-Adoption'),
         ('Deployed', 'Deployed'),
@@ -101,7 +153,7 @@ class K9(models.Model):
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    breed = models.ForeignKey(Dog_Breed, on_delete=models.CASCADE)
+    breed = models.CharField('breed', choices=BREED, max_length=200, blank=True, null=True)
     sex = models.CharField('sex', choices=SEX, max_length=200, default="Unspecified")
     color = models.CharField('color', choices=COLOR, max_length=200, default="Unspecified")
     birth_date = models.DateField('birth_date', null=True, blank=True)
@@ -113,8 +165,6 @@ class K9(models.Model):
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
     training_level = models.CharField('training_level', max_length=200, default="Stage 0")
-    partnered = models.BooleanField(default=False)
-    handler_on_leave = models.BooleanField(default=False)
     training_count = models.IntegerField('training_count', default = 0)
     capability = models.CharField('capability', max_length=200, default="None")
     #microchip = models.CharField('microchip', max_length=200, default = 'Unassigned Microchip')
@@ -127,7 +177,10 @@ class K9(models.Model):
     estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
-
+    supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
+    litter_no = models.IntegerField('litter_no', default = 0)
+    last_date_mated = models.DateField(blank=True, null=True)
+    #partnered = models.BooleanField(default=False)
     # def best_fertile_notification(self):
     #     notif = self.estrus_date - td(days=7)
     #     return notif
@@ -149,6 +202,23 @@ class K9(models.Model):
         return bday
 
     def save(self, *args, **kwargs):
+        #litter
+        if self.sex == 'Female':
+            try:
+                f = K9_Litter.objects.filter(mother__id=self.id).aggregate(Max('litter_no'))
+                self.litter_no = int(f['litter_no__max'])
+            except:
+                self.litter_no = 0
+            
+        else:
+            try:
+                m = K9_Litter.objects.filter(father__id=self.id).aggregate(Max('litter_no'))
+                self.litter_no = int(m['litter_no__max'])
+            except:
+                self.litter_no = 0
+            
+
+        self.last_proestrus_date = self.birth_date + relativedelta(months=+6)
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30
@@ -206,6 +276,10 @@ class K9(models.Model):
     def __str__(self):
         return str(self.name) + " : " + str(self.serial_number)
 
+class K9_Litter(models.Model):
+    mother = models.ForeignKey(K9, related_name='dam', on_delete=models.CASCADE, blank=True, null=True)
+    father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
+    litter_no = models.IntegerField('litter_no', blank=True, null=True)
 
 class K9_Past_Owner(models.Model):
     SEX = (
@@ -239,18 +313,6 @@ class K9_New_Owner(models.Model):
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
 
-    # def calculate_age(self):
-    #     today = d.today()
-    #     birthdate = self.birth_date
-    #     bday = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-    #     if bday < 1:
-    #         bday = 0
-    #     return bday
-
-    # def save(self, *args, **kwargs):
-    #     self.age = self.calculate_age()
-    #     super(K9_New_Owner, self).save(*args, **kwargs)
-
     def __str__(self):
         return str(self.first_name) + ' ' + str(self.middle_name) + ' ' + str(self.last_name)
 
@@ -275,6 +337,12 @@ class K9_Parent(models.Model):
     mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mother", blank=True, null=True)
     father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="father", blank=True, null=True)
     offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
+
+class K9_Mated(models.Model):
+    mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mom", blank=True, null=True)
+    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="dad", blank=True, null=True)  
+    status = models.CharField('status', max_length=200, default = "Breeding")
+    date_mated = models.DateField('date_mated', blank=True, null=True)  
 
 class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)

@@ -1,49 +1,73 @@
 {% extends "profiles/sidebar_um.html" %}
 
 {% block content %}
+{% if messages %}
+{% for message in messages %}
+    <div class="{{ style }} row"> {{ message }}</div>
+{% endfor %}
+{% endif %}
+
 <div class="ui basic segment" style="margin-bottom:0px;">
-    <h2 class="ui header">
-        {{title}}
-        <div class="sub header">Input data of Vaccination Here</div>
-    </h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="{{style}}" > {{ message }}</div>
-        {% endfor %}
-    {% endif %}
-</div>
-<div class="ui inverted segment">
-    <form class="ui inverted form" method="POST">
-        {% csrf_token %}
-        <div class="three fields">
-            <div class="field">
-                <label>Dog Name : Serial Number</label>
-                {{form.dog}}
-            </div>
-            <div class="field"></div>
-            <div class="field"></div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <label>Disease</label>
-                {{form.disease}}
-            </div>
-            <div class="field">
-                <label>Vaccine</label>
-                {{form.vaccine}}
-            </div>
-        </div>
-        <div class="ui inverted right aligned segment" style="padding: 0px;">
-            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
-        </div>
+   <h1>Vaccine</h1>
+   <form action="" method="POST" class="ui form" enctype="multipart/form-data"> 
+    {% csrf_token %}
+        <table class="ui celled table">
+            <thead>
+                <th class="two wide">Age</th>
+                <th class="three wide">Preventive Measure</th>
+                <th class="three wide">Vaccine/Prevention</th>
+                <th class="two wide">Date</th>
+                <th class="three wide">Stamp Image</th>
+                <th class="three wide">Veterinarian</th>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr>
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+
+                    {%if form.initial.vaccine != None %}
+                        {% for vu in vu %}
+                            {%if form.initial.disease == vu.disease %}
+                            <td>{{vu.age}}{{form.age.as_hidden}}</td>
+                            <td>{{vu.disease}}{{form.disease.as_hidden}}</td>
+                            <td>{{vu.vaccine}}{{form.vaccine.as_hidden}}</td>
+                            <td>{{vu.date_vaccinated}}{{form.date_vaccinated.as_hidden}}</td>
+                            {%if vu.image %}
+                            <td class='center aligned'><img src="{{vu.image.url}}" alt="" width="60">
+                                {{form.image.as_hidden}}
+                            </td>
+                            {% else %}
+                            <td>{{form.image}}</td>
+                            {% endif %}
+                            <td>{{vu.veterinary}}{{form.done.as_hidden}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <td>{{form.age.value}}{{form.age.as_hidden}}</td>
+                        <td>{{form.disease.value}}{{form.disease.as_hidden}}</td>
+                        <td>{{form.vaccine}}</td>
+                        <td>{{form.date_vaccinated}}</td>
+                        <td>{{form.image}}</td>
+                        <td>{{form.veterinary.as_hidden}}{{form.done.as_hidden}}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{formset.management_form}}
+
+        <button class="ui green button" type="submit">Submit</button>
     </form>
 </div>
+
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata').DataTable();
-
-    } );
+        $('#hide_this').hide();
+    });
 
 </script>
  {% endblock %}

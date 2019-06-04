@@ -1,32 +1,36 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
-<div>
-    <div style="background-color: transparent;margin-top: 1px;" class="ui icon top left pointing dropdown button" >
-        <i class="blue bell icon"></i>
-        <span style="color:red;font-size: 12px;">{{count}}</span>
-        <div class="ui vertical scrolling menu">
-            {% for notif_data in notif_data%}
-                {%if notif_data.viewed == True %}
-                <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 
-                    <br>
-                    <small>{{notif_data.datetime}}</small>
-                </a>
-                {%else%}
-                <a class="item" style='color: black;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 
-                        <br>
-                        <small>{{notif_data.datetime}}</small>
-                    </a>
-                {%endif%}
-            {% endfor%}
-        </div>
-    </div>
-</div>
+<ul>
+  {% for notif in notif_data %}
+  <li>{{notif}}</li>
+  {% endfor %}
+</ul>
 
-    
+<div class="load_data">
+  {% if n %}
+    <ul>
+      {% for n in n %}
+      <li>{{n}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+<input type="hidden" value="{{user.id}}" id = 'here'>
 <script>
-$('.ui.dropdown')
-  .dropdown()
-;
+    var url = 'index';  
+    var id = $("#here"). val();
+
+    $.ajax({                       
+      url: url,                    
+      data: {
+        'id': id       
+      },
+      success: function (data) {   
+        $("#load_data").html(data);  
+      }
+    });
+
 </script>
+
 {% endblock%}

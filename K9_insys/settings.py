@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'K9_insys.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'k9_db',
+        'NAME': 'k9',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -135,13 +135,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Manila'
 CELER_IGNORE_RESULT = False
-
-# CELERY_BEAT_SCHEDULE = {
-#     'every-10-seconds':{
-#         'task': 'unitmanagement.tasks.what',
-#         'schedule': timedelta(seconds=10),
-#     },
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
@@ -212,4 +205,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'profiles/media')
 STATICFILES_DIRS=[
     'static'
 ]
+
+LOGIN_REDIRECT_URL = '../home'
 

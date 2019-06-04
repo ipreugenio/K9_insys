@@ -7,52 +7,52 @@ from profiles.models import User
 #TODO inventory information before
 
 #Vaccine and Preventive
-class Vaccine_Preventive(models.Model):
-    TYPE = (
-        ('Vaccine', 'Vaccine'),
-        ('Preventive', 'Preventive'),
-    )
-    name = models.CharField(max_length=100)
-    vac_type = models.CharField('vac_type', choices=TYPE, max_length=50, default='Vaccine')
-    description = models.CharField(max_length=500, blank=True, null=True)
-    price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    used_yearly = models.IntegerField('used_yearly', default=0)
-    duration = models.IntegerField('duration', default=0)
+# class Vaccine_Preventive(models.Model):
+#     TYPE = (
+#         ('Vaccine', 'Vaccine'),
+#         ('Preventive', 'Preventive'),
+#     )
+#     name = models.CharField(max_length=100)
+#     vac_type = models.CharField('vac_type', choices=TYPE, max_length=50, default='Vaccine')
+#     description = models.CharField(max_length=500, blank=True, null=True)
+#     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
+#     used_yearly = models.IntegerField('used_yearly', default=0)
+#     duration = models.IntegerField('duration', default=0)
     
-    def save(self, *args, **kwargs):
-        if self.med_type == 'Vaccine':
-            self.used_yearly = 365 / int(self.duration)
-        super(Vaccine_Preventive, self).save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if self.med_type == 'Vaccine':
+#             self.used_yearly = 365 / int(self.duration)
+#         super(Vaccine_Preventive, self).save(*args, **kwargs)
 
-class Vaccine_Preventive_Inventory_Count(models.Model):
-    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    quantity = models.IntegerField('quantity', default=0)
-    date_counted = models.DateField('date_counted', auto_now_add=True)
-    time = models.TimeField('time', auto_now_add=True, blank=True)
+# class Vaccine_Preventive_Inventory_Count(models.Model):
+#     inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     quantity = models.IntegerField('quantity', default=0)
+#     date_counted = models.DateField('date_counted', auto_now_add=True)
+#     time = models.TimeField('time', auto_now_add=True, blank=True)
 
-    def __str__(self):
-        return self.inventory.name
+#     def __str__(self):
+#         return self.inventory.name
 
-class Vaccine_Preventive_Received_Trail(models.Model):
-    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    quantity = models.IntegerField('quantity', default=0)
-    date_received = models.DateField('date_received', auto_now_add=True)
-    time = models.TimeField('time', auto_now_add=True, blank=True)
+# class Vaccine_Preventive_Received_Trail(models.Model):
+#     inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     quantity = models.IntegerField('quantity', default=0)
+#     date_received = models.DateField('date_received', auto_now_add=True)
+#     time = models.TimeField('time', auto_now_add=True, blank=True)
 
-    def __str__(self):
-        return self.inventory.name
+#     def __str__(self):
+#         return self.inventory.name
 
-class Vaccine_Preventive_Subtracted_Trail(models.Model):
-    inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    quantity = models.IntegerField('quantity', default=0)
-    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
-    time = models.TimeField('time', auto_now_add=True, blank=True)
+# class Vaccine_Preventive_Subtracted_Trail(models.Model):
+#     inventory = models.ForeignKey(Vaccine_Preventive, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     quantity = models.IntegerField('quantity', default=0)
+#     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+#     time = models.TimeField('time', auto_now_add=True, blank=True)
 
-    def __str__(self):
-        return self.inventory.name
+#     def __str__(self):
+#         return self.inventory.name
 
 #Medicine
 class Medicine(models.Model):
@@ -66,14 +66,30 @@ class Medicine(models.Model):
         ('Capsule', 'Capsule'),
         ('Bottle', 'Bottle'),
         ('Vitamins', 'Vitamins'),
+        ('Vaccine', 'Vaccine'),
+        ('Preventive', 'Preventive'),
     )
+
+    IMMUNIZATION = (
+        ('Anti-Rabies', 'Anti-Rabies'),
+        ('Bordetella Bronchiseptica Bacterin', 'Bordetella Bronchiseptica Bacterin'),
+        ('Deworming', 'Deworming'),
+        ('DHPPiL+CV', 'DHPPiL+CV'),
+        ('DHPPiL4', 'DHPPiL4'),
+        ('Heartworm', 'Heartworm'),
+        ('Tick and Flea', 'Tick and Flea'),
+    )
+
     medicine = models.CharField(max_length=100)
-    med_type = models.CharField('med_type', choices=TYPE, max_length=50, default='Drug')
-    dose = models.DecimalField('dose', default=0, max_digits=50, decimal_places=2)
+    medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
+    med_type = models.CharField('med_type', choices=TYPE, max_length=50, blank=True, null=True)
+    immunization = models.CharField('immunization', choices=IMMUNIZATION, max_length=50, blank=True, null=True)
+    dose = models.DecimalField('dose', max_digits=50, default=1, decimal_places=2, blank=True, null=True)
     uom = models.CharField('uom', max_length=10, default='unit', blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
+    used_yearly = models.IntegerField('used_yearly', default=0, blank=True, null=True)
+    duration = models.IntegerField('duration', default=0, blank=True, null=True)
 
     def __str__(self):
         return self.medicine_fullname
@@ -83,6 +99,8 @@ class Medicine(models.Model):
 
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
+        if self.med_type == 'Vaccine':
+            self.used_yearly = 365 / int(self.duration)
         super(Medicine, self).save(*args, **kwargs)
 
 class Medicine_Inventory(models.Model):

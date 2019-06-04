@@ -14,20 +14,27 @@
     <a class="item" data-tab="second">Approved</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui two column celled table">
+    <table id="tabledata1" class="ui five column celled table">
         <thead>
             <tr>
+                <th>Date Requested</th>
                 <th>Handler</th>
+                <th>Dates</th>
                 <th>Duration</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in data1 %}
-            <tr>
-                <td>
-                    <a href="{% url 'unitmanagement:on_leave_details' data.id %}">{{data.handler}}</a>
-                </td>
+            <tr data-variation="wide" data-content="{{data.description}}" class="pop">
+                <td>{{data.date}}</td>
+                <td>{{data.handler}}</td>
                 <td>{{data.date_from}} - {{data.date_to}}</td>
+                <td>{{data.duration}}</td>
+                <td>
+                    <a href="{% url 'unitmanagement:on_leave_decision' data.id %}?leave=approve" class="ui tiny green button">Approve<a>
+                    <a href="{% url 'unitmanagement:on_leave_decision' data.id %}?leave=deny" class="ui tiny red button">Deny</a>
+                </td>
             </tr>
             
             {% endfor %}
@@ -35,21 +42,22 @@
     </table>
 </div>
 <div class="ui tab segment" data-tab="second">
-        <table id="tabledata2" class="ui two column celled table">
+        <table id="tabledata2" class="ui five column celled table">
             <thead>
                 <tr>
+                    <th>Dates</th>
                     <th>Handler</th>
                     <th>Duration</th>
+                    <th>Approved By</th>
                 </tr>
             </thead>
             <tbody>
                 {% for data in data2 %}
-                <tr>
-                    <td>
-                        <a href="{% url 'unitmanagement:on_leave_details' data.id %}">{{data.handler}}</a>
-                    </td>
+                <tr data-variation="wide" data-content="{{data.description}}" class="pop">
                     <td>{{data.date_from}} - {{data.date_to}}</td>
-                    
+                    <td>{{data.handler}}</td>
+                    <td>{{data.duration}}</td>
+                    <td>{{data.approved_by}}</td>
                 </tr>
                 
                 {% endfor %}
@@ -61,9 +69,20 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
+        $('#tabledata1').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
+
+        $('#tabledata2').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
+
         $('.menu .item').tab();
+
+        $('.pop').popup({
+            inline     : true,
+            hoverable  : true,
+        });
     });
 
 </script>

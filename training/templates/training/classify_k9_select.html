@@ -1,5 +1,6 @@
 {% extends "profiles/sidebar_training.html" %}
 {% load training_tags %}
+{% load static %}
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
@@ -64,16 +65,46 @@
   </ul>
 </div>
 
+<center>
+    <div class="ui three statistics">
+  <div class="statistic">
+    <div class="value">
+      {{NDD_count}} / {{NDD_demand}}
+    </div>
+    <div class="label">
+      NDD Count / NDD Required
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{EDD_count}} / {{EDD_demand}}
+    </div>
+    <div class="label">
+      EDD Count / EDD Required
+    </div>
+  </div>
+  <div class="statistic">
+    <div class="value">
+      {{SAR_count}} / {{SAR_demand}}
+    </div>
+    <div class="label">
+      SAR Count / SAR Required
+    </div>
+  </div>
+</div>
+</center>
+
 <form class="ui form" method="POST">
     {% csrf_token %}
   <div class = "ui segment">
-    <table class="ui five column celled table">
+    <table class="ui six column celled table">
         <thead class="center aligned">
             <tr>
                 <th>Select</th>
                 <th>Most Recurring Skill Among All K9s of the Same Breed</th>
                 <th ><a data-tooltip="View K9 ancestral data" href="{% url 'training:genealogy' data.id %}">Most Recurring Skill Among Ancestors</a></th>
-                <th>Recommended Skill Based on K9 Traits</th>
+                <th>Highest Training Grade Average Among Trained K9s of the Same Breed</th>
+                <th><a  data-tooltip="View {{select_trait.breed}} Traits" class ="ui button" id = "trait" >Recommended Skill Based on K9 Breed and Traits</a></th>
                 <th>Score</th>
             </tr>
 
@@ -101,7 +132,19 @@
                  {% else %}
                  <td>{{skill_gene_sar}}</td>
                  {% endif %}
-                  <td><i class="large green check circle icon"></i></td>
+
+                 {% if ave_score.0 == 1%}
+                 <td><a class="ui green circular label">{{skill_ave_sar}}</a></td>
+                 {% else %}
+                 <td>{{skill_ave_sar}}</td>
+                 {% endif %}
+
+                  <td>
+                 {% if trait_score.0 == 1%}
+                 <i class="large green check circle icon"></i>
+                 {% endif %}
+                 </td>
+
 
                   <td>
                   {% for i in SAR_score|star_times %}
@@ -136,7 +179,18 @@
                  {% else %}
                  <td>{{skill_gene_ndd}}</td>
                  {% endif %}
-                  <td></td>
+
+                  {% if ave_score.1 == 1%}
+                 <td><a class="ui green circular label">{{skill_ave_ndd}}</a></td>
+                 {% else %}
+                 <td>{{skill_ave_ndd}}</td>
+                 {% endif %}
+
+                    <td>
+                 {% if trait_score.1 == 1%}
+                 <i class="large green check circle icon"></i>
+                 {% endif %}
+                 </td>
 
                   <td>
                   {% for i in NDD_score|star_times %}
@@ -171,7 +225,18 @@
                  {% else %}
                  <td>{{skill_gene_edd}}</td>
                  {% endif %}
-                  <td></td>
+
+                 {% if ave_score.2 == 1%}
+                 <td><a class="ui green circular label">{{skill_ave_edd}}</a></td>
+                 {% else %}
+                 <td>{{skill_ave_edd}}</td>
+                 {% endif %}
+
+                  <td>
+                 {% if trait_score.2 == 1%}
+                 <i class="large green check circle icon"></i>
+                 {% endif %}
+                 </td>
 
                   <td>
                   {% for i in EDD_score|star_times %}
@@ -194,17 +259,95 @@
 {% endif %}
 
 
+<div class="ui modal">
+  <i class="close icon"></i>
+  <div class="header">
+    {{select_trait.breed}} Details
+  </div>
+
+
+
+      <table class="ui two column celled table">
+            <thead>
+            <tr>
+            <th>Breed</th>
+                <td>{{select_trait.breed}}</td>
+            </tr>
+            <tr>
+            <th>Life Span</th>
+                <td>{{select_trait.life_span}}</td>
+            </tr>
+            <tr>
+            <th>Temperament</th>
+                <td>{{select_trait.temperament}}</td>
+            </tr>
+            <tr>
+            <th>Colors</th>
+                <td>{{select_trait.colors}}</td>
+            </tr>
+            <tr>
+            <th>Weight</th>
+            <td>{{select_trait.weight}}</td>
+            </tr>
+            <tr>
+            <th>Height</th>
+                {% if data.sex == "Male" %}
+            <td>{{select_trait.male_height}}</td>
+                {% else %}
+                <td>{{select_trait.female_height}}</td>
+                {% endif %}
+            </tr>
+            <tr>
+            <th>Skill Recommendation</th>
+            <td>
+                {% if select_trait.skill_recommendation %}
+                {{select_trait.skill_recommendation}}
+                {% endif %}
+                {% if select_trait.skill_recommendation2 %}
+                {{select_trait.skill_recommendation2}}
+                {% endif %}
+                {% if select_trait.skill_recommendation3 %}
+                {{select_trait.skill_recommendation3}}
+                {% endif %}
+            </td>
+
+            </tr>
+            </thead>
+    </table>
+
+
+
+</div>
+
+
+
+
+
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata').DataTable();
 
-    
-    } );
 
-        var selected = $("input[name='radio']");
-        alert(select.val)
-    });
+    $('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  });
+
+
+$( "#trait" ).click(function() {
+$('.ui.modal').modal('show');
+});
+
+
+  } );
+
+
 
 </script>
+
+
+
  {% endblock %}

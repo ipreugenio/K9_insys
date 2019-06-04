@@ -1,13 +1,13 @@
 from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
-from django.contrib.admin.widgets import AdminDateWidget
+from django.contrib.admin.widgets import AdminDateWidget, AdminTimeWidget
 from datetime import date, datetime
 from django.core.validators import validate_integer
 from django.forms import fields
 
 import re
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher
 from planningandacquiring.models import K9
 from profiles.models import Account, User
 from django.contrib.sessions.models import Session
@@ -169,42 +169,23 @@ class LocationForm(forms.ModelForm):
         ('Zamboanga', 'Zamboanga'),
     )
     city = forms.CharField(max_length=50, label = 'city', widget = forms.Select(choices=CITY))
-
+    place = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     class Meta:
         model = Location
-        fields = ('area', 'city', 'place')
+        fields = ('area', 'city', 'place', 'sector_type')
 
 class AssignTeamForm(forms.ModelForm):
     location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
+    team_leader = forms.ModelChoiceField(queryset = User.objects.filter(position='Team Leader').filter(assigned=False))
 
     class Meta:
         model = Team_Assignment
-        fields = ('location', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
+        fields = ('location', 'team_leader', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
 class EditTeamForm(forms.ModelForm):
     class Meta:
         model = Team_Assignment
         fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
-
-'''
-class assign_team_form(forms.ModelForm):
-    class Meta:
-        model = Team_Assignment
-        fields = ('area', 'team', 'handlers', 'EDD', 'NDD', 'SAR')
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields['team'].queryset = Team.objects.none()
-
-            if 'area' in self.data:
-                try:
-                    area_id = int(self.data.get('area'))
-                    self.fields['team'].queryset = Team.objects.filter(area_id=area_id).order_by('name')
-                except (ValueError, TypeError):
-                    pass  # invalid input from the client; ignore and fallback to empty City queryset
-            elif self.instance.pk:
-                self.fields['team'].queryset = self.instance.area.team_set.order_by('name')
-'''
 
 class RequestForm(forms.ModelForm):
     
@@ -240,15 +221,40 @@ class RequestForm(forms.ModelForm):
 
 
 class IncidentForm(forms.ModelForm):
+    location = forms.ModelChoiceField(queryset = Location.objects.none(), empty_label=None)
     class Meta:
         model = Incidents
         fields = '__all__'
 
         widgets = {
             'date': DateInput(),
-            #'date_time': forms.widgets.DateTimeInput(format="%d %b %Y %H:%M:%S %Z")
         }
 
     def __init__(self, *args, **kwargs):
         super(IncidentForm, self).__init__(*args, **kwargs)
-        self.fields['user'].intial = current_user
+
+class DailyRefresherForm(forms.ModelForm):
+
+    class Meta:
+        model = Daily_Refresher
+        fields = '__all__'
+
+        widgets = {
+            'port_time': forms.TimeInput(format='%M:%S'),
+            'building_time': forms.TimeInput(format='%M:%S'),
+            'vehicle_time': forms.TimeInput(format='%M:%S'),
+            'baggage_time': forms.TimeInput(format='%M:%S'),
+            'others_time': forms.TimeInput(format='%M:%S'),
+            'mar': forms.RadioSelect(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(DailyRefresherForm, self).__init__(*args, **kwargs)
+        self.fields['rating'].required = False
+        self.fields['mar'].required = False
+        self.fields['on_leash'].required = False
+        self.fields['off_leash'].required = False
+        self.fields['obstacle_course'].required = False
+        self.fields['panelling'].required = False
+        self.fields['k9'].required = False
+        self.fields['handler'].required = False

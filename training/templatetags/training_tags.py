@@ -17,7 +17,7 @@ def star_times(number):
 
 @register.filter
 def star_left(number):
-    return range(3 - number)
+    return range(4 - number)
 
 @register.filter
 def to_ordinal(numb):

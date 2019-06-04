@@ -1,35 +1,33 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
 <h2 class="ui header">
- {{Title}}
-  <div class="sub header">Input K9 breeding data here</div>
+  K9's Born
+  <div class="sub header">Input breeded K9 data here</div>
 </h2>
+<div class="ui horizontal segments">
+    <div class="ui segment">
+        <center>
+            <img src="{{data.mother.image.url}}" alt="" width="200">
+          </center>
+    </div>
 
-<div class="ui ordered steps">
-  <div class="completed step">
-    <div class="content">
-      <div class="title">K9 Parents Form</div>
-      <div class="description">Select K9 Parents</div>
+    <div class="ui segment">
+        <center>
+            <img src="{{data.father.image.url}}" alt="" width="200">
+          </center>
     </div>
-  </div>
-  <div class="completed step">
-    <div class="content">
-      <div class="title">Confirm Parents</div>
-      <div class="description">Verify selected parents</div>
-    </div>
-  </div>
-  <div class="active step">
-    <div class="content">
-      <div class="title">Offspring Form</div>
-      <div class="description">Provide K9 offspring data</div>
-    </div>
-  </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Confirm Breeding</div>
-      <div class="description">Verify breeding details</div>
-    </div>
-  </div>
+
 </div>
+<table class="ui celled table">
+    <thead>
+      <tr>
+        <th class="center aligned three wide">Mother</th>
+        <td class="center aligned five wide">{{data.mother}}</td>
+        
+        <th class="center aligned three wide">Father</th>
+        <td class="center aligned five wide">{{data.father}}</td>
+      </tr>
+    </thead>
+</table>
  {% if messages %}
         {% for message in messages %}
             <div class="{{ style }} row"> {{ message }}</div>
@@ -37,54 +35,55 @@
     {% endif %}
 
 <div class="ui inverted segment">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="{{ style }} row"> {{ message }}</div>
-        {% endfor %}
-    {% endif %}
-<form class = "ui inverted form" action="{% url 'planningandacquiring:add_K9_offspring_form' %}" enctype="multipart/form-data" method="post">
+<form class = "ui inverted form" id="myForm" enctype="multipart/form-data" method="post">
     {% csrf_token %}
-    
-    <div class="sixteen wide field">
-      <label>K9 Image</label>
-      {{form.image}}
-    </div>
-  
-    <div class="fields">
-        <div class="sixteen wide field">
-            <label>Name</label>
-            {{form.name}}
+    <div>
+        <div class="three fields">
+            <div class="field"></div>
+            <div class="field">
+                <label>Birth Date</label>
+                {{form.birth_date}}
+            </div>
+            <div class="field"></div>
         </div>
     </div>
-
-    <div class="fields">
-
-        <div class="six wide field">
-            <label>Sex</label>
-            {{form.sex}}
-        </div>
-        <div class="six wide field">
-            <label>Color</label>
-            {{form.color}}
+    {% for form in formset %}
+    <div class="formset_class" id="{{ form.prefix }}-row">
+        <div class="four fields">
+            <div class="field">
+                <label>Name</label>
+                {{form.name}}
+            </div>    
+            <div class="field">
+                <label>Color</label>
+                {{form.color}}
+            </div> 
+            <div class="field">
+                <label>Sex</label>
+                {{form.sex}}
+            </div> 
+            <div class="field">
+                <label>Image</label>
+                {{form.image}}
+            </div>    
         </div>
     </div>
-
-    <div class="fields">
-        <div class="six wide field">
-            <label>Birthdate</label>
-            {{form.birth_date}}
-        </div>
-
-    </div>
-
-
-
+    {% endfor %}
     <div class="ui inverted right aligned segment" style="padding: 0px;">
-        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Next Step</button>
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
     </div>
+    {{formset.management_form}}
 </form>
 
 </div>
 
-
+<script>
+  $(document).ready(function() {
+      $(function() {
+          $('#myForm .formset_class').formset({
+              prefix: '{{ formset.prefix }}'
+          });            
+      })
+  });
+</script>
 {% endblock %}
