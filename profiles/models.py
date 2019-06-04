@@ -49,19 +49,45 @@ class User(models.Model):
         ('No Longer Employed', 'No Longer Employed'),
     )
 
-    CITIZENSHIP = (
-        ('FILIPINO', 'FILIPINO'),
+    RANK = (
+        ('MCPO', 'MCPO'),
+        ('SCPO', 'SCPO'),
+        ('CPO', 'CPO'),
+        ('PO1', 'PO1'),
+        ('PO2', 'PO2'),
+        ('PO3', 'PO3'),
+        ('SN1/SW1', 'SN1/SW1'),
+        ('SN2/SW2', 'SN2/SW2'),
+        ('ASN/ASW', 'ASN/ASW'),
+        ('CCGM', 'CCGM'),
+        ('ADMIRAL', 'ADMIRAL'),
+        ('VICE ADMIRAL', 'VICE ADMIRAL'),
+        ('REAR ADMIRAL', 'REAR ADMIRAL'),
+        ('COMMO', 'COMMO'),
+        ('CAPT', 'CAPT'),
+        ('CDR', 'CDR'),
+        ('LCDR', 'LCDR'),
+        ('LT', 'LT'),
+        ('LTJG', 'LTJG'),
+        ('ENS', 'ENS'),
+        ('P/ENS', 'P/ENS')
     )
 
     RELIGION = (
-        ('ROMAN CATHOLIC', 'ROMAN CATHOLIC'),
-        ('CHRISTIAN', 'CHRISTIAN'),
-        ('BORN AGAIN', 'BORN AGAIN'),
+        ('Roman Catholic','Roman Catholic'),
+        ('Christianity','Christianity'),
+        ('Islam','Islam'),
+        ('Iglesia ni Cristo','Iglesia ni Cristo'),
+        ('Buddhists','Buddhists'),
+    )
+
+    CITIZENSHIP = (
+        ('FILIPINO','FILIPINO'),
     )
 
     image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
-    rank = models.CharField('rank', max_length=200)
+    rank = models.CharField('rank', choices=RANK,  max_length=200)
     fullname = models.CharField('fullname', max_length=200, null=True, blank=True)
     firstname = models.CharField('firstname', max_length=200)
     lastname = models.CharField('lastname', max_length=200)

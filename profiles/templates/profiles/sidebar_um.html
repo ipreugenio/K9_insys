@@ -20,13 +20,12 @@
                             <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">
                                 <i class="retweet icon"></i>Reallocate Assets
                             </a>
-                            <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
-                                <i class="clipboard list icon"></i>K9 Incident List
-                            </a>
                             <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">
                                 <i class="clipboard list icon"></i>On-Leave Request list
                             </a>
-                           
+                            <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
+                                <i class="clipboard list icon"></i>K9 Incident List
+                            </a>
                             {% elif request.session.session_user_position == "Veterinarian" %}
                             <!-- <a href="{% url 'profiles:add_User_form'%}" class="item">
                                 <i class="user plus icon"></i>Add User Form
@@ -42,6 +41,9 @@
                             </a>
                             <a href="{% url 'unitmanagement:k9_sick_list'%}" class="item">
                                 <i class="ambulance icon"></i>Sick K9's List
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
+                                <i class="clipboard list icon"></i>K9 Incident List
                             </a>
                             <a href="{% url 'unitmanagement:health_record'%}" class="item">
                                 <i class="h square icon"></i>Health Records
@@ -81,6 +83,9 @@
                             </a>
                             <a href="{% url 'deployment:fou_details'%}" class="item">
                                     <i class="id card icon"></i>FOU's Details
+                            </a>
+                            <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
+                                <i class="clipboard list icon"></i>K9 Incident List
                             </a>
                             <a href="{% url 'deployment:add_incident'%}" class="item">
                                 <i class="pen square icon"></i>

@@ -17,7 +17,7 @@
     <div class="ui inverted segment">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="{{ style }} row"> {{ message }}</div>
+                    <div class="{{ style }}"> {{ message }}</div>
                 {% endfor %}
             {% endif %}
             <form class = "ui inverted form" method="POST">
@@ -42,19 +42,19 @@
                     </div>
                     <div class="four inline fields">
                         <div class="field">
-                            {{form.MARSEC}}
+                            <input type="radio" name="select" value="MARSEC">
                             <label for="">MARSEC</label>
                         </div>
                         <div class="field">
-                            {{form.MARLEN}}
+                            <input type="radio" name="select" value="MARLEN">
                             <label for="">MARLEN</label>
                         </div>
                         <div class="field">
-                            {{form.MARSAR}}
+                            <input type="radio" name="select" value="MARSAR">
                             <label for="">MARSAR</label>
                         </div>
                         <div class="field">
-                            {{form.MAREP}}
+                            <input type="radio" name="select" value="MAREP">
                             <label for="">MAREP</label>
                         </div>
                     </div>

@@ -34,8 +34,8 @@
                     </tr>
                 </thead>
             </table>
-            <div class="ui two equal width grid">
-                <div class="column">
+            <div class="ui grid">
+                <div class="ten wide column">
                         <table class="ui celled table">
                                 <thead>
                                     <tr>
@@ -49,8 +49,10 @@
                                 </thead>
                             </table>
                 </div>
-                <div class="column">
-                        <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                <div class="six wide column">
+                        <center>
+                                <img src="{{th.health.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                        </center>
                 </div>
             </div>
         </div>
@@ -107,13 +109,21 @@
         <div class="ui grid">
             {% for image in image%}
                 <div class="five wide column center aligned">
-                    <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                    <center>
+                            <img src="{{th.health.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                    </center>
                 </div>
             {%endfor%}
         </div>
     </div>
 
 {% elif user.position == 'Veterinarian' %}
+
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Concern</a>
+    <a class="item" data-tab="second">History</a>
+</div>
+<div class="ui tab segment active" data-tab="first">
 {% if th %}
         
 <div class="ui raised segment">
@@ -137,8 +147,8 @@
                 </tr>
             </thead>
         </table>
-        <div class="ui two equal width grid">
-            <div class="column">
+        <div class="ui grid">
+            <div class="ten wide column">
                     <table class="ui celled table">
                             <thead>
                                 <tr>
@@ -152,8 +162,10 @@
                             </thead>
                         </table>
             </div>
-            <div class="column">
-                    <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+            <div class="six wide column">
+                <center>
+                        <img src="{{th.health.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                </center>
             </div>
         </div>
     </div>
@@ -180,98 +192,127 @@
 
    
 {% endif %}
-<div class="ui raised segment">
+<div class="ui basic segment">
         {% if th %}
-        <h2>Follow-Up</h2>
+        <h3 class="ui horizontal divider header">
+            FOLLOW UP
+        </h3>
         {% endif %}
-        <table class="ui collapse table">
-            <thead>
-                <tr>
-                    <th>K9</th>
-                    <td>{{data.k9}}</td>
-                    <th>Date</th>
-                    <td>{{data.date}}</td>
-                </tr>
-                <tr>
-                    <th>Remarks</th>
-                    <td class="nine wide">{{data.description}}</td>
-                    <th>Reported by:</th>
-                    <td>{{data.reported_by}}</td>
-                </tr>
-            </thead>
-        </table>
-        <br>
-        <div class="ui grid">
-            {% for image in image%}
-                <div class="five wide column center aligned">
-                    <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+        <div class="ui raised segment">
+                <table class="ui collapse table">
+                    <thead>
+                        <tr>
+                            <th>K9</th>
+                            <td>{{data.k9}}</td>
+                            <th>Date</th>
+                            <td>{{data.date}}</td>
+                        </tr>
+                        <tr>
+                            <th>Remarks</th>
+                            <td class="nine wide">{{data.description}}</td>
+                            <th>Reported by:</th>
+                            <td>{{data.reported_by}}</td>
+                        </tr>
+                    </thead>
+                </table>
+                <br>
+                <div class="ui grid">
+                    {% for image in image%}
+                        <div class="five wide column center aligned">
+                            <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                        </div>
+                    {%endfor%}
                 </div>
-            {%endfor%}
-        </div>
-    </div>
-<div class="ui inverted segment">
-    <form class="ui inverted form" method="POST" id="myForm" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="field">
-                <label>Problem</label>
-                {{form.problem}}
             </div>
-        <div class="field">
-            <label>Treatment</label>
-            {{form.treatment}}
-        </div>
-        <div class="three fields">
-            <div class="field">
-                <label>Prescription Image (if any)</label>
-                {{form.image}}
-            </div>
-            <div class="field">
-                <label>Follow Up?</label>
-                {{form.follow_up}}
-            </div>
-            <div class="field">
-                <label>Follow Date</label>
-                {{form.follow_up_date}}
-            </div>
-        </div>
-        <table>
-            <tbody>
-            {% for form in formset %}
-            <tr id="{{ form.prefix }}-row" class="formset_class">
-                {% for field in form.hidden_fields %}{{ field }}{% endfor %}
-                {% for field in form.visible_fields %}
-                {% if form.visible_fields.instance.pk %} {{ form.visible_fields.DELETE }}{% endif %}
-                        <span class ="text-danger small">{{field.errors}}</span>
-                        <th>{{field.label_tag}}</th>
-                        <td>{{field}}</td>
-        
-                        {% for item in item %}
-                        <option value="{{ item.id }}">{{ item.item_name }}</option>
+        <div class="ui inverted segment">
+            <form class="ui inverted form" method="POST" id="myForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="field">
+                        <label>Problem</label>
+                        {{form.problem}}
+                    </div>
+                <div class="field">
+                    <label>Treatment</label>
+                    {{form.treatment}}
+                </div>
+                <div class="three fields">
+                    <div class="field">
+                        <label>Prescription Image (if any)</label>
+                        {{form.image}}
+                    </div>
+                    <div class="field">
+                        <label>Follow Up?</label>
+                        {{form.follow_up}}
+                    </div>
+                    <div class="field">
+                        <label>Follow Date</label>
+                        {{form.follow_up_date}}
+                    </div>
+                </div>
+                <table>
+                    <tbody>
+                    {% for form in formset %}
+                    <tr id="{{ form.prefix }}-row" class="formset_class">
+                        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+                        {% for field in form.visible_fields %}
+                        {% if form.visible_fields.instance.pk %} {{ form.visible_fields.DELETE }}{% endif %}
+                                <span class ="text-danger small">{{field.errors}}</span>
+                                <th>{{field.label_tag}}</th>
+                                <td>{{field}}</td>
+                
+                                {% for item in item %}
+                                <option value="{{ item.id }}">{{ item.item_name }}</option>
+                                {% endfor %}
                         {% endfor %}
-                {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        
+                <div class="ui inverted right aligned segment" style="padding: 0px;">
+                    <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+                </div>
+                {{formset.management_form}}
+            </form>
+        </div>
+</div>
+
+</div>
+
+<div class="ui tab segment" data-tab="second">
+    <table class="ui celled table" id = 'tabledata2'>
+        <thead>
+            <th>Date</th>
+            <th>Veterinarian</th>
+            <th>Problem</th>
+        </thead>
+        <tbody>
+            {% for data in health_id%}
+            <tr>
+                <td class="three wide">
+                   <span class="flip" href="#" id={{data.id}} style="cursor: pointer;  color:blue;">{{data.date}}</span>
+                    </td>
+                <td class="five wide">{{data.veterinary}}</td>
+                <td>{{data.problem}}</td>
             </tr>
             {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="ui inverted right aligned segment" style="padding: 0px;">
-            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
-        </div>
-        {{formset.management_form}}
-    </form>
+        </tbody>
+    </table>
 </div>
+
+<div id ="id_health_data" class="ui longer modal"></div>
 
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
         $('.menu .item').tab();
         $(function() {
             $('#myForm .formset_class').formset({
                 prefix: '{{ formset.prefix }}'
             });            
         })
-        console.log('yes')
         
         $('#id_follow_up_date').prop('disabled', 'disabled');
 
@@ -283,6 +324,23 @@
                 $('#id_follow_up_date').prop('disabled', 'disabled');
             }
         });
+
+        $( ".flip" ).bind('click', function() {
+            var url = 'ajax_load_health';  
+            var health_id = $(this).attr('id')
+            $('.ui.longer.modal').modal('show');
+
+            $.ajax({                      
+                url: url,                    
+                data: {
+                'health': health_id      
+                },
+                success: function (data) {   
+                $("#id_health_data").html(data); 
+                }
+            });
+        });
+
     });
 
 </script>

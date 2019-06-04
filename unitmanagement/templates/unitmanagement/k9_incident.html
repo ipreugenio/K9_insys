@@ -34,8 +34,15 @@
                 {{form.k9}}
             </div>
             <div class="field">
-                <label>Incident</label>
+                <label>Type</label>
                 {{form.incident}}
+            </div>
+            <div class="field"></div>
+        </div>
+        <div class="two fields">
+            <div class="sixteen wide field">
+                <label>Incident</label>
+                {{form.title}}
             </div>
             <div class="field"></div>
         </div>
@@ -64,6 +71,8 @@
         $("select[name='incident']").change(function() {
             if( $("select[name='incident']").val() == 'Accident'){
                 $("input[name='clinic']").prop('disabled', false);
+            }else{
+                $("input[name='clinic']").prop('disabled', true);
             }
         });
 

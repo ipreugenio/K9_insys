@@ -32,11 +32,11 @@
                         {% csrf_token %}
                         <div class="field">
                             <label>SERIAL NUMBER</label>
-                            <input name="serial_number" placeholder="Serial Number" type="text">
+                            {{form.username}}
                         </div>
                         <div class="field">
                             <label>PASSWORD</label>
-                            <input name="password" placeholder="Password" type="password">
+                            {{form.password}}
                         </div>
                     
                         <div class="center aligned">

@@ -303,6 +303,14 @@ class Incidents(models.Model):
     remarks = models.TextField('remarks', max_length=200, blank=True, null=True)
 
 class Daily_Refresher(models.Model):
+
+    MAR = (
+        ('MARSEC', 'MARSEC'),
+        ('MARLEN', 'MARLEN'),
+        ('MARSAR', 'MARSAR'),
+        ('MAREP', 'MAREP')
+    )
+
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField('date', auto_now_add = True)
@@ -314,26 +322,23 @@ class Daily_Refresher(models.Model):
     morning_feed_cups = models.DecimalField('morning_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
     evening_feed_cups = models.DecimalField('evening_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
     # plant and find
-    port_plant = models.IntegerField('port_plant', default= 0)
-    port_find = models.IntegerField('port_find', default= 0)
+    port_plant = models.IntegerField('port_plant', blank=True, null=True)
+    port_find = models.IntegerField('port_find', blank=True, null=True)
     port_time = models.TimeField('port_time', blank=True, null=True)
-    building_plant = models.IntegerField('building_plant',default= 0)
-    building_find = models.IntegerField('building_find', default= 0)
+    building_plant = models.IntegerField('building_plant',blank=True, null=True)
+    building_find = models.IntegerField('building_find', blank=True, null=True)
     building_time = models.TimeField('building_time', blank=True, null=True)
-    vehicle_plant = models.IntegerField('vehicle_plant', default= 0)
-    vehicle_find = models.IntegerField('vehicle_find', default= 0)
+    vehicle_plant = models.IntegerField('vehicle_plant', blank=True, null=True)
+    vehicle_find = models.IntegerField('vehicle_find',blank=True, null=True)
     vehicle_time = models.TimeField('vehicle_time', blank=True, null=True)
-    baggage_plant = models.IntegerField('baggage_plant', default= 0)
-    baggage_find = models.IntegerField('baggage_find', default= 0)
+    baggage_plant = models.IntegerField('baggage_plant', blank=True, null=True)
+    baggage_find = models.IntegerField('baggage_find', blank=True, null=True)
     baggage_time = models.TimeField('baggage_time', blank=True, null=True)
-    others_plant = models.IntegerField('others_plant', default= 0)
-    others_find = models.IntegerField('others_find',default= 0)
+    others_plant = models.IntegerField('others_plant', blank=True, null=True)
+    others_find = models.IntegerField('others_find', blank=True, null=True)
     others_time = models.TimeField('others_time', blank=True, null=True)
-    # What is this??
-    MARSEC = models.BooleanField(default=False)
-    MARLEN = models.BooleanField(default=False)
-    MARSAR = models.BooleanField(default=False)
-    MAREP = models.BooleanField(default=False)
+    mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
+    
 
 
    

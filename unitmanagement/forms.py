@@ -191,7 +191,7 @@ class K9IncidentForm(forms.ModelForm):
     incident = forms.CharField(max_length=10, label='incident', widget=forms.Select(choices=CONCERN))
     class Meta:
         model = K9_Incident
-        fields = ('k9', 'incident', 'description', 'reported_by', 'clinic')
+        fields = ('k9', 'incident', 'title', 'description', 'reported_by', 'clinic')
 
     def __init__(self, *args, **kwargs):
         super(K9IncidentForm, self).__init__(*args, **kwargs)

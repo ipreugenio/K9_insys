@@ -27,7 +27,7 @@ from training.forms import assign_handler_form
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from unitmanagement.serializers import K9Serializer, UserSerializer
+from unitmanagement.serializers import K9Serializer
 
 # Create your views here.
 
@@ -118,11 +118,8 @@ def index(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     n = None
-    try:
-        n = Notification.objects.filter(user__id=id)
-        print(n)
-    except:
-        pass
+   
+    Handler_K9_History.objects.get()
 
     context = {
         'notif_data':notif_data,
@@ -988,12 +985,26 @@ def k9_incident(request):
 
 # TODO
 def k9_incident_list(request):
-    style='ui green message'
-    data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+    user = user_session(request)
+    style='ui blue message'
+    if user.position == 'Team Leader':
+        ta = Team_Assignment.objects.get(team_leader=user)
+
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+        
+        k9 = []
+        for td in tdd:
+            k9.append(td.k9)
+        data = K9_Incident.objects.filter(k9__in=k9).filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+
+    elif user.position == 'Veterinarian':
+        data = K9_Incident.objects.filter(status='Pending').filter(incident='Accident')
+    else:
+        data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
+   
     
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title': "K9 Incident List",
         'style': style,
@@ -1025,20 +1036,18 @@ def k9_sick_form(request):
     form2 = DateForm(request.POST or None)
     handler = K9.objects.filter(handler=user)
     form.fields['k9'].queryset =  handler
-    
-    h = request.session['health']
     health = None
-    print(h)
+    h = None
+    
+    if 'health' in request.session:
+        h = request.session['health']
 
     try:
         th = Transaction_Health.objects.filter(status='Pending').get(id=h)
         health = Health.objects.get(id=th.health.id)
-        print(th)
     except ObjectDoesNotExist:
         th =  None
 
-    print(health)
-  
     if request.method == "POST":
         if form.is_valid():
             form = form.save(commit=False)
@@ -1384,9 +1393,15 @@ def choose_handler_list(request, id):
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     g = []
     for h in handler:
-        c = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
-        g.append(c)
+        edd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='SAR').count()
+        f = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='None').filter(Q(k9__status='Adopted') | Q(k9__training_status="For-Adoption") | Q(k9__status="Dead")).count()
+        
+        s = [edd, ndd, sar, f]
+        g.append(s)
 
+    print(g)
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
@@ -1426,6 +1441,22 @@ def choose_handler_list(request, id):
         'g':g,
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
+
+# TODO 
+# K9 Died
+def confirm_death(request, id):
+    i = K9_Incident.objects.get(id=id)
+    i.status = 'Done'
+    i.save()
+
+    k9 = K9.objects.get(id=i.k9.id)
+    k9.status = "Dead"
+    k9.training_status = "Dead"
+    k9.save()
+
+    messages.success(request, i.k9.name + 'has been confirmed dead...')
+
+    return redirect('unitmanagement:k9_incident_list')
 
 # TODO 
 # choose_handler Cycle
@@ -1490,6 +1521,8 @@ def k9_sick_list(request):
 def k9_sick_details(request, id):
     
     data = K9_Incident.objects.get(id=id)
+
+    health_id = Health.objects.filter(dog=data.k9)
     image = Image.objects.filter(incident_id=data)
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
@@ -1510,11 +1543,6 @@ def k9_sick_details(request, id):
             th = None
             h = None
             hh = None
-
-    print(h)
-    print(hh)
-    print(th)
-
 
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
@@ -1596,13 +1624,10 @@ def k9_sick_details(request, id):
                     for form in formset:
                         f = form.save()
                         med = Medicine_Inventory.objects.get(id=f.medicine.id)
-                        print('Med: ', med)
                         med.quantity = med.quantity - f.quantity
                         med.save()
                         Medicine_Subtracted_Trail.objects.create(inventory = med, user=user_in_session, quantity = f.quantity)
                         
-                    print('Days: ',max(days))
-                    print('Health: ', health)
                     health.duration =  max(days)
                     health.save() #health instance
                     dog.status = 'Sick'
@@ -1630,6 +1655,7 @@ def k9_sick_details(request, id):
         'user':user,
         'th':th,
         'h':h,
+        'health_id':health_id,
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 
@@ -1839,6 +1865,7 @@ class VetView(APIView):
 def load_handler(request):
 
     handler = None
+    pi = None
 
     try:
         handler_id = request.GET.get('handler')
@@ -1859,7 +1886,7 @@ def load_handler(request):
         'sar':sar,
     }
 
-    return render(request, 'training/handler_data.html', context)
+    return render(request, 'unitmanagement/handler_data.html', context)
 
 def load_stamp(request):
 
@@ -1893,3 +1920,37 @@ def load_k9(request):
     }
 
     return render(request, 'unitmanagement/k9_data.html', context)
+
+def load_health(request):
+
+    health = None
+    try:
+        health_id = request.GET.get('health')
+        health = Health.objects.get(id=health_id) 
+
+        h = HealthMedicine.objects.filter(health=health)
+
+    except:
+        pass
+   
+    context = {
+        'health': health,
+        'h': h,
+    }
+
+    return render(request, 'unitmanagement/health_data.html', context)
+
+def load_incident(request):
+
+    data_load = None
+    try:
+        id = request.GET.get('id')
+        data_load = K9_Incident.objects.get(id=id) 
+    except:
+        pass
+   
+    context = {
+        'data_load': data_load,
+    }
+
+    return render(request, 'unitmanagement/incident_data.html', context)

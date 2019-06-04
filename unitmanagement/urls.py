@@ -42,10 +42,14 @@ urlpatterns = [
     path('choose-handler-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
     path('health-history/ajax_load_stamp', views.load_stamp, name='ajax_load_stamp'),
     path('ajax_load_k9', views.load_k9, name='ajax_load_k9'),
+    path('k9-sick-details/ajax_load_health', views.load_health, name='ajax_load_health'),
+    path('k9-incident-list/ajax_load_incident', views.load_incident, name='ajax_load_incident'),
+
     
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
     path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
     
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),

@@ -1,0 +1,17 @@
+{% if data_load %}
+
+{% load static %}
+{% block content %}
+<div class="header">{{data_load.date}}</div>
+<div class="image content">
+  <img class="image" src="{% static 'images/qwe3.jpg' %}" style="max-width: 300px;max-height: 250px;">
+  <div class="description">
+    <p id = 'data_1'>{{data_load.description}}</p>
+  </div>
+</div>
+<div class="actions">
+    <a href="{% url 'unitmanagement:confirm_death' data_load.id %}" class="ui approve green button">Confirm</a>
+</div>
+{% endblock %}
+
+{% endif %}

@@ -240,20 +240,18 @@ class DailyRefresherForm(forms.ModelForm):
         fields = '__all__'
 
         widgets = {
-            'port_time': AdminTimeWidget(attrs={'class':'timepicker'}),
-            'building_time': AdminTimeWidget(),
-            'vehicle_time': AdminTimeWidget(),
-            'baggage_time': AdminTimeWidget(),
-            'others_time': AdminTimeWidget(),
+            'port_time': forms.TimeInput(format='%M:%S'),
+            'building_time': forms.TimeInput(format='%M:%S'),
+            'vehicle_time': forms.TimeInput(format='%M:%S'),
+            'baggage_time': forms.TimeInput(format='%M:%S'),
+            'others_time': forms.TimeInput(format='%M:%S'),
+            'mar': forms.RadioSelect(),
         }
 
     def __init__(self, *args, **kwargs):
         super(DailyRefresherForm, self).__init__(*args, **kwargs)
         self.fields['rating'].required = False
-        self.fields['MARSEC'].required = False
-        self.fields['MARLEN'].required = False
-        self.fields['MARSAR'].required = False
-        self.fields['MAREP'].required = False
+        self.fields['mar'].required = False
         self.fields['on_leash'].required = False
         self.fields['off_leash'].required = False
         self.fields['obstacle_course'].required = False

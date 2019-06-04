@@ -47,9 +47,13 @@ def user_session(request):
     return user_in_session
 
 def index(request):
+    d = Daily_Refresher.objects.get(id=4)
 
+    c = datetime.combine(d.port_time.min, end) + datetime.combine(d.vehicle_time.min, beginning)
+    print(c)
     context = {
-      'title':'Deployment'
+      'title':'Deployment',
+      'd':d,
     }
     return render (request, 'deployment/index.html', context)
 
@@ -715,7 +719,7 @@ def daily_refresher_form(request):
     user = user_session(request)
     k9 = K9.objects.get(handler=user)
     form = DailyRefresherForm(request.POST or None)
-
+    style = "ui green message"
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.date.today())
     
     dr = None
@@ -730,9 +734,23 @@ def daily_refresher_form(request):
             f = form.save(commit=False)
             f.k9 = k9
             f.handler = user
-            #TODO Formula for Rating
 
-            
+            mar = request.POST.get('select')
+            f.mar = mar
+            #TODO Formula for Rating
+            port = (f.port_find / f.port_plant * 20)
+            building = (f.building_find /f.building_plant * 20)
+            vehicle = (f.vehicle_find /f.vehicle_plant * 20)
+            baggage = (f.baggage_find /f.baggage_plant * 20)
+            others = (f.others_find /f.others_plant * 20)
+            find = (f.port_find+f.building_find+f.vehicle_find+f.baggage_find+f.others_find)
+            plant = (f.port_plant+f.building_plant+f.vehicle_plant+f.baggage_plant+f.others_plant)
+
+            f.rating = 100 - ((plant - find) * 5)
+
+            #TIME
+            #time = (f.port_time + f.building_time + f.vehicle_time + f.baggage_time + f.others_time)
+            print(f.port_time)
             ######################
             f.save()
             
@@ -752,6 +770,7 @@ def daily_refresher_form(request):
         'user':user,
         'form':form,
         'dr':dr,
+        'style':style,
     }
 
     return render(request, 'deployment/daily_refresher_form.html', context)
