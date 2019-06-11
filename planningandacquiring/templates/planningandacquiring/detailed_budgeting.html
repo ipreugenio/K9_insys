@@ -4,7 +4,7 @@
 {% load um_tags %}
 <center>
 <img src="{% static 'images/k9_logo.png' %}" width="150">
-    <br>For year {{year}}
+    <br>BUDGET FOR THE YEAR {{year}}
 </center>
 
 <table id="tabledata1" class="ui eleven column celled table">
@@ -21,7 +21,7 @@
             <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
-    {% for med in budget_medicine %}
+    {% for med in recent_budget_medicine %}
         <tr>
             <td>
                 {{med|get_medicine_name:forloop.counter0}}
@@ -59,7 +59,7 @@
             <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
-    {% for vac in budget_vaccine %}
+    {% for vac in recent_budget_vaccine %}
         <tr>
             <td>
                 {{vac|get_vaccine_name:forloop.counter0}}
@@ -97,7 +97,7 @@
             <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
-    {% for equipment in budget_equipment %}
+    {% for equipment in recent_budget_equipment %}
         <tr>
             <td>
                 {{equipment|get_equipment_name:forloop.counter0}}
@@ -135,7 +135,7 @@
             <th>Difference (Current Estimate - Spendings)</th>
             </thead>
         </tr>
-    {% for vet in budget_vet_supply %}
+    {% for vet in recent_budget_vet_supply %}
         <tr>
             <td>
                 {{vet|get_vet_name:forloop.counter0}}
@@ -159,7 +159,7 @@
 
 </table>
 
-<table id="tabledata4" class="ui eleven column celled table">
+<table id="tabledata5" class="ui eleven column celled table">
         <tr>
             <thead>
             <th>Food</th>
@@ -230,26 +230,52 @@
             <td style="text-align:right">₱{{difference_milk}}</td>
 
         </tr>
+
+</table>
+
+
+<table id="tabledata6" class="ui nine column celled table">
         <tr>
-            <td>
+            <thead>
+            <th>K9</th>
+            <th>Price per Item (Previous Budget Bid)</th>
+            <th>Price per Item (Current Budget Bid)</th>
+            <th>Current Available K9s</th>
+            <th>Estimated Quantity (Current)</th>
+            <th>Estimated Budget (Last Year's Estimate)</th>
+            <th>Spendings (This Year)</th>
+            <th>Estimated Budget (Current)</th>
+            <th>Difference (Current Estimate - Spendings)</th>
+            </thead>
+        </tr>
+        <tbody>
+        <tr>
+            <td></td>
+            <td style="text-align:right">₱{{previous_bid_k9}}</td>
+            <td style="text-align:right">₱{{current_bid_k9}}</td>
+            <td>{{all_current_k9}}</td>
+            <td>{{current_quantity_k9}}</td>
+            <td style="text-align:right">₱{{previous_total_k9}}</td>
+            <td style="text-align:right">₱{{k9_expense}}</td>
+            <td style="text-align:right">₱{{current_total_k9}}</td>
+            <td style="text-align:right">₱{{k9_difference}}</td>
+        </tr>
 
-            </td>
-            <td>
-
-            </td>
-            <td>
-
-            </td>
+         <tr>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
             <td style="text-align:right"><b>Grand Spending: ₱{{grandspendings}}</b></td>
             <td style="text-align:right"><b>Grand Total: ₱{{grandtotal}}</b></td>
-            <td style="text-align:right">Grand Difference: ₱{{granddiff}}</td>
+             <td style="text-align:right"><b>Grand Difference: ₱{{granddiff}}</b></td>
 
         </tr>
 
+        </tbody>
 
-</table>
+    </table>
 
 {% endblock %}

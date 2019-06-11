@@ -131,7 +131,7 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['heartworm_8'].required = False
 
 class VaccinationUsedForm(forms.Form):
-    vaccine = forms.ModelChoiceField(queryset = Medicine.objects.filter(Q (med_type = "Vaccine") | Q(med_type = "Others")).order_by('medicine'))
+    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.filter(Q (medicine__med_type = "Vaccine") | Q(medicine__med_type = "Others")).order_by('medicine'))
 
 
 class RequestForm(forms.ModelForm):
@@ -198,6 +198,7 @@ class HandlerOnLeaveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
+        self.fields['handler'].widget.attrs['readonly'] = "readonly"
        
 
 class ReassignAssetsForm(forms.Form):

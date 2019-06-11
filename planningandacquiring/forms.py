@@ -127,9 +127,10 @@ class add_donated_K9_form(forms.ModelForm):
     image = forms.ImageField()
     class Meta:
         model = K9
-        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date')
+        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date', 'date_created')
         widgets = {
             'birth_date': DateInput(),
+            'date_created': DateInput(),
         }
 
 class add_donator_form(forms.ModelForm):
@@ -264,6 +265,14 @@ class budget_vaccine(forms.Form):
     price = forms.DecimalField()
 
 class budget_vet_supply(forms.Form):
+    # class Meta:
+    #     model = Budget_vet_supply
+    #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
+
+class budget_k9(forms.Form):
     # class Meta:
     #     model = Budget_vet_supply
     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')

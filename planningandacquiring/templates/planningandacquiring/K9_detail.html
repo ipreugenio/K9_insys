@@ -68,6 +68,14 @@
                 <td>{{k9.source}}</td>
                 </tr>
             <tr>
+            {% if k9.source == "Procurement" %}
+                <tr>
+              <th>Date Procured</th>
+                <td>{{k9.date_created}}</td>
+                </tr>
+            <tr>
+                {% endif %}
+
               <th>Status</th>
                 <td>{{k9.status}}</td>
                 </tr>
@@ -87,11 +95,8 @@
               <th>Year Retired</th>
                 <td>{{k9.year_retired}}</td>
                 </tr>
-            <tr>
-              <th>Microchip</th>
-                <td>{{k9.microchip}}</td>
-            </tr>
-             {% if parent_exist %}
+
+             {% if parent_exist == 1%}
             <tr>
                 <th>Mother</th>
                 <td>{{parent.mother}}</td>

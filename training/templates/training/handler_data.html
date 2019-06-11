@@ -1,0 +1,64 @@
+{% if handler %}
+
+{% load static %}
+{% block content %}
+
+<center>
+            <img src="{{handler.image.url}}" alt="" width="240">
+        </center>
+
+         <div class="ui segment">
+    <table class="ui eight column celled table">
+        <thead>
+        <tr>
+                <th>Extension Name</th>
+                <td>"{{handler.extensionname}}"</td>
+
+                <th>First Name</th>
+                <td>{{handler.firstname}}</td>
+
+                <th>Middle name</th>
+                <td>{{handler.middlename}}</td>
+
+
+                <th>Last Name</th>
+                <td>{{handler.lastname}}</td>
+
+         </tr>
+            <tr>
+                <th>Birthdate</th>
+                <td>{{handler.birthdate}}</td>
+
+                <th>Age (years)</th>
+                <td>{{handler.age}}</td>
+
+                <th>Gender</th>
+                <td>{{handler.gender}}</td>
+            </tr>
+
+            <tr>
+                <th>Civil Status</th>
+                <td>{{handler.civilstatus}}</td>
+
+                <th>Citizenship</th>
+                <td>{{handler.citizenship}}</td>
+
+                <th>Religion</th>
+                <td>{{handler.religion}}</td>
+
+                <th>Blood Type</th>
+                <td>{{handler.bloodtype}}</td>
+
+            </tr>
+
+            <tr>
+                <th>Previous Skill</th>
+                <td>{{handler.capability}}</td>
+            </tr>
+
+        </thead>
+    </table>
+</div>
+ {% endblock %}
+
+{% endif %}

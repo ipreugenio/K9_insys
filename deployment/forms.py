@@ -264,7 +264,7 @@ class IncidentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(IncidentForm, self).__init__(*args, **kwargs)
 
-        self.fields['user'].intial = current_user
+        #self.fields['user'].intial = current_user
 
 class DateForm(forms.Form):
     from_date = forms.DateField( widget=DateInput())
@@ -272,14 +272,36 @@ class DateForm(forms.Form):
 
         #self.fields['user'].intial = current_user
 
+class GeoSearch(forms.Form):
+    search = forms.CharField()
 
 class GeoForm(geoforms.Form):
     point = geoforms.PointField(widget= geoforms.OSMWidget(attrs={'default_lon' : 120.993173,'default_lat' : 14.564752,
-                                                            'default_zoom': 14, 'display_raw': True, 'map_width': 800, 'map_height': 500}))
+                                                            'default_zoom': 18, 'display_raw': False, 'map_width': 470, 'map_height': 500}))
     # 'map_srid': 900913 Gmaps srid (geographic) current is projected
     # 120.993173 lon, 14.564752 lat,  DLSU default coordinates
     # 13468861.763567935675383 lon, 1639088.708640566794202 lat,  DLSU default coordinates
-    # 13476918.53413876 lon, 1632299.5848436863 lat, PCGK9 Taguig Coordinates
+    # 13476918.53413876 lon, 1632299.5848436863 lat, PCGK9 Taguig Coordinates (2D Plane)
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            lat  = kwargs.pop("lat", None)
+            lng = kwargs.pop("lng", None)
+        except:
+            pass
+
+        try:
+            width = kwargs.pop("width", None)
+        except:
+            pass
+
+        super(GeoForm, self).__init__(*args, **kwargs)
+        if lat and lng:
+            self.fields['point'].widget.attrs['default_lat'] = lat
+            self.fields['point'].widget.attrs['default_lon'] = lng
+        if width:
+            self.fields['point'].widget.attrs['map_width'] = width
 
 __all__ = ('MonthYearWidget',)
 

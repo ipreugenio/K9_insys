@@ -3,6 +3,12 @@
 {% load static %}
 {% load um_tags %}
 
+{% if messages %}
+        {% for message in messages %}
+            <div class="ui red message"> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
  <form enctype="multipart/form-data" class="ui inverted equal width form" action="{% url 'planningandacquiring:choose_date' %}" method="POST">
         {% csrf_token %}
 

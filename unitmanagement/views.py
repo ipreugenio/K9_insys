@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
-<<<<<<< HEAD
+
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, DateForm
@@ -21,7 +21,7 @@ from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Foo
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed
 from deployment.models import K9_Schedule
 from profiles.models import User, Account
-=======
+
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_Incident, K9_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
@@ -36,7 +36,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from unitmanagement.serializers import K9Serializer, UserSerializer
-
+from django.db.models import Q
 # Create your views here.
 
 
@@ -48,7 +48,7 @@ def notif(request):
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
-        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
+        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime').exclude(notif_type='handler_on_leave').exclude(notif_type='handler_died')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
    
@@ -114,11 +114,15 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('unitmanagement:health_details', id = notif.other_id)
+    elif notif.notif_type == 'handler_on_leave' :
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:on_leave_details', id = notif.other_id)
     #TODO location incident view details 
-    # elif notif.notif_type == 'location_incident' :
-    #     notif.viewed = True
-    #     notif.save()
-    #     return redirect('deployment:incident_detail', id = notif.other_id)
+    elif notif.notif_type == 'location_incident' :
+        notif.viewed = True
+        notif.save()
+        return redirect('deployment:incident_detail', id = notif.other_id)
     
 
 def index(request):
@@ -126,6 +130,15 @@ def index(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     form = k9_detail_form(request.POST or None, request.FILES or None, instance = user)
+
+    k9 = K9.objects.all()
+
+    for k9 in k9:
+        try:
+            print(k9.in_heat_monthly())
+        except:
+            pass
+
 
     if request.method == "POST":
         print('post')
@@ -336,7 +349,7 @@ def health_history(request, id):
 
     vaccine_record_form = VaccinationRecordForm(request.POST or None, instance = vaccine_record)
     vaccine_used_form = VaccinationUsedForm(request.POST or None)
-    vaccines = Medicine.objects.filter(med_type = "Vaccine").order_by('medicine')
+    vaccines = Medicine.objects.filter(Q(med_type = "Vaccine") | Q(med_type = "Others")).order_by('medicine')
     vaccine_available = Medicine_Inventory.objects.filter(medicine__in = vaccines).exclude(quantity=0)
    
     active_1 = ' active'
@@ -411,6 +424,10 @@ def health_history(request, id):
 
 
     if request.method == 'POST':
+        # if vaccine_record.dhppil4_2 == True:
+        #     data.training_status = 'Unclassified'
+        #     data.save()
+
         # if is changed to TRUE, it cannot be changed back to FALSE 
         if vaccine_record.deworming_1 == True:
             vaccine_record.deworming_1 = vaccine_record.deworming_1
@@ -482,8 +499,14 @@ def health_history(request, id):
             vaccine_record.tick_flea_3 = bool(request.POST.get('tick_flea_3'))
         if vaccine_record.dhppil4_2 == True:
             vaccine_record.dhppil4_2 = vaccine_record.dhppil4_2
+            if data.training_status == 'Puppy':
+                data.training_status = 'Unclassified'
+                data.save()
         else:
             vaccine_record.dhppil4_2 = bool(request.POST.get('dhppil4_2'))
+            if data.training_status == 'Puppy':
+                data.training_status = 'Unclassified'
+                data.save()
         if vaccine_record.heartworm_4 == True:
             vaccine_record.heartworm_4 = vaccine_record.heartworm_4
         else:
@@ -688,7 +711,7 @@ def health_history(request, id):
                 data_tick_flea_2.date_vaccinated = dtoday
                 data_tick_flea_2.veterinary = current_user
                 data_tick_flea_2.save()
-                vaccine_record.save(update_fields=["anti_rabies"])
+                vaccine_record.save(update_fields=["tick_flea_2"])
                 med.quantity = med.quantity - 1
                 med.save()
                 Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
@@ -714,7 +737,7 @@ def health_history(request, id):
                 data_heartworm_3.date_vaccinated = dtoday
                 data_heartworm_3.veterinary = current_user
                 data_heartworm_3.save()
-                vaccine_record.save(update_fields=["dhppil_cv_3"])
+                vaccine_record.save(update_fields=["heartworm_3"])
                 med.quantity = med.quantity - 1
                 med.save()
                 Medicine_Subtracted_Trail.objects.create(inventory = med, user = current_user, quantity = 1, date_subtracted = dtoday, time = dt.datetime.now())
@@ -773,6 +796,7 @@ def health_history(request, id):
 
         if vaccine_record.tick_flea_4 == True and request.POST.get('s_tick_flea_4') !='' and request.POST.get('s_tick_flea_4') !=None:
             m = Medicine.objects.get(medicine=request.POST.get('s_tick_flea_4'))
+            med = Medicine_Inventory.objects.get(medicine=m)
             if med.quantity > 0:
                 med = Medicine_Inventory.objects.get(medicine=m)
                 data_tick_flea_4.vaccine = m
@@ -1161,6 +1185,7 @@ def k9_incident(request):
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
 
+
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
@@ -1171,6 +1196,7 @@ def k9_incident(request):
             k9 =incident_save.k9
             k9_obj=K9.objects.get(id=k9.id)
 
+
             #if k9 has a partner handler and died
             if k9_obj.partnered==True and incident_save.incident=='Died' :
                 handler = User.objects.get(id=k9_obj.handler.id)
@@ -1180,6 +1206,11 @@ def k9_incident(request):
                 handler.partnered = False
                 k9_obj.save()
                 handler.save()
+                try:
+                    k9_handler = K9_Handler.objects.get(k9=k9_obj)
+                    k9_handler.delete()
+                except:
+                    k9_handler = None
             elif k9_obj.partnered==False and incident_save.incident=='Died' :
                 k9_obj.status = 'Dead'
                 k9_obj.save()
@@ -1226,6 +1257,7 @@ def handler_incident(request):
             # get k9 object
             handler =incident_save.handler
             handler_obj=User.objects.get(id=handler.id)
+
             
             #if k9 has a partner handler and died
             if handler_obj.partnered==True and incident_save.incident=='Died' :
@@ -1237,6 +1269,11 @@ def handler_incident(request):
                 print(k9, k9.handler)
                 k9.save()
                 handler_obj.save()
+                try:
+                    k9_handler = K9_Handler.objects.get(handler=handler_obj)
+                    k9_handler.delete()
+                except:
+                    k9_handler = None
             else:
                 handler_obj.status = 'Dead'
                 handler_obj.save()
@@ -1267,7 +1304,8 @@ def handler_incident(request):
 def on_leave_request(request):
     form = HandlerOnLeaveForm(request.POST or None)
     style=''
-  
+    u = user_session(request)
+    form.fields["handler"].queryset = User.objects.filter(id=u.id)
     form.initial['handler'] = user_session(request)
     if request.method == "POST":
         if form.is_valid():
@@ -1276,11 +1314,10 @@ def on_leave_request(request):
             form = HandlerOnLeaveForm()
             style = "ui green message"
             messages.success(request, 'Request has been successfully Submited!')
-        
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1316,6 +1353,8 @@ def reassign_assets(request):
 
             handler.partnered = True
             handler.save()
+
+            K9_Handler.objects.create(k9 = k9, handler = handler)
 
             form = ReassignAssetsForm()
             style = "ui green message"
@@ -1396,14 +1435,19 @@ def on_leave_details(request, id):
             u.partnered = False
             u.save()
             # What to do with k9?
-            k9.training_status = 'For-Deployment'
-            k9.assignment = None
+            k9.handler = None
             k9.partnered = False
             k9.save()
 
+            try:
+                k9_handler = K9_Handler.objects.get(k9 = k9)
+                k9_handler.delete()
+            except:
+                k9_handler = None
+
             # If deployed, pull out
             try:
-                td = Team_Dog_Deployed.objects.filter(k9=k9).filter(status='Deployed').latest()
+                td = Team_Dog_Deployed.objects.filter(k9=k9).filter(status='Deployed').latest('date_pulled')
                 td.status = 'Done'
                 td.date_pulled = date.today()
                 td.save()
@@ -1424,12 +1468,12 @@ def on_leave_details(request, id):
                 pass
 
             #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
+            return HttpResponseRedirect('../on-leave-list')
         elif 'deny' in request.POST:
             data.status = "Denied"
             data.save()
             #Make Notification
-            return HttpResponseRedirect('../on-leave-list/')
+            return HttpResponseRedirect('../on-leave-list')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1612,6 +1656,8 @@ def choose_handler(request, id):
     handler.partnered = True
     handler.capability = k9.capability
     handler.save()
+
+    K9_Handler.objects.create(k9 = k9, handler = handler)
 
     messages.success(request, 'Assets has been successfully Partnered!')
      

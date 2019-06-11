@@ -33,6 +33,8 @@ urlpatterns = [
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),
     path('on-leave-details/<int:id>', views.on_leave_details, name='on_leave_details'),
 
+    path('choose-date/<int:id>', views.choose_date, name='choose_date'),
+
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),
 

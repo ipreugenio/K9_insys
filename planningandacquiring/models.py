@@ -5,6 +5,7 @@ from datetime import date as d
 from dateutil.relativedelta import relativedelta
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food
+#from unitmanagement.models import Notification
 
 
 class Date(models.Model):
@@ -99,10 +100,55 @@ class K9(models.Model):
     estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
+    date_created = models.DateField('date_created', default=dt.now())
 
     # def best_fertile_notification(self):
     #     notif = self.estrus_date - td(days=7)
     #     return notif
+
+    def num_in_heat(self):
+        return self.in_heat_months/12
+
+    def in_heat_monthly(self):
+
+        upcoming_year = int(dt.now().year) + 1
+
+        months = [0,0,0,0,0,0,0,0,0,0,0,0]
+        prostreus_temp = self.last_proestrus_date
+        prostreus_temp_year = int(prostreus_temp.year)
+        year = []
+        while prostreus_temp_year <= upcoming_year:
+            if prostreus_temp_year == upcoming_year:
+
+                if prostreus_temp.month == 1:
+                    months[0] += 1
+                elif prostreus_temp.month == 2:
+                    months[1] += 1
+                elif prostreus_temp.month == 3:
+                    months[2] += 1
+                elif prostreus_temp.month == 4:
+                    months[3] += 1
+                elif prostreus_temp.month == 5:
+                    months[4] += 1
+                elif prostreus_temp.month == 6:
+                    months[5] += 1
+                elif prostreus_temp.month == 7:
+                    months[6] += 1
+                elif prostreus_temp.month == 8:
+                    months[7] += 1
+                elif prostreus_temp.month == 9:
+                    months[8] += 1
+                elif prostreus_temp.month == 10:
+                    months[9] += 1
+                elif prostreus_temp.month == 11:
+                    months[10] += 1
+                elif prostreus_temp.month == 12:
+                    months[11] += 1
+
+            prostreus_temp += relativedelta(months = self.in_heat_months)
+            prostreus_temp_year = prostreus_temp.year
+
+        return months
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -151,7 +197,8 @@ class K9(models.Model):
             self.training_status = 'Due-For-Retirement'
             self.status = 'Working Dog'
             #TODO notif 1 year
-            Notification.objects.create(message= str(k9) +' is due to retire next year.')
+            from unitmanagement.models import Notification
+            Notification.objects.create(message= str(self.name) +' is due to retire next year.')
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))
@@ -264,6 +311,7 @@ class Budget_allocation(models.Model):
     medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=2,)
     vaccine_total = models.DecimalField('vaccine_total', default=0, max_digits=50, decimal_places=2,)
     vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=2,)
+    k9_total = models.DecimalField('k9_total', default=0, max_digits=50, decimal_places=2, )
     grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
     date_created = models.DateField('date_created', auto_now_add=True)
     date_tobe_budgeted = models.CharField('date_tobe_budgeted', null=True, max_length=200, default="-")
@@ -311,6 +359,12 @@ class Budget_vaccine(models.Model):
 
 class Budget_vet_supply(models.Model):
     vet_supply = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+
+class Budget_k9(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)

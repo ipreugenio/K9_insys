@@ -30,6 +30,10 @@ urlpatterns = [
     path('choose-date/', views.choose_date, name='choose_date'),
     path('choose-date/deployment-report/', views.deployment_report, name='deployment_report'),
 
+    path('add-location/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('add-location/ajax_load_map', views.load_map, name='ajax_load_map'),
+    path('request_form/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('request_form/ajax_load_map', views.load_map, name='ajax_load_map'),
 
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),

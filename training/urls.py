@@ -16,7 +16,10 @@ urlpatterns = [
     path('training-details/<int:id>', views.training_details, name='training_details'),
 
     path('choose-date/<int:id>', views.choose_date, name='choose_date'),
-    path('choose-date/daily-record/', views.daily_record, name='daily_record'),  # the record itself
+
+    path('choose-date/daily-record/<int:id>', views.daily_record, name='daily_record'),
+    path('choose-date/daily-record/', views.daily_record_mult, name='daily_record'),
+    #path('choose-date/daily-record/<int:id>', views.daily_record, name='daily_record'),# the record itself
     path('record-daily/', views.record_form, name='record_daily'), #form for recording of refresher
 
     path('k9-record', views.k9_record, name='k9_record'), #list ng k9 with records
@@ -27,6 +30,7 @@ urlpatterns = [
     path('training/list-classify-k9', views.classify_k9_list, name='classify_k9_list'),
     path('training/classify-k9/<int:id>', views.classify_k9_select, name='classify_k9_select'),
     path('training/training-record', views.training_records, name='training_records'),
+    #path('training/training-record/<int:id>', views.training_records, name='training_records'),
 
     path('training/genealogy/<int:id>', views.view_family_tree, name='genealogy'),
     path('training/assign-k9/<int:id>', views.assign_k9_select, name='assign_k9_select'),
@@ -42,5 +46,6 @@ urlpatterns = [
 
     path('list-training-k9', views.k9_training_list, name='k9_training_list'),
 
+    path('training/assign-k9/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
     #path('/<int:id>/', views., name=''),
 ];

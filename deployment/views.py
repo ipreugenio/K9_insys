@@ -8,6 +8,8 @@ from django.db.models import Count
 from django.db.models import Q
 from django.views import generic
 from django.utils.safestring import mark_safe
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
 
 import datetime
 import re
@@ -23,14 +25,14 @@ from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed
 
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, DateForm
 
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch
 
 
 #Plotly
-'''import plotly.offline as opy
+import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
-import plotly.figure_factory as ff'''
+import plotly.figure_factory as ff
 
 
 #GeoDjango
@@ -111,6 +113,9 @@ def add_area(request):
 def add_location(request):
     form = LocationForm(request.POST or None)
     geoform = GeoForm(request.POST or None)
+    geosearch = GeoSearch(request.POST or None)
+    width = 470
+
     style = ""
     if request.method == 'POST':
         if form.is_valid():
@@ -147,13 +152,56 @@ def add_location(request):
       'texthelp': 'Input Location Details Here',
       'form': form,
       'geoform': geoform,
+      'geosearch': geosearch,
+       'width' :width,
       'actiontype': 'Submit',
       'style':style,
       'notif_data':notif_data,
       'count':count,
       'user':user,
+
     }
     return render (request, 'deployment/add_location.html', context)
+
+
+def load_locations(request):
+
+    search_query = request.GET.get('search_query')
+    width = request.GET.get('width')
+
+
+    if search_query == "":
+        geolocator = Nominatim(user_agent="Locator", timeout=None)
+    else:
+        geolocator = Nominatim(user_agent="Locator", format_string="%s, Philippines", timeout=None)
+
+    locations = geolocator.geocode(search_query, exactly_one=False)
+
+    print(locations)
+
+    context = {
+        'locations' : locations,
+        'width': width
+    }
+
+    return render(request, 'deployment/location_data.html', context)
+
+def load_map(request):
+    lng = request.GET.get('lng')
+    lat = request.GET.get('lat')
+
+    width = request.GET.get('width')
+
+    print("TEST coordinates")
+    print(str(lat) + " , " + str(lng))
+
+    geoform = GeoForm(request.POST or None, lat=lat, lng=lng, width=width)
+
+    context = {
+        'geoform' : geoform
+    }
+
+    return render(request, 'deployment/map_data.html', context)
 
 def assign_team_location(request):
     form = AssignTeamForm(request.POST or None)
@@ -397,8 +445,10 @@ def remove_dog_deployed(request, id):
 def dog_request(request):
 
     form = RequestForm(request.POST or None)
-    geoform = GeoForm(request.POST or None)
+    geoform = GeoForm(request.POST or None, width=750)
     style = ""
+    geosearch = GeoSearch(request.POST or None)
+    width = 750
 
     if request.method == 'POST':
         if form.is_valid() and geoform.is_valid():
@@ -448,6 +498,8 @@ def dog_request(request):
       'texthelp': 'Input request of client here.',
       'form': form,
       'geoform' : geoform,
+       'geosearch' : geosearch,
+        'width' : width,
       'actiontype': 'Submit',
       'style':style,
       'notif_data':notif_data,
@@ -548,7 +600,7 @@ def request_dog_details(request, id):
     # print(can_deploy)
 
     # dogs deployed to Dog Request
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2) #.filter(status='Deployed')
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(Q(status='Deployed') | Q(status='Scheduled'))
 
     #>>>> start of new Code for saving schedules instead of direct deployment
     # TODO Filter can deploy to with teams without date conflicts
@@ -561,7 +613,7 @@ def request_dog_details(request, id):
         print(k9)
 
         for sched in schedules:
-            if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date):
+            if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
                 deployable = 0
 
         if deployable == 1:
@@ -579,12 +631,12 @@ def request_dog_details(request, id):
             data2.remarks = request.POST.get('remarks')
             data2.status = "Approved"
             data2.save()
-            return HttpResponseRedirect('../request_dog_list/')
+            return redirect('deployment:request_dog_details', id=id)
         elif 'deny' in request.POST:
             data2.remarks = request.POST.get('remarks')
             data2.status = "Denied"
             data2.save()
-            return HttpResponseRedirect('../request_dog_list/')
+            return redirect('deployment:request_dog_details', id=id)
 
         checks = request.POST.getlist('checks')  # get the id of all the dogs checked
         # print(checks)
@@ -636,6 +688,9 @@ def remove_dog_request(request, id):
     k9 = K9.objects.get(id=pull_k9.k9.id)
     dog_request = Dog_Request.objects.get(id=pull_k9.team_requested.id)
 
+    sched = K9_Schedule.objects.get(Q(k9 = k9) & Q(dog_request = dog_request))
+    sched.delete()
+
     #change Team_Dog_Deployed model
     pull_k9.status = 'Pulled-Out'
     pull_k9.date_pulled = date.today()
@@ -661,21 +716,21 @@ def remove_dog_request(request, id):
 
     return redirect('deployment:request_dog_details', id=pull_k9.team_requested.id)
 
-def deployment_report(request):
-    assignment = Team_Assignment.objects.all()
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'title': 'Request Dog List',
-        'assignment': assignment,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'deployment/request_dog_list.html', context)
+# def deployment_report(request):
+#     assignment = Team_Assignment.objects.all()
+#
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#     context = {
+#         'title': 'Request Dog List',
+#         'assignment': assignment,
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#     }
+#     return render (request, 'deployment/request_dog_list.html', context)
 
 
 def view_schedule(request, id):
@@ -759,6 +814,10 @@ def add_incident(request):
     style = ""
 
     user_serial = request.session['session_serial']
+
+    print("USER SERIAL")
+    print(user_serial)
+
     user = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user.UserID.id)
 

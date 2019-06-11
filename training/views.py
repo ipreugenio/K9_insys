@@ -551,9 +551,9 @@ def classify_k9_select(request, id):
     print("AVE SCORE")
     print(ave_score)
 
-    skill_breed_sar = method_arrays[0][5]
-    skill_breed_ndd = method_arrays[0][6]
-    skill_breed_edd = method_arrays[0][7]
+    skill_breed_sar = method_arrays[0][1]
+    skill_breed_ndd = method_arrays[0][2]
+    skill_breed_edd = method_arrays[0][3]
     SAR_score += skill_breed_sar
     NDD_score += skill_breed_ndd
     EDD_score += skill_breed_edd
@@ -570,9 +570,9 @@ def classify_k9_select(request, id):
 
     #Run this if k9 has ancestors
     if len(method_arrays) == 2:
-        skill_gene_sar = method_arrays[1][5]
-        skill_gene_ndd = method_arrays[1][6]
-        skill_gene_edd = method_arrays[1][7]
+        skill_gene_sar = method_arrays[1][1]
+        skill_gene_ndd = method_arrays[1][2]
+        skill_gene_edd = method_arrays[1][3]
         SAR_score += skill_gene_sar
         NDD_score += skill_gene_ndd
         EDD_score += skill_breed_edd
@@ -603,6 +603,9 @@ def classify_k9_select(request, id):
     compact_score.append(SAR_score)
     compact_score.append(NDD_score)
     compact_score.append(EDD_score)
+
+    print("COMPACT SCORE")
+    print(compact_score)
 
     recommended = [0, 0, 0]
 
@@ -811,7 +814,7 @@ def assign_k9_select(request, id):
             k9.save()
 
             #Create K9_Handler Model
-            #K9_Handler.objects.create(k9 = k9, handler = handler)
+            K9_Handler.objects.create(k9 = k9, handler = handler)
 
             messages.success(request, 'K9 has been assigned to a handler!')
         else:
@@ -933,7 +936,7 @@ def training_update_form(request, id):
         if training.stage == "Finished Training":
             data.training_status = "Trained"
 
-            if training.grade == 75.0:
+            if training.grade == "75.0":
                 data.training_status = "For-Adoption"
         else:
             data.training_status = "On-Training"
@@ -982,11 +985,16 @@ def serial_number_form(request, id):
             data.save()
 
             if training_status == "For-Breeding":
-                user = User.objects.get(id = data.handler)
+                user = User.objects.get(id = data.handler.id)
                 user.partnered = 0
                 user.save()
                 data.handler = None
                 data.save()
+                try:
+                    k9_handler = K9_Handler.objects.get(k9=data)
+                    k9_handler.delete()
+                except:
+                    k9_handler = None
 
 
             style = "ui green message"
@@ -1014,8 +1022,15 @@ def serial_number_form(request, id):
 
 def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
+    k9_handler = User.objects.get(id=data.handler.id)
+    k9_handler.partnered = False
+    k9_handler.save()
+
     data.training_status = "For-Adoption"
+    data.handler = None
+    data.partnered = False
     data.save()
+
     training = Training.objects.filter(k9=data)
 
     for training in training:
@@ -1912,6 +1927,7 @@ def record_form(request):
    # training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
    # form = TrainingUpdateForm(request.POST or None, instance = training)
 
+
     handler = User.objects.get(id = int(handlerid))
     data = K9_Handler.objects.get(handler = handler)
     form2 = RecordForm(request.POST or None)
@@ -1957,7 +1973,7 @@ def choose_date(request, id):
     }
     return render(request, 'training/choose_date.html', context)
 
-def daily_record(request):
+def daily_record_mult(request):
   #  form = DateForm(request.POST or None)
     data = request.session["session_k9"] # get k9
   #  context = ''
@@ -1965,7 +1981,10 @@ def daily_record(request):
     k9 = K9.objects.get(id = data)
 
     date = request.session["session_date"]
-    record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+    try:
+        record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+    except:
+        record = None
 
     context = {
         'title': str(k9),
@@ -1975,3 +1994,18 @@ def daily_record(request):
     }
     return render(request, 'training/daily_record.html', context)
 
+def load_handler(request):
+
+    handler = None
+
+    try:
+        handler_id = request.GET.get('handler')
+        handler = User.objects.get(id=handler_id)
+    except:
+        pass
+
+    context = {
+        'handler': handler,
+    }
+
+    return render(request, 'training/handler_data.html', context)
