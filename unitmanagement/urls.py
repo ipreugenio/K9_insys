@@ -36,7 +36,7 @@ urlpatterns = [
     path('k9-retrieved/<int:id>', views.k9_retreived, name='k9_retreived'),
     path('follow-up/<int:id>', views.follow_up, name='follow_up'),
 
-    path('choose-date/<int:id>', views.choose_date, name='choose_date'),
+    #path('choose-date/<int:id>', views.choose_date, name='choose_date'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),

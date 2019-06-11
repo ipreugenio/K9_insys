@@ -234,8 +234,7 @@ class DateForm(forms.Form):
     date = forms.DateField()
 
     widgets = {
-        'date': DateInput(),
-
+        'date': DateInput()}
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))

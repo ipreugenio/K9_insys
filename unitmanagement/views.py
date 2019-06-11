@@ -20,7 +20,7 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Requests, VaccineUsed, Notification
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
 
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
@@ -39,7 +39,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from unitmanagement.serializers import K9Serializer, UserSerializer
+from unitmanagement.serializers import K9Serializer
 from django.db.models import Q
 
 # Create your views here.
@@ -924,7 +924,7 @@ def requests_form(request):
     return render (request, 'unitmanagement/request_form.html', context)
 
 def request_list(request):
-    data = Requests.objects.all()
+    data = Equipment_Request.objects.all()
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -940,7 +940,7 @@ def request_list(request):
     return render (request, 'unitmanagement/request_list.html', context)
 
 def change_equipment(request, id):
-    data = Requests.objects.get(id=id)
+    data = Equipment_Request.objects.get(id=id)
     style = ""
     changedate = dt.datetime.now()
 
