@@ -80,7 +80,7 @@
                 <td>{{k9.status}}</td>
                 </tr>
             <tr>
-              <th>Assigned</th>
+              <th>Type</th>
                 <td id='status'>{{k9.training_status}}</td>
                 </tr>
             <tr>
@@ -91,12 +91,13 @@
               <th>Assignment</th>
                 <td>{{k9.assignment}}</td>
                 </tr>
+
             <tr>
               <th>Year Retired</th>
                 <td>{{k9.year_retired}}</td>
                 </tr>
 
-             {% if parent_exist == 1%}
+             {% if parent_exist %}
             <tr>
                 <th>Mother</th>
                 <td>{{parent.mother}}</td>
@@ -106,14 +107,7 @@
                 <td>{{parent.father}}</td>
             </tr>
             {% else %}
-            <tr>
-                <th>Mother</th>
-                <td>Unknown</td>
-            </tr>
-            <tr>
-                <th>Father</th>
-                <td>Unknown</td>
-            </tr>
+          
             {% endif %}
 
     		</thead>

@@ -37,7 +37,4 @@ urlpatterns = [
     #damaged form
     path('damaged-form', views.damaged_form, name='damaged_form'),
     path('damaged-report-list', views.damaged_report_list, name='damaged_report_list'),
-    path('choose-date/', views.choose_date, name='choose_date'),
-    path('choose-date/inventory-report/', views.inventory_report, name='inventory_report'),
-
 ];

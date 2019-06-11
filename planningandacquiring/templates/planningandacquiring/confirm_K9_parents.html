@@ -17,18 +17,6 @@
       <div class="description">Verify selected parents</div>
     </div>
   </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Offspring Form</div>
-      <div class="description">Provide K9 offspring data</div>
-    </div>
-  </div>
-  <div class="disabled step">
-    <div class="content">
-      <div class="title">Confirm Breeding</div>
-      <div class="description">Verify breeding details</div>
-    </div>
-  </div>
 </div>
 
 <div class="ui placeholder segment">
@@ -44,64 +32,7 @@
         <div class="field">
 
          <h2 class="ui dividing header">Mother</h2>
-		<table class="ui two column celled table">
-        	<thead>
-          	<tr>
-                <th>Name</th>
-                <td>{{mother.name}}</td>
-                </tr>
-            <tr>
-              <th>Serial Number</th>
-                <td>{{mother.serial_number}}</td>
-                </tr>
-            <tr>
-              <th>Breed</th>
-                <td>{{mother.breed}}</td>
-                </tr>
-            <tr>
-              <th>Sex</th>
-                <td>{{mother.sex}}</td>
-                </tr>
-            <tr>
-			  <th>Color</th>
-                <td>{{mother.color}}</td>
-                </tr>
-            <tr>
-              <th>Birthdate</th>
-                <td>{{mother.birth_date}}</td>
-                </tr>
-            <tr>
-              <th>Age</th>
-                <td>{{mother.age}}</td>
-                </tr>
-            <tr>
-              <th>Microchip</th>
-                <td>{{mother.microchip}}</td>
-            </tr>
-            <tr>
-              <th>Source</th>
-                <td>{{mother.source}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Assignment</th>
-                <td>{{mother.assignment}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Status</th>
-                <td>{{mother.status}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Training Status</th>
-                <td>{{mother.training_status}}</td>
-                </tr>
-            <tr>
-
-    		</thead>
-        </table>
-
+	
         </div>
       </div>
 
@@ -114,64 +45,7 @@
       <div class = "field">
 
        <h2 class="ui dividing header">Father</h2>
-		<table class="ui celled table">
-        	<thead>
-          	<tr>
-                <th>Name</th>
-                <td>{{father.name}}</td>
-                </tr>
-            <tr>
-              <th>Serial Number</th>
-                <td>{{father.serial_number}}</td>
-                </tr>
-            <tr>
-              <th>Breed</th>
-                <td>{{father.breed}}</td>
-                </tr>
-            <tr>
-              <th>Sex</th>
-                <td>{{father.sex}}</td>
-                </tr>
-            <tr>
-			  <th>Color</th>
-                <td>{{father.color}}</td>
-                </tr>
-            <tr>
-              <th>Birthdate</th>
-                <td>{{father.birth_date}}</td>
-                </tr>
-            <tr>
-              <th>Age</th>
-                <td>{{father.age}}</td>
-                </tr>
-            <tr>
-              <th>Microchip</th>
-                <td>{{father.microchip}}</td>
-            </tr>
-            <tr>
-              <th>Source</th>
-                <td>{{father.source}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Assignment</th>
-                <td>{{father.assignment}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Status</th>
-                <td>{{father.status}}</td>
-                </tr>
-            <tr>
-            <tr>
-              <th>Training Status</th>
-                <td>{{father.training_status}}</td>
-                </tr>
-            <tr>
-
-    		</thead>
-        </table>
-
+		
       </div>
       </div>
 
@@ -179,13 +53,113 @@
     </div>
   </div>
 
+  <div class="ui horizontal segments">
+    <div class="ui stacked segment">
+      <table class="ui two column celled table">
+        <thead>
+          <tr>
+              <th>Name</th>
+              <td>{{mother.name}}</td>
+              </tr>
+          <tr>
+            <th>Serial Number</th>
+              <td>{{mother.serial_number}}</td>
+              </tr>
+          <tr>
+            <th>Breed</th>
+              <td>{{mother.breed}}</td>
+              </tr>
+          <tr>
+            <th>Sex</th>
+              <td>{{mother.sex}}</td>
+              </tr>
+          <tr>
+      <th>Color</th>
+              <td>{{mother.color}}</td>
+              </tr>
+          <tr>
+            <th>Age</th>
+              <td>{{mother.age}}</td>
+              </tr>
+              <tr>
+                  <th>Capability</th>
+                    <td>{{mother.capability}}</td>
+              </tr>
+              <tr>
+                  <th>Litter</th>
+                    <td>{{mother.litter_no}}</td>
+              </tr>
+          <tr>
+            <th>Source</th>
+              <td>{{mother.source}}</td>
+              </tr>
+          <tr>
+      </thead>
+      </table>
+    </div>
+    <div class="ui stacked segment">
+      <table class="ui celled table">
+        <thead>
+          <tr>
+              <th>Name</th>
+              <td>{{father.name}}</td>
+              </tr>
+          <tr>
+            <th>Serial Number</th>
+              <td>{{father.serial_number}}</td>
+              </tr>
+          <tr>
+            <th>Breed</th>
+              <td>{{father.breed}}</td>
+              </tr>
+          <tr>
+            <th>Sex</th>
+              <td>{{father.sex}}</td>
+              </tr>
+          <tr>
+      <th>Color</th>
+              <td>{{father.color}}</td>
+              </tr>
+          <tr>
+            <th>Age</th>
+              <td>{{father.age}}</td>
+              </tr>
+              <tr>
+                  <th>Capability</th>
+                    <td>{{father.capability}}</td>
+              </tr>
+              <tr>
+                  <th>Litter</th>
+                    <td>{{father.litter_no}}</td>
+              </tr>
+          <tr>
+            <th>Source</th>
+              <td>{{father.source}}</td>
+              </tr>
+          <tr>
+      </thead>
+      </table>
+    </div>
+
+  </div>
 <div class="ui center aligned basic segment" style="padding: 0px;">
-<form action="{% url 'planningandacquiring:K9_parents_confirmed' %}" method="post">
- {% csrf_token %}
+<form method="post" class="ui form">
+    {% csrf_token %}
+  <div class="ui segment">
+      <div class="three inline fields">
+          <div class=field></div>
+          <div class="field">
+              <label>Date Mated</label>
+              {{form.date_mated}}
+          </div>
+          <div class=field></div>
+      </div>    
+  </div>
+
     <div class="ui buttons">
   <button class="ui button" name="redo" onclick="return confirm('Go back to selecting parents?')">Select Parents</button>
   <div class="or"></div>
-  <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Next Step</button>
+  <button class="ui positive button" name="ok" onclick="return confirm('Are you sure?')">Submit</button>
 </div>
 </form>
 </div>

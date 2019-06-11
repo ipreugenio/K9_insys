@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import date as d
-
 # Create your models here.
 class User(models.Model):
     SEX = (
@@ -11,7 +10,8 @@ class User(models.Model):
     POSITION = (
         ('Handler', 'Handler'),
         ('Veterinarian', 'Veterinarian'),
-        ('Administrator', 'Administrator')
+        ('Administrator', 'Administrator'),
+        ('Team Leader', 'Team Leader'),
     )
 
     CIVILSTATUS = (
@@ -45,28 +45,66 @@ class User(models.Model):
 
     STATUS = (
         ('Working', 'Working'),
-        ('Sick', 'Sick'),
         ('On-Leave', 'On-Leave'),
-        ('Retired', 'Retired'),
-        ('Dead', 'Dead')
+        ('No Longer Employed', 'No Longer Employed'),
+    )
+
+    RANK = (
+        ('MCPO', 'MCPO'),
+        ('SCPO', 'SCPO'),
+        ('CPO', 'CPO'),
+        ('PO1', 'PO1'),
+        ('PO2', 'PO2'),
+        ('PO3', 'PO3'),
+        ('SN1/SW1', 'SN1/SW1'),
+        ('SN2/SW2', 'SN2/SW2'),
+        ('ASN/ASW', 'ASN/ASW'),
+        ('CCGM', 'CCGM'),
+        ('ADMIRAL', 'ADMIRAL'),
+        ('VICE ADMIRAL', 'VICE ADMIRAL'),
+        ('REAR ADMIRAL', 'REAR ADMIRAL'),
+        ('COMMO', 'COMMO'),
+        ('CAPT', 'CAPT'),
+        ('CDR', 'CDR'),
+        ('LCDR', 'LCDR'),
+        ('LT', 'LT'),
+        ('LTJG', 'LTJG'),
+        ('ENS', 'ENS'),
+        ('P/ENS', 'P/ENS')
+    )
+
+    RELIGION = (
+        ('Roman Catholic','Roman Catholic'),
+        ('Christianity','Christianity'),
+        ('Islam','Islam'),
+        ('Iglesia ni Cristo','Iglesia ni Cristo'),
+        ('Buddhists','Buddhists'),
+    )
+
+    CITIZENSHIP = (
+        ('FILIPINO','FILIPINO'),
     )
 
     image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
-    rank = models.CharField('rank', max_length=200, default="None", blank=True)
-    fullname = models.CharField('fullname', max_length=200, default="None", blank=True)
-    firstname = models.CharField('firstname', max_length=200, default="None", blank=True)
-    lastname = models.CharField('lastname', max_length=200, default="None", blank=True)
-    extensionname = models.CharField('extensionname', max_length=200, default="None", blank=True)
-    middlename = models.CharField('middlename', max_length=200, default="None", blank=True)
-    nickname = models.CharField('nickname', max_length=200, default="None", blank=True)
+
+    rank = models.CharField('rank', choices=RANK,  max_length=200)
+    fullname = models.CharField('fullname', max_length=200, null=True, blank=True)
+    firstname = models.CharField('firstname', max_length=200)
+    lastname = models.CharField('lastname', max_length=200)
+    extensionname = models.CharField('extensionname', max_length=200, null=True, blank=True)
+    middlename = models.CharField('middlename', max_length=200)
+    nickname = models.CharField('nickname', max_length=200, null=True, blank=True)
+
     birthdate = models.DateField('birthdate', blank=True)
     age = models.IntegerField('age', default=0)
     birthplace = models.CharField('birthplace', max_length=200, default="None", blank=True)
     gender = models.CharField('gender', choices=SEX, max_length=200, default="None", blank=True)
     civilstatus = models.CharField('civilstatus', choices=CIVILSTATUS, max_length=200)
-    citizenship = models.CharField('citizenship', max_length=200, default="None", blank=True)
-    religion = models.CharField('religion', max_length=200)
+
+    citizenship = models.CharField('citizenship', choices=CITIZENSHIP, max_length=200)
+    religion = models.CharField('religion',choices=RELIGION, max_length=200)
+
     bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
     distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200, default="None", blank=True)
@@ -79,10 +117,9 @@ class User(models.Model):
     bodybuild = models.CharField('bodybuild', max_length=200)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
-    capability = models.CharField('capability', max_length=200, default="None")
-    # edd = models.BooleanField(default=False)
-    # ndd = models.BooleanField(default=False)
-    # sar = models.BooleanField(default=False)
+    assigned = models.BooleanField(default=False)
+   
+    #capability = models.CharField('capability', max_length=200, default="None")
     
     def calculate_age(self):
         # delta = dt.now().date() - self.birth_date

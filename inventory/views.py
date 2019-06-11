@@ -12,17 +12,10 @@ from inventory.models import Medicine, Food, Miscellaneous, Medicine_Inventory, 
 from inventory.models import Medicine_Inventory_Count, Food_Inventory_Count, Miscellaneous_Inventory_Count
 from inventory.models import Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail, DamagedEquipemnt
 from inventory.models import Medicine_Subtracted_Trail, Food_Subtracted_Trail, Miscellaneous_Subtracted_Trail
-
-from unitmanagement.models import Requests
-
-from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm, DamagedEquipmentForm, DateForm
-
 from unitmanagement.models import Notification
-
-
+from inventory.forms import MedicineForm, FoodForm, MiscellaneousForm, DamagedEquipmentForm
 from inventory.forms import MedicineCountForm, FoodCountForm, MiscellaneousCountForm
 # Create your views here.
-
 
 
 def notif(request):
@@ -44,7 +37,6 @@ def user_session(request):
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
     return user_in_session
-
 
 def index(request):
     return render (request, 'inventory/index.html')
@@ -283,11 +275,7 @@ def miscellaneous_inventory_list(request):
 
 #Inventory Details
 def medicine_inventory_details(request, id):
-
-    x = Medicine_Inventory.objects.get(id = id)
-    x = x.medicine
-    i = Medicine.objects.get(id=x.id)
-
+    i = Medicine_Inventory.objects.get(id=id)
     data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Medicine_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
     data3 = Medicine_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')
@@ -816,77 +804,3 @@ def damaged_report_list(request):
         'user':user,
     }
     return render (request, 'inventory/damaged_report_list.html',context)
-
-def choose_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        if form.is_valid():
-            from_date = request.POST.get('from_date')
-            to_date = request.POST.get('to_date')
-            request.session["session_fromdate"] = from_date
-            request.session["session_todate"] = to_date
-
-            return HttpResponseRedirect('inventory-report/')
-
-    context = {
-        'title': "",
-        'form': form,
-    }
-    return render(request, 'inventory/choose_date.html', context)
-
-def inventory_report(request):
-
-    from_date = request.session["session_fromdate"]
-    to_date = request.session["session_todate"]
-    user = request.session["session_username"]
-    food_received = Food_Received_Trail.objects.filter(date_received__range = [from_date, to_date])
-    food_delivered = Food_Subtracted_Trail.objects.filter(date_subtracted__range = [from_date, to_date])
-    food_count = Food_Inventory_Count.objects.filter(date_counted__range = [from_date, to_date])
-    medicine_received = Medicine_Received_Trail.objects.filter(date_received__range = [from_date, to_date])
-    medicine_delivered = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
-    medicine_count = Medicine_Inventory_Count.objects.filter(date_counted__range=[from_date, to_date])
-    miscellaneous_received = Miscellaneous_Received_Trail.objects.filter(date_received__range = [from_date, to_date])
-    miscellaneous_delivered = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
-    miscellaneous_count = Miscellaneous_Inventory_Count.objects.filter(date_counted__range=[from_date, to_date])
-    equipment = Requests.objects.filter(date__range = [from_date, to_date])
-
-    #print(food_received.inventory)
-
-    food_received_list = []
-    for item in food_received:
-        food_received_list.append(item.inventory.id)
-
-    medicine_received_list = []
-    for item in medicine_received:
-        medicine_received_list.append(item.inventory.id)
-
-    miscellaneous_received_list = []
-    for item in miscellaneous_received:
-        miscellaneous_received_list.append(item.inventory.id)
-
-
-    food = Food.objects.filter(pk__in = food_received_list)
-    medicine = Medicine.objects.filter(pk__in = medicine_received_list)
-    miscellaneous = Miscellaneous.objects.filter(pk__in = miscellaneous_received_list)
-
-    context = {
-        'title': "",
-        'user': user,
-        'from_date': from_date,
-        'to_date': to_date,
-        'food_received': food_received,
-        'food_delivered': food_delivered,
-        'food_count': food_count,
-        'medicine_received': medicine_received,
-        'medicine_delivered': medicine_delivered,
-        'medicine_count': medicine_count,
-        'miscellaneous_received': miscellaneous_received,
-        'miscellaneous_delivered': miscellaneous_delivered,
-        'miscellaneous_count': miscellaneous_count,
-        'equipment': equipment,
-        'food': food,
-        'medicine': medicine,
-        'miscellaneous': miscellaneous,
-    }
-    return render(request, 'inventory/inventory_report.html', context)

@@ -159,8 +159,11 @@ def calculate_distance_from_current_team(K9, team_id):
             print(team_dog_deployed.id)
             current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
             deployed = 1
+        else:
+            pass
     except:
-        ...
+        pass
+
 
     team = Team_Assignment.objects.get(id = team_id)
     team_location = team.location

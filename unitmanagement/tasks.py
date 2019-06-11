@@ -8,28 +8,26 @@ from celery.decorators import periodic_task
 
 from datetime import timedelta, date, datetime
 from decimal import Decimal
-from django.db.models import  Sum
 from dateutil.relativedelta import relativedelta
 
 from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule, Team_Assignment
-from profiles.models import User
-from unitmanagement.models import Notification, PhysicalExam
-
-from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Food, Food_Subtracted_Trail, Medicine_Subtracted_Trail
+from inventory.models import Medicine_Inventory, Medicine_Received_Trail, Medicine_Subtracted_Trail, Food, Food_Subtracted_Trail
 from inventory.models import Safety_Stock
 from unitmanagement.models import Notification, PhysicalExam, Health, Handler_Incident
 from profiles.serializers import NotificationSerializer
 # Create your tasks here
 # The @shared_task decorator lets you create tasks that can be used by any app(s).
 #from celery.schedules import crontab
-
+from profiles.models import User
+from django.db.models import Avg, Count, Min, Sum
 #TODO
 #ADD POSITION, OTHER_ID
 
 # TODO UNITMANAGEMENT NOTIFS
-# 8AM
-@periodic_task(run_every=crontab(hour=6, minute=0))
+#8AM
+@periodic_task(run_every=crontab(hour=8, minute=0))
+
 def unitmanagement_notifs():
     k9 = K9.objects.all()
     phex = PhysicalExam.objects.all()
@@ -168,8 +166,10 @@ def unitmanagement_notifs():
 
     for h in health:
         if h.date_done == date.today():
+
             Notification.objects.create(k9=h.dog, message=str(h.dog.name) + ' will be done with medication today!',
                                         notif_type='medicine_done', position='Veterinarian', other_id=h.id)
+
 
         if date.today() == h.date_done:
             h.status = 'Done'
@@ -223,7 +223,6 @@ def unitmanagement_notifs():
                 pass
 
             # TODO DEPLOYMENT NOTIFS
-
 
 # 8:30AM
 @periodic_task(run_every=crontab(hour=6, minute=0))
@@ -469,9 +468,12 @@ def due_retired_k9():
                                         position="Administrator")
 
 
+
 # 12AM
-# DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
-@periodic_task(run_every=crontab(hour=6, minute=0))
+#DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
+@periodic_task(run_every=crontab(hour=23, minute=0))
+
 def delete():
     notif_delete = Notification.objects.filter(datetime=date.today - timedelta(days=60))
     notif_delete.delete()
+

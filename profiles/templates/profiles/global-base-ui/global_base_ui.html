@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load staticfiles %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,75 +9,59 @@
     <title>K9 Coast Guard</title>
     <link rel="icon" href="{% static 'images/k9_logo.png' %}">
     
-    <!--CDN--->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.7/angular.min.js"></script>
-
-    <!-- <script src="{% static 'custome/custom_jquery.js' %}"></script> -->
-    <!-- <script src="{% static 'js/angular.js' %}"></script> -->
-    <script src="{% static 'DataTables/jquery-1.12.4.min.js' %}"></script>
+   
     <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
-    <script src="{% static 'DataTables/datatables.min.js' %}"></script>
+    <script src="{% static 'Semantic-UI/semantic.min.js' %}"></script>
+    <script src="{% static 'DataTables/datatables.js' %}"></script>
     <script src="{% static 'js/jquery.formset.js' %}"></script>
-    <script src="{% static 'semantic/semantic.min.js' %}"></script>
-    <script src="{% static 'js/notification.js' %}"></script>
-    <!-- <link rel="stylesheet" href="{% static 'custom/custom_style.css' %}"> -->
-    <link rel="stylesheet" href="{% static 'semantic/semantic.min.css' %}">
-    <link rel="stylesheet" href="{% static 'DataTables/datatables.min.css' %}">
-
+    <script src="{% static 'Chart.js-2.8.0/dist/Chart.bundle.min.js' %}"></script>
     
+    <link rel="stylesheet" href="{% static 'Semantic-UI/semantic.min.css' %}">
+    <link rel="stylesheet" href="{% static 'DataTables/datatables.css' %}">
+    <link rel="stylesheet" href="{% static 'Chart.js-2.8.0/dist/Chart.min.css' %}">
+    
+
 </head>
-<body>
+<body class="Site">
     <!--START OF TOP MENU-->
-    <div class="ui inverted top attached demo menu" style="height:30px;">
-        <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
-        <div class="item">
-            <a class="text" href="{% url 'profiles:profile'%}">
-                <img class="ui avatar image" src="{{user.image.url}}" alt="">
-                {{request.session.session_username}}
-            </a>
+    <main class="Site-content">
+        <div class="ui inverted top attached menu" style="height:50px;">
+                <a class="item" style="width: 175px;" id = "menu"><i class="sidebar icon"></i>Menu</a>
+                <div class="item">
+                    <a class="text" href="{% url 'profiles:profile'%}">
+                        <img class="ui avatar image" src="{{user.image.url}}" alt="">
+                        {{request.session.session_username}}
+                    </a>
+                </div>
+                <div class="ui right borderless inverted menu">
+                    <div class="ui item" style='border-style: none;'>
+                        {% include 'profiles/global-base-ui/notification.html' %}
+                    </div>
+                    <div class="ui item">
+                        <img  class="ui avatar image" src="{% static 'images/k9_logo.png' %}">
+                        <span style="color: orangered;">PHILIPPINE K9 COAST GUARD</span>
+                    </div>
+                    
+                </div>
         </div>
-        <div class="right menu">
-            <div class="ui item" style='border-style: none;'>
-                {% include 'profiles/global-base-ui/notification.html' %}
-            </div>
-            <div class="topdiv">
-                <img src="{% static 'images/k9_logo.png' %}" height="18" width="18" style="margin-right: 5px;">
-                <p class="topmenu">PHILIPPINE K9 COAST GUARD</p>
-            </div>
-            
-        </div>
-    </div>
-     <!--END OF TOP MENU-->
+                <!--END OF TOP MENU-->
+            <!--sidebar_menu.html-->
+            {% block sidebar %}
+            {% endblock%}
+    </main>
+</body>
+<style>
+        .Site {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+        }
 
-    <!--sidebar_menu.html-->
-    {% block sidebar %}
-    {% endblock%}
-    <style>
-        .topmenu{
-            color:orangered;
-            display: block;
-            font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            display: list-item;
-            table-layout: fixed;
-            background-color: transparent;
-            list-style-type: none;
-            list-style-position: outside;
-            line-height: 1.14285714em;
-            font-weight: bold;
+        .Site-content {
+        flex: 1;
         }
-        
-        .topdiv{
-            display: flex; 
-            flex-wrap: wrap;
-            justify-content: center;
-            border: 5px;
-            padding: 10px;
-            border-left: 1px solid #262626;
-        }
-    
     </style>
 
-</body>
   
     {% block script%}
     {% endblock%}

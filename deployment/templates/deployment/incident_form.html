@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_deployment.html" %}
+{% extends "profiles/sidebar_um.html" %}
 {% load index %}
 {% block content %}
 <div class="ui fluid container">
@@ -12,25 +12,30 @@
                     <div class="ui inverted segment">
                         {% if messages %}
                             {% for message in messages %}
-                                <div class="{{ style }} row"> {{ message }}</div>
+                                <div class="{{style}}"> {{ message }}</div>
                             {% endfor %}
                         {% endif %}
                         <form class = "ui inverted form" method="POST">
                            {% csrf_token %}
-
-
-                            <div class="field">
-                                <label>Date</label>
-                                    {{form.date}}
-                            </div>
                             <div class="field">
                                 <label>Location</label>
                                     {{form.location}}
                             </div>
                             <div class="field">
-                                <label>Type</label>
-                                    {{form.type}}
-                            </div>
+                                    <label>Date</label>
+                                        {{form.date}}
+                                </div>
+                                <div class="two fields">
+                                    <div class="field">
+                                        <label>Incident</label>
+                                            {{form.incident}}
+                                    </div>
+                                    
+                                    <div class="field">
+                                        <label>Type</label>
+                                            {{form.type}}
+                                    </div>
+                                </div>
                             <div class="field">
                                 <label>Remarks</label>
                                     {{form.remarks}}

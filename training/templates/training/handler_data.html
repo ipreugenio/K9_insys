@@ -4,61 +4,52 @@
 {% block content %}
 
 <center>
-            <img src="{{handler.image.url}}" alt="" width="240">
-        </center>
 
-         <div class="ui segment">
-    <table class="ui eight column celled table">
-        <thead>
+    <img src="{{handler.image.url}}" alt="" width="240">
+</center>
+
+<table class="ui celled table">
+    <thead>
         <tr>
-                <th>Extension Name</th>
-                <td>"{{handler.extensionname}}"</td>
+            <th class="two wide">Name</th>
+            <td class="eight wide">{{handler.fullname}}</td>
 
-                <th>First Name</th>
-                <td>{{handler.firstname}}</td>
+            <th class="two wide">Age</th>
+            <td class="four wide">{{handler.age}}</td>
+        </tr>
+        <tr>
+            <th>Rank</th>
+            <td>{{handler.rank}}</td>
 
-                <th>Middle name</th>
-                <td>{{handler.middlename}}</td>
+            <th>Sex</th>
+            <td>{{handler.gender}}</td>
+        </tr>
+        <tr>
+            <th>City</th>
+            <td>{{pi.city}}</td>
 
+            <th>Mobile</th>
+            <td>{{pi.mobile_number}}</td>
+        </tr>
+    </thead>
+</table>
 
-                <th>Last Name</th>
-                <td>{{handler.lastname}}</td>
+<table class="ui three column celled table">
+    <thead class="center aligned">
+        <th>EDD</th>
+        <th>NDD</th>
+        <th>SAR</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{edd}}</td>
+            <td>{{ndd}}</td>
+            <td>{{sar}}</td>
+        </tr>
+    </tbody>
 
-         </tr>
-            <tr>
-                <th>Birthdate</th>
-                <td>{{handler.birthdate}}</td>
+</table>   
 
-                <th>Age (years)</th>
-                <td>{{handler.age}}</td>
-
-                <th>Gender</th>
-                <td>{{handler.gender}}</td>
-            </tr>
-
-            <tr>
-                <th>Civil Status</th>
-                <td>{{handler.civilstatus}}</td>
-
-                <th>Citizenship</th>
-                <td>{{handler.citizenship}}</td>
-
-                <th>Religion</th>
-                <td>{{handler.religion}}</td>
-
-                <th>Blood Type</th>
-                <td>{{handler.bloodtype}}</td>
-
-            </tr>
-
-            <tr>
-                <th>Previous Skill</th>
-                <td>{{handler.capability}}</td>
-            </tr>
-
-        </thead>
-    </table>
-</div>
  {% endblock %}
 
 {% endif %}

@@ -6,22 +6,25 @@ from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User as AuthUser
+from django.db.models import Q
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
-from unitmanagement.models import Requests, Notification
+from unitmanagement.models import Equipment_Request, Notification
 
-from unitmanagement.models import PhysicalExam, VaccinceRecord
-import datetime
+from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
+from datetime import datetime
 import calendar
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from profiles.serializers import NotificationSerializer
+from rest_framework import status, viewsets
+from profiles.serializers import NotificationSerializer, UserSerializer
 # Create your views here.
 
 def notif(request):
@@ -58,6 +61,7 @@ def user_session(request):
     return user_in_session
 
 def dashboard(request):
+    user = user_session(request)
 
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
     NDD_count = K9.objects.filter(capability='NDD').count()
@@ -119,13 +123,13 @@ def dashboard(request):
     on_training = K9.objects.filter(training_level="Stage 1").count()
     trained = K9.objects.filter(training_status="Trained").count()
 
-    equipment_requests = Requests.objects.filter(request_status="Pending").count()
+    equipment_requests = Equipment_Request.objects.filter(request_status="Pending").count()
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'can_deploy': can_deploy,
         'k9_demand': k9_demand,
@@ -138,12 +142,118 @@ def dashboard(request):
         'trained': trained,
         'equipment_requests': equipment_requests,
         'for_breeding': for_breeding,
+
         'notif_data':notif_data,
         'count':count,
         'user':user,
     }
 
     return render (request, 'profiles/dashboard.html', context)
+
+def team_leader_dashboard(request):
+    user = user_session(request)
+    ta = None
+    incident_count = 0
+    tdd = None
+    tdd_count= 0
+    try:
+        ta = Team_Assignment.objects.get(team_leader=user)
+
+        incident_count = Incidents.objects.filter(location = ta.location).count()
+
+        tdd_count = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').count()
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+    except:
+        pass
+
+    year = datetime.now().year
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'incident_count':incident_count,
+        'ta':ta,
+        'tdd_count':tdd_count,
+        'tdd':tdd,
+        'year':year,
+
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/team_leader_dashboard.html', context)
+
+def handler_dashboard(request):
+    user = user_session(request)
+    
+    dr = 0
+    k9 = None
+    try:
+        k9 = K9.objects.get(handler=user)
+        drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+        if drf.exists():
+            dr = 1
+        else:
+            dr = 0
+    except:
+        pass
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'k9':k9,
+        'dr':dr,
+    }
+    return render (request, 'profiles/handler_dashboard.html', context)
+
+def vet_dashboard(request):
+    user = user_session(request)
+    
+    cv1 = VaccinceRecord.objects.filter(dhppil_cv_1=False).count() #dhppil_cv_1
+    cv2 = VaccinceRecord.objects.filter(dhppil_cv_2=False).count() #dhppil_cv_2
+    cv3 = VaccinceRecord.objects.filter(dhppil_cv_3=False).count() #dhppil_cv_3
+
+    rabies = VaccinceRecord.objects.filter(anti_rabies=False).count() #anti_rabies
+    
+    bd1 = VaccinceRecord.objects.filter(bordetella_1=False).count() #bordetella_1
+    bd2 = VaccinceRecord.objects.filter(bordetella_2=False).count() #bordetella_2
+
+    dh1 = VaccinceRecord.objects.filter(dhppil4_1=False).count() #dhppil4_1
+    dh2 = VaccinceRecord.objects.filter(dhppil4_2=False).count() #dhppil4_2
+
+    vac_pending = VaccinceRecord.objects.filter(Q(dhppil_cv_1=False) | Q(dhppil_cv_2=False) | Q(dhppil_cv_3=False) | Q(anti_rabies=False) | Q(bordetella_1=False) | Q(bordetella_2=False) | Q(dhppil4_1=False) | Q(dhppil4_2=False)).count()
+    
+    #TODO Physical Exam
+    # phex_pending = 
+    health_pending = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
+
+    # pending incidents
+    incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'vac_pending':vac_pending,
+        'health_pending':health_pending,
+        'cv1':cv1,
+        'cv2':cv2,
+        'cv3':cv3,
+        'rabies':rabies,
+        'bd1':bd1,
+        'bd2':bd2,
+        'dh1':dh1,
+        'dh2':dh2,
+        'incident':incident,
+    }
+    return render (request, 'profiles/vet_dashboard.html', context)
 
 def profile(request):
    
@@ -177,6 +287,15 @@ def profile(request):
             if pform.is_valid():
                 print(eform.errors)
                 if eform.is_valid():
+                    if uform.status == 'No Longer Employed':
+                        uform.partnered = False
+                        try:
+                            k9 = K9.objects.get(handler=uform)
+                            k9.handler = None
+                            k9.save()
+                        except:
+                            pass
+
                     uform.save()
                     pform.save()
                     eform.save()
@@ -203,37 +322,38 @@ def profile(request):
 def register(request):
     return render (request, 'profiles/register.html')
 
-def login(request):
-    style=""
 
-    if request.method == 'POST':
-        serial = request.POST['serial_number']
-        password = request.POST['password']
+def home(request):
+    id = request.user.id
 
-        if Account.objects.filter(serial_number=serial).exists():
-            if Account.objects.filter(password=password).exists():
-                request.session["session_serial"] = serial
-                account = Account.objects.get(serial_number = serial)
-                user = User.objects.get(id = account.UserID.id)
+    print(id)
+    user = User.objects.get(id =id)
 
 
-                request.session["session_user_position"] = user.position
-                request.session["session_id"] = user.id
-                request.session["session_username"] = str(user)
+    request.session["session_serial"] = request.user.username
+    request.session["session_user_position"] = user.position
+    request.session["session_id"] = user.id
+    request.session["session_username"] = str(user)
 
-               # return HttpResponseRedirect('../dashboard')
-            return HttpResponseRedirect('../dashboard')
+    if user.position == 'Team Leader':
+        return HttpResponseRedirect('../team-leader-dashboard')
+    elif user.position == 'Handler':
+        return HttpResponseRedirect('../handler-dashboard')
+    elif user.position == 'Veterinarian':
+        return HttpResponseRedirect('../vet-dashboard')
+    else:
+        return HttpResponseRedirect('../dashboard')
 
-    '''else:
-        style = "ui red message"
-        messages.warning(request, 'Wrong serial number or password!')'''
 
-    context = {
-        'title': "Add User Form",
-        'style': style,
-    }
 
-    return render (request, 'profiles/login.html', context)
+    return redirect('profiles:vet_dashboard')
+
+
+def logout(request):
+    session_keys = list(request.session.keys())
+    for key in session_keys:
+        del request.session[key]
+    return redirect('profiles:login')
 
 def add_User(request):
 
@@ -347,41 +467,40 @@ def add_education(request):
     return render(request, 'profiles/add_education.html', context)
 
 def add_account(request):
-    form = add_user_account(request.POST)
+    form = add_user_account(request.POST or None)
+    form2 = UserCreationForm(request.POST or None)
     style = ""
-    if request.method == 'POST':
 
+    UserID = request.session["session_userid"]
+    data = User.objects.get(id = UserID)
+
+    if request.method == 'POST':
         if form.is_valid():
-            account_info = form.save(commit=False)
-            UserID = request.session["session_userid"]
-            data = User.objects.get(id = UserID)
-            account_info.serial_number = 'O-' + str(data.id)
-            user_s = User.objects.get(id=UserID)
-            account_info.UserID = user_s
-            account_info.save()
-            '''style = "ui green message"
-            messages.success(request, 'User has been successfully Added!')'''
+            form = form.save(commit=False)
+            form.UserID = data
+            form.serial_number =  'O-' + str(data.id) 
+            form.save()
+
+            AuthUser.objects.create_user(username= form.serial_number, email=form.email_address, password=form.password, last_name=data.lastname, first_name = data.firstname)
+           
             return HttpResponseRedirect('../../../../user_add_confirmed/')
 
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user_s = User.objects.get(id=request.session["session_userid"])
-    user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'Title': "Add Account Information for " + user_name,
+        'Title': "Add Account Information for " + data.fullname,
         'form': form,
         'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,
     }
-    print(form)
     return render(request, 'profiles/add_user_account.html', context)
 
 #Listview format
@@ -474,3 +593,34 @@ class NotificationDetailView(APIView):
         notif = get_object_or_404(Notification, id=id)
         notif.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# #TODO
+# class UserListView(APIView):
+
+#     def get(self, request):
+#         data = AuthUser.objects.all()
+#         serializer = UserSerializer(data, many=True)
+#         return Response(serializer.data)
+
+#     def put(self, request):
+#         serializer = UserSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class UserDetailView(APIView):
+#     def get(self, request, id):
+#         data = get_object_or_404(AuthUser, id=id)
+#         serializer = UserSerializer(data)
+#         return Response(serializer.data)
+
+#     def delete(self, request, id):
+#         data = get_object_or_404(AuthUser, id=id)
+#         data.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserView(viewsets.ModelViewSet):
+    queryset = AuthUser.objects.all()
+    serializer_class = UserSerializer

@@ -3,8 +3,10 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from planningandacquiring.models import K9
-from training.models import K9_Handler, Training, K9_Adopted_Owner, Record_Training
+from training.models import K9_Handler, Training, K9_Adopted_Owner
+from deployment.models import Daily_Refresher
 from profiles.models import User
+from unitmanagement.models import Handler_K9_History
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -40,6 +42,20 @@ class add_handler_form(forms.ModelForm):
     #     for handler in assigned_handler:
     #         assigned_handler_list.append(handler.id)
     #     self.fields['handler'].queryset = self.fields['handler'].queryset.exclude(pk__in=assigned_handler_list)
+
+class assign_handler_form(forms.ModelForm): 
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False),
+    widget=forms.RadioSelect(), empty_label=None)
+    
+    class Meta:
+        model = Handler_K9_History
+        fields = ('handler','k9')
+
+    def __init__(self, *args, **kwargs):
+        super(assign_handler_form, self).__init__(*args, **kwargs)
+        self.fields['handler'].required = False
+        self.fields['k9'].required = False
+
 
 class TrainingUpdateForm(forms.ModelForm):
     GRADE = (
@@ -84,10 +100,8 @@ class AdoptionForms(forms.ModelForm):
 class RecordForm(forms.ModelForm):
 
     class Meta:
-        model = Record_Training
-        fields = ('on_leash', 'off_leash', 'obstacle_course', 'panelling', 'port_plant', 'port_find', 'port_time', 'building_plant', 'building_find',
-                  'building_time', 'vehicle_plant', 'vehicle_find', 'vehicle_time', 'baggage_plant', 'baggage_find', 'baggage_time',
-                  'others_plant', 'others_find', 'others_time', 'daily_rating', 'MARSEC', 'MARLEN', 'MARSAR', 'MAREP', 'morning_feed', 'evening_feed')
+        model = Daily_Refresher
+        fields = '__all__'
 
 
 class DateForm(forms.Form):

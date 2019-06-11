@@ -4,18 +4,23 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity, Dog_Breed
+
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed, Dog_Breed
+
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
-from training.models import Training, K9_Adopted_Owner, Record_Training
-from .forms import TestForm, add_handler_form
+from unitmanagement.models import Handler_K9_History
+from training.models import Training, K9_Adopted_Owner 
+from .forms import TestForm, add_handler_form, assign_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm, RecordForm, DateForm
 import datetime
-from deployment.models import Team_Assignment
+from deployment.models import Team_Assignment, Daily_Refresher
 from django.db.models import Sum
 from decimal import Decimal
+
+import itertools
 
 
 from collections import OrderedDict
@@ -172,9 +177,9 @@ def unified_graph():
 
     loop = 0
     for breed in breeds:
-        SAR = K9.objects.filter(sex='Male', breed=str(breed), capability="SAR").count()
-        NDD = K9.objects.filter(sex='Male', breed=str(breed), capability="NDD").count()
-        EDD = K9.objects.filter(sex='Male', breed=str(breed), capability="EDD").count()
+        SAR = K9.objects.filter(sex='Male', breed=breed, capability="SAR").count()
+        NDD = K9.objects.filter(sex='Male', breed=breed, capability="NDD").count()
+        EDD = K9.objects.filter(sex='Male', breed=breed, capability="EDD").count()
 
         sar_count_male.append(SAR)
         ndd_count_male.append(NDD)
@@ -183,9 +188,9 @@ def unified_graph():
         loop += 1
 
     for breed in breeds:
-        SAR = K9.objects.filter(sex='Female', breed=str(breed), capability="SAR").count()
-        NDD = K9.objects.filter(sex='Female', breed=str(breed), capability="NDD").count()
-        EDD = K9.objects.filter(sex='Female', breed=str(breed), capability="EDD").count()
+        SAR = K9.objects.filter(sex='Female', breed=breed, capability="SAR").count()
+        NDD = K9.objects.filter(sex='Female', breed=breed, capability="NDD").count()
+        EDD = K9.objects.filter(sex='Female', breed=breed, capability="EDD").count()
 
         sar_count_female.append(SAR)
         ndd_count_female.append(NDD)
@@ -196,9 +201,9 @@ def unified_graph():
     ndd_breed = []
     edd_breed = []
     for breed in breeds:
-        sar_breed.append("SAR - " + str(breed))
-        ndd_breed.append("NDD - " + str(breed))
-        edd_breed.append("EDD - " + str(breed))
+        sar_breed.append("SAR - " + str(breed.breed))
+        ndd_breed.append("NDD - " + str(breed.breed))
+        edd_breed.append("EDD - " + str(breed.breed))
 
     print("K9 COUNT")
     print(str(k9_set.count()))
@@ -327,6 +332,40 @@ def classify_k9_list(request):
     }
     return render (request, 'training/classify_k9_list.html', context)
 
+def assign_k9_duty(request, id):
+    data = K9.objects.get(id=id) # get k9
+    duty = request.GET.get('duty')
+    print(duty)
+    active4 = ' active'
+
+    if duty == 'deployment':
+        data.training_status = 'For-Deployment'
+    elif duty == 'breeding':
+        data.training_status = 'For-Breeding'
+    
+    data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
+    data.status = 'Working Dog'
+    data.save()
+
+    style = "ui green message"
+    messages.success(request, data.name + ' has been assigned ' + data.training_status)
+    messages.info(request, 'Trained')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    
+    context = {
+        'active4':active4,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'style':style,
+        'title': 'K9 Classification',
+    }
+    return redirect('training:classify_k9_list')
+
 def view_graphs(request, id):
     k9_id = request.session['k9_id']
 
@@ -446,6 +485,7 @@ def classify_k9_select(request, id):
 
     trait_score = [0, 0, 0]
 
+
     dog_trait = Dog_Breed.objects.all()
 
     select_trait = None
@@ -473,7 +513,9 @@ def classify_k9_select(request, id):
         ('Mixed', 'Mixed'),
     )
 
+
     records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed__contains = data.breed)
+
 
     SAR_list = []
     NDD_list = []
@@ -787,44 +829,50 @@ def classify_k9_select(request, id):
 
 # TODO 
 def assign_k9_select(request, id):
-    form = add_handler_form(request.POST)
+    form = assign_handler_form(request.POST or None)
     style = ""
-    k9 = K9.objects.get(id=id)
+    k9 = K9.objects.get(id=id)  
+
+    handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
+    g = []
+    for h in handler:
+        c = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+        g.append(c)
 
     if request.method == 'POST':
+        print(form.errors)
         if form.is_valid():
-            handler = User.objects.get(id=form.data['handler'])
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.save()
             
-            # status of handler and k9 to partnered=TRUE
-            handler.capability = k9.capability
-            handler.partnered=True
-
-            # if k9.capability == 'EDD':
-            #     handler.edd = True
-            # elif k9.capability == 'NDD':
-            #     handler.ndd = True
-            # elif k9.capability == 'SAR':
-            #     handler.sar = True
-
-            handler.save()
-
-            k9.partnered=True
-            k9.training_status = "On-Training"
-            k9.handler = handler
+            #K9 Update
+            k9.training_status = 'On-Training'
+            k9.handler = f.handler
             k9.save()
+
 
             #Create K9_Handler Model
             K9_Handler.objects.create(k9 = k9, handler = handler)
 
-            messages.success(request, 'K9 has been assigned to a handler!')
+            #Handler Update
+            h = User.objects.get(id= f.handler.id)
+            h.partnered = True
+            h.save()
+
+            messages.success(request, str(k9) + ' has been assigned to ' + str(h) + ' and is ready for Training!')
+            messages.info(request, 'On-Training')
+            return redirect('training:classify_k9_list')
+
+
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            print(form)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
     context = {
         'Title': "K9 Assignment for " + k9.name,
         'form': form,
@@ -832,10 +880,62 @@ def assign_k9_select(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'k9':k9,
+        'g':g,
     }
     return render (request, 'training/assign_k9_select.html', context)
 
+#Trained Dog - Assign serial number Form
+def serial_number_form(request, id):
+    form = SerialNumberForm(request.POST or None)
+    style = "ui teal message"
+    data = K9.objects.get(id=id) # get k9
 
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
+            #data.microchip = request.POST.get('microchip')
+            training_status = request.POST.get('dog_type')
+            data.training_status = training_status
+            data.save()
+
+            if training_status == "For-Breeding":
+                user = User.objects.get(id = data.handler.id)
+                user.partnered = 0
+                user.save()
+                data.handler = None
+                data.save()
+                try:
+                    k9_handler = K9_Handler.objects.get(k9=data)
+                    k9_handler.delete()
+                except:
+                    k9_handler = None
+
+
+            style = "ui green message"
+            messages.success(request, 'K9 has been finalized!')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'form': form,
+        'title': 'Trained K9 Finalization',
+        'texthelp': 'Input Final Details Here',
+        'actiontype': 'Submit',
+        'style' : style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'training/serial_number_form.html', context)
+    
 def training_records(request):
     data = K9.objects.all()
     #NOTIF SHOW
@@ -969,57 +1069,6 @@ def training_update_form(request, id):
         return render(request, 'training/training_update_sar.html', context)
 
 
-#Trained Dog - Assign serial number Form
-def serial_number_form(request, id):
-    form = SerialNumberForm(request.POST or None)
-    style = "ui teal message"
-    data = K9.objects.get(id=id) # get k9
-
-    if request.method == 'POST':
-        print(form.errors)
-        if form.is_valid():
-            data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
-            #data.microchip = request.POST.get('microchip')
-            training_status = request.POST.get('dog_type')
-            data.training_status = training_status
-            data.save()
-
-            if training_status == "For-Breeding":
-                user = User.objects.get(id = data.handler.id)
-                user.partnered = 0
-                user.save()
-                data.handler = None
-                data.save()
-                try:
-                    k9_handler = K9_Handler.objects.get(k9=data)
-                    k9_handler.delete()
-                except:
-                    k9_handler = None
-
-
-            style = "ui green message"
-            messages.success(request, 'K9 has been finalized!')
-
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'title': 'Trained K9 Finalization',
-        'texthelp': 'Input Final Details Here',
-        'actiontype': 'Submit',
-        'style' : style,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'training/serial_number_form.html', context)
-
 def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
     k9_handler = User.objects.get(id=data.handler.id)
@@ -1069,7 +1118,7 @@ def daily_record(request, id):
     if request.method == 'POST':
         if form.is_valid():
             date = request.POST.get('choose_date')
-            record = Record_Training.objects.filter(k9=data).get(date_today = date)
+            record = Daily_Refresher.objects.filter(k9=data).get(date_today = date)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1116,9 +1165,9 @@ def skill_count_between_breeds(id):
     print(breeds)
 
     for breed in breeds:
-        S = K9.objects.filter(capability='SAR', breed=str(breed))
-        N = K9.objects.filter(capability='NDD', breed=str(breed))
-        E = K9.objects.filter(capability='EDD', breed=str(breed))
+        S = K9.objects.filter(capability='SAR', breed=breed)
+        N = K9.objects.filter(capability='NDD', breed=breed)
+        E = K9.objects.filter(capability='EDD', breed=breed)
         sar_count.append(S.count())
         ndd_count.append(N.count())
         edd_count.append(E.count())
@@ -1199,7 +1248,7 @@ def skill_count_between_breeds(id):
         EDD_score = 1
         desc2 = "EDD"
 
-    desc = str(target_k9.name) + " is a " + str(target_k9.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed + "s."
+    desc = str(target_k9.name) + " is a " + str(target_k9.breed.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed.breed + "s."
 
     graph = None
     classifier = []
@@ -1929,14 +1978,14 @@ def record_form(request):
 
 
     handler = User.objects.get(id = int(handlerid))
-    data = K9_Handler.objects.get(handler = handler)
+    data = K9.objects.get(handler=handler)
     form2 = RecordForm(request.POST or None)
-    title = data.k9.name
+    title = data.name
 
     if request.method == 'POST':
         if form2.is_valid():
             record = form2.save(commit=False)
-            record.k9 = data.k9
+            record.k9 = data
             record.handler = data.handler
             record.save()
 
@@ -1982,7 +2031,11 @@ def daily_record_mult(request):
 
     date = request.session["session_date"]
     try:
-        record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+# <<<<<<< HEAD
+#         record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+# =======
+        record = Daily_Refresher.objects.filter(k9 = k9).get(date_today = date)
+# >>>>>>> 67603ec727f20d95ed779807086d18316555466a
     except:
         record = None
 
@@ -2001,11 +2054,24 @@ def load_handler(request):
     try:
         handler_id = request.GET.get('handler')
         handler = User.objects.get(id=handler_id)
+
+        pi = Personal_Info.objects.get(UserID=handler)
+        edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
+        ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
+        sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
+        
+
     except:
         pass
 
     context = {
         'handler': handler,
+
+        'pi':pi,
+        'ndd':ndd,
+        'edd':edd,
+        'sar':sar,
+
     }
 
     return render(request, 'training/handler_data.html', context)

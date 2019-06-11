@@ -1,6 +1,20 @@
 {% extends "profiles/sidebar_um.html" %}  
 
 {% block content %}
+{%if num > 0 %}
+    {% for data in data %}
+        <div class="ui info icon message">
+            <i class="question icon"></i>
+            <div class="content">
+                <div class="header">
+                    You have already Filed a Leave Request at {{data.date}}.
+                    Request is currently being evaluated. 
+                </div>
+                <p>Your Request Leave is from {{data.date_from}} to {{data.date_to}}</p>
+            </div>
+        </div>
+    {% endfor %}
+{%else%}
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
@@ -13,7 +27,7 @@
     {% endif %}
 </div>
 <div class="ui inverted segment">
-    <form class="ui inverted form" method="POST">
+    <form class="ui inverted form" method="POST" id='myForm'>
         {% csrf_token %}
         <div class="four fields">
             <div class="field">
@@ -43,12 +57,40 @@
         </div>
     </form>    
 </div>
-
+{%endif%}
 <script type="text/javascript">
         
     $(document).ready(function() {
         $("#id_incident").prop('readonly', true);
         $("#id_handler").prop('readonly', true);
+
+        function treatAsUTC(date) {
+            var result = new Date(date);
+            result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+            return result;
+        }
+
+        function daysBetween(startDate, endDate) {
+            var millisecondsPerDay = 24 * 60 * 60 * 1000;
+            return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
+        }
+
+        $("#myForm").submit(function(e){
+            var date = new Date($("input[name='date_from']").val());
+            var date2 = new Date($("input[name='date_to']").val());
+            a = daysBetween(date, date2)
+
+            if (a>21){
+                e.preventDefault();
+                alert('Maximum Leave is 21 Days. Please Adjust Accordingly.');
+            }
+
+            if (a<=0){
+                e.preventDefault();
+                alert('Invalid Input. Please check again.');
+            }
+        });
+            
     });
     
 </script>

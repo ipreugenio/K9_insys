@@ -10,24 +10,62 @@
     {% endif %}
 </div>
 
-<div class="ui segment" data-tab="first">
-    <table id="tabledata1" class="ui three column celled table">
+<div class="ui top attached tabular menu">
+    <a class="item active" data-tab="first">Concerns</a>
+    <a class="item" data-tab="second">Scheduled Follow-up</a>
+</div>
+
+
+<div class="ui tab segment active" data-tab="first">
+    <table id="tabledata1" class="ui four column celled table">
         <thead>
             <tr>
+                <th>Date Reported</th>
                 <th>K9</th>
                 <th>Reported By:</th>
-                <th>Date Reported</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in data %}
             <tr>
+                <td>{{data.date}}</td>
                 <td>{{data.k9}}</td>
                 <td>{{data.reported_by}}</td>
-                <td>{{data.date}}</td>
-                <td class="center aligned">
-                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}" class="ui blue button">Select</a>
+                <td class="center aligned three wide">
+                    <a href="{% url 'unitmanagement:k9_sick_details' data.id %}"
+                    class="ui basic blue button">Select</a>
+                </td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="ui tab segment" data-tab="second">
+    <table id="tabledata2" class="ui four column celled table">
+        <thead>
+            <tr>
+                <th>Follow-up Date</th>
+                <th>K9</th>
+                <th>Reported By:</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in th %}
+            <tr>
+                {% if data.follow_up_date == None %}
+                <td>Requested Follow-up</td>
+                {% else%}
+                <td>{{data.follow_up_date}}</td>
+                {% endif %}
+                <td>{{data.dog}}</td>
+                <td>{{data.dog.handler}}</td>
+                <td class="center aligned three wide">
+                    <a href="{% url 'unitmanagement:k9_sick_details' data.incident_id.id %}"
+                    class="ui basic blue button">Select</a>
                 </td>
             </tr>
             
@@ -39,7 +77,12 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
+        $('#tabledata1').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
+        $('#tabledata2').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
         $('.menu .item').tab();
     });
 

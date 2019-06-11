@@ -1,0 +1,248 @@
+{% extends "profiles/global-base-ui/sidebar_menu.html" %} 
+
+{% block dashboard %}
+<div class="container fluid">
+<div class="ui two column grid">
+  <div class="streched row">
+    <div class="ten wide column"  style="padding-right: 0%;">
+      <div class="ui basic segment">
+        <div class="ui stackable grid">
+            <div class="eight wide column">
+              <div class="ui raised segment">
+                <div class="ui two statistics">
+                  <div class="purple statistic">
+                    <div class="value">
+                      {{ta.total_dogs_demand}}
+                    </div>
+                    <div class="label">
+                      K9 Demand in Area
+                    </div>
+                  </div>  
+                  <div class="blue statistic">
+                    <div class="value">
+                      {{ta.total_dogs_deployed}}
+                    </div>
+                    <div class="label">
+                      K9 Assigned in Area
+                    </div>
+                  </div>  
+                </div>
+                  <canvas id="myChart2"></canvas>
+              </div>
+            </div>
+            <div class="eight wide column">
+              <div class="ui raised segment">
+                  <div class="ui horizontal statistics">
+                      <div class="violet statistic">
+                        <div class="value">
+                          {{incident_count}}
+                        </div>
+                        <div class="label">
+                          Total Incidents
+                        </div>
+                      </div>  
+                  </div>
+                  <canvas id="myChart"></canvas>
+              </div>
+            </div>
+            <div class="sixteen wide column">
+                <div class="ui raised segment">
+                    <div class="ui horizontal statistics">
+                        <div class="olive statistic">
+                          <div class="value">
+                            {{tdd_count}}
+                          </div>
+                          <div class="label">
+                            Field Officer Units
+                          </div>
+                        </div>  
+                    </div>
+                    <canvas id="myChart3"></canvas>
+                </div>
+              </div>
+      </div>
+    </div>
+    </div>
+    <div class="six wide column" style="padding: 0%;padding-right: 1%;">
+        <div class="ui basic segment" style="padding-left: 0%;">
+            
+                <div class="ui black floating message">
+                    <p>Reminder</p>
+                  </div>
+                <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
+
+                    <table class="ui basic table">
+                      <tr>
+                        <td>Someone is on leave: Will return on Date</td>
+                        <td class="center aligned three wide">
+                          <a href="#" class="ui tiny black button">Details</a>
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+    var endpoint = '../../unitmanagement/team-leader/api'
+    var defaultData = [];
+    var labels = [];
+    var demand = [];
+    var supply = [];
+    var performance = [];
+    var fou = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+          labels = data.labels
+          defaultData = data.default
+          demand = data.demand
+          supply = data.supply
+          performance = data.performance
+          fou = data.fou
+          console.log(performance)
+        setChart()         
+        },
+        error: function(error_data){
+          console.log("error")
+          console.log(error_data)
+        }
+    })
+
+    function setChart(){
+        var ctx = document.getElementById('myChart');
+        var ctx2 = document.getElementById('myChart2');
+        var ctx3 = document.getElementById('myChart3');
+        //Chart1
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: defaultData,
+                    backgroundColor: ['#F13C20','#16a085','#2980b9','#33266E',],
+                    borderColor: ['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)',],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+            cutoutPercentage: 40,
+            animation: {
+                animateScale: true,
+            },
+            title: {
+                display: true,
+                text: "Incidents Occured in Area"
+            },
+            }
+        });
+        //Chart2
+        var myChart2 = new Chart(ctx2, {
+        type: 'horizontalBar',
+            data: {
+            labels: ["EDD", "NDD", "SAR"],
+            datasets: [
+                {
+                label: "Demand",
+                backgroundColor: "#8e5ea2",
+                data: demand,
+                }, {
+                label: "Supply",
+                backgroundColor: "#3e95cd",
+                data: supply,
+                }]
+            },
+            options: {
+            animation: {
+                animateScale: true,
+            },
+            title: {
+                display: true,
+                text: "K9's Demand and Assigned in Area"
+            },
+                scales: {
+                xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                
+                    suggestedMax:parseInt("{{ta.total_dogs_deployed}}"),
+                    
+                }
+                }],
+                yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    step:1,
+                
+                }
+                }]
+            },
+            },
+        });
+        //Chart3
+
+        var myChart3 = new Chart(ctx3, {
+            type: 'line',
+            data: {
+            labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            datasets: []
+            },
+            options: {
+            animation: {
+                animateScale: true,
+            },
+            title: {
+                display: true,
+                text: "FOU's Performance (K9 - Handler)"
+            },
+                scales: {
+                xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                }
+                }],
+                yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    step:1,
+                    suggestedMax:100,
+                }
+                }]
+            },
+            }
+        });
+
+        var i;
+        var color = ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)', 'rgba(255, 162, 192, 0.5)', 'rgba(54, 162, 99, 0.5)', 'rgba(153, 162, 235, 0.5)', 'rgba(54, 64, 86, 0.5)']
+        // var sub_color = []
+        // for (i = 0; i < data.length; i++) { 
+        //     sub_color.push(color[i])
+        // }  
+
+        function addData(chart, data, label, color) {
+        
+        for (i = 0; i < data.length; i++) { 
+            chart.data.datasets.push({
+            label: label[i],
+            data: data[i],
+            backgroundColor: color[i],
+            });
+        } 
+        chart.update();
+        }
+
+        addData(myChart3, performance, fou, color);
+
+    }
+
+    
+});
+      
+</script>
+{% endblock%}

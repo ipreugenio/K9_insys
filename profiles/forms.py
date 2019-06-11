@@ -9,44 +9,6 @@ class DateInput(forms.DateInput):
     input_type = 'date'
 
 class add_User_form(forms.ModelForm):
-    RANK = (
-        ('MCPO', 'MCPO'),
-        ('SCPO', 'SCPO'),
-        ('CPO', 'CPO'),
-        ('PO1', 'PO1'),
-        ('PO2', 'PO2'),
-        ('PO3', 'PO3'),
-        ('SN1/SW1', 'SN1/SW1'),
-        ('SN2/SW2', 'SN2/SW2'),
-        ('ASN/ASW', 'ASN/ASW'),
-        ('CCGM', 'CCGM'),
-        ('ADMIRAL', 'ADMIRAL'),
-        ('VICE ADMIRAL', 'VICE ADMIRAL'),
-        ('REAR ADMIRAL', 'REAR ADMIRAL'),
-        ('COMMO', 'COMMO'),
-        ('CAPT', 'CAPT'),
-        ('CDR', 'CDR'),
-        ('LCDR', 'LCDR'),
-        ('LT', 'LT'),
-        ('LTJG', 'LTJG'),
-        ('ENS', 'ENS'),
-        ('P/ENS', 'P/ENS')
-    )
-
-    RELIGION = (
-        ('Roman Catholic','Roman Catholic'),
-        ('Christianity','Christianity'),
-        ('Islam','Islam'),
-        ('Iglesia ni Cristo','Iglesia ni Cristo'),
-        ('Buddhists','Buddhists'),
-    )
-    CITIZENSHIP = (
-        ('FILIPINO','FILIPINO'),
-    )
-    rank = forms.CharField(max_length=50, label='rank', widget=forms.Select(choices=RANK))
-    religion = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=RELIGION))
-    citizenship = forms.CharField(max_length=50, label='religion', widget=forms.Select(choices=CITIZENSHIP))
-    image = forms.ImageField()
     class Meta:
         model = User
         fields = ('image','firstname', 'lastname', 'nickname', 'position', 'rank', 'extensionname', 'middlename',
@@ -61,6 +23,7 @@ class add_User_form(forms.ModelForm):
             super(add_User_form, self).__init__(*args, **kwargs)
             self.fields['extensionname'].required = False
             self.fields['distinct_feature'].required = False
+            self.fields['image'].required = False
 
 class add_personal_form(forms.ModelForm):
     class Meta:

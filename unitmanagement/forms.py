@@ -2,11 +2,11 @@ from django import forms
 from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
-from django.forms import formset_factory, inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Requests, VaccineUsed
-from unitmanagement.models import K9_Incident, Handler_Incident
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed
+from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
@@ -57,17 +57,29 @@ class PhysicalExamForm(forms.ModelForm):
         # self.fields['dog'].initial = a
 
 class HealthForm(forms.ModelForm):
+    CHOICE = (
+        (True,'Yes'),
+        (False,'No')
+    )
+
     treatment = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
+    problem = forms.CharField(widget = forms.Textarea(attrs={'rows':'4'}))
+    follow_up =forms.ChoiceField(choices=CHOICE,widget=forms.RadioSelect)
+    follow_up_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
     
     class Meta:
         model = Health
-        fields = ('dog','problem', 'treatment', 'incident_id')
+        fields = ('dog','problem', 'treatment', 'incident_id', 'image', 'follow_up', 'follow_up_date')
+        
 
     def __init__(self, *args, **kwargs):
         super(HealthForm, self).__init__(*args, **kwargs)
         self.fields['dog'].required = False
         self.fields['problem'].required = False
         self.fields['incident_id'].required = False
+        self.fields['image'].required = False
+        self.fields['follow_up_date'].required = False
 
 class HealthMedicineForm(forms.ModelForm):
     TIME_OF_DAY = (
@@ -84,7 +96,7 @@ class HealthMedicineForm(forms.ModelForm):
         model = HealthMedicine
         fields = ('medicine', 'quantity', 'time_of_day', 'duration')
 
-    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine').exclude(medicine__med_type='Vitamins'))
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(quantity=0).exclude(medicine__med_type='Vaccine'))
     time_of_day = forms.CharField(label = 'Time of Day', widget = forms.Select(choices=TIME_OF_DAY))
     duration = forms.IntegerField(label = 'Duration (Days)')
 
@@ -130,9 +142,26 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['tick_flea_7'].required = False
         self.fields['heartworm_8'].required = False
 
-class VaccinationUsedForm(forms.Form):
-    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.filter(Q (medicine__med_type = "Vaccine") | Q(medicine__med_type = "Others")).order_by('medicine'))
 
+class VaccinationUsedForm(forms.ModelForm):
+    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
+    date_vaccinated = forms.DateField(widget = DateInput(), label=None)
+    image = forms.ImageField()
+
+    class Meta:
+        model = VaccineUsed
+ 
+        fields=('age', 'disease', 'vaccine', 'date_vaccinated', 'image', 'veterinary', 'done')
+    
+    def __init__(self, *args, **kwargs):
+        super(VaccinationUsedForm, self).__init__(*args, **kwargs)
+        self.fields['age'].required = False
+        self.fields['disease'].required = False
+        self.fields['vaccine'].required = False
+        self.fields['date_vaccinated'].required = False
+        self.fields['image'].required = False
+        self.fields['veterinary'].required = False
+        self.fields['done'].required = False
 
 class RequestForm(forms.ModelForm):
     CONCERN = (
@@ -146,7 +175,7 @@ class RequestForm(forms.ModelForm):
     remarks = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
 
     class Meta:
-        model = Requests
+        model = Equipment_Request
         fields = ('handler', 'equipment', 'remarks', 'concern')
 
     def __init__(self, *args, **kwargs):
@@ -154,40 +183,41 @@ class RequestForm(forms.ModelForm):
         self.fields['handler'].required = False
         
 class K9IncidentForm(forms.ModelForm):
-    
-    k9 = forms.ModelChoiceField(queryset = K9.objects.all())
+    CONCERN = (
+        ('Lost', 'Lost'),
+        ('Stolen', 'Stolen'),
+        ('Accident', 'Accident'),
+    )
 
+    k9 = forms.ModelChoiceField(queryset = K9.objects.all(), empty_label=None)
+    incident = forms.CharField(max_length=10, label='incident', widget=forms.Select(choices=CONCERN))
     class Meta:
         model = K9_Incident
-        fields = ('k9', 'incident', 'description', 'reported_by')
+        fields = ('k9', 'incident', 'title', 'description', 'reported_by', 'clinic')
 
     def __init__(self, *args, **kwargs):
         super(K9IncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['reported_by'].required = False
+        self.fields['incident'].required = False
+        self.fields['clinic'].required = False
 
 class HandlerIncidentForm(forms.ModelForm):
-    INCIDENT = (
-        #('Accident', 'Accident'),
-        ('Died', 'Died'),
-    )
-    
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
-    incident = forms.CharField(widget = forms.Select(choices=INCIDENT))
-    
     class Meta:
         model = Handler_Incident
-        fields = ('handler', 'incident', 'description')
+        fields = ('handler', 'incident', 'description', 'reported_by', 'k9')
 
     def __init__(self, *args, **kwargs):
         super(HandlerIncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
+        self.fields['reported_by'].required = False
+        self.fields['k9'].required = False
 
 class HandlerOnLeaveForm(forms.ModelForm):
     incident = forms.CharField()
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(position='Handler').exclude(status='Retired').exclude(status='Dead'))
+    handler = forms.ModelChoiceField(queryset = User.objects.none(), empty_label=None)
     class Meta:
-        model = Handler_Incident
+        model = Handler_On_Leave
         fields = ('handler', 'incident', 'description', 'date_from', 'date_to')
 
         widgets = {
@@ -199,26 +229,17 @@ class HandlerOnLeaveForm(forms.ModelForm):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
         self.fields['handler'].widget.attrs['readonly'] = "readonly"
-       
-
-class ReassignAssetsForm(forms.Form):
-    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(partnered=False))
-    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False))
 
 class DateForm(forms.Form):
-    from_date = forms.DateField( widget=DateInput())
-    to_date = forms.DateField(widget=DateInput())
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['handler'].queryset = User.objects.none()
-    #     if 'k9' in self.data:
-    #         try:
-    #             k9_capability = str(self.data.get('k9').capability)
-    #             self.fields['handler'].queryset = User.objects.filter(handler_id=k9_capability).filter(status='Working').filter(position='Handler').filter(partnered=False)
-    #         except (ValueError, TypeError):
-    #             pass  # invalid input from the client; ignore and fallback to empty City queryset
-    #     elif self.instance.pk:
-    #          self.fields['handler'].queryset = self.k9.handler.order_by('name')
+    date = forms.DateField()
+
+    widgets = {
+        'date': DateInput(),
+
+
+class ReassignAssetsForm(forms.Form):
+    k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))
+    handler = forms.ModelChoiceField(queryset = User.objects.filter(status='Working').filter(position='Handler').filter(handler=None))
 
 class ReproductiveForm(forms.ModelForm):
     class Meta:
@@ -232,4 +253,4 @@ class ReproductiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReproductiveForm, self).__init__(*args, **kwargs)
         self.fields['last_proestrus_date'].required = False
-
+        
