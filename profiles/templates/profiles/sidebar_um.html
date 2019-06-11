@@ -76,6 +76,15 @@
                             <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
                                 <i class="question icon"></i>On-Leave Request
                             </a>
+
+                            {% elif request.session.session_user_position == "Commander" %}
+                            
+                            <a href="{% url 'deployment:deployment_area_details'%}" class="item">
+                                <i class="building icon"></i>Area List
+                            </a>
+                            <a href="{% url 'deployment:fou_details'%}" class="item">
+                                <i class="id card icon"></i>FOU's List
+                            </a>
                           
                             {% else %}
                             <a href="{% url 'deployment:deployment_area_details'%}" class="item">

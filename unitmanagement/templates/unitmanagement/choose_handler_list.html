@@ -48,14 +48,11 @@
         {% csrf_token %}
         <div class="ui horizontal segments">
             <div class="ui segment">
-                <table class="ui celled inverted orange table" id = 'tabledata'>
-                    <thead>
+                <table class="ui column celled inverted orange table" id = 'tabledata'>
+                    <thead class="center aligned">
                         <th class="three wide"></th>
-                        <th>Name</th>
-                        <th class="three wide">EDD</th>
-                        <th>NDD</th>
-                        <th>SAR</th>
-                        <th>Failed</th>
+                        <th class="eight wide">Name</th>
+                        <th>{{k9.capability}} Success Rating</th>
                     </thead>
                     <tbody>
                         {% for a in form.handler %}
@@ -63,10 +60,13 @@
                         <tr>
                             <td class="center aligned">{{a.tag}}</td>
                             <td>{{a.choice_label}}</td>
-                            <td>{{g.0}}</td>
-                            <td>{{g.1}}</td>
-                            <td>{{g.2}}</td>
-                            <td>{{g.3}}</td>
+                            {% if k9.capability == 'EDD'%}
+                            <td  class="center aligned">{{g.4}}/{{g.5}} - {{g.0}}%</td>
+                            {% elif k9.capability == 'NDD'%}
+                            <td  class="center aligned">{{g.6}}/{{g.7}} - {{g.1}}%</td>
+                            {% elif k9.capability == 'SAR'%}
+                            <td  class="center aligned">{{g.8}}/{{g.9}} - {{g.2}}%</td>
+                            {% endif %}
                         </tr>
                         {%endif%}{% endfor %}
                         {% endfor %}

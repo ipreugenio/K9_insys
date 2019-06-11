@@ -3,6 +3,8 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 from .models import User, Personal_Info, Education, Account
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User as Auth_User
 from deployment.models import Location
 
 class DateInput(forms.DateInput):
@@ -42,11 +44,8 @@ class add_education_form(forms.ModelForm):
         fields = ('primary_education', 'secondary_education', 'tertiary_education', 'pe_schoolyear', 'se_schoolyear',
                   'te_schoolyear', 'pe_degree', 'se_degree', 'te_degree')
 
-class add_user_account(forms.ModelForm):
+class add_user_account(UserCreationForm):
+   
     class Meta:
-        model = Account
-        fields = ('email_address', 'password')
-
-        widgets = {
-            'password': forms.PasswordInput(),
-        }
+        model = Auth_User
+        fields = ('email', 'password1')

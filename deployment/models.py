@@ -2,10 +2,10 @@ from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
 from datetime import timedelta, date, datetime
-
 # Create your models here.
 
 class Area(models.Model):
+    commander = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=100, default='')
 
     def __str__(self):
@@ -339,7 +339,26 @@ class Daily_Refresher(models.Model):
     others_time = models.TimeField('others_time', blank=True, null=True)
     mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
     
-
-
-   
-   
+#TODO
+# either text or Fk from equipment
+# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
+class K9_Pre_Deployment_Items(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    phex = models.ForeignKey('unitmanagement.PhysicalExam', on_delete=models.CASCADE, null=True, blank=True) 
+    food = models.ForeignKey('inventory.Food', on_delete=models.CASCADE, null=True, blank=True) 
+    vitamins = models.ForeignKey('inventory.Medicine_Inventory', on_delete=models.CASCADE, null=True, blank=True) 
+    collar = models.IntegerField('collar', default=0)
+    vest = models.IntegerField('vest', default=0)
+    leash = models.IntegerField('leash', default=0)
+    shipping_crate = models.IntegerField('shipping crate', default=0)
+    food_quantity = models.IntegerField('quantity', default=0) 
+    vitamins_quantity = models.IntegerField('quantity', default=0)
+    grooming_kit = models.IntegerField('grooming_kit', default=0)
+    first_aid_kit = models.IntegerField('first_aid_kit', default=0)
+    oral_dextrose = models.IntegerField('oral_dextrose', default=0)
+    
+class K9_Deployment_Group(models.Model):
+    pre_deployment = models.ForeignKey(K9_Pre_Deployment_Items, on_delete=models.CASCADE, null=True, blank=True)   
+    date_deployed = models.DateField('date_deployed', null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    

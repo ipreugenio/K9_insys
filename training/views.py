@@ -9,7 +9,7 @@ from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
 from unitmanagement.models import Handler_K9_History
-from training.models import Training, K9_Adopted_Owner 
+from training.models import Training, K9_Adopted_Owner, Training_History
 from .forms import TestForm, add_handler_form, assign_handler_form
 from planningandacquiring.forms import add_donator_form
 from training.forms import TrainingUpdateForm, SerialNumberForm, AdoptionForms, ClassifySkillForm, RecordForm, DateForm
@@ -848,6 +848,9 @@ def assign_k9_select(request, id):
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
             h.save()
+
+            #Create History
+            Training_History.objects.create(k9=k9, handler=h)
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h) + ' and is ready for Training!')
             messages.info(request, 'On-Training')

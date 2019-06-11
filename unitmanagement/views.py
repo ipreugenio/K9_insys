@@ -21,7 +21,7 @@ from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Foo
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler
+from training.models import K9_Handler, Training_History
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -986,7 +986,7 @@ def k9_incident(request):
 # TODO
 def k9_incident_list(request):
     user = user_session(request)
-    style='ui blue message'
+    style='ui green message'
     if user.position == 'Team Leader':
         ta = Team_Assignment.objects.get(team_leader=user)
 
@@ -1002,7 +1002,25 @@ def k9_incident_list(request):
     else:
         data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
    
-    
+
+    if request.method == "POST":
+        i = request.POST.get('input_id')
+        dc = request.POST.get('death_cert')
+        date = request.POST.get('date_died')
+        ki = K9_Incident.objects.get(id=i)
+        
+        k9 = K9.objects.get(id=ki.k9.id)
+        k9.status= 'Dead'
+        k9.training_status = 'Dead'
+        k9.death_cert = dc
+        k9.death_date = date
+
+        ki.status = 'Done'
+        ki.save()
+        k9.save()
+        messages.success(request, 'K9 Died...')
+        return redirect('unitmanagement:k9_incident_list')
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     context = {
@@ -1108,6 +1126,25 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list') 
 
+def k9_accident(request, id):
+    accident = request.GET.get('accident')
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.save()
+    
+    k9 = K9.objects.get(id=data.k9.id)
+    
+    if accident == 'recovered':
+        k9.status = 'Working Dog'
+        messages.success(request, 'K9 has recovered!')
+    else:
+        k9.status = 'Died'
+        k9.training_status = 'Died'
+        messages.success(request, 'K9 died..')
+   
+    k9.save()
+    return redirect('unitmanagement:k9_incident_list') 
+
 def health_list_handler(request):
     user = user_session(request)
     style = "ui green message"
@@ -1161,6 +1198,21 @@ def handler_incident_form(request):
             f = form.save(commit=False)
             f.reported_by = user
             f.k9 = b
+
+            if f.incident == 'Died':
+                user.status = 'Died'
+                user.partnered = False
+                user.assigned = False
+                b.handler = None
+            elif f.incident == 'MIA':
+                user.status = 'MIA'
+                user.partnered = False
+                user.assigned = False
+                b.handler = None
+                #if MIA, kasama ba ang aso?
+            
+            user.save()
+            b.save()
             f.save()
 
             style = "ui green message"
@@ -1393,12 +1445,41 @@ def choose_handler_list(request, id):
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     g = []
     for h in handler:
-        edd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='EDD').count()
-        ndd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='NDD').count()
-        sar = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='SAR').count()
-        f = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='None').filter(Q(k9__status='Adopted') | Q(k9__training_status="For-Adoption") | Q(k9__status="Dead")).count()
+        edd = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Trained').count()
+        edd_f = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Failed').count()
+        ndd = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Trained').count()
+        ndd_f = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Failed').count()
+        sar = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Trained').count()
+        sar_f = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Failed').count()
+        s = 0
+        n = 0
+        e = 0
+        f = 0
+
+        if sar != 0:
+            s = int((sar / (sar+sar_f)) * 100) 
+        if edd != 0:
+            e = int((edd / (edd+edd_f)) * 100)
+        if ndd != 0:
+            n = int((ndd / (ndd+ndd_f)) * 100)
         
-        s = [edd, ndd, sar, f]
+        ctr = 0
+        if s !=0:
+            ctr = ctr+1
+        if e !=0:
+            ctr = ctr+1
+        if n !=0:
+            ctr = ctr+1
+        if ctr == 0:
+            ctr = 1
+
+        et = edd+edd_f
+        nt = ndd+ndd_f
+        st = sar+sar_f
+        f = int((e+n+s) / ctr )
+        fs = int(edd+ndd+sar)
+        ft = int(et+nt+st) 
+        s = [e, n, s, f, edd, et, ndd, nt, sar, st, fs, ft]
         g.append(s)
 
     print(g)

@@ -4,30 +4,19 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
 from training.models import Training
-from profiles.models import User
+from profiles.models import User, Account
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User as AuthUser
 # Create your models here.
-
-#TODO
-# either text or Fk from equipment
-# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
-class K9_Pre_Deployment_Items(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)    
-    collar = models.CharField('collar', max_length=200)
-    vest = models.CharField('vest', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    shipping_crate = models.CharField('shipping crate', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True, blank=True)
-    food_quantity = models.IntegerField('quantity', default=0) 
-    vitamins = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, null=True, blank=True)
-    vitamins_quantity = models.IntegerField('quantity', default=0) 
     
+class Meta:
+    app_label = 'unitmanagement'
+
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
@@ -144,6 +133,8 @@ class PhysicalExam(models.Model):
     remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
     date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
+    status = models.CharField('status', max_length=200, default="Pending")
+    cleared = models.BooleanField(default=False)
 
     def due_notification(self):
         notif = self.date_next_exam - timedelta(days=7)
@@ -254,10 +245,8 @@ class Handler_Incident(models.Model):
         ('Rescued People', 'Rescued People'),
         ('Made an Arrest', 'Made an Arrest'),
         ('Poor Performance', 'Poor Performance'),
-        ('Accident', 'Accident'),
         ('MIA', 'MIA'),
         ('Died', 'Died'),
-        ('Others', 'Others'),
     )
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -456,3 +445,9 @@ def location_incident(sender, instance, **kwargs):
                                 notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
+
+@receiver(post_save, sender=AuthUser)
+def account_create(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        UserID = User.objects.last()
+        Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
