@@ -23,6 +23,56 @@
     <tbody>
         {% for data in data %}
             <tr>
+                <th>K9</th>
+                <th>Serial Number</th>
+                <th>Breed</th>
+                <th>Age</th>
+                <th>Capability</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in data %}
+                <tr>
+                    <td>
+                        <a href="{% url 'unitmanagement:choose_handler_list' data.id %}">{{data.name}}</a>
+                    </td>
+                    <th>{{data.serial_number}}</th>
+                    <td>{{data.breed}}</td>
+                    <td>{{data.age}}</td>
+                    <td>{{data.capability}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="ui tab segment" data-tab="second">
+    <table id="tabledata2" class="ui five column celled table">
+        <thead>
+            <tr>
+                <th>K9</th>
+                <th>Serial Number</th>
+                <th>Breed</th>
+                <th>Age</th>
+                <th>Capability</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in data2 %}
+                <tr>
+                    <td>
+                        <a href="{% url 'unitmanagement:choose_handler_list' data.id %}">{{data.name}}</a>
+                    </td>
+                    <th>{{data.serial_number}}</th>
+                    <td>{{data.breed}}</td>
+                    <td>{{data.age}}</td>
+                    <td>{{data.capability}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
                 <td>{{data.name}}</td>
                 <td>{{data.breed}}</td>
                 <td>{{data.age}}</td>
@@ -35,6 +85,7 @@
         {% endfor %}
     </tbody>
 </table>
+
 
 <script type="text/javascript">
         

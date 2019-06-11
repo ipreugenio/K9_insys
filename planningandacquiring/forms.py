@@ -8,6 +8,12 @@ from .models import K9_Mated
 import datetime
 import re
 
+from six import string_types
+
+from django.forms.widgets import Widget, Select
+from django.utils.dates import MONTHS
+from django.utils.safestring import mark_safe
+
 from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
@@ -160,9 +166,10 @@ class add_donated_K9_form(forms.ModelForm):
 
     class Meta:
         model = K9
-        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date')
+        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date', 'date_created')
         widgets = {
             'birth_date': DateInput(),
+            'date_created': DateInput(),
         }
     
     def __init__(self, *args, **kwargs):
@@ -318,6 +325,14 @@ class budget_vet_supply(forms.Form):
     quantity = forms.IntegerField()
     price = forms.DecimalField()
 
+class budget_k9(forms.Form):
+    # class Meta:
+    #     model = Budget_vet_supply
+    #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+    budget = forms.DecimalField()
+    quantity = forms.IntegerField()
+    price = forms.DecimalField()
+
 class budget_date(forms.Form):
     #date = forms.DateField()
     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -383,4 +398,18 @@ class add_breed_form(forms.ModelForm):
         fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
 
 
+class HistDateForm(forms.Form):
+    cur_year = datetime.datetime.today().year
 
+    #year_list = []
+
+   # for x in range(cur_year - 15, cur_year + 15):
+     #   year_list.append(x)
+
+   # print(year_list)
+
+    #YEAR = (
+      #  year_list
+   # )
+    #hist_date =  forms.ChoiceField(widget = forms.Select(choices=YEAR))
+    hist_date = forms.ChoiceField(choices=[(x, x) for x in range(cur_year - 15, cur_year + 15)])

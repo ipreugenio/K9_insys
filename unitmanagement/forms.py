@@ -10,6 +10,7 @@ from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Inciden
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
+from django.db.models import Q
 
 def user_in_session(request):
     serial = request.session['session_serial']
@@ -141,6 +142,7 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['tick_flea_7'].required = False
         self.fields['heartworm_8'].required = False
 
+
 class VaccinationUsedForm(forms.ModelForm):
     vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
     date_vaccinated = forms.DateField(widget = DateInput(), label=None)
@@ -226,14 +228,14 @@ class HandlerOnLeaveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
+        self.fields['handler'].widget.attrs['readonly'] = "readonly"
 
 class DateForm(forms.Form):
     date = forms.DateField()
 
     widgets = {
         'date': DateInput(),
-    }
-       
+
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))

@@ -88,6 +88,7 @@ class User(models.Model):
 
     image = models.FileField(upload_to='profile_image', default='profile_image/default.png', blank=True, null=True)
     position = models.CharField('position', choices=POSITION, max_length=200)
+
     rank = models.CharField('rank', choices=RANK,  max_length=200)
     fullname = models.CharField('fullname', max_length=200, null=True, blank=True)
     firstname = models.CharField('firstname', max_length=200)
@@ -95,18 +96,21 @@ class User(models.Model):
     extensionname = models.CharField('extensionname', max_length=200, null=True, blank=True)
     middlename = models.CharField('middlename', max_length=200)
     nickname = models.CharField('nickname', max_length=200, null=True, blank=True)
+
     birthdate = models.DateField('birthdate', blank=True)
     age = models.IntegerField('age', default=0)
-    birthplace = models.CharField('birthplace', max_length=200)
-    gender = models.CharField('gender', choices=SEX, max_length=200)
+    birthplace = models.CharField('birthplace', max_length=200, default="None", blank=True)
+    gender = models.CharField('gender', choices=SEX, max_length=200, default="None", blank=True)
     civilstatus = models.CharField('civilstatus', choices=CIVILSTATUS, max_length=200)
+
     citizenship = models.CharField('citizenship', choices=CITIZENSHIP, max_length=200)
     religion = models.CharField('religion',choices=RELIGION, max_length=200)
+
     bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
     distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
-    haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200)
-    eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200)
-    skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200)
+    haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200, default="None", blank=True)
+    eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200, default="None", blank=True)
+    skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200, default="None", blank=True)
     height = models.IntegerField('height')
     weight = models.IntegerField('weight')
     headsize = models.IntegerField('headsize')

@@ -1,13 +1,18 @@
 from django.shortcuts import render
 from django.http import Http404
 
-from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, budget_food, budget_equipment, budget_medicine, budget_vaccine, budget_vet_supply, budget_date
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, budget_food, budget_equipment, budget_medicine, budget_vaccine, budget_vet_supply, budget_date, budget_k9
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Budget_vaccine, Budget_vet_supply
+
+
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, HistDateForm
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Dog_Breed, Budget_k9
 
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, K9_Breed, K9_Supplier, K9_Litter
 from .models import K9_Mated
 from .forms import DateForm
+
 
 from training.models import Training
 from profiles.models import Account, User
@@ -21,7 +26,7 @@ from .forms import ReportDateForm, add_breed_form, k9_detail_form, SupplierForm,
 from deployment.models import Dog_Request, Team_Assignment
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
-from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
+from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail, Food_Received_Trail, Medicine_Received_Trail, Miscellaneous_Received_Trail
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
@@ -38,7 +43,11 @@ from sklearn.metrics import mean_squared_error
 
 
 from datetime import datetime as dt
+
+from datetime import timedelta
+
 from datetime import date
+
 from faker import Faker
 
 #statistical imports
@@ -49,7 +58,7 @@ import pandas as pd
 import numpy as np
 
 #graphing imports
-'''from igraph import *
+from igraph import *
 import plotly.offline as opy
 import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
@@ -63,7 +72,7 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from random import random, randint
 from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm'''
+import statsmodels.api as sm
 
 import math
 # Create your views here.
@@ -235,15 +244,11 @@ def add_donated_K9(request):
     if request.method == 'POST':
         if form.is_valid():
             k9 = form.save()
-            k9.source = "Procurement"
+            k9.training_status = "Unclassified"
+            k9.source = "Procured"
             k9.save()
 
             request.session['k9_id'] = k9.id
-
-            #create Training object when k9 is created, self.id of k9 will be the value of training_id
-            #Training.objects.create(k9=k9, training='EDD')
-            #Training.objects.create(k9=k9, training='NDD')
-            #Training.objects.create(k9=k9, training='SAR')
 
 
             return HttpResponseRedirect('confirm_donation/')
@@ -297,6 +302,7 @@ def confirm_donation(request):
 
     k9_id = request.session['k9_id']
     k9= K9.objects.get(id = k9_id)
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -326,6 +332,16 @@ def donation_confirmed(request):
     }
 
     if 'ok' in request.POST:
+        VaccinceRecord.objects.create(k9=k9, deworming_1=True, deworming_2=True, deworming_3=True,
+                                      deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True,
+                                      heartworm_1=True, heartworm_2=True,
+                                      heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True,
+                                      heartworm_7=True, heartworm_8=True,
+                                      anti_rabies=True, bordetella_1=True, bordetella_2=True, dhppil4_1=True,
+                                      dhppil4_2=True, tick_flea_1=True,
+                                      tick_flea_2=True, tick_flea_3=True, tick_flea_4=True, tick_flea_5=True,
+                                      tick_flea_6=True, tick_flea_7=True)
+
         return render(request, 'planningandacquiring/donation_confirmed.html', context)
     else:
         #delete k9
@@ -613,6 +629,35 @@ def breeding_confirmed(request):
     if 'ok' in request.POST:
         k9_parent = K9_Parent(offspring = offspring, mother = mother, father = father)
         k9_parent.save()
+
+        cvr = VaccinceRecord.objects.create(k9=offspring)
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
+        VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
 
 
         #NOTIF SHOW
@@ -1034,7 +1079,7 @@ def scatter_model(timeseries, prediction, title):
 
     ctr = 0
     for index, row in timeseries.iterrows():
-        if ctr >= test_index-1: # +1 if data is differenced
+        if ctr >= test_index: # +1 if data is differenced
             predicted_date.append(index)
         ctr += 1
 
@@ -1510,15 +1555,25 @@ def budgeting(request):
         medicine_current.append(inventory.quantity)
 
         select_price = 0
+        item_exist = 0
         for item in previous_medicine_budget:
-
+            print("ITEM MEDICINE ID")
+            print(item.medicine.id)
+            print("MEDICINE ID")
+            print(medicine.id)
             if item.medicine.id == medicine.id:
                 medicine_previous_price.append(item.price)
                 medicine_previous_total.append(item.total)
                 select_price = item.price
+                item_exist = 1
 
-        medicine_usage_lastyear = Medicine_Subtracted_Trail.objects.filter(inventory=inventory.id).filter(
-            date_subtracted__year=now.year)
+        if item_exist == 0:
+            medicine_previous_price.append(medicine.price)
+            medicine_previous_total.append(Decimal(0.0))
+            select_price = medicine.price
+
+        medicine_usage_lastyear = Medicine_Received_Trail.objects.filter(inventory=inventory.id).filter(
+            date_received__year=now.year)
 
         usage_total = 0
         for item in medicine_usage_lastyear:
@@ -1553,14 +1608,22 @@ def budgeting(request):
         vaccine_current.append(inventory.quantity)
 
         select_price = 0
+        item_exist = 0
         for item in previous_vaccine_budget:
             if item.vaccine.id == vaccine.id:
                 vaccine_previous_price.append(item.price)
                 vaccine_previous_total.append(item.total)
                 select_price = item.price
+                item_exist = 1
 
-        vaccine_usage_lastyear = Medicine_Subtracted_Trail.objects.filter(inventory=inventory.id).filter(
-            date_subtracted__year=now.year)
+        if item_exist == 0:
+            vaccine_previous_price.append(vaccine.price)
+            vaccine_previous_total.append(Decimal(0.0))
+            select_price = vaccine.price
+
+
+        vaccine_usage_lastyear = Medicine_Received_Trail.objects.filter(inventory=inventory.id).filter(
+            date_received__year=now.year)
 
         usage_total = 0
         for item in vaccine_usage_lastyear:
@@ -1577,8 +1640,8 @@ def budgeting(request):
 
     food_spendings = 0
 
-    usage_lastyear = Food_Subtracted_Trail.objects.filter(
-            date_subtracted__year=now.year)
+    usage_lastyear = Food_Received_Trail.objects.filter(
+            date_received__year=now.year)
 
     for item in usage_lastyear:
         if item.inventory.foodtype == "Adult Dog Food":
@@ -1765,14 +1828,22 @@ def budgeting(request):
         equipment_quantity.append(item.quantity)
 
         select_price = 0
+        item_exist = 0
         for equip in previous_equipment_budget:
             if equip.equipment.id == item.id:
                 equipment_previous_price.append(equip.price)
                 equipment_previous_total.append(equip.total)
                 select_price = equip.price
+                item_exist = 1
 
-        equipment_usage_lastyear = Miscellaneous_Subtracted_Trail.objects.filter(inventory=item.id).filter(
-            date_subtracted__year=now.year)
+        if item_exist == 0:
+            equipment_previous_price.append(item.price)
+            equipment_previous_total.append(Decimal(0.0))
+            select_price = item.price
+
+
+        equipment_usage_lastyear = Miscellaneous_Received_Trail.objects.filter(inventory=item.id).filter(
+            date_received__year=now.year)
 
         usage_total = 0
         for item in equipment_usage_lastyear:
@@ -1847,14 +1918,22 @@ def budgeting(request):
         vet_supply_uom.append(item.uom)
 
         select_price = 0
+        item_exist = 0
         for vet in previous_vet_supply_budget:
             if vet.vet_supply.id == item.id:
                 vet_supply_previous_price.append(vet.price)
                 vet_supply_previous_total.append(vet.total)
                 select_price = vet.price
+                item_exist = 1
 
-        vet_supply_usage_lastyear = Miscellaneous_Subtracted_Trail.objects.filter(inventory=item.id).filter(
-            date_subtracted__year=now.year)
+        if item_exist == 0:
+            vet_supply_previous_price.append(item.price)
+            vet_supply_previous_total.append(Decimal(0.0))
+            select_price = item.price
+
+
+        vet_supply_usage_lastyear = Miscellaneous_Received_Trail.objects.filter(inventory=item.id).filter(
+            date_received__year=now.year)
 
         usage_total = 0
         for item in vet_supply_usage_lastyear:
@@ -1883,6 +1962,7 @@ def budgeting(request):
     dhppil4 = 0
     tick_flea = 0
 
+    vac_needed = []
 
     for k9 in all_current_dogs_obj:
 
@@ -1959,6 +2039,26 @@ def budgeting(request):
             tick_flea += 1
 
 
+    vac_needed.append(deworming_req - deworming)
+    vac_needed.append(dhppil_cv_req - dhppil_cv)
+    vac_needed.append(heartworming_req - heartworming)
+    vac_needed.append(antirabies_req - antirabies)
+    vac_needed.append(bordetella_req - bordetella)
+    vac_needed.append(dhppil4_req - dhppil4)
+    vac_needed.append(tick_flea_req - tick_flea)
+
+    try:
+        previous_k9_budget = Budget_k9.objects.get(budget_allocation=previous_budget_alloc)
+        k9_previous_price = previous_k9_budget.price
+        k9_previous_total = previous_k9_budget.total
+    except:
+        k9_previous_price = Decimal(0.0)
+        k9_previous_total = Decimal(0.0)
+
+    k9_procured = K9.objects.filter(source = "Procurement").filter(date_created__year = date.today().year).count()
+
+    k9_spendings = k9_procured * k9_previous_price
+
     grandspendings = medicine_spendings + vaccine_spendings + food_spendings + equipment_spendings + vet_supply_spendings
 
     #Forms
@@ -1975,7 +2075,7 @@ def budgeting(request):
     EquipmentFormset = formset_factory(budget_equipment, extra = equip_field_count)
     Vet_supplyFormset = formset_factory(budget_vet_supply, extra = vet_field_count)
 
-
+    K9Form = budget_k9
     #TODO detail view of budgets
 
     style = ""
@@ -1983,13 +2083,19 @@ def budgeting(request):
         medicine_formset = MedicineFormset(request.POST, prefix="medicine")
         vaccine_formset = VaccineFormset(request.POST, prefix="vaccine")
         food_form = FoodForm(request.POST, prefix="food")
+        k9_form = K9Form(request.POST, prefix="k9")
         equipment_formset = EquipmentFormset(request.POST, prefix="equipment")
         vet_supply_formset = Vet_supplyFormset(request.POST, prefix="vet_supply")
 
 
         if medicine_formset.is_valid() and vaccine_formset.is_valid() and food_form.is_valid() and equipment_formset.is_valid() and vet_supply_formset.is_valid():
 
-            budget_alloc = Budget_allocation()
+            today = dt.now()
+            next_year = today.year + 1
+            #last_year.strftime('%m%d%y')
+            next_year = str(next_year)
+
+            budget_alloc = Budget_allocation(date_tobe_budgeted = next_year)
             budget_alloc.save()
             budget_alloc = Budget_allocation.objects.get(id=budget_alloc.id)
 
@@ -2012,7 +2118,11 @@ def budgeting(request):
 
                 med_budget = Budget_medicine(medicine = medicine, quantity = quantity, price = price, total = budget, budget_allocation = budget_alloc)
                 med_budget.save()
+
+                medicine.price = price
+                medicine.save()
                 ctr += 1
+
             print("Medicine Total")
             med_total = request.POST.get('medicine_total')
             print(med_total)
@@ -2035,6 +2145,9 @@ def budgeting(request):
                 vac_budget = Budget_vaccine(vaccine=vaccine, quantity=quantity, price=price, total=budget,
                                              budget_allocation=budget_alloc)
                 vac_budget.save()
+
+                vaccine.price = price
+                vaccine.save()
                 ctr += 1
 
             print("Vaccine Total")
@@ -2095,6 +2208,9 @@ def budgeting(request):
                                             budget_allocation=budget_alloc)
                 equip_budget.save()
 
+                equipment.price = price
+                equipment.save()
+
                 ctr += 1
 
             print("Equipment Total")
@@ -2120,7 +2236,20 @@ def budgeting(request):
                                               budget_allocation=budget_alloc)
                 supply_budget.save()
 
+                vet_supply.price = price
+                vet_supply.save()
                 ctr += 1
+
+            #K9 Form
+            quantity = k9_form['quantity'].value()
+            budget = k9_form['budget'].value()
+            price = k9_form['price'].value()
+
+            k9_total = budget
+
+            k9_budget = Budget_k9(quantity=quantity, price=price, total=budget,
+                                              budget_allocation=budget_alloc)
+            k9_budget.save()
 
             print("Vet Supply Total")
             vet_total = request.POST.get('vet_supply_total')
@@ -2135,6 +2264,7 @@ def budgeting(request):
             budget_alloc.medicine_total = med_total
             budget_alloc.vaccine_total = vac_total
             budget_alloc.vet_supply_total = vet_total
+            budget_alloc.k9_total = k9_total
 
             budget_alloc.k9_request_forecast = request_forecast[4]
             budget_alloc.k9_needed_for_demand = required_dogs
@@ -2157,6 +2287,7 @@ def budgeting(request):
         food_form = FoodForm(prefix="food")
         equipment_formset = EquipmentFormset(prefix="equipment")
         vet_supply_formset = Vet_supplyFormset(prefix="vet_supply")
+        k9_form = K9Form(prefix="k9")
 
 
     print("TEST SUPPLY FORECAST")
@@ -2164,6 +2295,31 @@ def budgeting(request):
 
     print(previous_medicine_budget)
     print(medicine_ids)
+
+    k9_procured = K9.objects.filter(source="Procurement").filter(date_created__year=date.today().year).count()
+    all_current_k9 = K9.objects.exclude(Q(training_status='Adopted') | Q(training_status='Dead'))
+    all_exclude_deployement = K9.objects.filter(age__lte=7).exclude(training_status='For-Deployment').exclude(training_status='Deployed').exclude(status='Retired').exclude(status='Dead')
+
+    sum_in_heat = 0
+
+    sum_in_heat_monthly_array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    for k9 in all_exclude_deployement:
+        try:
+            # print(k9.in_heat_monthly())
+            heat_array = k9.in_heat_monthly()
+
+            ctr = 0
+            for x in heat_array:
+                sum_in_heat_monthly_array[ctr] += x
+                sum_in_heat += x
+                ctr += 1
+        except:
+            pass
+    print("IN HEAT TEST")
+    print(sum_in_heat_monthly_array)
+
+    upcoming_year = date.today().year + 1
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2222,6 +2378,7 @@ def budgeting(request):
         'bordetella' : bordetella,
         'dhppil4' : dhppil4,
         'tick_flea' :tick_flea,
+        'vac_needed': vac_needed,
 
         'adult_food_quantity': Decimal(adult_food_quantity),
         'puppy_food_quantity': Decimal(puppy_food_quantity),
@@ -2276,6 +2433,15 @@ def budgeting(request):
         'equipment_spendings': equipment_spendings,
         'vet_supply_spendings': vet_supply_spendings,
         'grandspendings': grandspendings,
+
+        'k9_form': k9_form,
+        'k9_previous_price': k9_previous_price,
+        'k9_previous_total': k9_previous_total,
+        'k9_spendings': k9_spendings,
+
+        'sum_in_heat_monthly_array': sum_in_heat_monthly_array,
+        'sum_in_heat': sum_in_heat,
+        'upcoming_year' : upcoming_year,
 
         'notif_data':notif_data,
         'count':count,
@@ -2412,20 +2578,20 @@ def budgeting_report(request):
     date = dt.now()
     year = date.year
     prev_year = year - 1
+    grandtotal = 0
+    grandspendings = 0
+    granddiff = 0
 
-    medicine = Medicine_Subtracted_Trail.objects.filter(date_subtracted__year = prev_year)
-    food = Food_Subtracted_Trail.objects.filter(date_subtracted__year = prev_year)
-    miscellaneous = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__year = prev_year)
+    miscellaneous_trail = Miscellaneous_Received_Trail.objects.filter(date_received__year = prev_year)
 
-
-    previous_budget_alloc = Budget_allocation.objects.exclude(date_created__year__gte = year).latest('id')
+    previous_budget_alloc = Budget_allocation.objects.exclude(date_created__year__gte=year).latest('id')
     recent_budget_alloc = Budget_allocation.objects.latest('id')
 
-    budget_medicine = Budget_medicine.objects.filter(budget_allocation = previous_budget_alloc)
-    budget_equipment = Budget_equipment.objects.filter(budget_allocation = previous_budget_alloc)
-    budget_food = Budget_food.objects.filter(budget_allocation = previous_budget_alloc)
-    budget_vaccine = Budget_vaccine.objects.filter(budget_allocation = previous_budget_alloc)
-    budget_vet_supply = Budget_vet_supply.objects.filter(budget_allocation = previous_budget_alloc)
+    budget_medicine = Budget_medicine.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_equipment = Budget_equipment.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_food = Budget_food.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_vet_supply = Budget_vet_supply.objects.filter(budget_allocation=previous_budget_alloc)
 
     recent_budget_medicine = Budget_medicine.objects.filter(budget_allocation=recent_budget_alloc)
     recent_budget_equipment = Budget_equipment.objects.filter(budget_allocation=recent_budget_alloc)
@@ -2433,30 +2599,921 @@ def budgeting_report(request):
     recent_budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=recent_budget_alloc)
     recent_budget_vet_supply = Budget_vet_supply.objects.filter(budget_allocation=recent_budget_alloc)
 
+    #MEDICINE
+    medicine_objects = Medicine.objects.exclude(med_type = "Vaccine") #Get all medicines
+
+    medicine_list = []
+    for item in recent_budget_medicine:
+        medicine_list.append(item.medicine)
+
+    med_inventory = Medicine_Inventory.objects.filter(medicine__in = medicine_list)
+
+    medicine_inv_list = []
+    for item in med_inventory:
+        medicine_inv_list.append(item)
+
+    quantity_medicine = Medicine_Inventory.objects.filter(medicine__in = medicine_list)
+
+
+    medicine_spendings_list = [] #Spendings list (see computation below)
+    ctr = 0
+
+    #.get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    #.filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for med in medicine_objects: # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        #Med = Isa lang, medicine_objects = marami
+        med_inventory = Medicine_Inventory.objects.get(medicine=med)
+
+        print("MED INVENTORY")
+        print(med_inventory)
+        med_Received_Trail = Medicine_Received_Trail.objects.filter(inventory = med_inventory).filter(
+            date_received__year=year)
+
+        sum = 0
+        for trail in med_Received_Trail: #Get all subtracted trails (of this particular medicine) for this year
+            #Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+            print("TRAIL QUANTITY")
+            print(trail.quantity)
+
+        #Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_medicine  = Budget_medicine.objects.filter(budget_allocation = previous_budget_alloc).get(medicine = med)
+
+        # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_medicine.price
+
+        except:
+            last_years_price = 0
+
+        spending = sum * last_years_price
+        grandspendings += spending
+        medicine_spendings_list.append(spending)
+        ctr += 1
+
+    med_difference_list = []
+    ctr = 0
+    for budget in recent_budget_medicine:
+        med_difference_list.append(budget.total - medicine_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - medicine_spendings_list[ctr])
+        ctr += 1
+
+    print("MEDICINE SPENDINGS LIST")
+    print(medicine_spendings_list)
+
     list_recent_budg_med_price = []
     for item in recent_budget_medicine:
         list_recent_budg_med_price.append(item.price)
 
+    ####VACCINE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    vaccine_objects = Medicine.objects.filter(med_type="Vaccine")  # Get all medicines
+
+    vaccine_list = []
+    for item in recent_budget_vaccine:
+        vaccine_list.append(item.vaccine)
+
+    vaccine_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    #medicine_inv_list = []
+    #for item in med_inventory:
+       # medicine_inv_list.append(item)
+
+    quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    vaccine_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for vac in vaccine_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+
+        vac_Received_Trail = Medicine_Received_Trail.objects.filter(inventory=vac_inventory).filter(
+            date_received__year=year)
+
+        sum = 0
+        for trail in vac_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=previous_budget_alloc).get(vaccine=vac)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_vaccine.price
+        except:
+            last_years_price = 0
+
+
+        spending = sum * last_years_price
+        vaccine_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+    vac_difference_list = []
+    ctr = 0
+    for budget in recent_budget_vaccine:
+        vac_difference_list.append(budget.total - vaccine_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - vaccine_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_vac_price = []
+    for item in recent_budget_vaccine:
+        list_recent_budg_vac_price.append(item.price)
+
+    ####EQUIPMENT>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    equipment_objects = Miscellaneous.objects.filter(misc_type = "Equipment")  # Get all medicines
+
+    equipment_list = []
+    for item in recent_budget_equipment:
+        equipment_list.append(item.equipment)
+
+    # equipment_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    # medicine_inv_list = []
+    # for item in med_inventory:
+    # medicine_inv_list.append(item)
+
+    # quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    equipment_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for equipment in equipment_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        # vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+        equipment_Received_Trail = Miscellaneous_Received_Trail.objects.filter(inventory=equipment).filter(
+                date_received__year=year)
+
+        sum = 0
+        for trail in equipment_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_equipment = Budget_equipment.objects.filter(budget_allocation=previous_budget_alloc).get(equipment = equipment)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_equipment.price
+        except:
+            last_years_price = 0
+
+        spending = sum * last_years_price
+        equipment_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+        equipment_difference_list = []
+        ctr = 0
+
+        print("EQUIPMENT SPENDINGS LIST")
+        print(equipment_spendings_list)
+        print("RECENT BUDGET EQUIPMENT")
+        print(recent_budget_equipment)
+
+    for budget in recent_budget_equipment:
+        equipment_difference_list.append(budget.total - equipment_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - equipment_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_equipment_price = []
+    for item in recent_budget_equipment:
+        list_recent_budg_equipment_price.append(item.price)
+
+    ####VET SUPPLY>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    vet_objects = Miscellaneous.objects.filter(misc_type="Vet Supply")  # Get all medicines
+
+    vet_list = []
+    for item in recent_budget_vet_supply:
+        vet_list.append(item.vet_supply)
+
+    # equipment_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    # medicine_inv_list = []
+    # for item in med_inventory:
+    # medicine_inv_list.append(item)
+
+    #  quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    vet_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for vet in vet_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        # vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+        vet_Received_Trail = Miscellaneous_Received_Trail.objects.filter(inventory=vet).filter(
+            date_received__year=year)
+
+        sum = 0
+        for trail in vet_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_vet = Budget_vet_supply.objects.filter(budget_allocation=previous_budget_alloc).get(
+            vet_supply=vet)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_vet.price
+        except:
+            last_years_price = 0
+        spending = sum * last_years_price
+        vet_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+        vet_difference_list = []
+        ctr = 0
+
+
+    for budget in recent_budget_vet_supply:
+        vet_difference_list.append(budget.total - vet_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - vet_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_vet_price = []
+    for item in recent_budget_vet_supply:
+        list_recent_budg_vet_price.append(item.price)
+
+    user = request.session["session_username"]
+
+    # FOOD >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    adult_objects = Food.objects.filter(foodtype="Adult Dog Food")  # Get all adult dog food
+    puppy_objects = Food.objects.filter(foodtype="Puppy Dog Food")
+    milk_objects = Food.objects.filter(foodtype="Milk")
+
+    adult_quantity_sum = 0
+    puppy_quantity_sum = 0
+    milk_quantity_sum = 0
+
+    for adult in adult_objects:
+        adult_quantity_sum += adult.quantity
+
+    for puppy in puppy_objects:
+        puppy_quantity_sum += puppy.quantity
+
+    for milk in milk_objects:
+        milk_quantity_sum += milk.quantity
+
+    this_budget_adult = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food = "Adult Food")
+    this_budget_puppy = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food="Puppy Food")
+    this_budget_milk = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food="Milk")
+
+    current_budget_adult = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Adult Food")
+    current_budget_puppy = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Puppy Food")
+    current_budget_milk = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Milk")
+
+    food_trail_adult = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = adult_objects)
+    food_trail_puppy = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = puppy_objects)
+    food_trail_milk = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = milk_objects)
+
+    adult_trail_sum = 0
+    puppy_trail_sum = 0
+    milk_trail_sum = 0
+
+    for adult in food_trail_adult:
+        adult_trail_sum += adult.quantity
+
+    for puppy in food_trail_puppy:
+         puppy_trail_sum += puppy.quantity
+
+    for milk in food_trail_milk:
+        milk_trail_sum += milk.quantity
+
+    previous_bid_adult = this_budget_adult.price
+    previous_bid_puppy = this_budget_puppy.price
+    previous_bid_milk = this_budget_milk.price
+
+    adult_expense = adult_trail_sum * previous_bid_adult
+    puppy_expense = puppy_trail_sum * previous_bid_puppy
+    milk_expense = milk_trail_sum * previous_bid_milk
+
+    difference_adult = current_budget_adult.total - adult_expense
+    difference_puppy = current_budget_puppy.total - puppy_expense
+    difference_milk = current_budget_milk.total - milk_expense
+
+    grandtotal += current_budget_adult.total + current_budget_puppy.total + current_budget_milk.total
+    grandspendings += adult_expense + puppy_expense + milk_expense
+    granddiff += difference_adult + difference_puppy + difference_milk
+
+    # K9>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    this_budget_k9 = Budget_k9.objects.get(budget_allocation=previous_budget_alloc)
+    current_budget_k9 = Budget_k9.objects.get(budget_allocation=recent_budget_alloc)
+
+    previous_bid_k9 = this_budget_k9.price
+    current_bid_k9 = current_budget_k9.price
+
+    current_quantity_k9 =  this_budget_k9.quantity
+
+    previous_total_k9 = this_budget_k9.total
+    current_total_k9 = current_budget_k9.total
+
+
+    k9_procured = K9.objects.filter(source="Procurement").filter(date_created__year=date.today().year).count()
+    all_current_k9 = K9.objects.exclude(Q(training_status='Adopted') | Q(training_status='Dead')).count()
+    k9_expense = previous_bid_k9 * k9_procured
+    all_exclude_deployement = K9.objects.filter(age__lte=7).exclude(training_status='For-Deployment').exclude(training_status='Deployed').exclude(status='Retired').exclude(status='Dead')
+
+    k9_difference = current_total_k9 - k9_expense
+
+    grandtotal += current_total_k9
+    grandspendings += k9_expense
+    granddiff += k9_difference
+    '''
+        -
+        previous_bid_k9
+        current_bid_k9
+        all_current_k9
+        current_quantity_k9
+        previous_total_k9
+        k9_expense
+        current_total_k9
+        k9_difference
+    '''
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
     context = {
-        'medicine' : medicine,
-        'food': food,
-        'miscellaneous': miscellaneous,
+        'notif': notif,
+        'count': count,
+        'miscellaneous_trail': miscellaneous_trail,
         'budget_alloc': previous_budget_alloc,
         'budget_medicine': budget_medicine,
         'budget_equipment': budget_equipment,
         'budget_food': budget_food,
         'budget_vaccine': budget_vaccine,
         'budget_vet_supply': budget_vet_supply,
-        'year': year,
+        'year': year + 1,
         'recent_budget_medicine': recent_budget_medicine,
         'recent_budget_equipment': recent_budget_equipment,
         'recent_budget_food': recent_budget_food,
         'recent_budget_vaccine': recent_budget_vaccine,
         'recent_budget_vet_supply': recent_budget_vet_supply,
         'list_recent_budg_med_price': list_recent_budg_med_price,
+
+        'quantity_medicine': quantity_medicine,
+        'medicine_spendings_list': medicine_spendings_list,
+        'med_difference_list': med_difference_list,
+
+        'quantity_vaccine': quantity_vaccine,
+        'vaccine_spendings_list': vaccine_spendings_list,
+        'vac_difference_list': vac_difference_list,
+        'list_recent_budg_vac_price': list_recent_budg_vac_price,
+
+        #'quantity_vaccine': quantity_vaccine,
+        'equipment_spendings_list': equipment_spendings_list,
+        'equipment_difference_list': equipment_difference_list,
+        'list_recent_budg_equipment_price': list_recent_budg_equipment_price,
+        'equipment_objects': equipment_objects,
+
+        'vet_spendings_list': vet_spendings_list,
+        'vet_difference_list': vet_difference_list,
+        'list_recent_budg_vet_price': list_recent_budg_vet_price,
+        'vet_objects': vet_objects,
+
+        'adult_objects': adult_objects,
+        'puppy_objects': puppy_objects,
+        'milk_objects': milk_objects,
+        'adult_quantity_sum': adult_quantity_sum,
+        'puppy_quantity_sum': puppy_quantity_sum,
+        'milk_quantity_sum': milk_quantity_sum,
+        'this_budget_adult': this_budget_adult,
+        'this_budget_puppy': this_budget_puppy,
+        'this_budget_milk': this_budget_milk,
+        'current_budget_adult': this_budget_adult,
+        'current_budget_puppy': this_budget_puppy,
+        'current_budget_milk': this_budget_milk,
+        'adult_expense': adult_expense,
+        'puppy_expense': puppy_expense,
+        'milk_expense': milk_expense,
+        'difference_adult': difference_adult,
+        'difference_puppy': difference_puppy,
+        'difference_milk': difference_milk,
+
+        'previous_bid_k9' : previous_bid_k9,
+        'current_bid_k9' : current_bid_k9,
+        'all_current_k9' : all_current_k9,
+        'current_quantity_k9' : current_quantity_k9,
+        'previous_total_k9' : previous_total_k9,
+        'k9_expense' : k9_expense,
+        'current_total_k9' : current_total_k9,
+        'k9_difference' :k9_difference,
+
+        'user': user,
+        'grandtotal': grandtotal,
+        'grandspendings': grandspendings,
+        'granddiff': granddiff,
+
     }
 
     return render(request, 'planningandacquiring/budgeting_report.html', context)
+
+def choose_date(request):
+    form = HistDateForm(request.POST or None)
+    success = 0
+    if request.method == 'POST':
+        if form.is_valid():
+            year = request.POST.get('hist_date')
+            request.session["session_year"] = year
+
+
+            try:
+                budget_alloc = Budget_allocation.objects.filter(date_created__year=year).latest('id')
+                success = 1
+            except:
+                messages.success(request, 'Budget Estimate for this year does not exist!')
+
+    if success == 1:
+        return HttpResponseRedirect('detailed_budget/')
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'notif_data':notif_data,
+        'count': count,
+        'title': "",
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/choose_date.html', context)
+
+def detailed_budgeting(request):
+    #date = dt.now()
+    year = int(request.session["session_year"])
+    print(year)
+    prev_year = year - 1
+    grandtotal = 0
+    grandspendings = 0
+    granddiff = 0
+
+    miscellaneous_trail = Miscellaneous_Received_Trail.objects.filter(date_received__year = prev_year)
+
+    previous_budget_alloc = Budget_allocation.objects.exclude(date_created__year__gte=year).latest('id')
+    recent_budget_alloc = Budget_allocation.objects.filter(date_created__year = year).latest('id')
+
+    print("RECENT BUDGET ALLOC")
+    print(recent_budget_alloc)
+
+    budget_medicine = Budget_medicine.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_equipment = Budget_equipment.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_food = Budget_food.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=previous_budget_alloc)
+    budget_vet_supply = Budget_vet_supply.objects.filter(budget_allocation=previous_budget_alloc)
+
+    recent_budget_medicine = Budget_medicine.objects.filter(budget_allocation=recent_budget_alloc)
+    recent_budget_equipment = Budget_equipment.objects.filter(budget_allocation=recent_budget_alloc)
+    recent_budget_food = Budget_food.objects.filter(budget_allocation=recent_budget_alloc)
+    recent_budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=recent_budget_alloc)
+    recent_budget_vet_supply = Budget_vet_supply.objects.filter(budget_allocation=recent_budget_alloc)
+
+    #MEDICINE
+    medicine_objects = Medicine.objects.exclude(med_type = "Vaccine") #Get all medicines
+
+    medicine_list = []
+    for item in recent_budget_medicine:
+        medicine_list.append(item.medicine)
+
+    med_inventory = Medicine_Inventory.objects.filter(medicine__in = medicine_list)
+
+    medicine_inv_list = []
+    for item in med_inventory:
+        medicine_inv_list.append(item)
+
+    quantity_medicine = Medicine_Inventory.objects.filter(medicine__in = medicine_list)
+
+
+    medicine_spendings_list = [] #Spendings list (see computation below)
+    ctr = 0
+
+    #.get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    #.filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for med in medicine_objects: # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        #Med = Isa lang, medicine_objects = marami
+        med_inventory = Medicine_Inventory.objects.get(medicine=med)
+
+        print("MED INVENTORY")
+        print(med_inventory)
+        med_Received_Trail = Medicine_Received_Trail.objects.filter(inventory = med_inventory).filter(
+            date_received__year=year)
+
+        sum = 0
+        for trail in med_Received_Trail: #Get all subtracted trails (of this particular medicine) for this year
+            #Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+            print("TRAIL QUANTITY")
+            print(trail.quantity)
+
+        #Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_medicine = Budget_medicine.objects.filter(budget_allocation=previous_budget_alloc).get(
+                medicine=med)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_medicine.price
+        except:
+            last_years_price = 0
+
+        spending = sum * last_years_price
+        grandspendings += spending
+        medicine_spendings_list.append(spending)
+
+        ctr += 1
+
+    med_difference_list = []
+    ctr = 0
+    for budget in recent_budget_medicine:
+        med_difference_list.append(budget.total - medicine_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - medicine_spendings_list[ctr])
+        ctr += 1
+
+    print("MEDICINE SPENDINGS LIST")
+    print(medicine_spendings_list)
+
+    list_recent_budg_med_price = []
+    for item in recent_budget_medicine:
+        list_recent_budg_med_price.append(item.price)
+
+    ####VACCINE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    vaccine_objects = Medicine.objects.filter(med_type="Vaccine")  # Get all medicines
+
+    vaccine_list = []
+    for item in recent_budget_vaccine:
+        vaccine_list.append(item.vaccine)
+
+    vaccine_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    #medicine_inv_list = []
+    #for item in med_inventory:
+       # medicine_inv_list.append(item)
+
+    quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    vaccine_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for vac in vaccine_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+
+        vac_Received_Trail = Medicine_Received_Trail.objects.filter(inventory=vac_inventory).filter(
+            date_received__year=year)
+
+        sum = 0
+        for trail in vac_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_vaccine = Budget_vaccine.objects.filter(budget_allocation=previous_budget_alloc).get(vaccine=vac)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_vaccine.price
+        except:
+            last_years_price = 0
+        spending = sum * last_years_price
+        vaccine_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+    vac_difference_list = []
+    ctr = 0
+    for budget in recent_budget_vaccine:
+        vac_difference_list.append(budget.total - vaccine_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - vaccine_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_vac_price = []
+    for item in recent_budget_vaccine:
+        list_recent_budg_vac_price.append(item.price)
+
+    ####EQUIPMENT>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    equipment_objects = Miscellaneous.objects.filter(misc_type = "Equipment")  # Get all medicines
+
+    equipment_list = []
+    for item in recent_budget_equipment:
+        equipment_list.append(item.equipment)
+
+    #equipment_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    # medicine_inv_list = []
+    # for item in med_inventory:
+    # medicine_inv_list.append(item)
+
+    #quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    equipment_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+    #   get_quantity = object.quantity
+    for equipment in equipment_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        # vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+        equipment_Received_Trail = Miscellaneous_Received_Trail.objects.filter(inventory=equipment).filter(
+                date_received__year=year)
+
+        sum = 0
+        for trail in equipment_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_equipment = Budget_equipment.objects.filter(budget_allocation=previous_budget_alloc).get(
+            equipment = equipment)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_equipment.price
+        except:
+            last_years_price = 0
+        spending = sum * last_years_price
+        equipment_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+    equipment_difference_list = []
+    ctr = 0
+    for budget in recent_budget_equipment:
+        equipment_difference_list.append(budget.total - equipment_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - equipment_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_equipment_price = []
+    for item in recent_budget_equipment:
+        list_recent_budg_equipment_price.append(item.price)
+
+    ####VET SUPPLY>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    vet_objects = Miscellaneous.objects.filter(misc_type="Vet Supply")  # Get all medicines
+
+    vet_list = []
+    for item in recent_budget_vet_supply:
+        vet_list.append(item.vet_supply)
+
+    # equipment_inventory = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    # medicine_inv_list = []
+    # for item in med_inventory:
+    # medicine_inv_list.append(item)
+
+    #  quantity_vaccine = Medicine_Inventory.objects.filter(medicine__in=vaccine_list)
+
+    vet_spendings_list = []  # Spendings list (see computation below)
+    ctr = 0
+
+    # .get = Isa lang (dito mo lang pwede kunin yung attribute, ex. object.quantity)
+    # .filter = marami (pag marami, kailangan iloop)
+    #
+    # for object in objects: (pwede ibahin pangalan nung "object")
+     #   get_quantity = object.quantity
+    for vet in vet_objects:  # For every medicine in Medicines.object.exclude(med_type = vaccines)
+        # Med = Isa lang, medicine_objects = marami
+        # vac_inventory = Medicine_Inventory.objects.get(medicine=vac)
+
+        vet_Received_Trail = Miscellaneous_Received_Trail.objects.filter(inventory=vet).filter(
+                date_received__year=year)
+
+        sum = 0
+        for trail in vet_Received_Trail:  # Get all subtracted trails (of this particular medicine) for this year
+            # Trail = isa lang, med_Received_Trail = marami
+            sum += trail.quantity
+
+        # Get last_years's Budget_medicine related to this medicine
+        try:
+            this_budget_vet = Budget_vet_supply.objects.filter(budget_allocation=previous_budget_alloc).get(
+            vet_supply=vet)
+
+            # Spendings =  This year's subtracted inventory * Last year's budget bid
+            last_years_price = this_budget_vet.price
+        except:
+             last_years_price = 0
+
+        spending = sum * last_years_price
+        vet_spendings_list.append(spending)
+        grandspendings += spending
+        ctr += 1
+
+    vet_difference_list = []
+    ctr = 0
+    for budget in recent_budget_vet_supply:
+        vet_difference_list.append(budget.total - vet_spendings_list[ctr])
+        grandtotal += budget.total
+        granddiff += (budget.total - vet_spendings_list[ctr])
+        ctr += 1
+
+    list_recent_budg_vet_price = []
+    for item in recent_budget_vet_supply:
+        list_recent_budg_vet_price.append(item.price)
+
+    user = request.session["session_username"]
+
+    # FOOD >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    adult_objects = Food.objects.filter(foodtype="Adult Dog Food")  # Get all adult dog food
+    puppy_objects = Food.objects.filter(foodtype="Puppy Dog Food")
+    milk_objects = Food.objects.filter(foodtype="Milk")
+
+    adult_quantity_sum = 0
+    puppy_quantity_sum = 0
+    milk_quantity_sum = 0
+
+    for adult in adult_objects:
+        adult_quantity_sum += adult.quantity
+
+    for puppy in puppy_objects:
+        puppy_quantity_sum += puppy.quantity
+
+    for milk in milk_objects:
+        milk_quantity_sum += milk.quantity
+
+    this_budget_adult = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food = "Adult Food")
+    this_budget_puppy = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food="Puppy Food")
+    this_budget_milk = Budget_food.objects.filter(budget_allocation=previous_budget_alloc).get(food="Milk")
+
+    current_budget_adult = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Adult Food")
+    current_budget_puppy = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Puppy Food")
+    current_budget_milk = Budget_food.objects.filter(budget_allocation=recent_budget_alloc).get(food="Milk")
+
+    food_trail_adult = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = adult_objects)
+    food_trail_puppy = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = puppy_objects)
+    food_trail_milk = Food_Received_Trail.objects.filter(date_received__year=prev_year).filter(inventory__in = milk_objects)
+
+    adult_trail_sum = 0
+    puppy_trail_sum = 0
+    milk_trail_sum = 0
+
+    for adult in food_trail_adult:
+        adult_trail_sum += adult.quantity
+
+    for puppy in food_trail_puppy:
+        puppy_trail_sum += puppy.quantity
+
+    for milk in food_trail_milk:
+        milk_trail_sum += milk.quantity
+
+    previous_bid_adult = this_budget_adult.price
+    previous_bid_puppy = this_budget_puppy.price
+    previous_bid_milk = this_budget_milk.price
+
+    adult_expense = adult_trail_sum * previous_bid_adult
+    puppy_expense = puppy_trail_sum * previous_bid_puppy
+    milk_expense = milk_trail_sum * previous_bid_milk
+
+    difference_adult = current_budget_adult.total - adult_expense
+    difference_puppy = current_budget_puppy.total - puppy_expense
+    difference_milk = current_budget_milk.total - milk_expense
+
+    grandtotal += current_budget_adult.total + current_budget_puppy.total + current_budget_milk.total
+    grandspendings += adult_expense + puppy_expense + milk_expense
+    granddiff += difference_adult + difference_puppy + difference_milk
+
+    # K9>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    this_budget_k9 = Budget_k9.objects.get(budget_allocation=previous_budget_alloc)
+    current_budget_k9 = Budget_k9.objects.get(budget_allocation=recent_budget_alloc)
+
+    previous_bid_k9 = this_budget_k9.price
+    current_bid_k9 = current_budget_k9.price
+
+    current_quantity_k9 = this_budget_k9.quantity
+
+    previous_total_k9 = this_budget_k9.total
+    current_total_k9 = current_budget_k9.total
+
+    k9_procured = K9.objects.filter(source="Procurement").filter(date_created__year=year).count()
+    all_current_k9 = K9.objects.exclude(Q(training_status='Adopted') | Q(training_status='Dead')).count()
+    k9_expense = previous_bid_k9 * k9_procured
+
+    k9_difference = current_total_k9 - k9_expense
+
+    grandtotal += current_total_k9
+    grandspendings += k9_expense
+    granddiff += k9_difference
+
+    context = {
+        'miscellaneous_trail': miscellaneous_trail,
+        'budget_alloc': previous_budget_alloc,
+        'budget_medicine': budget_medicine,
+        'budget_equipment': budget_equipment,
+        'budget_food': budget_food,
+        'budget_vaccine': budget_vaccine,
+        'budget_vet_supply': budget_vet_supply,
+        'year': year + 1,
+        'recent_budget_medicine': recent_budget_medicine,
+        'recent_budget_equipment': recent_budget_equipment,
+        'recent_budget_food': recent_budget_food,
+        'recent_budget_vaccine': recent_budget_vaccine,
+        'recent_budget_vet_supply': recent_budget_vet_supply,
+        'list_recent_budg_med_price': list_recent_budg_med_price,
+
+        'quantity_medicine': quantity_medicine,
+        'medicine_spendings_list': medicine_spendings_list,
+        'med_difference_list': med_difference_list,
+
+        'quantity_vaccine': quantity_vaccine,
+        'vaccine_spendings_list': vaccine_spendings_list,
+        'vac_difference_list': vac_difference_list,
+        'list_recent_budg_vac_price': list_recent_budg_vac_price,
+
+        #'quantity_vaccine': quantity_vaccine,
+        'equipment_spendings_list': equipment_spendings_list,
+        'equipment_difference_list': equipment_difference_list,
+        'list_recent_budg_equipment_price': list_recent_budg_equipment_price,
+        'equipment_objects': equipment_objects,
+
+        'vet_spendings_list': vet_spendings_list,
+        'vet_difference_list': vet_difference_list,
+        'list_recent_budg_vet_price': list_recent_budg_vet_price,
+        'vet_objects': vet_objects,
+
+        'adult_objects': adult_objects,
+        'puppy_objects': puppy_objects,
+        'milk_objects': milk_objects,
+        'adult_quantity_sum': adult_quantity_sum,
+        'puppy_quantity_sum': puppy_quantity_sum,
+        'milk_quantity_sum': milk_quantity_sum,
+        'this_budget_adult': this_budget_adult,
+        'this_budget_puppy': this_budget_puppy,
+        'this_budget_milk': this_budget_milk,
+        'current_budget_adult': this_budget_adult,
+        'current_budget_puppy': this_budget_puppy,
+        'current_budget_milk': this_budget_milk,
+        'adult_expense': adult_expense,
+        'puppy_expense': puppy_expense,
+        'milk_expense': milk_expense,
+        'difference_adult': difference_adult,
+        'difference_puppy': difference_puppy,
+        'difference_milk': difference_milk,
+
+        'previous_bid_k9': previous_bid_k9,
+        'current_bid_k9': current_bid_k9,
+        'all_current_k9': all_current_k9,
+        'current_quantity_k9': current_quantity_k9,
+        'previous_total_k9': previous_total_k9,
+        'k9_expense': k9_expense,
+        'current_total_k9': current_total_k9,
+        'k9_difference': k9_difference,
+
+        'user': user,
+        'grandtotal': grandtotal,
+        'grandspendings': grandspendings,
+        'granddiff': granddiff,
+    }
+
+    return render(request, 'planningandacquiring/detailed_budgeting.html', context)
+
 
 def load_supplier(request):
 
@@ -2502,3 +3559,4 @@ def load_k9_reco(request):
     }
 
     return render(request, 'planningandacquiring/breeding_reco_data.html', context)
+

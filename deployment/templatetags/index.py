@@ -41,14 +41,18 @@ def incident_count_location(Location, id):
 @register.filter
 def incident_count(K9, request_id):
     incident_count = 0
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
-    if (team_dog_deployed.date_pulled is None):
-        team_assignment_id = team_dog_deployed.team_assignment.id
-        team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
-        location = team_assignment.location
-        incident_count = Incidents.objects.filter(location=location).count()
-        print("TEAM DOG DEPLOYED ID")
-        print(team_dog_deployed.id)
+
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+        if (team_dog_deployed.date_pulled is None):
+            team_assignment_id = team_dog_deployed.team_assignment.id
+            team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
+            location = team_assignment.location
+            incident_count = Incidents.objects.filter(location=location).count()
+            print("TEAM DOG DEPLOYED ID")
+            print(team_dog_deployed.id)
+    except:
+        ...
 
     return incident_count
 
@@ -100,17 +104,20 @@ def calculate_distance_from_current(K9, request_id):
     pcg_lat = 1632299.5848436863
 
     current_coordinates = convert_to_geographic(pcg_lon, pcg_lat)
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
 
-    if(team_dog_deployed.date_pulled is None):
-        team_assignment_id = team_dog_deployed.team_assignment.id
-        team_assignment = Team_Assignment.objects.get(id = team_assignment_id)
-        location = team_assignment.location
-        print("TEAM DOG DEPLOYED ID")
-        print(team_dog_deployed.id)
-        current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
-        deployed = 1
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
 
+        if(team_dog_deployed.date_pulled is None):
+            team_assignment_id = team_dog_deployed.team_assignment.id
+            team_assignment = Team_Assignment.objects.get(id = team_assignment_id)
+            location = team_assignment.location
+            print("TEAM DOG DEPLOYED ID")
+            print(team_dog_deployed.id)
+            current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
+            deployed = 1
+    except:
+        ...
     request = Dog_Request.objects.get(id = request_id)
     target_coordinates = convert_to_geographic(request.longtitude, request.latitude)
 
@@ -140,7 +147,7 @@ def calculate_distance_from_current_team(K9, team_id):
     pcg_lat = 1632299.5848436863
 
     current_coordinates = convert_to_geographic(pcg_lon, pcg_lat)
-    
+
     try:
         team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
 
@@ -152,11 +159,11 @@ def calculate_distance_from_current_team(K9, team_id):
             print(team_dog_deployed.id)
             current_coordinates = convert_to_geographic(location.longtitude, location.latitude)
             deployed = 1
-        
         else:
             pass
     except:
         pass
+
 
     team = Team_Assignment.objects.get(id = team_id)
     team_location = team.location
@@ -177,14 +184,20 @@ def calculate_distance_from_current_team(K9, team_id):
 #TODO Get location for K9s deployed in requests
 @register.filter
 def current_location(K9, request_id):
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
-    print("NOT NONE TEAM DOG DEPLOYED")
-    print(team_dog_deployed.__dict__)
-    if (team_dog_deployed.date_pulled is None):
-        team_assignment_id = team_dog_deployed.team_assignment.id
-        team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
-        location = team_assignment.location
-    else:
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+        print("NOT NONE TEAM DOG DEPLOYED")
+        print(team_dog_deployed.__dict__)
+
+
+        if (team_dog_deployed.date_pulled is None):
+            team_assignment_id = team_dog_deployed.team_assignment.id
+            team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
+            location = team_assignment.location
+        else:
+            location = "PCGK9 Taguig Base"
+
+    except:
         location = "PCGK9 Taguig Base"
 
     return location

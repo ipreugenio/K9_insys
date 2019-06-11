@@ -181,10 +181,23 @@
         <tbody>
                 {% for data in h%}
             <tr>
+
+                <th>K9</th>
+                <td>{{data.k9}}</td>
+                <th>Date</th>
+                <td>{{data.date}}</td>
+            </tr>
+            <tr>
+                <th>Problem</th>
+                <td class="nine wide">{{data.description}}</td>
+                <th>Reported by:</th>
+                <td>{{data.reported_by}}</td>
+
                 <td>{{data.medicine}}</td>
                 <td>{{data.quantity}}</td>
                 <td>{{data.time_of_day}}</td>
                 <td>{{data.duration}}</td>
+
             </tr>
             {% endfor %}
         </tbody>

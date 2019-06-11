@@ -106,7 +106,7 @@
           <td>{{dogs_deployed.k9.name}}</td>
           <td>{{dogs_deployed.k9.serial_number}}</td>
           <td>{{dogs_deployed.k9.capability}}</td>
-          <td>{{dogs_deployed.handler}}</td>
+          <td>{{dogs_deployed.k9.handler}}</td>
         </tr>
           {% endfor %}
     </tbody>
@@ -128,7 +128,7 @@
         <td>{{dogs_deployed.k9.name}}</td>
         <td>{{dogs_deployed.k9.serial_number}}</td>
         <td>{{dogs_deployed.k9.capability}}</td>
-        <td>{{dogs_deployed.handler}}</td>
+        <td>{{dogs_deployed.k9.handler}}</td>
           <td class="ui center aligned" style="width:15%;">
            <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
          </td>
@@ -137,6 +137,7 @@
   </tbody>
 </table>
  {% endif %}
+
 {% if data2.status == "Pending"%}
 
  <form action="" method="post">

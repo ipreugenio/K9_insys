@@ -1,6 +1,6 @@
 from django import template
 from planningandacquiring.models import Budget_allocation, Budget_medicine, Budget_equipment, Budget_food, Budget_vaccine, Budget_vet_supply
-from inventory.models import Medicine
+from inventory.models import Medicine, Miscellaneous, Food
 
 register = template.Library()
 
@@ -36,7 +36,65 @@ def get_medicine_name(med_budget, i):
     return med.medicine
 
 @register.filter
+def get_vaccine_name(vac_budget, i):
+
+    vac = Medicine.objects.get(id = vac_budget.vaccine.id)
+
+    return vac.medicine
+
+@register.filter
+def get_equipment_name(equipment_budget, i):
+
+    equipment = Miscellaneous.objects.get(id = equipment_budget.equipment.id)
+
+    return equipment.miscellaneous
+
+@register.filter
+def get_vet_name(vet_budget, i):
+
+    vet = Miscellaneous.objects.get(id = vet_budget.vet_supply.id)
+
+    return vet.miscellaneous
+
+@register.filter
+def get_food_name(food_budget, i):
+
+    food = Food.objects.get(id = food_budget.food.id)
+
+    return food.food
+
+@register.filter
 def get_medicine_recent_price(med_budget_price_list, i):
 
 
     return med_budget_price_list[i]
+
+@register.filter
+def get_quantity_medicine(quantity_medicine, i):
+
+    object = quantity_medicine[i]
+
+    return object.quantity
+
+@register.filter
+def get_quantity_spendings(spendings_list, i):
+
+    list = spendings_list[i]
+
+    #total = object.quantity * object.price
+
+    return list
+
+@register.filter
+def recent_budget_medicine(recent_budget_medicine, i):
+
+    object = recent_budget_medicine[i]
+
+    return object.total
+
+@register.filter
+def equipment_quantity(equipment_objects, i):
+
+    object = equipment_objects[i]
+
+    return object.quantity

@@ -36,8 +36,9 @@
 
 <div class="ui fluid container">
     <div class="ui inverted segment">
-    <form class="ui inverted equal width form" action="{% url 'profiles:add_User_form' %}" method="POST">
+    <form enctype="multipart/form-data" class="ui inverted equal width form" action="{% url 'profiles:add_User_form' %}" method="POST">
         {% csrf_token %}
+
         <div class="field">
             {{form.image}}
         </div>

@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed
+
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed, Dog_Breed
+
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
@@ -17,7 +19,9 @@ import datetime
 from deployment.models import Team_Assignment, Daily_Refresher
 from django.db.models import Sum
 from decimal import Decimal
+
 import itertools
+
 
 from collections import OrderedDict
 
@@ -481,7 +485,8 @@ def classify_k9_select(request, id):
 
     trait_score = [0, 0, 0]
 
-    dog_trait = K9_Breed.objects.all()
+
+    dog_trait = Dog_Breed.objects.all()
 
     select_trait = None
     for trait in dog_trait:
@@ -508,7 +513,9 @@ def classify_k9_select(request, id):
         ('Mixed', 'Mixed'),
     )
 
-    records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed = data.breed)
+
+    records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed__contains = data.breed)
+
 
     SAR_list = []
     NDD_list = []
@@ -844,6 +851,10 @@ def assign_k9_select(request, id):
             k9.handler = f.handler
             k9.save()
 
+
+            #Create K9_Handler Model
+            K9_Handler.objects.create(k9 = k9, handler = handler)
+
             #Handler Update
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
@@ -855,6 +866,7 @@ def assign_k9_select(request, id):
             messages.success(request, str(k9) + ' has been assigned to ' + str(h) + ' and is ready for Training!')
             messages.info(request, 'On-Training')
             return redirect('training:classify_k9_list')
+
 
         else:
             style = "ui red message"
@@ -1058,6 +1070,7 @@ def training_update_form(request, id):
         return render(request, 'training/training_update_ndd.html', context)
     else:
         return render(request, 'training/training_update_sar.html', context)
+
 
 def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
@@ -2021,7 +2034,11 @@ def daily_record_mult(request):
 
     date = request.session["session_date"]
     try:
+# <<<<<<< HEAD
+#         record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+# =======
         record = Daily_Refresher.objects.filter(k9 = k9).get(date_today = date)
+# >>>>>>> 67603ec727f20d95ed779807086d18316555466a
     except:
         record = None
 
@@ -2040,20 +2057,24 @@ def load_handler(request):
     try:
         handler_id = request.GET.get('handler')
         handler = User.objects.get(id=handler_id)
+
         pi = Personal_Info.objects.get(UserID=handler)
         edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
         ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
         sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
         
+
     except:
         pass
 
     context = {
         'handler': handler,
+
         'pi':pi,
         'ndd':ndd,
         'edd':edd,
         'sar':sar,
+
     }
 
     return render(request, 'training/handler_data.html', context)

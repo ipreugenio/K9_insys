@@ -4,8 +4,7 @@
 {% load um_tags %}
 <center>
 <img src="{% static 'images/k9_logo.png' %}" width="150">
-    <br>BUDGETING REPORT
-    <br>for {{year}}
+    <br>BUDGET FOR THE YEAR {{year}}
 </center>
 
 <table id="tabledata1" class="ui eleven column celled table">
@@ -232,8 +231,8 @@
 
         </tr>
 
-
 </table>
+
 
 <table id="tabledata6" class="ui nine column celled table">
         <tr>
@@ -278,10 +277,5 @@
         </tbody>
 
     </table>
-
-<center>
-    <br> End of Report
-    <br> Prepared by: {{user}}
-</center>
 
 {% endblock %}
