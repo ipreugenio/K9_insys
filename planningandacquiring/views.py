@@ -4,7 +4,7 @@ from django.http import Http404
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, budget_food, budget_equipment, budget_medicine, budget_vaccine, budget_vet_supply, budget_date
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, Budget_vaccine, Budget_vet_supply
 
-from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, add_breed_form
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, K9_Breed, K9_Supplier, K9_Litter
 from .models import K9_Mated
 from .forms import DateForm
@@ -2387,6 +2387,49 @@ def add_breed(request):
     }
     print(form)
     return render(request, 'planningandacquiring/add_breed.html', context)
+
+def breed_list(request):
+    breed = K9_Breed.objects.all()
+
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'Title': 'Breed List',
+        'breed': breed,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/breed_list.html', context)
+
+def breed_detail(request, id):
+    breed = K9_Breed.objects.get(id=id)
+
+    form = add_breed_form(request.POST or None, request.FILES or None, instance=breed)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Breed Details Updated!')
+
+            return redirect('planningandacquiring:breed_detail', id=breed.id)
+
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context = {
+        'Title': 'Breed List',
+        'breed': breed,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+    return render(request, 'planningandacquiring/breed_detail.html', context)
 
 
 def breed_listview(request):

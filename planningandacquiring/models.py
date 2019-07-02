@@ -62,11 +62,13 @@ class K9_Breed(models.Model):
     breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
     life_span = models.CharField('life_span', max_length=200, null=True)
     temperament = models.CharField('temperament', max_length=200, null=True)
-    colors = models.CharField('colors', choices=COLORS, max_length=200, null=True)
+    colors = models.CharField('colors', max_length=200, null=True)
     weight = models.CharField('weight', max_length=200, null=True)
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
     skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+    litter_number = models.IntegerField('litter_number', null=True)
+    value = models.FloatField('value', max_length=200, null=True)
 
     def __str__(self):
         return str(self.breed)

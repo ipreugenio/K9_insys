@@ -345,8 +345,40 @@ def home(request):
         return HttpResponseRedirect('../dashboard')
 
 
-
     return redirect('profiles:vet_dashboard')
+
+
+def login(request):
+    if request.method == 'POST':
+        serial = request.POST['serial_number']
+        password = request.POST['password']
+
+        request.session["session_serial"] = serial
+        account = Account.objects.get(serial_number=serial)
+        user = User.objects.get(id=account.UserID.id)
+
+        request.session["session_user_position"] = user.position
+        request.session["session_id"] = user.id
+        request.session["partnered"] = user.partnered
+        request.session["session_username"] = str(user)
+
+        if user.position == 'Administrator':
+            return HttpResponseRedirect('../dashboard')
+        elif user.position == 'Veterinarian':
+            return HttpResponseRedirect('../vet-dashboard')
+        elif user.position == 'Team Leader':
+            return HttpResponseRedirect('../team-leader-dashboard')
+        elif user.position == 'Handler':
+            return HttpResponseRedirect('../handler-dashboard')
+        elif user.position == 'Commander':
+            return HttpResponseRedirect('../commander-dashboard')
+        else:
+            return HttpResponseRedirect('../dashboard')
+    else:
+        messages.warning(request, 'username or password is invalid!')
+
+
+    return render(request, 'profiles/login.html')
 
 
 def logout(request):
