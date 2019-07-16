@@ -5,7 +5,9 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
@@ -32,38 +34,6 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from profiles.serializers import NotificationSerializer, UserSerializer
 # Create your views here.
-
-# def login(request):
-#     style=""
-#
-#     if request.method == 'POST':
-#         serial = request.POST['serial_number']
-#         password = request.POST['password']
-#
-#         if Account.objects.filter(serial_number=serial).exists():
-#             if Account.objects.filter(password=password).exists():
-#                 request.session["session_serial"] = serial
-#                 account = Account.objects.get(serial_number = serial)
-#                 user = User.objects.get(id = account.UserID.id)
-#
-#
-#                 request.session["session_user_position"] = user.position
-#                 request.session["session_id"] = user.id
-#                 request.session["session_username"] = str(user)
-#
-#                # return HttpResponseRedirect('../dashboard')
-#             return HttpResponseRedirect('../dashboard')
-#
-#     '''else:
-#         style = "ui red message"
-#         messages.warning(request, 'Wrong serial number or password!')'''
-#
-#     context = {
-#         'title': "Login",
-#         'style': style,
-#     }
-#
-#     return render (request, 'profiles/login.html', context)
 
 def notif(request):
     serial = request.session['session_serial']
@@ -233,7 +203,7 @@ def handler_dashboard(request):
     user = user_session(request)
 
     form = RequestForm(request.POST or None)
-    geoform = GeoForm(request.POST or None)
+    geoform = GeoForm(request.POST or None, lat=120.993173, lng=14.564752)
     geosearch = GeoSearch(request.POST or None)
     
     dr = 0
@@ -397,18 +367,14 @@ def register(request):
     return render (request, 'profiles/register.html')
 
 def home(request):
-    id = request.user.id - 1
+    id = request.user.id
 
-    print(id)
     user = User.objects.get(id =id)
-
 
     request.session["session_serial"] = request.user.username
     request.session["session_user_position"] = user.position
     request.session["session_id"] = user.id
     request.session["session_username"] = str(user)
-
-    #print(user.position)
 
     if user.position == 'Team Leader':
         return HttpResponseRedirect('../team-leader-dashboard')
@@ -419,7 +385,7 @@ def home(request):
     else:
         return HttpResponseRedirect('../dashboard')
 
-    #return redirect('profiles:vet_dashboard')
+    return redirect('profiles:vet_dashboard')
 
 def logout(request):
     session_keys = list(request.session.keys())
@@ -432,6 +398,7 @@ def login(request):
         serial = request.POST['serial_number']
         password = request.POST['password']
         user_auth = authenticate(request, username=serial, password=password)
+        print(password)
         if user_auth is not None:
             auth_login(request, user_auth)
             request.session["session_serial"] = serial
@@ -459,6 +426,7 @@ def login(request):
                 return HttpResponseRedirect('../dashboard')
         else:
             messages.warning(request, 'username or password is invalid!')
+
     return render (request, 'profiles/login.html')
 
 def add_User(request):
@@ -574,7 +542,6 @@ def add_education(request):
 
 def add_account(request):
     form = add_user_account(request.POST or None)
-    form2 = UserCreationForm(request.POST or None)
     style = ""
 
     UserID = request.session["session_userid"]
@@ -583,15 +550,12 @@ def add_account(request):
     if request.method == 'POST':
         if form.is_valid():
             form = form.save(commit=False)
-            form.UserID = data
-            form.serial_number =  'O-' + str(data.id) 
+            form.username = 'O-' + str(data.id) 
+            form.first_name = data.firstname
+            form.last_name = data.lastname
             form.save()
 
             return HttpResponseRedirect('../../../../user_list/')
-
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
 
     #NOTIF SHOW
     notif_data = notif(request)

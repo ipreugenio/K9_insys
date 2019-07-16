@@ -11,9 +11,8 @@
             {% endfor %}
         {% endif %}
     </div>
+{% if stat == True %}
 <div class="ui segment">
-
-    
         <table class="ui eight column celled table">
             <thead>
                 <tr>
@@ -309,6 +308,11 @@
         </form>
         
 </div>
+{%else%}
+<div class="ui info message">
+    Dont have enought data on k9's and inventory.
+</div>
+{% endif %}
 <script type="text/javascript">
             
         $(document).ready(function() {

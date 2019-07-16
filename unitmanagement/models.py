@@ -4,7 +4,7 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
 from training.models import Training
-from profiles.models import User
+from profiles.models import User, Account
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -12,6 +12,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
 from planningandacquiring.models import K9
+from django.contrib.auth.models import User as AuthUser
 
 # Create your models here.
 

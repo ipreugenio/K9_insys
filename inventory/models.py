@@ -84,7 +84,7 @@ class Medicine(models.Model):
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, blank=True, null=True)
     immunization = models.CharField('immunization', choices=IMMUNIZATION, max_length=50, blank=True, null=True)
-    dose = models.DecimalField('dose', max_digits=50, default=1, decimal_places=2, blank=True, null=True)
+    dose = models.IntegerField('dose', default=1, blank=True, null=True)
     uom = models.CharField('uom', max_length=10, default='pc', blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
@@ -169,7 +169,7 @@ class Food(models.Model):
     unit = models.CharField('unit', choices=UNIT, max_length=50)
     description = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    quantity = models.DecimalField('quantity', default=0, decimal_places=2, max_digits=10)
+    quantity = models.IntegerField('quantity', default=0)
 
     def __str__(self):
         return self.food
@@ -229,7 +229,6 @@ class Miscellaneous(models.Model):
     )
 
     TYPE = (
-        ('Equipment', 'Equipment'),
         ('Vet Supply', 'Vet Supply'),
         ('Kennel Supply', 'Kennel Supply'),
         ('Others', 'Others'),
@@ -237,7 +236,7 @@ class Miscellaneous(models.Model):
 
     miscellaneous = models.CharField(max_length=100)
     uom = models.CharField(max_length=100, choices=UOM, default="pack")
-    misc_type = models.CharField(max_length=100, choices=TYPE, default="Equipment")
+    misc_type = models.CharField(max_length=100, choices=TYPE, default="Others")
     description = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)

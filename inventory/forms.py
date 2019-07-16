@@ -83,8 +83,8 @@ class MiscellaneousForm(forms.ModelForm):
     )
 
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
-    uom = forms.CharField(max_length=10, label = 'uom', widget = forms.Select(choices=UOM))
-    misc_type = forms.CharField(max_length=10, label = 'misc_type', widget = forms.Select(choices=TYPE))
+    uom = forms.CharField(max_length=100, label = 'uom', widget = forms.Select(choices=UOM))
+    misc_type = forms.CharField(max_length=100, label = 'misc_type', widget = forms.Select(choices=TYPE))
 
     class Meta:
         model = Miscellaneous

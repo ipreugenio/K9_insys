@@ -160,6 +160,11 @@ class K9(models.Model):
         ('Dead', 'Dead'),
     )
 
+    TRAINED = (
+        ('Trained', 'Trained'),
+        ('Failed', 'Failed'),
+    )
+
     image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
     name = models.CharField('name', max_length=200)

@@ -387,6 +387,7 @@ class Dog_Request(models.Model):
     )
 
     requester = models.CharField('requester', max_length=100)
+    event_name = models.CharField('event_name', max_length=100)
     location = models.CharField('location', max_length=300)
     city = models.CharField('city', choices=CITY, max_length=100, default="Manila")
     sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
