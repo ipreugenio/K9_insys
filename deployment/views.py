@@ -26,10 +26,8 @@ from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
 from inventory.models import Medicine
 
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, SelectLocationForm
-
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment, K9_Pre_Deployment_Items
-from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
+from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment,K9_Pre_Deployment_Items
 
 from pyproj import Proj, transform
 
@@ -234,18 +232,27 @@ def load_map(request):
 def assign_team_location(request):
     form = AssignTeamForm(request.POST or None)
     style = ""
+
     if request.method == 'POST':
         if form.is_valid():
             f = form.save(commit=False)
             f.team_leader.assigned=True
             f.location.status='assigned'
             f.save()
+            
+            #Location
+            l=Location.objects.get(id=f.location.id)
+            l.status = 'assigned'
 
-            print(f)
+            #Team Leader
+            u = User.objects.get(id=f.team_leader.id)
+            u.assigned = True
+
+            l.save()
+            u.save()
 
             style = "ui green message"
-            messages.success(request, 'Location has been successfully Added!')
-            form = AssignTeamForm()
+            return redirect('deployment:assigned_location_list')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -319,6 +326,7 @@ def assigned_location_list(request):
 
 def team_location_details(request, id):
     data = Team_Assignment.objects.get(id=id)
+    print(data.id)
     incidents = Incidents.objects.filter(location = data.location)
     edd_inc = Incidents.objects.filter(location = data.location).filter(type = "Explosives Related").count()
     ndd_inc = Incidents.objects.filter(location=data.location).filter(type="Narcotics Related").count()
@@ -334,7 +342,6 @@ def team_location_details(request, id):
 
     # #filter K9 where handler = person_info and k9 assignment = None
     can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
-    
     dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
   
@@ -420,10 +427,9 @@ def dog_request(request):
 
     form = RequestForm(request.POST or None)
 
-    geoform = GeoForm(request.POST or None, width=750)
-    style = ""
+    geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
-    width = 750
+    width = 470
 
     style = ""
 
@@ -473,27 +479,29 @@ def dog_request(request):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-      'title':'Request Form',
-      'texthelp': 'Input request of client here.',
+      'title':'Add Location Form',
+      'texthelp': 'Input Location Details Here',
       'form': form,
 
-      'geoform' : geoform,
-       'geosearch' : geosearch,
-        'width' : width,
+      'geoform': geoform,
+      'geosearch': geosearch,
+       'width' :width,
 
       'actiontype': 'Submit',
       'style':style,
       'notif_data':notif_data,
       'count':count,
       'user':user,
+
     }
     return render (request, 'deployment/request_form.html', context)
+    
 
 def request_dog_list(request):
     data = Dog_Request.objects.all()
@@ -905,7 +913,7 @@ def add_incident(request):
     user = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user.UserID.id)
 
-    ta = Team_Assignment.objects.get(team_leader=user)
+    ta = Team_Assignment.objects.get(team_leader=current_user)
 
 
     form.initial['date'] = date.today() 

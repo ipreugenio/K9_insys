@@ -18,14 +18,18 @@
                             {% endif %}
                             <form class = "ui inverted form" method="POST">
                                 {% csrf_token %}
-                                <div class = "two fields">
-                                    <div class="ten wide field">
+                                <div class = "three fields">
+                                    <div class="Seven wide field">
                                         <label>Medicine</label>
                                         {{form.medicine}}
                                     </div>
-                                    <div class="six wide field">
+                                    <div class="four wide field">
                                         <label>Type</label>
                                         {{form.med_type}}
+                                    </div>
+                                    <div class="five wide field">
+                                        <label>Imminization/Prevention</label>
+                                        {{form.immunization}}
                                     </div>
                                 </div>
 
@@ -45,16 +49,6 @@
                                     </div>
                                 </div>
                                     
-                                <div class="two fields">
-                                    <div class="field">
-                                        <label>Imminization/Prevention</label>
-                                        {{form.immunization}}
-                                    </div>
-                                    <div class="field">
-                                        <label>Duration(In-Days)</label>
-                                        {{form.duration}}
-                                    </div>
-                                </div>
                                 <div class="field">
                                     <label>Description</label>
                                         {{form.description}}
@@ -76,24 +70,20 @@
     $(document).ready(function() {
         $('#tabledata').DataTable();
 
-        $("input[name='duration']").prop('disabled', true);
         $("select[name='immunization']").prop('disabled', true);
 
         $("select[name='med_type']").change(function() {
             if ($("select[name='med_type']").val() == 'Vaccine'){
-                $("input[name='duration']").prop('disabled', false);
                 $("select[name='immunization']").prop('disabled', false);
                 $("input[name='dose']").val('').prop('disabled', true);
                 $("select[name='uom']").prop('disabled', true);
             }
             else if ($("select[name='med_type']").val() == 'Preventive'){
-                $("input[name='duration']").prop('disabled', true);
                 $("select[name='immunization']").prop('disabled', false);
                 $("input[name='dose']").val('').prop('disabled', false);
                 $("select[name='uom']").prop('disabled', false);
             }
             else{
-                $("input[name='duration']").prop('disabled', true);
                 $("select[name='immunization']").prop('disabled', true);
                 $("input[name='dose']").prop('disabled', false);
                 $("select[name='uom']").prop('disabled', false);

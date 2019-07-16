@@ -4,6 +4,9 @@ from planningandacquiring.models import K9
 # from inventory.models import Food, Medicine_Inventory
 from profiles.models import User
 from datetime import timedelta, date, datetime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+# Create your models here.
 import re
 from django.utils import timezone
 
@@ -169,7 +172,6 @@ class Location(models.Model):
         ('Vigan', 'Vigan'),
         ('Zamboanga', 'Zamboanga'),
     )
-
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     place = models.CharField('place', max_length=200, default='Undefined')
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
@@ -472,6 +474,11 @@ class K9_Schedule(models.Model):
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
+
+    def save(self, *args, **kwargs):
+        self.date_start = self.dog_request.start_date
+        self.date_end = self.dog_request.end_date
+        super(K9_Schedule, self).save(*args, **kwargs)
 
 class Incidents(models.Model):
     TYPE = (

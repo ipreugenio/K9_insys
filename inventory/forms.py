@@ -24,14 +24,13 @@ class MedicineForm(forms.ModelForm):
 
     class Meta:
         model = Medicine
-        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type', 'duration','immunization')
+        fields = ('medicine', 'dose', 'uom', 'description', 'price', 'med_type','immunization')
 
     def __init__(self, *args, **kwargs):
         super(MedicineForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['uom'].required = False 
         self.fields['dose'].required = False 
-        self.fields['duration'].required = False 
         self.fields['immunization'].required = False 
 
 class MedicineCountForm(forms.ModelForm):
@@ -45,19 +44,11 @@ class MedicineCountForm(forms.ModelForm):
         
 #Food
 class FoodForm(forms.ModelForm):
-
-    FOODTYPE = (
-        ('Adult Dog Food', 'Adult Dog Food'),
-        ('Puppy Dog Food', 'Puppy Dog Food'),
-        ('Milk', 'Milk'),
-    )
-
-    foodtype = forms.CharField(max_length=100, label = 'foodtype', widget = forms.Select(choices=FOODTYPE))
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))
-
+    
     class Meta:
         model = Food
-        fields = ('food', 'foodtype', 'description', 'price')
+        fields = ('food', 'foodtype', 'description', 'price','unit')
 
     def __init__(self, *args, **kwargs):
         super(FoodForm, self).__init__(*args, **kwargs)
@@ -77,17 +68,18 @@ class MiscellaneousForm(forms.ModelForm):
 
     UOM = (
         ('pc', 'pc'),
+        ('pack', 'pack'),
+        ('box', 'box'),
         ('roll', 'roll'),
         ('can', 'can'),
         ('bottle', 'bottle'),
         ('tube', 'tube'),
-        ('box', 'box'),
     )
 
-    TYPE = (
-        ('Equipment', 'Equipment'),
+    TYPE = (    
         ('Vet Supply', 'Vet Supply'),
-
+        ('Kennel Supply', 'Kennel Supply'),
+        ('Others', 'Others'),
     )
 
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))

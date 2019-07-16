@@ -39,39 +39,28 @@
     {% csrf_token %}
     <div>
         <div class="three fields">
-            <div class="field"></div>
             <div class="field">
                 <label>Birth Date</label>
                 {{form.birth_date}}
             </div>
-            <div class="field"></div>
+            <div class="two wide field">
+                <label>Litter No:</label>
+                <input type="number" name='litter_number'>
+            </div>
+            <div class="two wide field">
+                <label>Puppies that Died:</label>
+               <input type="number" name='litter_died'>
+            </div>
         </div>
     </div>
-    {% for form in formset %}
-    <div class="formset_class" id="{{ form.prefix }}-row">
-        <div class="four fields">
-            <div class="field">
-                <label>Name</label>
-                {{form.name}}
-            </div>    
-            <div class="field">
-                <label>Color</label>
-                {{form.color}}
-            </div> 
-            <div class="field">
-                <label>Sex</label>
-                {{form.sex}}
-            </div> 
-            <div class="field">
-                <label>Image</label>
-                {{form.image}}
-            </div>    
-        </div>
-    </div>
-    {% endfor %}
-    <div class="ui inverted right aligned segment" style="padding: 0px;">
+    
+    <div id="id_form_data"></div>
+
+    <div class="ui inverted center aligned segment" style="padding: 0px;">
         <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
     </div>
+
+    
     {{formset.management_form}}
 </form>
 
@@ -79,11 +68,21 @@
 
 <script>
   $(document).ready(function() {
-      $(function() {
-          $('#myForm .formset_class').formset({
-              prefix: '{{ formset.prefix }}'
-          });            
-      })
+
+      $("input[name='litter_died']").change(function () {
+        var url = 'ajax_load_form';  
+        var num =  $("input[name='litter_number']").val() - $("input[name='litter_died']").val()
+        
+        $.ajax({                       
+        url: url,                    
+        data: {
+            'num': num      
+        },
+        success: function (data) {   
+            $("#id_form_data").html(data);  
+        }
+        });
+    });
   });
 </script>
 {% endblock %}

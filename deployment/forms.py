@@ -38,9 +38,12 @@ class LocationForm(forms.ModelForm):
     place = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     class Meta:
         model = Location
-        fields = ('area', 'place', 'city')
+        fields = ('area', 'city', 'place')
 
-
+    def __init__(self, *args, **kwargs):
+        super(LocationForm, self).__init__(*args, **kwargs)
+        self.fields['place'].widget.attrs['readonly'] = 'readonly'
+        self.fields['place'].widget.attrs['placeholder'] = 'Please search for the location' 
 
 class SelectLocationForm(forms.Form):
     location_list = []
@@ -85,7 +88,6 @@ class SelectUnitsForm(forms.Form):
             self.fields['k9'].widget.attrs['checked'] = True
 
 class ScheduleUnitsForm(forms.Form):
-
     schedule = forms.DateField(widget=DateInput())
     unit = forms.ModelChoiceField(TempDeployment.objects.all())
 
@@ -96,6 +98,10 @@ class AssignTeamForm(forms.ModelForm):
     class Meta:
         model = Team_Assignment
         fields = ('location', 'team_leader', 'team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
+    
+    def __init__(self, *args, **kwargs):
+        super(AssignTeamForm, self).__init__(*args, **kwargs)
+        self.fields['team_leader'].queryset = User.objects.filter(position='Team Leader').filter(assigned=False)
 
 class EditTeamForm(forms.ModelForm):
     class Meta:
@@ -103,9 +109,6 @@ class EditTeamForm(forms.ModelForm):
         fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
 class RequestForm(forms.ModelForm):
-    
-    #area = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
-    
     class Meta:
         model = Dog_Request
         fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'city', 'k9s_needed', 'start_date', 'end_date')
@@ -114,6 +117,12 @@ class RequestForm(forms.ModelForm):
             'start_date': DateInput(),
             'end_date': DateInput()
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(RequestForm, self).__init__(*args, **kwargs)
+        self.fields['location'].widget.attrs['readonly'] = 'readonly'
+        self.fields['location'].widget.attrs['placeholder'] = 'Please search for the location' 
+        self.fields['remarks'].required = False
 
     def validate_date(self):
         date_start = self.cleaned_data['start_date']
@@ -192,10 +201,6 @@ class GeoForm(geoforms.Form):
             self.fields['point'].widget.attrs['default_lon'] = lng
         if width:
             self.fields['point'].widget.attrs['map_width'] = width
-
-__all__ = ('MonthYearWidget',)
-
-RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
 
 class MonthYearWidget(Widget):

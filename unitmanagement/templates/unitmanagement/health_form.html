@@ -31,13 +31,19 @@
                 <label>Treatment</label>
                 {{form.treatment}}
             </div>
-            <div class="three fields">
+            <div class="three fields center">
                 <div class="field">
                     <label>Prescription Image (if any)</label>
                     {{form.image}}
                 </div>
-                <div class="field"></div>
-                <div class="field"></div>
+                <div class="field">
+                    <label>Follow Up?</label>
+                    {{form.follow_up}}
+                </div>
+                <div class="field">
+                    <label>Follow Date</label>
+                    {{form.follow_up_date}}
+                </div>
             </div>
             <table>
                 <tbody>
@@ -65,6 +71,12 @@
             {{formset.management_form}}
         </form>
     </div>
+
+<style>
+    ul {
+        list-style-type: none;
+    }
+</style>
 <script type="text/javascript">
         
     $(document).ready(function() {
@@ -75,6 +87,17 @@
                 prefix: '{{ formset.prefix }}'
             });            
         })
+
+        $('#id_follow_up_date').prop('disabled', 'disabled');
+
+        $( "#id_follow_up" ).change(function() {
+          
+            if ($("input[name='follow_up']:checked").val() == 'True'){
+                $('#id_follow_up_date').prop('disabled', false);
+            }else{
+                $('#id_follow_up_date').prop('disabled', 'disabled');
+            }
+        });
     });
     
 </script>

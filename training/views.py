@@ -5,7 +5,7 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed, Dog_Breed
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, Dog_Breed
 
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification

@@ -3,7 +3,7 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from .models import K9, K9_Past_Owner, K9_Parent, Date, Budget_allocation, Budget_medicine,Budget_food,Budget_equipment,Budget_vaccine,Budget_vet_supply
+from .models import K9, K9_Past_Owner, K9_Parent, Date
 from .models import K9_Mated
 import datetime
 import re
@@ -19,7 +19,7 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 from profiles.models import User
-from .models import K9, K9_Past_Owner, K9_Parent, Date, K9_Breed, K9_Supplier
+from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed, K9_Supplier
 from django.forms.widgets import CheckboxSelectMultiple
 
 
@@ -86,7 +86,7 @@ class add_donated_K9_form(forms.ModelForm):
 
     class Meta:
         model = K9
-        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date', 'date_created')
+        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date','date_created')
         widgets = {
             'birth_date': DateInput(),
             'date_created': DateInput(),
@@ -96,6 +96,7 @@ class add_donated_K9_form(forms.ModelForm):
         super(add_donated_K9_form, self).__init__(*args, **kwargs)
         self.fields['breed'].empty_label = None
         self.fields['image'].required = False
+        self.fields['date_created'].required = False
 
 class add_donator_form(forms.ModelForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':'2', 'style':'resize:none;'}))
@@ -195,67 +196,67 @@ class k9_detail_form(forms.ModelForm):
 
 #class select_date(forms.Form):
 
-class budget_food(forms.Form):
-    # class Meta:
-    #     model = Budget_food
-    #     fields = ('food', 'quantity', 'price', 'total', 'budget_allocation')
-    budget_puppy = forms.DecimalField()
-    budget_milk = forms.DecimalField()
-    budget_adult = forms.DecimalField()
+# class budget_food(forms.Form):
+#     # class Meta:
+#     #     model = Budget_food
+#     #     fields = ('food', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget_puppy = forms.DecimalField()
+#     budget_milk = forms.DecimalField()
+#     budget_adult = forms.DecimalField()
 
-    quantity_puppy = forms.DecimalField()
-    quantity_milk = forms.DecimalField()
-    quantity_adult = forms.DecimalField()
+#     quantity_puppy = forms.DecimalField()
+#     quantity_milk = forms.DecimalField()
+#     quantity_adult = forms.DecimalField()
 
-    price_puppy = forms.IntegerField()
-    price_milk = forms.IntegerField()
-    price_adult = forms.IntegerField()
-
-
-class budget_equipment(forms.Form):
-    # class Meta:
-    #     model = Budget_equipment
-    #     fields = ('equipment', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
-
-class budget_medicine(forms.Form):
-    # class Meta:
-    #     model = Budget_medicine
-    #     fields = ('medicine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+#     price_puppy = forms.IntegerField()
+#     price_milk = forms.IntegerField()
+#     price_adult = forms.IntegerField()
 
 
-class budget_vaccine(forms.Form):
-    # class Meta:
-    #     model = Budget_vaccine
-    #     fields = ('vaccine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+# class budget_equipment(forms.Form):
+#     # class Meta:
+#     #     model = Budget_equipment
+#     #     fields = ('equipment', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
 
-class budget_vet_supply(forms.Form):
-    # class Meta:
-    #     model = Budget_vet_supply
-    #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+# class budget_medicine(forms.Form):
+#     # class Meta:
+#     #     model = Budget_medicine
+#     #     fields = ('medicine', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
 
-class budget_k9(forms.Form):
-    # class Meta:
-    #     model = Budget_vet_supply
-    #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
 
-class budget_date(forms.Form):
-    #date = forms.DateField()
-    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+# class budget_vaccine(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vaccine
+#     #     fields = ('vaccine', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_vet_supply(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vet_supply
+#     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_k9(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vet_supply
+#     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_date(forms.Form):
+#     #date = forms.DateField()
+#     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
 
 class add_breed_form(forms.ModelForm):
     TEMPERAMENT = (
@@ -314,7 +315,7 @@ class add_breed_form(forms.ModelForm):
 
 
     class Meta:
-        model = K9_Breed
+        model = Dog_Breed
         fields = ('breed', 'life_span', 'temperament', 'colors', 'weight', 'male_height', 'female_height', 'skill_recommendation')
 
 
