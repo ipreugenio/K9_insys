@@ -1,5 +1,5 @@
 from django import template
-from deployment.models import Incidents, K9_Schedule, Team_Dog_Deployed, Team_Assignment, Location, Dog_Request
+from deployment.models import Incidents, K9_Schedule, Team_Dog_Deployed, Team_Assignment, Location, Dog_Request, Maritime
 from datetime import date as dt
 from django.db.models import Q
 from dateutil import parser
@@ -11,9 +11,83 @@ import ast
 from decimal import *
 from django.contrib.gis.geos import Point
 from pyproj import Proj, transform
-
-
+from deployment.forms import SelectLocationForm, SelectUnitsForm, DeploymentDateForm
 register = template.Library()
+
+@register.filter
+def render_formset_item(formset, idx):
+
+    return formset[idx]["deployment_date"].as_widget()
+
+@register.filter
+def add_items(A, B):
+
+    return A+B
+
+@register.filter
+def render_location_radio(location):
+    location_list = []
+    location_list.append((location.id, location.place))
+    location_form = SelectLocationForm(location_dict=location_list)
+
+    return location_form['location'][0].tag()
+
+@register.filter
+def render_k9_checkbox(k9, selected_list): #check_true as form parameter to set initial value as true
+    k9_list = []
+    k9_list.append((k9.id, k9.name))
+
+    k9_is_checked = False
+
+    for item in selected_list:
+        if int(item) == int(k9.id):
+            k9_is_checked = True
+
+
+    if k9_is_checked == True:
+        unit_form = SelectUnitsForm(k9_dict=k9_list, check_true=True)
+    else:
+        unit_form = SelectUnitsForm(k9_dict=k9_list)
+
+    return unit_form['k9'][0].tag()
+
+@register.filter
+def add_one(idx):
+
+    plus = idx + 1
+
+    return plus
+
+@register.filter
+def area_name(area, i):
+    item = area[int(i)]
+    name = item.name
+
+    return name
+
+@register.filter
+def area_maritime(area, i):
+    item = area[int(i)]
+
+    locations = Location.objects.filter(area=item)
+    area_maritime_count = 0
+    for location in locations:
+        maritime_count = Maritime.objects.filter(location=location).count()
+        area_maritime_count += maritime_count
+
+    return area_maritime_count
+
+@register.filter
+def area_incidents(area, i):
+    item = area[int(i)]
+
+    locations = Location.objects.filter(area=item)
+    area_incident_count = 0
+    for location in locations:
+        incident_count = Incidents.objects.filter(location=location).count()
+        area_incident_count += incident_count
+
+    return area_incident_count
 
 @register.filter
 def get_duration(schedule, i):
@@ -43,7 +117,7 @@ def incident_count(K9, request_id):
     incident_count = 0
 
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9, status = "Deployed").latest('id')
         if (team_dog_deployed.date_pulled is None):
             team_assignment_id = team_dog_deployed.team_assignment.id
             team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
@@ -59,7 +133,7 @@ def incident_count(K9, request_id):
 @register.filter
 def days_before_next_request(K9, i):
 
-    schedule = K9_Schedule.objects.filter(Q(k9=K9.id) & Q(date_start__gt=dt.today())).order_by('date_start')
+    schedule = K9_Schedule.objects.filter(Q(k9=K9.id) & Q(date_start__gt=dt.today())).filter(status = "Request").order_by('date_start')
 
     if schedule:
         days_before = schedule[0].date_start - dt.today()
@@ -106,7 +180,7 @@ def calculate_distance_from_current(K9, request_id):
     current_coordinates = convert_to_geographic(pcg_lon, pcg_lat)
 
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9, status = "Deployed").latest('id')
 
         if(team_dog_deployed.date_pulled is None):
             team_assignment_id = team_dog_deployed.team_assignment.id
@@ -123,24 +197,22 @@ def calculate_distance_from_current(K9, request_id):
 
     if deployed == 1:
         distance = calc_dist(current_coordinates[0], current_coordinates[1], target_coordinates[0], target_coordinates[1])
-    else:
-        distance = calc_dist(current_coordinates[0], current_coordinates[1], target_coordinates[0], target_coordinates[1])
-
-    if deployed == 1:
         print(location)
     else:
+        distance = calc_dist(current_coordinates[0], current_coordinates[1], target_coordinates[0], target_coordinates[1])
         print("PCG TAGUIG BASE")
-    print(request)
-    print("Current Coordinates")
-    print(current_coordinates)
-    print("Target Coordinates")
-    print(target_coordinates)
+        print(request)
+        print("Current Coordinates")
+        print(current_coordinates)
+        print("Target Coordinates")
+        print(target_coordinates)
+
 
     return round(distance, 4)
 
 @register.filter
 def calculate_distance_from_current_team(K9, team_id):
-    #calculate distance from current location to request location
+    #calculate distance from current location to team location
 
     deployed = 0
     pcg_lon = 13476918.53413876
@@ -149,7 +221,7 @@ def calculate_distance_from_current_team(K9, team_id):
     current_coordinates = convert_to_geographic(pcg_lon, pcg_lat)
 
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9).latest('id')
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9 = K9, status = "Deployed").latest('id')
 
         if(team_dog_deployed.date_pulled is None):
             team_assignment_id = team_dog_deployed.team_assignment.id
@@ -185,7 +257,7 @@ def calculate_distance_from_current_team(K9, team_id):
 @register.filter
 def current_location(K9, request_id):
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9, status = "Deployed").latest('id')
         print("NOT NONE TEAM DOG DEPLOYED")
         print(team_dog_deployed.__dict__)
 

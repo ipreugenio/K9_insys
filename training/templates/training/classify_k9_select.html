@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="ui inverted segment" style="padding:20px;">
-    <h3 class="ui header">Classify {{ title }}</h3>
+    <h1 class="ui header">Classify {{ title }}</h1>
     {% if messages %}
         {% for message in messages %}
             <div class='{{style}}'> {{ message }}</div>
@@ -12,6 +12,11 @@
     {% endif %}
 </div>
 <div class="ui segment">
+    <div class='column'>
+                <center>
+                    <img src="{{data.image.url}}" alt="" width="280">
+                </center>
+            </div>
     <table class="ui two column celled table">
         <thead>
         <tr>
@@ -39,19 +44,14 @@
                 <th>Father</th>
                 <td>{{parent.father}}</td>
             </tr>
-            {% else %}
-            <tr>
-                <th>Mother</th>
-                <td>Unknown</td>
-            </tr>
-            <tr>
-                <th>Father</th>
-                <td>Unknown</td>
-            </tr>
+
             {% endif %}
         </thead>
     </table>
 </div>
+
+
+
 
 <div class="ui info message">
   <i class="close icon"></i>
@@ -59,40 +59,12 @@
    <i class="question icon"></i>Information
   </div>
   <ul class="list">
-    <li>Below this is a list of suggested skill assignment based from current data.</li>
-      <li>The systems follows the following criteria below and adds a score to the skill that best meet the criteria. The skill cell that meets the criteria has a value highlighted in green.</li>
-      <li>The skill with the most score is the recommended assignment. The user may still check some of the other data presented in the page as basis for assigning a skill.</li>
+    <li>Below this is a list of suggested skill assignment based on current data.</li>
+      <li>PCGK9 follows the following criteria below, the skill that best meet the criteria have their values highlighted in green.</li>
+      <li>The skill with the most highlighted values are recommened, the user may check the data below in case of ties.</li>
   </ul>
 </div>
 
-<center>
-    <div class="ui three statistics">
-  <div class="statistic">
-    <div class="value">
-      {{NDD_count}} / {{NDD_demand}}
-    </div>
-    <div class="label">
-      NDD Count / NDD Required
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{EDD_count}} / {{EDD_demand}}
-    </div>
-    <div class="label">
-      EDD Count / EDD Required
-    </div>
-  </div>
-  <div class="statistic">
-    <div class="value">
-      {{SAR_count}} / {{SAR_demand}}
-    </div>
-    <div class="label">
-      SAR Count / SAR Required
-    </div>
-  </div>
-</div>
-</center>
 
 <form class="ui form" method="POST">
     {% csrf_token %}
@@ -101,11 +73,10 @@
         <thead class="center aligned">
             <tr>
                 <th>Select</th>
-                <th>Most Recurring Skill Among All K9s of the Same Breed</th>
                 <th ><a data-tooltip="View K9 ancestral data" href="{% url 'training:genealogy' data.id %}">Most Recurring Skill Among Ancestors</a></th>
                 <th>Highest Training Grade Average Among Trained K9s of the Same Breed</th>
                 <th><a  data-tooltip="View {{select_trait.breed}} Traits" class ="ui button" id = "trait" >Recommended Skill Based on K9 Breed and Traits</a></th>
-                <th>Score</th>
+
             </tr>
 
         </thead>
@@ -121,11 +92,6 @@
         </td>
             {%endif%}
 
-                 {% if breed_score.0 == 1%}
-                 <td><a class="ui green circular label">{{skill_breed_sar}}</a></td>
-                 {% else %}
-                 <td>{{skill_breed_sar}}</td>
-                 {% endif %}
 
                  {% if gene_score.0 == 1%}
                  <td><a class="ui green circular label">{{skill_gene_sar}}</a></td>
@@ -146,14 +112,7 @@
                  </td>
 
 
-                  <td>
-                  {% for i in SAR_score|star_times %}
-                      <i class="yellow star icon"></i>
-                  {% endfor %}
-                    {% for i in SAR_score|star_left %}
-                      <i class="yellow star outline icon"></i>
-                      {% endfor %}
-                  </td>
+
         </tr>
 
 
@@ -168,11 +127,6 @@
             </td>
             {%endif%}
 
-               {% if breed_score.1 == 1%}
-                 <td><a class="ui green circular label">{{skill_breed_ndd}}</a></td>
-                 {% else %}
-                 <td>{{skill_breed_ndd}}</td>
-                 {% endif %}
 
                  {% if gene_score.1 == 1%}
                  <td><a class="ui green circular label">{{skill_gene_ndd}}</a></td>
@@ -192,14 +146,7 @@
                  {% endif %}
                  </td>
 
-                  <td>
-                  {% for i in NDD_score|star_times %}
-                      <i class="yellow star icon"></i>
-                  {% endfor %}
-                    {% for i in NDD_score|star_left %}
-                      <i class="yellow star outline icon"></i>
-                      {% endfor %}
-                  </td>
+
             </tr>
 
 
@@ -214,11 +161,7 @@
               <input type="radio" name="radio" value="EDD">EDD
             </td>
             {%endif%}
-                 {% if breed_score.2 == 1%}
-                 <td><a class="ui green circular label">{{skill_breed_edd}}</a></td>
-                 {% else %}
-                 <td>{{skill_breed_edd}}</td>
-                 {% endif %}
+
 
                  {% if gene_score.2 == 1%}
                  <td><a class="ui green circular label">{{skill_gene_edd}}</a></td>
@@ -238,25 +181,64 @@
                  {% endif %}
                  </td>
 
-                  <td>
-                  {% for i in EDD_score|star_times %}
-                      <i class="yellow star icon"></i>
-                  {% endfor %}
-                    {% for i in EDD_score|star_left %}
-                      <i class="yellow star outline icon"></i>
-                      {% endfor %}
-                  </td>
+
              </tr>
 </tbody>
     </table>
+
+      <center>
+    <div class="ui three statistics">
+
+  <div class="statistic">
+    <div class="value">
+      {{NDD_assigned}} / {{ NDD_difference}}
+    </div>
+    <div class="label">
+      Classified NDD K9s/ Undeployed NDD K9s
+    </div>
+
+    <h3>Total NDD K9s required: {{NDD_demand}}
+        <br>Total NDD K9s deployed:  {{NDD_deployed}}</h3>
+
+</div>
+
+
+  <div class="statistic">
+    <div class="value">
+      {{EDD_assigned}} / {{EDD_difference}}
+    </div>
+    <div class="label">
+      Classified  EDD K9s / Undeployed EDD K9s
+    </div>
+
+      <h3>Total EDD K9s required: {{EDD_demand}}
+        <br>Total NDD K9s deployed:  {{EDD_deployed}}</h3>
+
+  </div>
+
+  <div class="statistic">
+    <div class="value">
+      {{SAR_assigned}} / {{SAR_difference}}
+    </div>
+    <div class="label">
+      Classified SAR K9s  /  Undeployed SAR K9s
+    </div>
+
+       <h3>Total SAR K9s required: {{SAR_demand}}
+        <br>Total SAR K9s deployed:  {{SAR_deployed}}</h3>
+  </div>
+
+
+</div>
+</center>
+
+
+
           <button class="ui green button" type="Submit">Assign Skill</button>
   </div>
 </form>
 
 
-{% if graph %}
-{{ graph|safe }}
-{% endif %}
 
 
 <div class="ui modal">

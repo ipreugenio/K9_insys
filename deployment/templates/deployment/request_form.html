@@ -33,6 +33,11 @@
         </div>
 
         <div class="fields">
+
+            <div class="field">
+                <label>Area</label>
+                {{form.area}}
+            </div>
             <div class="field">
                 <label>Address</label>
                 {{form.location}}
@@ -41,22 +46,15 @@
                 <label>City</label>
                 {{form.city}}
             </div>
+
+            <div class="field">
+                <label>Number of K9s needed</label>
+                {{form.k9s_needed}}
+            </div>
+
         </div>
 
-        <div class="fields">
-            <div class="field">
-                <label>Number of Explosives needed</label>
-                {{form.EDD_needed}}
-            </div>
-            <div class="field">
-                <label>Number of Narcotics needed</label>
-                {{form.NDD_needed}}
-            </div>
-            <div class="field">
-                <label>Number of Search and Rescue needed</label>
-                {{form.SAR_needed}}
-            </div>
-        </div>
+
 
          <div class="fields">
             <div class="field">

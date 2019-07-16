@@ -20,19 +20,19 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, VaccineUsed, Notification
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
 
 from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler
+from training.models import K9_Handler, Training_History
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -41,8 +41,12 @@ from rest_framework import status
 
 from unitmanagement.serializers import K9Serializer
 from django.db.models import Q
-
+from dateutil.parser import parse
 # Create your views here.
+
+import json
+
+from pandas import DataFrame as df
 
 
 def notif(request):
@@ -169,6 +173,7 @@ def index(request):
     return render (request, 'unitmanagement/index.html', context)
 
 #TODO Initialize treatment
+#TODO fix missing form
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
@@ -923,69 +928,69 @@ def requests_form(request):
     }
     return render (request, 'unitmanagement/request_form.html', context)
 
-def request_list(request):
-    data = Equipment_Request.objects.all()
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'data': data,
-        'title': 'Damaged Equipment List',
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'unitmanagement/request_list.html', context)
-
-def change_equipment(request, id):
-    data = Equipment_Request.objects.get(id=id)
-    style = ""
-    changedate = dt.datetime.now()
-
-    if request.method == 'POST':
-        if 'ok' in request.POST:
-            data.request_status = "Approved"
-            data.date_approved = changedate
-            data.save()
-            #subtract inventory
-            equipment = Miscellaneous.objects.get(miscellaneous=data.equipment)
-            if equipment.quantity > 0:
-                equipment.quantity = equipment.quantity-1
-                equipment.save()
-
-                Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=user_session(request),
-                                                         quantity=1,
-                                                         date_subtracted=dt.date.today(),
-                                                         time=dt.datetime.now())
-                style = "ui green message"
-                messages.success(request, 'Equipment Approved!')
-
-            else:
-                style = "ui red message"
-                messages.success(request, 'Insufficient Inventory!')
-
-        else:
-            data.request_status = "Denied"
-            data.date_approved = changedate
-            data.save()
-            style = "ui green message"
-            messages.success(request, 'Equipment Denied!')
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'data': data,
-        'style': style,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-
-    return render (request, 'unitmanagement/change_equipment.html', context)
+# def request_list(request):
+#     data = Requests.objects.all()
+#
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#     context = {
+#         'data': data,
+#         'title': 'Damaged Equipment List',
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#     }
+#     return render (request, 'unitmanagement/request_list.html', context)
+#
+# def change_equipment(request, id):
+#     data = Requests.objects.get(id=id)
+#     style = ""
+#     changedate = dt.datetime.now()
+#
+#     if request.method == 'POST':
+#         if 'ok' in request.POST:
+#             data.request_status = "Approved"
+#             data.date_approved = changedate
+#             data.save()
+#             #subtract inventory
+#             equipment = Miscellaneous.objects.get(miscellaneous=data.equipment)
+#             if equipment.quantity > 0:
+#                 equipment.quantity = equipment.quantity-1
+#                 equipment.save()
+#
+#                 Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=user_session(request),
+#                                                          quantity=1,
+#                                                          date_subtracted=dt.date.today(),
+#                                                          time=dt.datetime.now())
+#                 style = "ui green message"
+#                 messages.success(request, 'Equipment Approved!')
+#
+#             else:
+#                 style = "ui red message"
+#                 messages.success(request, 'Insufficient Inventory!')
+#
+#         else:
+#             data.request_status = "Denied"
+#             data.date_approved = changedate
+#             data.save()
+#             style = "ui green message"
+#             messages.success(request, 'Equipment Denied!')
+#
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#     context = {
+#         'data': data,
+#         'style': style,
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#     }
+#
+#     return render (request, 'unitmanagement/change_equipment.html', context)
 
 # TODO
 def k9_incident(request):
@@ -1028,7 +1033,7 @@ def k9_incident(request):
 # TODO
 def k9_incident_list(request):
     user = user_session(request)
-    style='ui blue message'
+    style='ui green message'
     if user.position == 'Team Leader':
         ta = Team_Assignment.objects.get(team_leader=user)
 
@@ -1044,7 +1049,25 @@ def k9_incident_list(request):
     else:
         data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
    
-    
+
+    if request.method == "POST":
+        i = request.POST.get('input_id')
+        dc = request.POST.get('death_cert')
+        date = request.POST.get('date_died')
+        ki = K9_Incident.objects.get(id=i)
+        
+        k9 = K9.objects.get(id=ki.k9.id)
+        k9.status= 'Dead'
+        k9.training_status = 'Dead'
+        k9.death_cert = dc
+        k9.death_date = date
+
+        ki.status = 'Done'
+        ki.save()
+        k9.save()
+        messages.success(request, 'K9 Died...')
+        return redirect('unitmanagement:k9_incident_list')
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     context = {
@@ -1152,6 +1175,25 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list') 
 
+def k9_accident(request, id):
+    accident = request.GET.get('accident')
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.save()
+    
+    k9 = K9.objects.get(id=data.k9.id)
+    
+    if accident == 'recovered':
+        k9.status = 'Working Dog'
+        messages.success(request, 'K9 has recovered!')
+    else:
+        k9.status = 'Died'
+        k9.training_status = 'Died'
+        messages.success(request, 'K9 died..')
+   
+    k9.save()
+    return redirect('unitmanagement:k9_incident_list') 
+
 def health_list_handler(request):
     user = user_session(request)
     style = "ui green message"
@@ -1206,6 +1248,21 @@ def handler_incident_form(request):
             f = form.save(commit=False)
             f.reported_by = user
             f.k9 = b
+
+            if f.incident == 'Died':
+                user.status = 'Died'
+                user.partnered = False
+                user.assigned = False
+                b.handler = None
+            elif f.incident == 'MIA':
+                user.status = 'MIA'
+                user.partnered = False
+                user.assigned = False
+                b.handler = None
+                #if MIA, kasama ba ang aso?
+            
+            user.save()
+            b.save()
             f.save()
 
             style = "ui green message"
@@ -1448,12 +1505,41 @@ def choose_handler_list(request, id):
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     g = []
     for h in handler:
-        edd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='EDD').count()
-        ndd = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='NDD').count()
-        sar = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='SAR').count()
-        f = Handler_K9_History.objects.filter(handler=h).filter(k9__capability='None').filter(Q(k9__status='Adopted') | Q(k9__training_status="For-Adoption") | Q(k9__status="Dead")).count()
+        edd = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Trained').count()
+        edd_f = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Failed').count()
+        ndd = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Trained').count()
+        ndd_f = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Failed').count()
+        sar = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Trained').count()
+        sar_f = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Failed').count()
+        s = 0
+        n = 0
+        e = 0
+        f = 0
+
+        if sar != 0:
+            s = int((sar / (sar+sar_f)) * 100) 
+        if edd != 0:
+            e = int((edd / (edd+edd_f)) * 100)
+        if ndd != 0:
+            n = int((ndd / (ndd+ndd_f)) * 100)
         
-        s = [edd, ndd, sar, f]
+        ctr = 0
+        if s !=0:
+            ctr = ctr+1
+        if e !=0:
+            ctr = ctr+1
+        if n !=0:
+            ctr = ctr+1
+        if ctr == 0:
+            ctr = 1
+
+        et = edd+edd_f
+        nt = ndd+ndd_f
+        st = sar+sar_f
+        f = int((e+n+s) / ctr )
+        fs = int(edd+ndd+sar)
+        ft = int(et+nt+st) 
+        s = [e, n, s, f, edd, et, ndd, nt, sar, st, fs, ft]
         g.append(s)
 
     print(g)
@@ -1821,46 +1907,34 @@ class TeamLeaderView(APIView):
 class HandlerView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
-        k = K9.objects.get(handler=user)
+        try:
+            k = K9.objects.get(handler=user)
 
-        jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
-        feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
-        mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
-        apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
-        may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
-        jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
-        jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
-        aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
-        sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
-        oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
-        nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
-        dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
-
-        if jan == None:
-            jan = 0
-        if feb == None:
-            feb = 0
-        if mar == None:
-            mar = 0
-        if apr == None:
-            apr = 0
-        if may == None:
-            may = 0
-        if jun == None:
-            jun = 0
-        if jul == None:
-            jul = 0
-        if aug == None:
-            aug = 0
-        if sep == None:
-            sep = 0
-        if oct == None:
-            oct = 0
-        if nov == None:
-            nov = 0
-        if dec == None:
-            dec = 0
-        
+            jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+            feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+            mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+            apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+            may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+            jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+            jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+            aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+            sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+            oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+            nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+            dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+        except:
+            jan=0
+            feb=0
+            mar=0
+            apr=0
+            may=0
+            jun=0
+            jul=0
+            aug=0
+            sep=0
+            oct=0
+            nov=0
+            dec=0
 
         perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
 
@@ -1918,6 +1992,23 @@ class VetView(APIView):
             "in_heat":in_heat_items,
         }
         return Response(data)
+
+class CommanderView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+        area = Area.objects.filter(commander=user)
+        location = Location.objects.filter(area__in = area)
+
+        team = Team_Assignment.objects.filter(location__in =location)
+        team_items = []
+        for t in team:
+            pass
+
+        data = {
+            "team_items":team_items,
+        }
+        return Response(data)
+
 
 def load_handler(request):
 
@@ -2011,3 +2102,186 @@ def load_incident(request):
     }
 
     return render(request, 'unitmanagement/incident_data.html', context)
+
+
+def k9_checkup_pending(request):
+    removal = TempCheckup.objects.all()
+
+    #TODO Save schedule before deletion
+    if request.method == "POST":
+        for item in removal:
+            sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
+            sched.save()
+
+    removal.delete()
+
+
+    current_appointments = K9_Schedule.objects.filter(status = "Checkup")
+
+    k9s_scheduled = []
+
+    for item in current_appointments:
+        k9s_scheduled.append(item.k9)
+
+    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_scheduled)
+    date_form = DateForm()
+
+    print(pending_schedule)
+
+    context = {
+        'k9_pending': pending_schedule,
+        'date_form': date_form['date'].as_widget(),
+        'selected_list': []
+    }
+
+    return render(request, 'unitmanagement/k9_checkup_pending.html', context)
+
+def load_appointments(request):
+
+    appointments = None
+    date = None
+    try:
+        date = request.GET.get('date')
+        print("PRINT DATE")
+        print(date)
+        new_date = parse(date)
+        print(new_date)
+        appointments = K9_Schedule.objects.filter(status="Checkup", date_start=new_date)
+    except:
+        pass
+
+
+    context = {
+        'appointments': appointments,
+        'new_date': str(date),
+    }
+
+    return render(request, 'unitmanagement/ajax_load_appointments.html', context)
+
+
+#TODO Hide items from available units when they are already scheduled
+def load_checkups(request):
+    fullstring = request.GET.get('fullstring')
+    fullstring = json.loads(fullstring)
+
+    k9_list = []
+    k9_list_id = []
+
+    try:
+        date = request.GET.get('date')
+        print("DATE")
+        print(date)
+        date = parse(date)
+
+        for item in fullstring.values():
+            k9 = K9.objects.get(id=item)
+            k9_list.append(k9)
+            k9_list_id.append(k9.id)
+
+            deployment = K9_Schedule.objects.filter(k9 = k9, status = "Initial Deployment").order_by('-id')[0]
+
+            # >>>>>>>
+
+            if TempCheckup.objects.filter(k9=k9).exists():
+                pass
+            else:
+                temp = TempCheckup.objects.create(date=date, k9=k9, deployment_date = deployment.date_start)
+                temp.save()
+
+                removal = TempCheckup.objects.exclude(id=temp.id).filter(k9=k9).filter(
+                    date=date)  # This line removes duplicates
+                removal.delete()
+
+    except:
+        for item in fullstring.values():
+            k9 = K9.objects.get(id=item)
+            k9_list.append(k9)
+            k9_list_id.append(k9.id)
+
+            # >>>>>>>
+
+            if TempCheckup.objects.filter(k9=k9).exists():
+                pass
+            else:
+                removal = TempCheckup.objects.filter(k9=k9)  # Dapat icheck niya kung ano yung mga hindi naka select
+                removal.delete()
+
+    # pending_schedule = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in = k9_list)
+
+    removal = TempCheckup.objects.exclude(k9__in=k9_list)
+    removal.delete()
+
+
+    temp = TempCheckup.objects.all()
+
+
+    context = {
+        'checkups' : temp,
+        'selected_list': k9_list_id,
+
+    }
+
+    return render(request, 'unitmanagement/ajax_load_checkups.html', context)
+
+
+def current_team(K9):
+    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+    team_assignment = None
+
+    if (team_dog_deployed.date_pulled is not None):
+        team_assignment_id = team_dog_deployed.team_assignment.id
+        team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
+
+    return team_assignment
+
+def transfer_request(request, location_id):
+
+    #TODO check if date of transfer has conflict
+    #TODO if unit is transferring, prompt commander/operations if he wants to replace units assigned to a request
+
+    serial = request.session['session_serial']
+    account = Account.objects.get(serial_number=serial)
+    user_in_session = User.objects.get(id=account.UserID.id)
+    personal_info = Personal_Info.objects.get(id = user_in_session.id)
+
+    k9 = K9.objects.get(handler = user_in_session)
+
+    team = current_team(k9)
+
+    location = Location.objects.get(id = location_id)
+    team_to_transfer = Team_Assignment.objects.get(location = location)
+
+    can_transfer = 0
+
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).latest('id') #check current team_assignment
+        if (team_dog_deployed.date_pulled is None):
+            date_deployed = team_dog_deployed.date_added
+            delta = date.today() - date_deployed
+            duration = delta.days
+
+            if k9.capability == "SAR":
+                if team_to_transfer.SAR_deployed < team_to_transfer.SAR_demand:
+                    can_transfer = 1
+            elif K9.capability == "NDD":
+                if team_to_transfer.NDD_deployed < team_to_transfer.NDD_demand:
+                    can_transfer = 1
+            else:
+                if team_to_transfer.EDD_deployed < team_to_transfer.EDD_demand:
+                    can_transfer = 1
+
+            if duration >= 730 and (team.total_dogs_deployed - 1) >= 2 and can_transfer == 0 and team_to_transfer.location.city != personal_info.city:
+                can_transfer = 1
+
+        if can_transfer == 1:
+            team_dog_deployed.date_pulled = date.today()
+            team_dog_deployed.save()
+            deploy = Team_Dog_Deployed.objects.create(k9=k9, team_assignment=team_to_transfer)
+
+    except:
+        pass
+
+
+    context = {}
+
+    return render(request, 'unitmanagement/transfer_request.html', context)

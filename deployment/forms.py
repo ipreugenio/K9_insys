@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django.core.validators import validate_integer
 from django.forms import fields
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher, TempDeployment
 from planningandacquiring.models import K9
 from profiles.models import Account, User
 from django.contrib.sessions.models import Session
@@ -20,6 +20,10 @@ from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
+
+class TransferRequestForm(forms.Form):
+    ...
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -28,159 +32,62 @@ class AreaForm(forms.ModelForm):
         model = Area
         fields = ('name',)
 
+
 class LocationForm(forms.ModelForm):
-    CITY = (
-        ('Alaminos', 'Alaminos'),
-        ('Angeles', 'Angeles'),
-        ('Antipolo', 'Antipolo'),
-        ('Bacolod', 'Bacolod'),
-        ('Bacoor', 'Bacoor'),
-        ('Bago', 'Bago'),
-        ('Baguio', 'Baguio'),
-        ('Bais', 'Bais'),
-        ('Balanga', 'Balanga'),
-        ('Batac', 'Batac'),
-        ('Batangas', 'Batangas'),
-        ('Bayawan', 'Bayawan'),
-        ('Baybay', 'Baybay'),
-        ('Bayugan', 'Bayugan'),
-        ('Biñan', 'Biñan'),
-        ('Bislig', 'Bislig'),
-        ('Bogo', 'Bogo'),
-        ('Borongan', 'Borongan'),
-        ('Butuan', 'Butuan'),
-        ('Cabadbaran', 'Cabadbaran'),
-        ('Cabanatuan', 'Cabanatuan'),
-        ('Cabuyao', 'Cabuyao'),
-        ('Cadiz', 'Cadiz'),
-        ('Cagayan de Oro', 'Cagayan de Oro'),
-        ('Calamba', 'Calamba'),
-        ('Calapan', 'Calapan'),
-        ('Calbayog', 'Calbayog'),
-        ('Caloocan', 'Caloocan'),
-        ('Candon', 'Candon'),
-        ('Canlaon', 'Canlaon'),
-        ('Carcar', 'Carcar'),
-        ('Catbalogan', 'Catbalogan'),
-        ('Cauayan', 'Cauayan'),
-        ('Cavite', 'Cavite'),
-        ('Cebu', 'Cebu'),
-        ('Cotabato', 'Cotabato'),
-        ('Dagupan', 'Dagupan'),
-        ('Danao', 'Danao'),
-        ('Dapitan', 'Dapitan'),
-        ('Dasmariñas', 'Dasmariñas'),
-        ('Davao', 'Davao'),
-        ('Digos', 'Digos'),
-        ('Dipolog', 'Dipolog'),
-        ('Dumaguete', 'Dumaguete'),
-        ('El Salvador', 'El Salvador'),
-        ('Escalante', 'Escalante'),
-        ('Gapan', 'Gapan'),
-        ('General Santos', 'General Santos'),
-        ('General Trias', 'General Trias'),
-        ('Gingoog', 'Gingoog'),
-        ('Guihulngan', 'Guihulngan'),
-        ('Himamaylan', 'Himamaylan'),
-        ('Ilagan', 'Ilagan'),
-        ('Iligan', 'Iligan'),
-        ('Iloilo', 'Iloilo'),
-        ('Imus', 'Imus'),
-        ('Iriga', 'Iriga'),
-        ('Isabela', 'Isabela'),
-        ('Kabankalan', 'Kabankalan'),
-        ('Kidapawan', 'Kidapawan'),
-        ('Koronadal', 'Koronadal'),
-        ('La Carlota', 'La Carlota'),
-        ('Lamitan', 'Lamitan'),
-        ('Laoag', 'Laoag'),
-        ('Lapu‑Lapu', 'Lapu‑Lapu'),
-        ('Las Piñas', 'Las Piñas'),
-        ('Legazpi', 'Legazpi'),
-        ('Ligao', 'Ligao'),
-        ('Lipa', 'Lipa'),
-        ('Lucena', 'Lucena'),
-        ('Maasin', 'Maasin'),
-        ('Mabalacat', 'Mabalacat'),
-        ('Makati', 'Makati'),
-        ('Malabon', 'Malabon'),
-        ('Malaybalay', 'Malaybalay'),
-        ('Malolos', 'Malolos'),
-        ('Mandaluyong', 'Mandaluyong'),
-        ('Mandaue', 'Mandaue'),
-        ('Manila', 'Manila'),
-        ('Marawi', 'Marawi'),
-        ('Marikina', 'Marikina'),
-        ('Masbate', 'Masbate'),
-        ('Mati', 'Mati'),
-        ('Meycauayan', 'Meycauayan'),
-        ('Muñoz', 'Muñoz'),
-        ('Muntinlupa', 'Muntinlupa'),
-        ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
-        ('Naga - Cebu', 'Naga - Cebu'),
-        ('Navotas', 'Navotas'),
-        ('Olongapo', 'Olongapo'),
-        ('Ormoc', 'Ormoc'),
-        ('Oroquieta', 'Oroquieta'),
-        ('Ozamiz', 'Ozamiz'),
-        ('Pagadian', 'Pagadian'),
-        ('Palayan', 'Palayan'),
-        ('Panabo', 'Panabo'),
-        ('Parañaque', 'Parañaque'),
-        ('Pasay', 'Pasay'),
-        ('Pasig', 'Pasig'),
-        ('Passi', 'Passi'),
-        ('Puerto Princesa', 'Puerto Princesa'),
-        ('Quezon', 'Quezon'),
-        ('Roxas', 'Roxas'),
-        ('Sagay', 'Sagay'),
-        ('Samal', 'Samal'),
-        ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
-        ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
-        ('San Fernando - La Union', 'San Fernando - La Union'),
-        ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
-        ('San Jose', 'San Jose'),
-        ('San Jose del Monte', 'San Jose del Monte'),
-        ('San Juan', 'San Juan'),
-        ('San Pablo', 'San Pablo'),
-        ('San Pedro', 'San Pedro'),
-        ('Santa Rosa', 'Santa Rosa'),
-        ('Santiago', 'Santiago'),
-        ('Silay', 'Silay'),
-        ('Sipalay', 'Sipalay'),
-        ('Sorsogon', 'Sorsogon'),
-        ('Surigao', 'Surigao'),
-        ('Tabaco', 'Tabaco'),
-        ('Tabuk', 'Tabuk'),
-        ('Tacloban', 'Tacloban'),
-        ('Tacurong', 'Tacurong'),
-        ('Tagaytay', 'Tagaytay'),
-        ('Tagbilaran', 'Tagbilaran'),
-        ('Taguig', 'Taguig'),
-        ('Tagum', 'Tagum'),
-        ('Talisay - Cebu', 'Talisay - Cebu'),
-        ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
-        ('Tanauan', 'Tanauan'),
-        ('Tandag', 'Tandag'),
-        ('Tangub', 'Tangub'),
-        ('Tanjay', 'Tanjay'),
-        ('Tarlac', 'Tarlac'),
-        ('Tayabas', 'Tayabas'),
-        ('Toledo', 'Toledo'),
-        ('Trece Martires', 'Trece Martires'),
-        ('Tuguegarao', 'Tuguegarao'),
-        ('Urdaneta', 'Urdaneta'),
-        ('Valencia', 'Valencia'),
-        ('Valenzuela', 'Valenzuela'),
-        ('Victorias', 'Victorias'),
-        ('Vigan', 'Vigan'),
-        ('Zamboanga', 'Zamboanga'),
-    )
-    city = forms.CharField(max_length=50, label = 'city', widget = forms.Select(choices=CITY))
+
     place = forms.CharField(widget = forms.Textarea(attrs={'rows':'3', 'style':'resize:none;'}))
     class Meta:
         model = Location
-        fields = ('area', 'city', 'place', 'sector_type')
+        fields = ('area', 'place', 'city')
+
+
+
+class SelectLocationForm(forms.Form):
+    location_list = []
+
+    location = forms.ChoiceField(choices=location_list,
+                             widget=forms.RadioSelect)
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            location_dict  = kwargs.pop("location_dict", None)
+        except:
+            pass
+
+        super(SelectLocationForm, self).__init__(*args, **kwargs)
+        if location_dict:
+            self.fields['location'].choices = location_dict
+
+class SelectUnitsForm(forms.Form):
+    k9_list = []
+
+    k9 = forms.ChoiceField(choices=k9_list,
+                                 widget=forms.CheckboxSelectMultiple())
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            k9_dict = kwargs.pop("k9_dict", None)
+        except:
+            pass
+
+        try:
+            check_true = kwargs.pop("check_true", None)
+        except:
+            pass
+
+        super(SelectUnitsForm, self).__init__(*args, **kwargs)
+        if k9_dict:
+            self.fields['k9'].choices = k9_dict
+
+        if check_true:
+            self.fields['k9'].widget.attrs['checked'] = True
+
+class ScheduleUnitsForm(forms.Form):
+
+    schedule = forms.DateField(widget=DateInput())
+    unit = forms.ModelChoiceField(TempDeployment.objects.all())
 
 class AssignTeamForm(forms.ModelForm):
     location = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
@@ -197,12 +104,11 @@ class EditTeamForm(forms.ModelForm):
 
 class RequestForm(forms.ModelForm):
     
-    area = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
+    #area = forms.ModelChoiceField(queryset = Location.objects.filter(status='unassigned'))
     
     class Meta:
         model = Dog_Request
-        fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'EDD_needed',
-                  'NDD_needed', 'SAR_needed', 'start_date', 'end_date')
+        fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'city', 'k9s_needed', 'start_date', 'end_date')
 
         widgets = {
             'start_date': DateInput(),
@@ -248,6 +154,13 @@ class DateForm(forms.Form):
     to_date = forms.DateField(widget=DateInput())
 
         #self.fields['user'].intial = current_user
+
+class DeploymentDateForm(forms.Form):
+    deployment_date = forms.DateField( widget=DateInput())
+
+    def __init__(self, *args, **kwargs):
+        super(DeploymentDateForm, self).__init__(*args, **kwargs)
+        self.fields['deployment_date'].required = True
 
 class GeoSearch(forms.Form):
     search = forms.CharField()

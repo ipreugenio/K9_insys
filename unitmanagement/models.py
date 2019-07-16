@@ -5,7 +5,7 @@ from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Fo
 from inventory.models import Medicine_Inventory
 from training.models import Training
 from profiles.models import User
-from deployment.models import K9_Schedule, Incidents
+from deployment.models import K9_Schedule, Incidents, Team_Assignment
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -284,6 +284,15 @@ class Handler_Incident(models.Model):
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='leader')
 
 
+class TransferRequest(models.Model):
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    from_location = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name="from_location")
+    to_location = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name="to_location")
+    date_created = models.DateField('date_created', auto_now_add=True)
+    date_of_transfer = models.DateField('date_of_transfer', null=True, blank=True)
+    status = models.CharField('status', max_length=200, default="Pending")
+
+
 class Notification(models.Model):
     POSITION = (
         ('Administrator', 'Administrator'),
@@ -343,7 +352,7 @@ def create_training_record(sender, instance, **kwargs):
 @receiver(post_save, sender=K9)
 def create_k9_vaccines(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        if instance.source == 'Procured':
+        if instance.source == 'Procurement':
             cvr = VaccinceRecord.objects.create(k9=instance,  deworming_1=True, deworming_2=True, deworming_3=True,
             deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True, heartworm_1=True, heartworm_2=True,
             heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True, heartworm_7=True, heartworm_8=True,
@@ -379,6 +388,8 @@ def create_k9_vaccines(sender, instance, **kwargs):
             VaccineUsed.objects.create(vaccine_record = cvr, age= '30 Weeks', disease='7th Heartworm Prevention', order='25')
             VaccineUsed.objects.create(vaccine_record = cvr, age= '32 Weeks', disease='7th Tick and Flea Prevention', order='26')
             VaccineUsed.objects.create(vaccine_record = cvr, age= '34 Weeks', disease='8th Heartworm Prevention', order='27')
+
+
 
 #######################################################################################################################
 
@@ -463,49 +474,49 @@ def create_medicine_inventory(sender, instance, **kwargs):
 
 
 # create vaccine record, and vaccine used
-@receiver(post_save, sender=K9)
-def create_k9_vaccines(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        pass
-        # if instance.source == 'Procured':
-        #     VaccinceRecord.objects.create(k9=instance, deworming_1=True, deworming_2=True, deworming_3=True,
-        #     deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True,heartworm_1=True, heartworm_2=True,
-        #     heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True,heartworm_7=True, heartworm_8=True,
-        #     anti_rabies=True, bordetella_1=True, bordetella_2=True, dhppil4_1=True,dhppil4_2=True, tick_flea_1=True,
-        #     tick_flea_2=True, tick_flea_3=True, tick_flea_4=True, tick_flea_5=True,tick_flea_6=True, tick_flea_7=True)
-        #
-        #     instance.training_status = 'Unclassified'
-        #     instance.save()
-        #
-        # else:
-        #     cvr = VaccinceRecord.objects.create(k9=instance)
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
-        #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
+# @receiver(post_save, sender=K9)
+# def create_k9_vaccines(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         pass
+#         # if instance.source == 'Procured':
+#         #     VaccinceRecord.objects.create(k9=instance, deworming_1=True, deworming_2=True, deworming_3=True,
+#         #     deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True,heartworm_1=True, heartworm_2=True,
+#         #     heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True,heartworm_7=True, heartworm_8=True,
+#         #     anti_rabies=True, bordetella_1=True, bordetella_2=True, dhppil4_1=True,dhppil4_2=True, tick_flea_1=True,
+#         #     tick_flea_2=True, tick_flea_3=True, tick_flea_4=True, tick_flea_5=True,tick_flea_6=True, tick_flea_7=True)
+#         #
+#         #     instance.training_status = 'Unclassified'
+#         #     instance.save()
+#         #
+#         # else:
+#         #     cvr = VaccinceRecord.objects.create(k9=instance)
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_3')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='deworming_4')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='bordetella_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='anti_rabies')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil_cv_3')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_3')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_1')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_3')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='dhppil4_2')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_4')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_4')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_5')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_5')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_6')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_6')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_7')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='tick_flea_7')
+#         #     VaccineUsed.objects.create(vaccine_record=cvr, disease='heartworm_8')
 
 
 # Location incidentes reported

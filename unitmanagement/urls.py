@@ -16,7 +16,7 @@ urlpatterns = [
     path('physical-exam-details/<int:id>', views.physical_exam_details, name='physical_exam_details'),
     path('approve-medicine/<int:id>', views.medicine_approve, name='medicine_approve'),
     path('request-form', views.requests_form, name='request_form'),
-    path('request-list', views.request_list, name='request_list'),
+    #path('request-list', views.request_list, name='request_list'),
     path('k9-incident', views.k9_incident, name='k9_incident'),
     path('handler-incident-form', views.handler_incident_form, name='handler_incident_form'),
     path('reproductive-list', views.reproductive_list, name='reproductive_list'),
@@ -50,12 +50,19 @@ urlpatterns = [
     
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
-    path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
     
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),
     path('vet/api', views.VetView.as_view()),
+
+
+    path('k9-checkup-pending', views.k9_checkup_pending, name='k9_checkup_pending'),
+    path('ajax_load_appointments', views.load_appointments, name='ajax_load_appointments'),
+    path('ajax_load_checkups', views.load_checkups, name='ajax_load_checkups')
+
+
 
     #path('/<int:id>/', views., name=''),
 ];

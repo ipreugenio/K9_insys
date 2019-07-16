@@ -18,7 +18,7 @@ from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
-from datetime import datetime
+import datetime
 import calendar
 
 from rest_framework.views import APIView
@@ -26,6 +26,38 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from profiles.serializers import NotificationSerializer, UserSerializer
 # Create your views here.
+
+# def login(request):
+#     style=""
+#
+#     if request.method == 'POST':
+#         serial = request.POST['serial_number']
+#         password = request.POST['password']
+#
+#         if Account.objects.filter(serial_number=serial).exists():
+#             if Account.objects.filter(password=password).exists():
+#                 request.session["session_serial"] = serial
+#                 account = Account.objects.get(serial_number = serial)
+#                 user = User.objects.get(id = account.UserID.id)
+#
+#
+#                 request.session["session_user_position"] = user.position
+#                 request.session["session_id"] = user.id
+#                 request.session["session_username"] = str(user)
+#
+#                # return HttpResponseRedirect('../dashboard')
+#             return HttpResponseRedirect('../dashboard')
+#
+#     '''else:
+#         style = "ui red message"
+#         messages.warning(request, 'Wrong serial number or password!')'''
+#
+#     context = {
+#         'title': "Login",
+#         'style': style,
+#     }
+#
+#     return render (request, 'profiles/login.html', context)
 
 def notif(request):
     serial = request.session['session_serial']
@@ -90,33 +122,33 @@ def dashboard(request):
     if not SAR_demand:
         SAR_demand = 0
 
-    NDD_needed = list(Dog_Request.objects.aggregate(Sum('NDD_needed')).values())[0]
-    EDD_needed = list(Dog_Request.objects.aggregate(Sum('EDD_needed')).values())[0]
-    SAR_needed = list(Dog_Request.objects.aggregate(Sum('SAR_needed')).values())[0]
-
-    if not NDD_needed:
-        NDD_needed = 0
-    if not EDD_needed:
-        EDD_needed = 0
-    if not SAR_needed:
-        SAR_needed = 0
-
-    NDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('NDD_deployed')).values())[0]
-    EDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('EDD_deployed')).values())[0]
-    SAR_deployed_request = list(Dog_Request.objects.aggregate(Sum('SAR_deployed')).values())[0]
-
-    if not NDD_deployed_request:
-        NDD_deployed_request = 0
-    if not EDD_deployed_request:
-        EDD_deployed_request = 0
-    if not SAR_deployed_request:
-        SAR_deployed_request = 0
+    # NDD_needed = list(Dog_Request.objects.aggregate(Sum('NDD_needed')).values())[0]
+    # EDD_needed = list(Dog_Request.objects.aggregate(Sum('EDD_needed')).values())[0]
+    # SAR_needed = list(Dog_Request.objects.aggregate(Sum('SAR_needed')).values())[0]
+    #
+    # if not NDD_needed:
+    #     NDD_needed = 0
+    # if not EDD_needed:
+    #     EDD_needed = 0
+    # if not SAR_needed:
+    #     SAR_needed = 0
+    #
+    # NDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('NDD_deployed')).values())[0]
+    # EDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('EDD_deployed')).values())[0]
+    # SAR_deployed_request = list(Dog_Request.objects.aggregate(Sum('SAR_deployed')).values())[0]
+    #
+    # if not NDD_deployed_request:
+    #     NDD_deployed_request = 0
+    # if not EDD_deployed_request:
+    #     EDD_deployed_request = 0
+    # if not SAR_deployed_request:
+    #     SAR_deployed_request = 0
 
     k9_demand = NDD_demand + EDD_demand + SAR_demand
     k9_deployed = NDD_deployed + EDD_deployed + SAR_deployed
 
-    k9_demand_request = NDD_needed + EDD_needed + SAR_needed
-    k9_deployed_request = NDD_deployed_request + EDD_deployed_request + SAR_deployed_request
+    # k9_demand_request = NDD_needed + EDD_needed + SAR_needed
+    # k9_deployed_request = NDD_deployed_request + EDD_deployed_request + SAR_deployed_request
 
     unclassified_k9 = K9.objects.filter(capability="None").count()
     untrained_k9 = K9.objects.filter(training_status="Unclassified").count()
@@ -134,8 +166,8 @@ def dashboard(request):
         'can_deploy': can_deploy,
         'k9_demand': k9_demand,
         'k9_deployed': k9_deployed,
-        'k9_demand_request': k9_demand_request,
-        'k9_deployed_request': k9_deployed_request,
+        # 'k9_demand_request': k9_demand_request,
+        # 'k9_deployed_request': k9_deployed_request,
         'unclassified_k9': unclassified_k9,
         'untrained_k9': untrained_k9,
         'on_training': on_training,
@@ -322,9 +354,8 @@ def profile(request):
 def register(request):
     return render (request, 'profiles/register.html')
 
-
 def home(request):
-    id = request.user.id
+    id = request.user.id - 1
 
     print(id)
     user = User.objects.get(id =id)
@@ -335,6 +366,8 @@ def home(request):
     request.session["session_id"] = user.id
     request.session["session_username"] = str(user)
 
+    #print(user.position)
+
     if user.position == 'Team Leader':
         return HttpResponseRedirect('../team-leader-dashboard')
     elif user.position == 'Handler':
@@ -344,10 +377,7 @@ def home(request):
     else:
         return HttpResponseRedirect('../dashboard')
 
-
-
-    return redirect('profiles:vet_dashboard')
-
+    #return redirect('profiles:vet_dashboard')
 
 def logout(request):
     session_keys = list(request.session.keys())

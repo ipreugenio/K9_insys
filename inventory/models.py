@@ -304,3 +304,5 @@ class Safety_Stock(models.Model):
     puppy_food = models.IntegerField('puppy_food', default=0)
     adult_food = models.IntegerField('adult_food', default=0)
     milk = models.IntegerField('milk', default=0)
+
+

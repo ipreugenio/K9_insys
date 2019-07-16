@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
@@ -134,7 +135,7 @@ class K9(models.Model):
         ('Anestrus', 'Anestrus'), 
     )
     SOURCE = (
-        ('Procured', 'Procured'),
+        ('Procurement', 'Procurement'),
         ('Breeding', 'Breeding'),
     )
 
@@ -183,7 +184,7 @@ class K9(models.Model):
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
 
-    date_created = models.DateField('date_created', default=dt.now())
+    date_created = models.DateField('date_created', default=now, blank=True, null=True)
 
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     litter_no = models.IntegerField('litter_no', default = 0)

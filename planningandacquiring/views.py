@@ -170,26 +170,34 @@ def add_procured_k9(request):
     k9_formset = inlineformset_factory(K9_Supplier, K9, form=add_donated_K9_form, extra=1, can_delete=True)
     formset = k9_formset(request.POST, request.FILES)
     style = ""
+
     if request.method == "POST":
         if form.is_valid():
             supplier_data = form.cleaned_data['supplier']
             supplier = K9_Supplier.objects.get(name=supplier_data)
 
             if formset.is_valid():
+                print("Formset is valid")
                 for form in formset:
                    k9 = form.save(commit=False)
                    k9.supplier = supplier
                    k9.source = 'Procurement'
+                   k9.training_status = 'Unclassified'
                    k9.save()
 
-            style = "ui green message"
-            messages.success(request, 'Procured K9s has been added!')
+                style = "ui green message"
+                messages.success(request, 'Procured K9s has been added!')
+            else:
+                for form in formset:
+                    print(form.errors)
+                style = "ui red message"
+                messages.warning(request, 'Invalid input data!')
 
-            return HttpResponseRedirect('../breeding_k9_confirmed/')
-        
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
+
+        return HttpResponseRedirect('../breeding_k9_confirmed/')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -245,7 +253,7 @@ def add_donated_K9(request):
         if form.is_valid():
             k9 = form.save()
             k9.training_status = "Unclassified"
-            k9.source = "Procured"
+            k9.source = "Procurement"
             k9.save()
 
             request.session['k9_id'] = k9.id

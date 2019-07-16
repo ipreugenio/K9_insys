@@ -73,6 +73,19 @@ class User(models.Model):
         ('P/ENS', 'P/ENS')
     )
 
+    # Larger number = Higher Ranking
+    RANK_SORTED = (
+        (1, "ASN"),
+        (2, "SN2"),
+        (3, "SN1"),
+        (4, "PO3"),
+        (5, 'PO2'),
+        (6, 'PO1'),
+        (7, 'CPO'),
+        (8, 'SCPO'),
+        (9, 'MCPO')
+    )
+
     RELIGION = (
         ('Roman Catholic','Roman Catholic'),
         ('Christianity','Christianity'),

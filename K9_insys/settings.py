@@ -205,5 +205,8 @@ STATICFILES_DIRS=[
     'static'
 ]
 
-LOGIN_REDIRECT_URL = '../home'
+#LOGIN_URL = 'account/login/'
+LOGIN_REDIRECT_URL = '../home/'
+#SESSION_COOKIE_SECURE = False
+
 

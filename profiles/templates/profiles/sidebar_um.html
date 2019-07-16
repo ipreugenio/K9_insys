@@ -14,7 +14,7 @@
                             <a href="{% url 'profiles:user_list'%}" class="item">
                                 <i class="address book icon"></i>User List
                             </a>
-                            <a href="{% url 'unitmanagement:request_list'%}" class="item">
+                            <a href="#" class="item">
                                 <i class="clipboard list icon"></i>Damaged Equipment List
                             </a>
                             <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">
@@ -51,6 +51,9 @@
                             <a href="{% url 'unitmanagement:reproductive_list'%}" class="item">
                                 <i class="venus icon"></i>Reproductive Cycle
                             </a>
+                             <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
+                                <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
+                            </a>
 
 
                             {% elif request.session.session_user_position == "Handler" %}
@@ -76,6 +79,9 @@
                             </a>
                             <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
                                 <i class="question icon"></i>On-Leave Request
+                            </a>
+                            <a href="#" class="item">
+                                <i class="question icon"></i>Transfer Request
                             </a>
                           
                             {% else %}
