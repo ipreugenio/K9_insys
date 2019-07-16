@@ -12,7 +12,6 @@ class User(models.Model):
         ('Veterinarian', 'Veterinarian'),
         ('Administrator', 'Administrator'),
         ('Team Leader', 'Team Leader'),
-        ('Commander', 'Commander'),
     )
 
     CIVILSTATUS = (

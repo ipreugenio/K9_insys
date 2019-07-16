@@ -94,7 +94,8 @@ def user_session(request):
     return user_in_session
 
 def index(request):
-    d = 'Pre-dept'
+    d = Daily_Refresher.objects.get(id=4)
+
     context = {
       'title':'Deployment',
       'd':d,
@@ -300,15 +301,12 @@ def edit_team(request, id):
     return render(request, 'deployment/edit_team.html', context)
 
 def assigned_location_list(request):
-    user = user_session(request)
     data = Team_Assignment.objects.all()
-
-    if user.position == 'Commander':
-        data = Team_Assignment.objects.filter(location__area.commanderuser)
 
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
         'data' : data,
@@ -1585,3 +1583,46 @@ def schedule_units(request):
     return render(request, 'deployment/schedule_units.html', context)
 
 
+def transfer_request(request, k9_id, team_assignment_id, location_id):
+
+    #TODO check if date of transfer has conflict
+    #TODO if unit is transferring, prompt commander/operations if he wants to replace units assigned to a request
+
+    k9 = K9.objects.get(id = k9_id)
+    team = Team_Assignment.objects.get(id = team_assignment_id)
+    location = Location.objects.get(id = location_id)
+    team_to_transfer = Team_Assignment.objects.get(location = location)
+
+    can_transfer = 0
+
+    try:
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).latest('id') #check current team_assignment
+        if (team_dog_deployed.date_pulled is None):
+            date_deployed = team_dog_deployed.date_added
+            delta = date.today() - date_deployed
+            duration = delta.days
+
+            if k9.capability == "SAR":
+                if team_to_transfer.SAR_deployed < team_to_transfer.SAR_demand:
+                    can_transfer = 1
+            elif K9.capability == "NDD":
+                if team_to_transfer.NDD_deployed < team_to_transfer.NDD_demand:
+                    can_transfer = 1
+            else:
+                if team_to_transfer.EDD_deployed < team_to_transfer.EDD_demand:
+                    can_transfer = 1
+
+
+            if duration >= 730 and (team.total_dogs_deployed - 1) >= 2 and can_transfer == 0:
+                can_transfer = 1
+
+        if can_transfer == 1:
+            team_dog_deployed.date_pulled = date.today()
+            team_dog_deployed.save()
+            deploy = Team_Dog_Deployed.objects.create(k9=k9, team_assignment=team_to_transfer)
+
+    except:
+        pass
+
+
+    return None

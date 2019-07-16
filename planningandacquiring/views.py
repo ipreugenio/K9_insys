@@ -563,8 +563,6 @@ def add_K9_offspring(request, id):
                 k9_count = k9_count+1
         
             K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=k9_count)
-            data.mother.training_status='For-Breeding'
-            data.save()
             return HttpResponseRedirect('../breeding_k9_confirmed/')
         else:
             style = "ui red message"

@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'widget_tweaks',
     'rest_framework',
-    # 'rest_framework.authtoken',
 
 ]
 
@@ -77,6 +76,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'K9_insys.urls'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
 
 TEMPLATES = [
     {
@@ -104,15 +110,6 @@ TEMPLATE_LOADERS = (
 )
 
 WSGI_APPLICATION = 'K9_insys.wsgi.application'
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES':(
-#         'rest_framework.authentication.TokenAuthentication'
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES':(
-#         'rest_framework.permissions.IsAuthenticated'
-#     )
-# }
 
 
 # Database

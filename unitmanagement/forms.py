@@ -21,10 +21,6 @@ def user_in_session(request):
 class DateInput(forms.DateInput):
     input_type = 'date'
 
-
-class TransferRequestForm(forms.Form):
-    ...
-
 class SelectUnitsForm(forms.Form):
     k9_list = []
 

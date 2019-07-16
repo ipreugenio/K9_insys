@@ -9,7 +9,6 @@ from django.utils import timezone
 
 # Create your models here.
 class Area(models.Model):
-    commander = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField('name', max_length=100, default='')
 
     def __str__(self):
@@ -405,7 +404,7 @@ class Dog_Request(models.Model):
     def due_start(self):
         notif = self.date_start - timedelta(days=7)
         return notif
-
+    
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
@@ -469,7 +468,7 @@ class K9_Schedule(models.Model):
     def due_start(self):
         notif = self.date_start - timedelta(days=7)
         return notif
-
+    
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
@@ -543,7 +542,7 @@ class Daily_Refresher(models.Model):
     others_find = models.IntegerField('others_find', blank=True, null=True)
     others_time = models.TimeField('others_time', blank=True, null=True)
     mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
-
+    
 
 class TempDeployment(models.Model):
 
@@ -560,6 +559,11 @@ class TempCheckup(models.Model):
 
     def __str__(self):
         return str(self.k9)
+
+# class TransferRequest(models.Model):
+#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     from_location = models.ForeignKey(Location, on_delete=models.CASCADE)
+#     to_location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
 
 

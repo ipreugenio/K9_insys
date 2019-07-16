@@ -5,14 +5,13 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 from django.contrib.sessions.models import Session
-from django.contrib.auth import authenticate
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
@@ -93,7 +92,6 @@ def user_session(request):
     user_in_session = User.objects.get(id=account.UserID.id)
     return user_in_session
 
-@login_required
 def dashboard(request):
     user = user_session(request)
 
@@ -218,28 +216,6 @@ def team_leader_dashboard(request):
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
-def commander_dashboard(request):
-    user = user_session(request)
-    
-    dr = 0
-    area = None
-    try:
-        area = Location.objects.filter(area__commander=user).count()
-     
-    except:
-        pass
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-
-    context = {
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-        'area':area,
-    }
-    return render (request, 'profiles/commander_dashboard.html', context)
-
 def handler_dashboard(request):
     user = user_session(request)
     
@@ -281,8 +257,6 @@ def vet_dashboard(request):
 
     dh1 = VaccinceRecord.objects.filter(dhppil4_1=False).count() #dhppil4_1
     dh2 = VaccinceRecord.objects.filter(dhppil4_2=False).count() #dhppil4_2
-
-    adoption = K9.objects.filter(training_status='For-Adoption').count()
 
     vac_pending = VaccinceRecord.objects.filter(Q(dhppil_cv_1=False) | Q(dhppil_cv_2=False) | Q(dhppil_cv_3=False) | Q(anti_rabies=False) | Q(bordetella_1=False) | Q(bordetella_2=False) | Q(dhppil4_1=False) | Q(dhppil4_2=False)).count()
     
@@ -409,37 +383,7 @@ def logout(request):
     session_keys = list(request.session.keys())
     for key in session_keys:
         del request.session[key]
-    auth_logout(request)
     return redirect('profiles:login')
-
-def login(request):
-    if request.method == 'POST':
-        serial = request.POST['serial_number']
-        password = request.POST['password']
-        user_auth = authenticate(request, username=serial, password=password)
-        print(user_auth)
-        if user_auth is not None:
-            auth_login(request, user_auth)
-            request.session["session_serial"] = serial
-            account = Account.objects.get(serial_number = serial)
-            user = User.objects.get(id = account.UserID.id)
-
-            request.session["session_user_position"] = user.position
-            request.session["session_id"] = user.id
-            request.session["session_username"] = str(user)
-
-            if user.position == 'Aministrator':
-                return HttpResponseRedirect('../dashboard')
-            elif user.position == 'Veterinarian':
-                return HttpResponseRedirect('../vet-dashboard')
-            elif user.position == 'Team Leader':
-                return HttpResponseRedirect('../team-leader-dashboard')
-            elif user.position == 'Handler':
-                return HttpResponseRedirect('../handler-dashboard')
-            else:
-                return HttpResponseRedirect('../dashboard')
-
-    return render (request, 'profiles/login.html')
 
 def add_User(request):
 
@@ -554,6 +498,7 @@ def add_education(request):
 
 def add_account(request):
     form = add_user_account(request.POST or None)
+    form2 = UserCreationForm(request.POST or None)
     style = ""
 
     UserID = request.session["session_userid"]
@@ -562,12 +507,17 @@ def add_account(request):
     if request.method == 'POST':
         if form.is_valid():
             form = form.save(commit=False)
-            form.username = 'O-' + str(data.id) 
-            form.first_name = data.firstname
-            form.last_name = data.lastname
+            form.UserID = data
+            form.serial_number =  'O-' + str(data.id) 
             form.save()
 
+            AuthUser.objects.create_user(username= form.serial_number, email=form.email_address, password=form.password, last_name=data.lastname, first_name = data.firstname)
+           
             return HttpResponseRedirect('../../../../user_add_confirmed/')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -674,6 +624,33 @@ class NotificationDetailView(APIView):
         notif.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# class UserView(viewsets.ModelViewSet):
-#     queryset = AuthUser.objects.all()
-#     serializer_class = UserSerializer
+# #TODO
+# class UserListView(APIView):
+
+#     def get(self, request):
+#         data = AuthUser.objects.all()
+#         serializer = UserSerializer(data, many=True)
+#         return Response(serializer.data)
+
+#     def put(self, request):
+#         serializer = UserSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class UserDetailView(APIView):
+#     def get(self, request, id):
+#         data = get_object_or_404(AuthUser, id=id)
+#         serializer = UserSerializer(data)
+#         return Response(serializer.data)
+
+#     def delete(self, request, id):
+#         data = get_object_or_404(AuthUser, id=id)
+#         data.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserView(viewsets.ModelViewSet):
+    queryset = AuthUser.objects.all()
+    serializer_class = UserSerializer
