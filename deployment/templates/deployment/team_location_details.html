@@ -184,7 +184,7 @@
             <td>{{can_deploy}}</td>
             <td>{{can_deploy.capability}}</td>
             <td>{{can_deploy.handler}}</td>
-            <td>{{can_deploy|calculate_distance_from_current_team:can_deploy.id}} miles</td>
+            <td>{{can_deploy|calculate_distance_from_current_team:data.id}} miles</td>
             <td>{{can_deploy|days_before_next_request:forloop.counter0}}</td>
             <td><a href="{% url 'deployment:view_schedule' can_deploy.id %}">View Schedule</a></td>
           </tr>

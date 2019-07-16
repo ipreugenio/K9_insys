@@ -32,12 +32,13 @@ urlpatterns = [
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),
     path('on-leave-decision/<int:id>', views.on_leave_decision, name='on_leave_decision'),
 
+    path('unfit-list', views.unfit_list, name='unfit_list'),
     path('health-list', views.health_list_handler, name='health_list_handler'),
     path('k9-incident-list', views.k9_incident_list, name='k9_incident_list'),
     path('k9-retrieved/<int:id>', views.k9_retreived, name='k9_retreived'),
     path('follow-up/<int:id>', views.follow_up, name='follow_up'),
 
-    path('choose-date/<int:id>', views.choose_date, name='choose_date'),
+    path('yearly-vaccine-list', views.yearly_vaccine_list, name='yearly_vaccine_list'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
     # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),
@@ -47,7 +48,9 @@ urlpatterns = [
     path('ajax_load_k9', views.load_k9, name='ajax_load_k9'),
     path('k9-sick-details/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('k9-incident-list/ajax_load_incident', views.load_incident, name='ajax_load_incident'),
-
+    path('k9-sick-details/ajax_load_image', views.load_image, name='ajax_load_image'),
+    path('yearly-vaccine-list/ajax_load_yearly_vac', views.load_yearly_vac, name='ajax_load_yearly_vac'),
+    path('unfit-list/ajax_load_physical', views.load_physical, name='ajax_load_physical'),
     
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
     path('reassign-assets', views.reassign_assets, name='reassign_assets'),
@@ -57,6 +60,7 @@ urlpatterns = [
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),
     path('vet/api', views.VetView.as_view()),
+    path('commander/api', views.CommanderView.as_view()),
 
     #path('/<int:id>/', views., name=''),
 ];

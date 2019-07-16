@@ -1,5 +1,8 @@
 {% extends "profiles/sidebar_deployment.html" %}
 
+{% load um_tags %}
+{% load widget_tweaks %}
+
 {% block content %}
 <h2 class="ui header">
     {{title}}
@@ -23,23 +26,23 @@
                 {{form.requester}}
             </div>
             <div class="field">
+                <label>Event Name</label>
+                {{form.event_name}}
+            </div>
+            <div class="field">
+                <label>Type</label>
+                {{form.event_type}}
+            </div>
+        </div>
+
+        <div class="fields">
+            <div class="field">
                 <label>Phone Number</label>
                 {{form.phone_number}}
             </div>
             <div class="field">
                 <label>Email Address</label>
                 {{form.email_address}}
-            </div>
-        </div>
-
-        <div class="fields">
-            <div class="field">
-                <label>Address</label>
-                {{form.location}}
-            </div>
-            <div class="field">
-                <label>City</label>
-                {{form.city}}
             </div>
         </div>
 
@@ -60,80 +63,61 @@
 
          <div class="fields">
             <div class="field">
-                <label>Start of deployment</label>
+                <label>Start of Event</label>
                 {{form.start_date}}
             </div>
             <div class="field">
-                <label>End of deployment</label>
+                <label>End of Event</label>
                 {{form.end_date}}
             </div>
         </div>
-
-               <div class="ui inverted right aligned segment" style="padding: 0px;">
-                                <button class = "ui button green" type="submit" >{{actiontype}}</button>
-                            </div>
-
-                            <div class="ui inverted placeholder segment">
-  <div class="ui two column stackable center aligned grid">
-    <div class="ui vertical divider"></div>
-    <div class="top aligned row">
-      <div class="column">
-
-
-          <label>Search Location</label>
-          <div class="ui fluid category search">
-  <div class="ui icon input">
-    {{geosearch.search}}
-    <i class="search icon"></i>
-  </div>
-  <div class="results"></div>
-</div>
-
-          <button id = "btn_search" class="ui blue button" type="button">Search</button>
-
-          <div  id ="id_location_cards"></div>
-
-
-      </div>
-      <div class="column">
-
-          <label>Geotag Location</label>
-        <div id = "id_geomap">
-            {{geoform.point}}
+        <div class="fields">
+            <div class="six wide field">
+                <label>Area</label>
+                {{form.area}}
+            </div>
+            <div class="ten wide field">
+                    <label>Address</label>
+                    {{form.location}}
+                </div>
         </div>
+               <div class="ui inverted right aligned segment" style="padding: 0px;">
+                    <button class = "ui button green" type="submit" >{{actiontype}}</button>
+                </div>
+                <div class="ui inverted placeholder segment">
+                    <div class="ui two column stackable center aligned grid">
+                      <div class="ui vertical divider"></div>
+                      <div class="top aligned row">
+                        <div class="column">
+                      
+                            <label>Search Location</label>
+                            <div class="ui fluid category search">
+                              <div class="ui icon input">
+                                {{geosearch.search}}
+                                <i class="search icon"></i>
+                              </div>
+                              <div class="results"></div>
+                            </div>
+                            <br>
+                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
 
-      </div>
-    </div>
-  </div>
-</div>
+                            <div  id ="id_location_cards"></div>
 
 
+                        </div>
+                        <div class="column">
 
+                            <label>Geotag Location</label>
+                          <div id = "id_geomap">
+                              {{geoform.point}}
+                          </div>
 
-    </div>
-
-
+                        </div>
+                      </div>
+                    </div>
+                  </div>
         </form>
 </div>
-
-  <!--<script>
-    $("#id_area").change(function () {
-      var url = $("#area_team_form").attr("data-teams-url");  // get the url of the `load_teams` view
-      var areaId = $(this).val();  // get the selected area ID from the HTML input
-
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'area': areaId       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_teams` view function
-          $("#id_team").html(data);  // replace the contents of the teams input with the data that came from the server
-        }
-      });
-
-    });
-  </script>-->
-
 <script>
     $("#btn_search").click(function () {
       var url = 'ajax_load_locations';  // get the url of the `load_locations` view

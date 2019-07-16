@@ -2,7 +2,7 @@
 {% load pa_tags %}
 
 <h2 class="ui header">
- {{Title}}
+  K9 Breeding
   <div class="sub header">Input K9 breeding data here</div>
 </h2>
 
@@ -20,122 +20,114 @@
     </div>
   </div>
 </div>
-
-<div id = 'recommendation'></div>
-
     {% if messages %}
         {% for message in messages %}
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui form" action="{% url 'planningandacquiring:add_K9_parents_form' %}" method="post">
-
+<form class = "ui form" action="" method="post">
   {% csrf_token %}
+<div class="ui two column grid">
+  <div class="column">
+     <center>
+       <h4 class='ui horizontal divider header'>Dam (Mother)</h4>
+     </center>
 
-    <div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">Mother</a>
-    <a class="item" data-tab="second">Father</a>
+      <table id="tabledata1" class="ui eight column inverted pink celled small table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Breed</th>
+                    <th>Capability</th>
+                    <th>Birth Success</th>
+                    <th>Litter</th>
+                    <th>Sick Record</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+    
+                {% for m, s, b in mlist %}
+                <tr>
+                    <td class="center aligned"> 
+                        <input type="radio" id="radiom" name="radiom" value="{{m.id}}">
+                    </td>
+                    <td>
+                        <a href="#" class="show_modal" id='{{m.id}}' style="color:powderblue;">{{m.name}}</a>
+                    </td>
+                    <td>{{m.age}}</td>
+                    <td>{{m.breed}}</td>
+                    <td>{{m.capability}}</td>
+                    <td>{{b}}%</td>
+                    <td>{{m.litter_no}}</td>
+                    <td>{{s}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+  </div>
+
+    <div class="column" id = 'id_father_data'>
+      <center>
+        <h4 class='ui horizontal divider header'>Sire (Father)</h4>
+      </center>
     </div>
-
-    <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui seven column inverted pink celled table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Breed</th>
-                <th>Color</th>
-                <th>Capability</th>
-                <th>Litter</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            {% for radio in form.mother %}
-            <tr>
-                <td class="center aligned"> {{radio.tag}} </td>
-                <td>{{mothers|name:forloop.counter0 }}</td>
-                <td>{{mothers|age:forloop.counter0 }}</td>
-                <td>{{mothers|breed:forloop.counter0 }}</td>
-                <td>{{mothers|color:forloop.counter0 }}</td>
-                <td>{{mothers|capability:forloop.counter0 }}</td>
-                <td>{{mothers|litter_no:forloop.counter0 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    </div>
-
-    <div class="ui tab segment " data-tab="second">
-    <table id="tabledata2" class="ui six column inverted blue celled table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Breed</th>
-                <th>Color</th>
-                <th>Capability</th>
-                <th>Litter</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-              {% for radio in form.father %}
-            <tr>
-                <td class="center aligned">{{radio.tag}}</td>
-                <td>{{fathers|name:forloop.counter0 }}</td>
-                <td>{{fathers|age:forloop.counter0 }}</td>
-                <td>{{fathers|breed:forloop.counter0 }}</td>
-                <td>{{fathers|color:forloop.counter0 }}</td>
-                <td>{{fathers|capability:forloop.counter0 }}</td>
-                <td>{{fathers|litter_no:forloop.counter0 }}</td>
-            </tr>
-         {% endfor %}
-        </tbody>
-    </table>
-    </div>
-
-
+</div>
   <div class="ui center aligned basic segment" style="padding: 0px;">
-        <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
-    </div>
-
+      <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
+  </div>
 </form>
 
 <script type="text/javascript">
 
 	$(document).ready(function() {
 		$('#tabledata1').DataTable({
-      "order": [[ 2, "asc" ]]
+      "order": [[ 5, "desc" ],[ 6, "desc" ],[ 7, "asc" ]]
     });
-		$('#tabledata2').DataTable({
-      "order": [[ 2, "asc" ]]
-    });
-
 		$('.menu .item').tab();
 
-    $('.ui.radio.checkbox').checkbox();       
+    $('.ui.radiom.checkbox').checkbox();       
 	});
 
-  $("input[name='mother']").change(function () {
+  $("input[name='radiom']").change(function () {
         var url = 'ajax_load_k9_reco';  
-        var id = $("input[name='mother']:checked"). val();
-
+        var id = $("input[name='radiom']:checked"). val();
+        
         $.ajax({                       
         url: url,                    
         data: {
             'id': id      
         },
         success: function (data) {   
-            $("#recommendation").html(data);  
+            $("#id_father_data").html(data);  
         }
         });
-
     });
+
+    $(".show_modal" ).bind('click', function() {
+            var id = $(this).attr('id')
+            var k9 = $(this).text();
+            $('#id_health_data').modal('show');
+            $('.header').text(id);
+            
+            var url = 'ajax_load_health';  
+            $('#id_health_data').modal('show');
+
+            $.ajax({                      
+                url: url,                    
+                data: {
+                'id': id,
+                'k9': k9,      
+                },
+                success: function (data) {   
+                $("#id_health_data").html(data); 
+                }
+            });
+
+        });
+
 </script>
 
 {% endblock %}

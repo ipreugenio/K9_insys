@@ -39,6 +39,12 @@
                             <a href="{% url 'unitmanagement:physical_exam_form'%}" class="item">
                                 <i class="heartbeat icon"></i>Physical Exam Form
                             </a>
+                            <a href="{% url 'unitmanagement:unfit_list'%}" class="item">
+                                <i class="clipboard list icon"></i>Unfit K9 List
+                            </a>
+                            <a href="{% url 'unitmanagement:yearly_vaccine_list'%}" class="item">
+                                <i class="clipboard list icon"></i>Yearly Vaccine K9 List
+                            </a>
                             <a href="{% url 'unitmanagement:k9_sick_list'%}" class="item">
                                 <i class="ambulance icon"></i>Sick K9's List
                             </a>
@@ -55,6 +61,7 @@
 
                             {% elif request.session.session_user_position == "Handler" %}
                             
+                            {% if request.session.partnered == True %}
                             <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
                                 <i class="sync alternate icon"></i>Daily Refresher Form
                             </a>
@@ -65,15 +72,15 @@
                                 <i class="exclamation icon"></i>
                                 <i class="paw icon"></i>K9-Incident Form
                             </a>
-                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
-                                <i class="exclamation icon"></i>Damaged Equipment
-                            </a>
+                          
                             <a href="{% url 'unitmanagement:health_history_handler'%}" class="item">
                                 <i class="h square icon"></i>Health Records
                             </a>
+                          
                             <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">
                                 <i class="clipboard list icon"></i>Health Concern List
                             </a>
+                            {% endif %}
                             <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
                                 <i class="question icon"></i>On-Leave Request
                             </a>

@@ -50,14 +50,13 @@
     </div>
 <script>
 $(document).ready(function() {
-    var endpoint = '../../unitmanagement/handler/api'
+    var endpoint = '../../unitmanagement/commander/api'
     var performance = []
     $.ajax({
         method: "GET",
         url: endpoint,
         success: function(data){
-          performance = data.performance
-          console.log(performance)
+          team = data.team_items
           setChart()         
         },
         error: function(error_data){
@@ -72,10 +71,10 @@ $(document).ready(function() {
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-              labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+              labels: ['Something'],
               datasets: [{
-                    label: "{{k9}}",
-                    data: performance,
+                    label: "AOR",
+                    data: team_items,
                     backgroundColor: ['rgba(75, 192, 192, 0.5)'],
                     borderColor: ['rgba(75, 192, 192, 1)'],
                     borderWidth: 1
@@ -87,7 +86,7 @@ $(document).ready(function() {
             },
             title: {
                 display: true,
-                text: "K9 Performance"
+                text: "AOR"
             },
             scales: {
                 xAxes: [{

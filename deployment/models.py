@@ -2,6 +2,8 @@ from django.db import models
 from planningandacquiring.models import K9
 from profiles.models import User
 from datetime import timedelta, date, datetime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 # Create your models here.
 
 class Area(models.Model):
@@ -160,19 +162,13 @@ class Location(models.Model):
         ('Vigan', 'Vigan'),
         ('Zamboanga', 'Zamboanga'),
     )
-
-    TYPE = (
-        ('Mall', 'Mall'),
-        ('Airport', 'Airport'),
-        ('Government Building', 'Government Building')
-    )
-
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     place = models.CharField('place', max_length=200, default='Undefined')
-    sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     status = models.CharField('status', max_length=100, default="unassigned")
-
+    longtitude = models.DecimalField('longtitude', max_digits=50, decimal_places=4, null=True)
+    latitude = models.DecimalField('latitude', max_digits=50, decimal_places=4, null=True)
+    
     def __str__(self):
         return str(self.area) + ' : ' + str(self.city) + ' City - ' + str(self.place)
 
@@ -200,19 +196,21 @@ class Team_Assignment(models.Model):
 
 class Dog_Request(models.Model):
     TYPE = (
-        ('Disaster', 'Disaster'),
-        ('Government Request', 'Government Request'),
-        ('Annual Event', 'Annual Event'),
-        ('Event', 'Event'),
+        ('Recurring Event', 'Recurring Event'),
+        ('One-Time Event', 'One-Time Event'),
+        ('Disaster Event', 'Disaster Event'),
     )
 
     requester = models.CharField('requester', max_length=100)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     location = models.CharField('location', max_length=100)
-    sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
-    phone_number = models.CharField('phone_number', max_length=100, default="n/a")
+    event_name = models.CharField('event_name', max_length=100)
+    event_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
+    phone_number = models.CharField('phone_number', max_length=100)
     email_address = models.EmailField('email', max_length=100, blank=True, null=True)
     remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
-    area = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    longtitude = models.DecimalField('longtitude', max_digits=50, decimal_places=4, null=True)
+    latitude = models.DecimalField('latitude', max_digits=50, decimal_places=4, null=True)
     EDD_needed = models.IntegerField('EDD_needed', default=0)
     NDD_needed = models.IntegerField('NDD_needed', default=0)
     SAR_needed = models.IntegerField('SAR_needed', default=0)
@@ -274,6 +272,11 @@ class Team_Dog_Deployed(models.Model):
         super(Team_Dog_Deployed, self).save(*args, **kwargs)
 
 class K9_Schedule(models.Model):
+    TYPE = (
+        ('Recurring Event', 'Recurring Event'),
+        ('One-Time Event', 'One-Time Event'),
+        ('Disaster Event', 'Disaster Event'),
+    )
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     dog_request = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, null=True, blank=True)
     date_start = models.DateField('date_start', null=True, blank=True)
@@ -286,6 +289,11 @@ class K9_Schedule(models.Model):
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
+
+    def save(self, *args, **kwargs):
+        self.date_start = self.dog_request.start_date
+        self.date_end = self.dog_request.end_date
+        super(K9_Schedule, self).save(*args, **kwargs)
 
 class Incidents(models.Model):
     TYPE = (
@@ -340,9 +348,12 @@ class Daily_Refresher(models.Model):
     mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
     
 #TODO
-# either text or Fk from equipment
-# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
 class K9_Pre_Deployment_Items(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Complete', 'Complete'),
+    )
+
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     phex = models.ForeignKey('unitmanagement.PhysicalExam', on_delete=models.CASCADE, null=True, blank=True) 
     food = models.ForeignKey('inventory.Food', on_delete=models.CASCADE, null=True, blank=True) 
@@ -351,14 +362,36 @@ class K9_Pre_Deployment_Items(models.Model):
     vest = models.IntegerField('vest', default=0)
     leash = models.IntegerField('leash', default=0)
     shipping_crate = models.IntegerField('shipping crate', default=0)
-    food_quantity = models.IntegerField('quantity', default=0) 
-    vitamins_quantity = models.IntegerField('quantity', default=0)
+    food_quantity = models.IntegerField('food_quantity', default=0) 
+    vitamins_quantity = models.IntegerField('vitamins_quantity', default=0)
     grooming_kit = models.IntegerField('grooming_kit', default=0)
     first_aid_kit = models.IntegerField('first_aid_kit', default=0)
     oral_dextrose = models.IntegerField('oral_dextrose', default=0)
+    ball = models.IntegerField('ball,.', default=0)
+    status = models.CharField('status', max_length=100, choices=STATUS, default='Pending')
     
 class K9_Deployment_Group(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Deployed', 'Deployed'),
+        ('Done', 'Done'),
+    )
     pre_deployment = models.ForeignKey(K9_Pre_Deployment_Items, on_delete=models.CASCADE, null=True, blank=True)   
     date_deployed = models.DateField('date_deployed', null=True, blank=True)
+    date_received = models.DateField('date_received', null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField('status', max_length=100, choices=STATUS, default='Pending')
     
+
+# @receiver(post_save, sender=K9_Schedule)
+# def create_deployment_items(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         K9_Pre_Deployment_Items.objects.create(k9=instance.k9)
+
+
+# @receiver(post_save, sender=Dog_Request)
+# def dog_request_create(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+        
+            
+        

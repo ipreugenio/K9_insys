@@ -41,11 +41,11 @@
                                         {{form.quantity}}
                                         {% if data.foodtype == 'Milk' %}
                                         <div class="ui left pointing blue basic label">
-                                            Milk per grams.
+                                            Milk per {{data.unit}}.
                                         </div>
                                         {% else %}
                                         <div class="ui left pointing blue basic label">
-                                            Dog Food per Kg.
+                                            Dog Food per {{data.unit}}.
                                         </div>
                                         {% endif %}
                                     </div>

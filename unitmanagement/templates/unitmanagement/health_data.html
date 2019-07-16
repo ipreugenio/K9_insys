@@ -1,6 +1,29 @@
 
 {% load static %}
 {% block content %}
+{% if k9 %}
+<div class="header">{{k9}}</div>
+  <div class="scrolling content">
+    
+      <table class="ui inverted green celled table">
+            <thead>
+                <th>Date</th>
+                <th>Problem</th>
+                <th>Treatment</th>
+            </thead>
+            <tbody>
+                {% for data in k9_health %}
+                <tr>
+                    <td>{{data.date}}</td>
+                    <td>{{data.problem}}</td>
+                    <td>{{data.treatment}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+  </div> 
+
+{% else %}
 <div class="header">{{health.date}}</div>
   <div class="scrolling content">
     <div class="ui grid">
@@ -32,6 +55,6 @@
             </tbody>
         </table>
   </div>
-
+{% endif %}
 {% endblock %}
 

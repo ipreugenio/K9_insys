@@ -5,7 +5,7 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed, Dog_Breed
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, Dog_Breed
 
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
@@ -201,9 +201,9 @@ def unified_graph():
     ndd_breed = []
     edd_breed = []
     for breed in breeds:
-        sar_breed.append("SAR - " + str(breed.breed))
-        ndd_breed.append("NDD - " + str(breed.breed))
-        edd_breed.append("EDD - " + str(breed.breed))
+        sar_breed.append("SAR - " + str(breed))
+        ndd_breed.append("NDD - " + str(breed))
+        edd_breed.append("EDD - " + str(breed))
 
     print("K9 COUNT")
     print(str(k9_set.count()))
@@ -1251,7 +1251,7 @@ def skill_count_between_breeds(id):
         EDD_score = 1
         desc2 = "EDD"
 
-    desc = str(target_k9.name) + " is a " + str(target_k9.breed.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed.breed + "s."
+    desc = str(target_k9.name) + " is a " + str(target_k9.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed + "s."
 
     graph = None
     classifier = []

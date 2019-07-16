@@ -46,7 +46,8 @@ class PhysicalExamForm(forms.ModelForm):
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
         'musculo_skeletal', 'respiratory', 'genito_urinary', 'nervous', 'circulatory', 'digestive',
-        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam')
+        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam',
+        'heart_rate','respiratory_rate','temperature','weight')
 
     def __init__(self, *args, **kwargs):
         super(PhysicalExamForm, self).__init__(*args, **kwargs)
@@ -163,6 +164,25 @@ class VaccinationUsedForm(forms.ModelForm):
         self.fields['veterinary'].required = False
         self.fields['done'].required = False
 
+class VaccinationYearlyForm(forms.ModelForm):
+    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
+    date_vaccinated = forms.DateField(widget = DateInput(), label=None)
+    image = forms.ImageField()
+
+    class Meta:
+        model = VaccineUsed
+ 
+        fields=('disease', 'vaccine', 'date_vaccinated', 'image', 'veterinary', 'done')
+    
+    def __init__(self, *args, **kwargs):
+        super(VaccinationYearlyForm, self).__init__(*args, **kwargs)
+        self.fields['disease'].required = False
+        self.fields['vaccine'].required = False
+        self.fields['date_vaccinated'].required = False
+        self.fields['image'].required = False
+        self.fields['veterinary'].required = False
+        self.fields['done'].required = False
+
 class RequestForm(forms.ModelForm):
     CONCERN = (
         ('Broken', 'Broken'),
@@ -199,6 +219,7 @@ class K9IncidentForm(forms.ModelForm):
         super(K9IncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['reported_by'].required = False
+        self.fields['title'].required = False
         self.fields['incident'].required = False
         self.fields['clinic'].required = False
 
@@ -235,7 +256,7 @@ class DateForm(forms.Form):
 
     widgets = {
         'date': DateInput(),
-
+    }
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))

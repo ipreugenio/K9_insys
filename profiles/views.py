@@ -11,16 +11,22 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
 
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
+
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule
+from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
-from datetime import datetime
+from datetime import datetime, date
 import calendar
+import ast
+from decimal import *
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -129,6 +135,11 @@ def dashboard(request):
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
 
+    #Calendar
+
+    events = Dog_Request.objects.all()
+
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -144,6 +155,8 @@ def dashboard(request):
         'trained': trained,
         'equipment_requests': equipment_requests,
         'for_breeding': for_breeding,
+
+        'events': events,
 
         'notif_data':notif_data,
         'count':count,
@@ -210,6 +223,10 @@ def commander_dashboard(request):
 
 def handler_dashboard(request):
     user = user_session(request)
+
+    form = RequestForm(request.POST or None)
+    geoform = GeoForm(request.POST or None)
+    geosearch = GeoSearch(request.POST or None)
     
     dr = 0
     k9 = None
@@ -222,16 +239,41 @@ def handler_dashboard(request):
             dr = 0
     except:
         pass
+
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            checks = geoform['point'].value()
+            checked = ast.literal_eval(checks)
+           
+            toList = list(checked['coordinates'])
+          
+            lon = Decimal(toList[0])
+            lat = Decimal(toList[1])
+
+            f = form.save(commit=False)
+            f.longtitude = lon
+            f.latitude = lat
+            f.save()
+
+            messages.success(request, 'event')
+            return redirect("profiles:handler_dashboard")
+
+    events = Dog_Request.objects.all()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
         'k9':k9,
         'dr':dr,
+        'form': form,
+        'geoform': geoform,
+        'geosearch': geosearch,
+        'events': events,
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -387,16 +429,18 @@ def login(request):
         serial = request.POST['serial_number']
         password = request.POST['password']
         user_auth = authenticate(request, username=serial, password=password)
-        print(user_auth)
         if user_auth is not None:
             auth_login(request, user_auth)
             request.session["session_serial"] = serial
             account = Account.objects.get(serial_number = serial)
-            user = User.objects.get(id = account.UserID.id)
+            user = User.objects.get(id = account.UserID.id) 
 
             request.session["session_user_position"] = user.position
             request.session["session_id"] = user.id
+            request.session["partnered"] = user.partnered
             request.session["session_username"] = str(user)
+
+            print(request.session["partnered"])
 
             if user.position == 'Aministrator':
                 return HttpResponseRedirect('../dashboard')
@@ -406,9 +450,12 @@ def login(request):
                 return HttpResponseRedirect('../team-leader-dashboard')
             elif user.position == 'Handler':
                 return HttpResponseRedirect('../handler-dashboard')
+            elif user.position == 'Commander':
+                return HttpResponseRedirect('../commander-dashboard')
             else:
                 return HttpResponseRedirect('../dashboard')
-
+        else:
+            messages.warning(request, 'username or password is invalid!')
     return render (request, 'profiles/login.html')
 
 def add_User(request):
@@ -537,7 +584,7 @@ def add_account(request):
             form.last_name = data.lastname
             form.save()
 
-            return HttpResponseRedirect('../../../../user_add_confirmed/')
+            return HttpResponseRedirect('../../../../user_list/')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -560,8 +607,36 @@ def user_listview(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    style = "ui green message"
+
+    if request.method == 'POST':
+        date = request.POST.get('date_input')
+        status = request.POST.get('status_input')
+        handler_id = request.POST.get('id_input')
+
+        u = User.objects.get(id=handler_id)
+        u.retire_quit_died = date
+        u.partnered = False
+        u.assigned = False
+
+        if status == 'Quit':
+            u.status = 'No Longer Employed'
+
+        u.save()
+
+        try:
+            k = K9.objects.get(handler=u) 
+            k.handler = None
+            k.save()
+        except:
+            pass
+
+        messages.success(request, 'User status has been updated to '+ u.status +'!')
+        
+
     context = {
         'Title' : 'User List',
+        'style':style,
         'user_s' : user_s,
         'notif_data':notif_data,
         'count':count,
@@ -607,6 +682,67 @@ def user_add_confirmed(request):
     }
     return render(request, 'profiles/user_add_confirmed.html', context)
 
+def load_locations(request):
+
+    search_query = request.GET.get('search_query')
+    width = request.GET.get('width')
+
+
+    if search_query == "":
+        geolocator = Nominatim(user_agent="Locator", timeout=None)
+    else:
+        geolocator = Nominatim(user_agent="Locator", format_string="%s, Philippines", timeout=None)
+
+    locations = geolocator.geocode(search_query, exactly_one=False)
+
+    print(locations)
+    print(width)
+
+    context = {
+        'locations' : locations,
+        'width': width
+    }
+
+    return render(request, 'deployment/location_data.html', context)
+
+def load_map(request):
+    lng = request.GET.get('lng')
+    lat = request.GET.get('lat')
+
+    width = request.GET.get('width')
+
+    print("TEST coordinates")
+    print(str(lat) + " , " + str(lng))
+
+    geoform = GeoForm(request.POST or None, lat=lat, lng=lng, width=width)
+
+    context = {
+        'geoform' : geoform
+    }
+
+    return render(request, 'deployment/map_data.html', context)
+
+class ScheduleView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        today = datetime.now()
+        print(date.today())
+
+        k9 = K9.objects.get(handler=user)
+        sched = K9_Schedule.objects.filter(k9=k9).filter(date_end__gte= today)
+
+        sched_items = []
+
+        for items in sched:
+            i = [items.dog_request.location, items.date_start, items.date_end]
+            sched_items.append(i)
+
+        data = {
+            "sched_items":sched_items,
+        }
+        return Response(data)
+
 #TODO
 class NotificationListView(APIView):
 
@@ -647,3 +783,44 @@ class NotificationDetailView(APIView):
 # class UserView(viewsets.ModelViewSet):
 #     queryset = AuthUser.objects.all()
 #     serializer_class = UserSerializer
+
+
+def update_event(request):
+
+    event = None
+
+    event_id = request.GET.get('event_id')
+    event_start = request.GET.get('event_start')
+    event_end = request.GET.get('event_end')
+    event_title = request.GET.get('event_title')
+    event_allDay = request.GET.get('event_allDay')
+    event_allDay = event_allDay.capitalize()
+    python_date_start = datetime.fromtimestamp(int(event_start))
+    if event_end is not None:
+        python_date_end = datetime.fromtimestamp(int(event_end))
+        # if python_date_start.day == python_date_end.day:
+        #     python_date_end = python_date_end + relativedelta.relativedelta(days=1)
+    else:
+        python_date_end = python_date_start
+        #python_date_end = python_date_end + relativedelta.relativedelta(days=1)
+
+
+    print("ID : " + event_id)
+    print("TITLE : " + event_title)
+    print("START : " + str(python_date_start))
+    print("END : " + str(python_date_end))
+    print("ALLDAY : " + event_allDay)
+
+    event = Events.objects.get(id=event_id)
+    event.event_name = event_title
+    event.start_date = python_date_start
+    event.end_date = python_date_end
+
+    event.all_day = event_allDay
+    event.save()
+
+
+    context = {"event": event}
+
+    return render(request, 'module/something.html', context)
+

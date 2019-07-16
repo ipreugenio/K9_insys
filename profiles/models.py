@@ -13,6 +13,8 @@ class User(models.Model):
         ('Administrator', 'Administrator'),
         ('Team Leader', 'Team Leader'),
         ('Commander', 'Commander'),
+        ('Operations', 'Operations'),
+        ('Trainor', 'Trainor'),
     )
 
     CIVILSTATUS = (
@@ -48,6 +50,8 @@ class User(models.Model):
         ('Working', 'Working'),
         ('On-Leave', 'On-Leave'),
         ('No Longer Employed', 'No Longer Employed'),
+        ('Retired', 'Retired'),
+        ('Died', 'Died'),
     )
 
     RANK = (
@@ -97,28 +101,29 @@ class User(models.Model):
     middlename = models.CharField('middlename', max_length=200)
     nickname = models.CharField('nickname', max_length=200, null=True, blank=True)
 
-    birthdate = models.DateField('birthdate', blank=True)
+    birthdate = models.DateField('birthdate', blank=True, null=True)
     age = models.IntegerField('age', default=0)
-    birthplace = models.CharField('birthplace', max_length=200, default="None", blank=True)
-    gender = models.CharField('gender', choices=SEX, max_length=200, default="None", blank=True)
-    civilstatus = models.CharField('civilstatus', choices=CIVILSTATUS, max_length=200)
+    birthplace = models.CharField('birthplace', max_length=200, default="None", blank=True, null=True)
+    gender = models.CharField('gender', choices=SEX, max_length=200, default="None", blank=True, null=True)
+    civilstatus = models.CharField('civilstatus', choices=CIVILSTATUS, max_length=200, blank=True, null=True)
 
-    citizenship = models.CharField('citizenship', choices=CITIZENSHIP, max_length=200)
-    religion = models.CharField('religion',choices=RELIGION, max_length=200)
+    citizenship = models.CharField('citizenship', choices=CITIZENSHIP, max_length=200, blank=True, null=True)
+    religion = models.CharField('religion',choices=RELIGION, max_length=200, blank=True, null=True)
 
-    bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200)
+    bloodtype = models.CharField('bloodtype', choices=BLOODTYPE, max_length=200, blank=True, null=True)
     distinct_feature = models.CharField('distinct_feature', max_length=200, blank=True, null=True)
     haircolor = models.CharField('haircolor', choices=HAIRCOLOR, max_length=200, default="None", blank=True)
     eyecolor = models.CharField('eyecolor', choices=EYECOLOR, max_length=200, default="None", blank=True)
     skincolor = models.CharField('skincolor', choices=SKINCOLOR, max_length=200, default="None", blank=True)
-    height = models.IntegerField('height')
-    weight = models.IntegerField('weight')
-    headsize = models.IntegerField('headsize')
-    footsize = models.IntegerField('footsize')
-    bodybuild = models.CharField('bodybuild', max_length=200)
+    height = models.IntegerField('height', blank=True, null=True)
+    weight = models.IntegerField('weight', blank=True, null=True)
+    headsize = models.IntegerField('headsize', blank=True, null=True)
+    footsize = models.IntegerField('footsize', blank=True, null=True)
+    bodybuild = models.CharField('bodybuild', max_length=200, blank=True, null=True)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Working")
     partnered = models.BooleanField(default=False)
     assigned = models.BooleanField(default=False)
+    retire_quit_died = models.DateField('retire_quit_died', blank=True, null=True)
    
     #capability = models.CharField('capability', max_length=200, default="None")
     

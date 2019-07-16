@@ -2,13 +2,11 @@
 {% load um_tags %}
 {% load widget_tweaks %}
 
-
 {% block content %}
 <div class="ui fluid container">
         <div class="ui grid">
-            <div class="three column row">
-                <div class="three wide column"></div>
-                <div class="ten wide column">
+            <div class="row">
+                <div class="column">
                     <h1 class="ui header">{{ title }}
                         <div class="sub header">{{ texthelp }}</div>
                          {{geoform.media}}
@@ -31,14 +29,6 @@
                                      {{form.city}}
                              </div>
                            </div>
-                           <div class="two fields">
-                                <div class="field">
-                                    <label>Sector</label>
-                                        {{form.sector_type}}
-                                </div>
-                                
-                              
-                              </div>
                             <div class="field">
                                 <label>Place</label>
                                     {{form.place}}
@@ -48,46 +38,41 @@
                             </div>
 
 
-                            <div class="ui inverted placeholder segment">
-  <div class="ui two column stackable center aligned grid">
-    <div class="ui vertical divider"></div>
-    <div class="top aligned row">
-      <div class="column">
+                          <div class="ui inverted placeholder segment">
+                            <div class="ui two column stackable center aligned grid">
+                              <div class="ui vertical divider"></div>
+                              <div class="top aligned row">
+                                <div class="column">
+                              
+                                    <label>Search Location</label>
+                                    <div class="ui fluid category search">
+                                      <div class="ui icon input">
+                                        {{geosearch.search}}
+                                        <i class="search icon"></i>
+                                      </div>
+                                      <div class="results"></div>
+                                    </div>
+                                    <br>
+                                    <button id = "btn_search" class="ui blue button" type="button">Search</button>
+
+                                    <div  id ="id_location_cards"></div>
 
 
-          <label>Search Location</label>
-          <div class="ui fluid category search">
-  <div class="ui icon input">
-    {{geosearch.search}}
-    <i class="search icon"></i>
-  </div>
-  <div class="results"></div>
-</div>
+                                </div>
+                                <div class="column">
 
-          <button id = "btn_search" class="ui blue button" type="button">Search</button>
+                                    <label>Geotag Location</label>
+                                  <div id = "id_geomap">
+                                      {{geoform.point}}
+                                  </div>
 
-          <div  id ="id_location_cards"></div>
-
-
-      </div>
-      <div class="column">
-
-          <label>Geotag Location</label>
-        <div id = "id_geomap">
-            {{geoform.point}}
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </form>
                     </div>
                 </div>
-                <div class="three wide column"></div>
             </div>
         </div>
     </div>

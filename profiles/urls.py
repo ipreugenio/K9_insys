@@ -30,9 +30,16 @@ urlpatterns = [
     path('user_list/', views.user_listview, name='user_list'),
     path('user_detail/<int:id>', views.user_detailview, name='user_detail'),
     path('user_add_confirmed/', views.user_add_confirmed, name='user_add_confirmed'),
+    
+    path('dashboard/update_event/', views.update_event, name='update_event'),
 
     path('api', views.NotificationListView.as_view()),
     path('api/<int:id>', views.NotificationDetailView.as_view()),
+
+    path('handler-dashboard/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('handler-dashboard/ajax_load_map', views.load_map, name='ajax_load_map'),
+
+    path('schedule/api', views.ScheduleView.as_view()),
 
     # path('user/api', views.UserListView.as_view()),
     # path('user/api/<int:id>', views.UserDetailView.as_view()),

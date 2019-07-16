@@ -164,7 +164,6 @@ def calculate_distance_from_current_team(K9, team_id):
     except:
         pass
 
-
     team = Team_Assignment.objects.get(id = team_id)
     team_location = team.location
     target_coordinates = convert_to_geographic(team_location.longtitude, team_location.latitude)
