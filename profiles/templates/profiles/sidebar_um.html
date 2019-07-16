@@ -57,7 +57,7 @@
 
 
                             {% elif request.session.session_user_position == "Handler" %}
-                            
+
                             <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
                                 <i class="sync alternate icon"></i>Daily Refresher Form
                             </a>
@@ -83,7 +83,7 @@
                             <a href="#" class="item">
                                 <i class="question icon"></i>Transfer Request
                             </a>
-                          
+
                             {% else %}
                             <a href="{% url 'deployment:deployment_area_details'%}" class="item">
                                 <i class="building icon"></i>Assigned Area Details
@@ -103,7 +103,7 @@
                                 <i class="exclamation icon"></i>Handler Incident
                                 Form
                             </a>
-                           
+
                             {% endif %}
 
                         </div>

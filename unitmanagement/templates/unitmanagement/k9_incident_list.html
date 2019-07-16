@@ -73,7 +73,7 @@
     </div>
 {% else %}
 <div class="ui segment" data-tab="first">
-        <table id="tabledata1" class="ui five column celled table">
+        <table id="tabledata1" class="ui column celled table">
             <thead>
                 <tr>
                     <th>Date Reported</th>
@@ -81,6 +81,7 @@
                     <th>Reported By</th>
                     <th>Port/Area</th>
                     <th>Clinic</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -96,7 +97,8 @@
                     {%endif%}
                     <td>{{data.clinic}}</td>
                     <td class="center aligned three wide">
-                        <button class="ui tiny blue button flip" id = "{{data.id}}" type="button">Select</button>
+                        <a href="{% url 'unitmanagement:k9_accident' data.id%}?accident=recovered" class="ui tiny blue button">Recovered</a>
+                        <button class="ui tiny red button died" id ='{{data.id}}' data-var='{{data.k9}}'>Died</button>
                     </td>
                 </tr>
                 
@@ -106,6 +108,30 @@
     </div>
 
     <div class="ui modal" id = 'id_data'></div>
+
+    <div class="ui mini modal" id = 'accident_modal'>
+        <div class="header" id = 'header'></div>
+        <div class="content">
+        
+            <form class="ui form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" value="" id='input_id' name='input_id'>
+                <div class="field">
+                    <label>Date Died</label>
+                    <input type="date" name = 'date_died'>
+                </div>
+                <div class="field">
+                    <label>Death Certificate</label>
+                    <input type="file" name = 'death_cert'>
+                </div>
+               
+                <div class="ui center aligned basic segment" style="padding: 0px;">
+                    <button type="submit" class="ui tiny blue button">Submit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
 {% endif %}
 
 <script type="text/javascript">
@@ -119,7 +145,7 @@
         $( ".flip" ).bind('click', function() {
             var url = 'k9-incident-list/ajax_load_incident';  
             var id = $(this).attr('id')
-            $('.ui.modal').modal('show');
+            $('#id_data').modal('show');
             $.ajax({                         
                 url: url,                  
                 data: {
@@ -130,6 +156,15 @@
                 }
             });
          
+        });
+
+        $( ".died" ).bind('click', function() {
+            var k9 = $(this).attr('data-var')
+            var id = parseInt($(this).attr('id'))
+            $('#input_id').val(id);
+            $('#header').text(k9);
+            $('#accident_modal').modal('show');
+           
         });
     });
 

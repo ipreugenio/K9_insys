@@ -26,6 +26,7 @@ urlpatterns = [
     path('choose-handler/<int:id>', views.choose_handler, name='choose_handler'),
     path('k9-sick-form', views.k9_sick_form, name='k9_sick_form'),
     path('k9-sick-list', views.k9_sick_list, name='k9_sick_list'),
+    path('k9-accident/<int:id>', views.k9_accident, name='k9_accident'),
     path('k9-sick-details/<int:id>', views.k9_sick_details, name='k9_sick_details'),
     path('on-leave-request', views.on_leave_request, name='on_leave_request'),
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),

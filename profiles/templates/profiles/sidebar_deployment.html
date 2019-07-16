@@ -7,6 +7,13 @@
             <div class="three wide column">
                     <div class="ui pointing vertical menu">
                         <a class="item"> <b>Deployment Menu</b></a>
+
+                        {% if request.session.session_user_position == "Commander" %}
+                        <a href="{% url 'deployment:assigned_location_list'%}" class="item">
+                            <i class="list alternate icon"></i>Team Location List
+                        </a>
+
+                        {%else%}
                         <a href="{% url 'deployment:add_area'%}" class="item">
                             <i class="plus circle icon"></i>Add Area
                         </a>
@@ -47,6 +54,6 @@
   $('.ui .item').on('click', function() {
       $('.ui .item').removeClass('active');
       $(this).addClass('active');
-   }); 
+   });
 </script>
 {% endblock%}

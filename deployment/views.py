@@ -94,8 +94,7 @@ def user_session(request):
     return user_in_session
 
 def index(request):
-    d = Daily_Refresher.objects.get(id=4)
-
+    d = 'Pre-dept'
     context = {
       'title':'Deployment',
       'd':d,
@@ -301,12 +300,15 @@ def edit_team(request, id):
     return render(request, 'deployment/edit_team.html', context)
 
 def assigned_location_list(request):
+    user = user_session(request)
     data = Team_Assignment.objects.all()
+
+    if user.position == 'Commander':
+        data = Team_Assignment.objects.filter(location__area.commanderuser)
 
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
         'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
         'data' : data,
