@@ -51,7 +51,6 @@ class Training_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
 
-    
 class K9_Adopted_Owner(models.Model):
     SEX = (
         ('Male', 'Male'),

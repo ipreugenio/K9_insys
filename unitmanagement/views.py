@@ -29,7 +29,7 @@ from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, Vaccinatio
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipment_Request, VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History
@@ -41,9 +41,12 @@ from rest_framework import status
 
 from unitmanagement.serializers import K9Serializer
 from django.db.models import Q
-
+from dateutil.parser import parse
 # Create your views here.
 
+import json
+
+from pandas import DataFrame as df
 
 def notif(request):
     serial = request.session['session_serial']
@@ -239,6 +242,7 @@ def yearly_vaccine_list(request):
     return render (request, 'unitmanagement/yearly_vaccination.html', context)
 
 #TODO Initialize treatment
+#TODO fix missing form
 def health_form(request):
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
@@ -1054,69 +1058,69 @@ def requests_form(request):
     }
     return render (request, 'unitmanagement/request_form.html', context)
 
-def request_list(request):
-    data = Requests.objects.all()
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'data': data,
-        'title': 'Damaged Equipment List',
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'unitmanagement/request_list.html', context)
-
-def change_equipment(request, id):
-    data = Requests.objects.get(id=id)
-    style = ""
-    changedate = dt.datetime.now()
-
-    if request.method == 'POST':
-        if 'ok' in request.POST:
-            data.request_status = "Approved"
-            data.date_approved = changedate
-            data.save()
-            #subtract inventory
-            equipment = Miscellaneous.objects.get(miscellaneous=data.equipment)
-            if equipment.quantity > 0:
-                equipment.quantity = equipment.quantity-1
-                equipment.save()
-
-                Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=user_session(request),
-                                                         quantity=1,
-                                                         date_subtracted=dt.date.today(),
-                                                         time=dt.datetime.now())
-                style = "ui green message"
-                messages.success(request, 'Equipment Approved!')
-
-            else:
-                style = "ui red message"
-                messages.success(request, 'Insufficient Inventory!')
-
-        else:
-            data.request_status = "Denied"
-            data.date_approved = changedate
-            data.save()
-            style = "ui green message"
-            messages.success(request, 'Equipment Denied!')
-
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'data': data,
-        'style': style,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-
-    return render (request, 'unitmanagement/change_equipment.html', context)
+# def request_list(request):
+#     data = Requests.objects.all()
+#
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#     context = {
+#         'data': data,
+#         'title': 'Damaged Equipment List',
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#     }
+#     return render (request, 'unitmanagement/request_list.html', context)
+#
+# def change_equipment(request, id):
+#     data = Requests.objects.get(id=id)
+#     style = ""
+#     changedate = dt.datetime.now()
+#
+#     if request.method == 'POST':
+#         if 'ok' in request.POST:
+#             data.request_status = "Approved"
+#             data.date_approved = changedate
+#             data.save()
+#             #subtract inventory
+#             equipment = Miscellaneous.objects.get(miscellaneous=data.equipment)
+#             if equipment.quantity > 0:
+#                 equipment.quantity = equipment.quantity-1
+#                 equipment.save()
+#
+#                 Miscellaneous_Subtracted_Trail.objects.create(inventory=equipment, user=user_session(request),
+#                                                          quantity=1,
+#                                                          date_subtracted=dt.date.today(),
+#                                                          time=dt.datetime.now())
+#                 style = "ui green message"
+#                 messages.success(request, 'Equipment Approved!')
+#
+#             else:
+#                 style = "ui red message"
+#                 messages.success(request, 'Insufficient Inventory!')
+#
+#         else:
+#             data.request_status = "Denied"
+#             data.date_approved = changedate
+#             data.save()
+#             style = "ui green message"
+#             messages.success(request, 'Equipment Denied!')
+#
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#     context = {
+#         'data': data,
+#         'style': style,
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#     }
+#
+#     return render (request, 'unitmanagement/change_equipment.html', context)
 
 # TODO
 def k9_incident(request):
@@ -2261,7 +2265,6 @@ def load_incident(request):
 
     return render(request, 'unitmanagement/incident_data.html', context)
 
-
 def load_yearly_vac(request):
 
     data = None
@@ -2319,3 +2322,121 @@ def load_physical(request):
     }
 
     return render(request, 'unitmanagement/physical_data.html', context)
+def k9_checkup_pending(request):
+    removal = TempCheckup.objects.all()
+
+    #TODO Save schedule before deletion
+    if request.method == "POST":
+        for item in removal:
+            sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
+            sched.save()
+
+    removal.delete()
+
+
+    current_appointments = K9_Schedule.objects.filter(status = "Checkup")
+
+    k9s_scheduled = []
+
+    for item in current_appointments:
+        k9s_scheduled.append(item.k9)
+
+    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_scheduled)
+    date_form = DateForm()
+
+    print(pending_schedule)
+
+    context = {
+        'k9_pending': pending_schedule,
+        'date_form': date_form['date'].as_widget(),
+        'selected_list': []
+    }
+
+    return render(request, 'unitmanagement/k9_checkup_pending.html', context)
+
+def load_appointments(request):
+
+    appointments = None
+    date = None
+    try:
+        date = request.GET.get('date')
+        print("PRINT DATE")
+        print(date)
+        new_date = parse(date)
+        print(new_date)
+        appointments = K9_Schedule.objects.filter(status="Checkup", date_start=new_date)
+    except:
+        pass
+
+
+    context = {
+        'appointments': appointments,
+        'new_date': str(date),
+    }
+
+    return render(request, 'unitmanagement/ajax_load_appointments.html', context)
+
+
+#TODO Hide items from available units when they are already scheduled
+def load_checkups(request):
+    fullstring = request.GET.get('fullstring')
+    fullstring = json.loads(fullstring)
+
+    k9_list = []
+    k9_list_id = []
+
+    try:
+        date = request.GET.get('date')
+        print("DATE")
+        print(date)
+        date = parse(date)
+
+        for item in fullstring.values():
+            k9 = K9.objects.get(id=item)
+            k9_list.append(k9)
+            k9_list_id.append(k9.id)
+
+            deployment = K9_Schedule.objects.filter(k9 = k9, status = "Initial Deployment").order_by('-id')[0]
+
+            # >>>>>>>
+
+            if TempCheckup.objects.filter(k9=k9).exists():
+                pass
+            else:
+                temp = TempCheckup.objects.create(date=date, k9=k9, deployment_date = deployment.date_start)
+                temp.save()
+
+                removal = TempCheckup.objects.exclude(id=temp.id).filter(k9=k9).filter(
+                    date=date)  # This line removes duplicates
+                removal.delete()
+
+    except:
+        for item in fullstring.values():
+            k9 = K9.objects.get(id=item)
+            k9_list.append(k9)
+            k9_list_id.append(k9.id)
+
+            # >>>>>>>
+
+            if TempCheckup.objects.filter(k9=k9).exists():
+                pass
+            else:
+                removal = TempCheckup.objects.filter(k9=k9)  # Dapat icheck niya kung ano yung mga hindi naka select
+                removal.delete()
+
+    # pending_schedule = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in = k9_list)
+
+    removal = TempCheckup.objects.exclude(k9__in=k9_list)
+    removal.delete()
+
+
+    temp = TempCheckup.objects.all()
+
+
+    context = {
+        'checkups' : temp,
+        'selected_list': k9_list_id,
+
+    }
+
+    return render(request, 'unitmanagement/ajax_load_checkups.html', context)

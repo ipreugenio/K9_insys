@@ -21,6 +21,39 @@ def user_in_session(request):
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class SelectUnitsForm(forms.Form):
+    k9_list = []
+
+    k9 = forms.ChoiceField(choices=k9_list,
+                             widget=forms.CheckboxSelectMultiple())
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            k9_dict  = kwargs.pop("k9_dict", None)
+        except:
+            pass
+
+        try:
+            check_true = kwargs.pop("check_true", None)
+        except:
+            pass
+
+        try:
+            disable_cb = kwargs.pop("disable_cb", None)
+        except:
+            pass
+
+        super(SelectUnitsForm, self).__init__(*args, **kwargs)
+        if k9_dict:
+            self.fields['k9'].choices = k9_dict
+
+        if check_true:
+            self.fields['k9'].widget.attrs['checked'] = True
+
+        if disable_cb:
+            self.fields['k9'].widget.attrs['readonly'] = True
+
 class PhysicalExamForm(forms.ModelForm):
     EXAMSTATUS = (
         ('Normal', 'Normal'),
@@ -252,11 +285,7 @@ class HandlerOnLeaveForm(forms.ModelForm):
         self.fields['handler'].widget.attrs['readonly'] = "readonly"
 
 class DateForm(forms.Form):
-    date = forms.DateField()
-
-    widgets = {
-        'date': DateInput(),
-    }
+    date = forms.DateField(widget=DateInput)
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))

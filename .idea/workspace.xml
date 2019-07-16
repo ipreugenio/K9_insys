@@ -2,43 +2,458 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c1549005-f422-45fb-b8ca-51eeca63e016" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/choose_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/inventory/templates/inventory/choose_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/inventory/templates/inventory/inventory_report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/training/templates/training/choose_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/training/templates/training/k9_record.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/training/templates/training/record_daily.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/choose_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/um_report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_selected.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/location_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/schedule_deployment.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deployment/templates/deployment/schedule_units.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_appointments.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_checkups.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_checkup_pending.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/transfer_request.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/K9_insys.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/K9_insys.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/K9_insys/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/K9_insys/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/celerybeat-schedule.bak" beforeDir="false" afterPath="$PROJECT_DIR$/celerybeat-schedule.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/celerybeat-schedule.dat" beforeDir="false" afterPath="$PROJECT_DIR$/celerybeat-schedule.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/celerybeat-schedule.dir" beforeDir="false" afterPath="$PROJECT_DIR$/celerybeat-schedule.dir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/celerybeat.pid" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/deployment/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/deployment_report.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/deployment_report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/add_area.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/add_area.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/add_location.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/add_location.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/deployment_area_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/deployment_area_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/request_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/request_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployment/templatetags/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/templatetags/index.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployment/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deployment/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inventory/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inventory/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inventory/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inventory/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/inventory/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_procured_k9.html" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_procured_k9.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planningandacquiring/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/planningandacquiring/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/media/k9_image/doggy_RhD1lej.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/media/k9_image/k9_default.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/media/profile_image/Eugenio.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/media/profile_image/default.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/media/profile_image/joyce_PZ5AgoE.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.codeclimate.yml" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.codeclimate.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.eslintignore" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.eslintignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.eslintrc.yml" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.eslintrc.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/BUG.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/BUG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/DOCS.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/DOCS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/FEATURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/FEATURE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/SUPPORT.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/ISSUE_TEMPLATE/SUPPORT.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/PULL_REQUEST_TEMPLATE.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.github/PULL_REQUEST_TEMPLATE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.htmllintrc" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.htmllintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/.travis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/MAINTAINING.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/MAINTAINING.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/book.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/book.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/SUMMARY.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/SUMMARY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/category.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/category.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/linear.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/linear.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/logarithmic.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/logarithmic.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/time.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/cartesian/time.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/labelling.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/labelling.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/radial/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/radial/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/radial/linear.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/radial/linear.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/styling.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/axes/styling.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/area.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/area.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/bar.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/bar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/bubble.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/bubble.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/doughnut.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/doughnut.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/line.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/line.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/mixed.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/mixed.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/polar.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/polar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/radar.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/radar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/scatter.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/charts/scatter.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/animations.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/animations.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/elements.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/elements.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/layout.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/layout.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/legend.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/legend.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/title.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/title.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/tooltip.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/configuration/tooltip.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/api.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/api.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/axes.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/axes.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/charts.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/charts.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/contributing.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/contributing.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/plugins.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/plugins.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/updates.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/developers/updates.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/accessibility.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/accessibility.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/colors.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/colors.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/device-pixel-ratio.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/device-pixel-ratio.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/fonts.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/fonts.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/events.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/events.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/modes.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/interactions/modes.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/options.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/options.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/responsive.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/general/responsive.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/installation.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/installation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/integration.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/integration.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/usage.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/getting-started/usage.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/comparison.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/comparison.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/extensions.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/extensions.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/license.md" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/notes/license.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/docs/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/gulpfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/gulpfile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/karma.conf.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/karma.conf.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/rollup.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/rollup.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/rollup.plugins.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/rollup.plugins.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/.eslintrc.yml" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/.eslintrc.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.css" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/content-security-policy.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/progress-bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/advanced/progress-bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/analyser.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/analyser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-boundaries.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-boundaries.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-datasets.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-datasets.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-stacked.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/line-stacked.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/radar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/area/radar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/horizontal.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/horizontal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/multi-axis.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/multi-axis.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/stacked-group.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/stacked-group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/stacked.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/stacked.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/vertical.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bar/vertical.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bubble.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/bubble.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/combo-bar-line.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/combo-bar-line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/doughnut.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/doughnut.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/basic.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/basic.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/interpolation-modes.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/interpolation-modes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/line-styles.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/line-styles.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/multi-axis.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/multi-axis.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/point-sizes.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/point-sizes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/point-styles.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/point-styles.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/skip-points.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/skip-points.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/stepped.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/line/stepped.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/pie.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/pie.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/polar-area.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/polar-area.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/radar-skip-points.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/radar-skip-points.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/radar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/radar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/scatter/basic.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/scatter/basic.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/scatter/multi-axis.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/charts/scatter/multi-axis.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/callbacks.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/callbacks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/point-style.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/point-style.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/positioning.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/legend/positioning.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/samples.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/samples.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/filtering-labels.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/filtering-labels.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/gridlines-display.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/gridlines-display.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/gridlines-style.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/gridlines-style.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/min-max-suggested.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/min-max-suggested.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/min-max.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/min-max.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/step-size.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/linear/step-size.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/logarithmic/line.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/logarithmic/line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/logarithmic/scatter.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/logarithmic/scatter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/multiline-labels.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/multiline-labels.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/non-numeric-y.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/non-numeric-y.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/combo.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/combo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/financial.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/financial.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/line-point-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/line-point-data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/line.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/time/line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/toggle-scale-type.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scales/toggle-scale-type.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/bubble.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/bubble.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/line.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/pie.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/pie.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/polar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/polar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/radar.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/scriptable/radar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/border.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/border.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/callbacks.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/callbacks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-line.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-pie.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-pie.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-points.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/custom-points.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/interactions.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/interactions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/positioning.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/tooltips/positioning.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/samples/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/scripts/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/scripts/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/scripts/release.sh" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/scripts/release.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/adapters/adapter.moment.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/adapters/adapter.moment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/adapters/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/adapters/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.bar.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.bar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.bubble.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.bubble.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.doughnut.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.doughnut.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.horizontalBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.horizontalBar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.line.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.line.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.pie.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.pie.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.polarArea.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.polarArea.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.radar.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.radar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.scatter.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/controller.scatter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/controllers/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.adapters.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.adapters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.animation.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.animation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.animations.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.animations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.datasetController.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.datasetController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.defaults.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.defaults.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.helpers.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.helpers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.interaction.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.interaction.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.layouts.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.layouts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.plugins.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.plugins.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.scale.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.scale.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.scaleService.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.scaleService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.ticks.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.ticks.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.tooltip.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/core/core.tooltip.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.arc.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.arc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.line.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.line.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.point.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.point.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.rectangle.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/element.rectangle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/elements/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.canvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.canvas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.core.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.core.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.easing.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.easing.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/helpers.options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/helpers/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.basic.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.basic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.dom.css" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.dom.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/platforms/platform.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.filler.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.filler.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.legend.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.legend.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.title.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/plugins/plugin.title.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.category.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.category.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.linear.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.linear.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.linearbase.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.linearbase.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.logarithmic.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.logarithmic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.radialLinear.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.radialLinear.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.time.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/src/scales/scale.time.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/.eslintrc.yml" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/.eslintrc.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/context.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/context.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixture.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixture.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/backgroundColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-absolute.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-absolute.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-offset.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-offset.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-single-reverse.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-single-reverse.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-single.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex-single.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-flex.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-max.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-max.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-min-interval.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-min-interval.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-multiple.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-multiple.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-no-overlap.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-no-overlap.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-offset.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-offset.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-reverse.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-reverse.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-single-xy.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-single-xy.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-single.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-single.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-stacked.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/bar-thickness-stacked.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderSkipped/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/indexable-object.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/indexable-object.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/negative.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/negative.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/object.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/object.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/scriptable-object.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/scriptable-object.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/borderWidth/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/chart-area-clip.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/chart-area-clip.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/horizontal-borders.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bar/horizontal-borders.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bubble/point-style.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bubble/point-style.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bubble/radius-scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.bubble/radius-scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/backgroundColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderAlign/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/borderWidth/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-border-align-center.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-border-align-center.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-border-align-inner.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-border-align-inner.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-weight.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/doughnut-weight.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-border-align-center.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-border-align-center.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-border-align-inner.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-border-align-inner.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-weight.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.doughnut/pie-weight.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/backgroundColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/borderWidth/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/point-style.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/point-style.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/pointStyle/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/radius/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.line/rotation/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/angle-array.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/angle-array.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/angle-undefined.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/angle-undefined.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/indexable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/indexable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/indexable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/indexable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/scriptable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/scriptable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/scriptable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/scriptable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/value-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/value-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/value-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/backgroundColor/value-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/border-align-center.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/border-align-center.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/border-align-inner.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/border-align-inner.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/indexable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/indexable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/indexable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/indexable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/scriptable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/scriptable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/scriptable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/scriptable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/value-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/value-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/value-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderAlign/value-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/indexable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/indexable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/indexable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/indexable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/scriptable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/scriptable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/scriptable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/scriptable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/value-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/value-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/value-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderColor/value-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/indexable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/indexable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/indexable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/indexable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/scriptable-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/scriptable-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/scriptable-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/scriptable-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/value-dataset.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/value-dataset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/value-element-options.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.polarArea/borderWidth/value-element-options.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/backgroundColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderColor/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/borderWidth/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/point-style.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/point-style.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/pointStyle/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/radius/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/indexable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/indexable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/scriptable.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/scriptable.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/value.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/controller.radar/rotation/value.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.scale/label-offset-vertical-axes.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.scale/label-offset-vertical-axes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.scale/tick-drawing.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.scale/tick-drawing.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.tooltip/opacity.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/core.tooltip/opacity.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-circle.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-circle.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-cross-rot.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-cross-rot.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-cross.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-cross.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-dash.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-dash.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-line.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-line.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect-rot.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect-rot.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect-rounded.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect-rounded.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-rect.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-star.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-star.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-triangle.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/point-style-triangle.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/rotation.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/element.point/rotation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/helpers.canvas/rounded-rect.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/helpers.canvas/rounded-rect.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-end-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-end-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-end.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-end.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-spline-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-spline-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-spline.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-spline.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-stepped-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-stepped-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-stepped.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin-stepped.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-origin.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-start-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-start-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-start.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-boundary-start.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-spline-span.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-spline-span.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-spline.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset-spline.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-line-dataset.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-radar-boundary-origin-spline.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-radar-boundary-origin-spline.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-radar-boundary-origin.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/plugin.filler/fill-radar-boundary-origin.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/border-dash.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/border-dash.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/circular-border-dash.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/circular-border-dash.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/indexable-gridlines.json" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/fixtures/scale.radialLinear/indexable-gridlines.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/matchers.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/matchers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.bar.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.bar.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.bubble.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.bubble.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.doughnut.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.doughnut.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.line.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.line.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.polarArea.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.polarArea.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.radar.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.radar.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.scatter.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/controller.scatter.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.controller.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.controller.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.datasetController.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.datasetController.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.element.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.element.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.helpers.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.helpers.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.interaction.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.interaction.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.layouts.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.layouts.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.plugin.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.plugin.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.scale.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.scale.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.scaleService.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.scaleService.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.ticks.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.ticks.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.tooltip.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/core.tooltip.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.arc.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.arc.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.line.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.line.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.point.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.point.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.rectangle.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/element.rectangle.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.defaults.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.defaults.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.deprecations.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.deprecations.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.namespace.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/global.namespace.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.canvas.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.canvas.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.core.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.core.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.easing.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.easing.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.options.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/helpers.options.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/platform.dom.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/platform.dom.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.filler.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.filler.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.legend.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.legend.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.title.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/plugin.title.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.category.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.category.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.linear.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.linear.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.logarithmic.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.logarithmic.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.radialLinear.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.radialLinear.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.time.tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/specs/scale.time.tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/static/Chart.js-2.8.0/test/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/handler_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/handler_dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_inventory.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profiles/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/profiles/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/profiles/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/daily_record.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/daily_record.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/training_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/training_records.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_records.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_edd.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_edd.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/templates/training/training_update_sar.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/training_update_sar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/training/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/assign_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/assign_k9_select.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" beforeDir="false" afterPath="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/training/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/training/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/migrations/0010_handler_incident_retain_last_handler.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/change_equipment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitmanagement/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/unitmanagement/views.py" afterDir="false" />
     </list>
@@ -77,11 +492,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/deployment/urls.py">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/unitmanagement/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="527">
-              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="83">
+              <caret line="2236" column="43" lean-forward="true" selection-start-line="2236" selection-start-column="43" selection-end-line="2236" selection-end-column="43" />
+              <folding>
+                <element signature="e#0#58#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unitmanagement/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="488">
+              <caret line="64" selection-start-line="64" selection-end-line="64" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/templatetags/index.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="386">
+              <caret line="277" selection-start-line="277" selection-end-line="285" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unitmanagement/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="366">
+              <caret line="293" lean-forward="true" selection-start-line="293" selection-end-line="293" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -89,14 +537,38 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/deployment/views.py">
+      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unitmanagement/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="491">
-              <caret line="871" lean-forward="true" selection-start-line="871" selection-end-line="871" />
-              <folding>
-                <element signature="e#0#58#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="203">
+              <caret line="25" column="7" lean-forward="true" selection-start-line="25" selection-start-column="7" selection-end-line="25" selection-end-column="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="transfer_request.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/transfer_request.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" column="9" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sidebar_um.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="539">
+              <caret line="83" column="69" selection-start-line="83" selection-start-column="69" selection-end-line="83" selection-end-column="69" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="team_location_details.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="197" column="2" selection-start-line="197" selection-start-column="2" selection-end-line="197" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -113,37 +585,43 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>initi</find>
-      <find>reques</find>
-      <find>re</find>
-      <find>request.post</find>
-      <find>subtrac</find>
-      <find>second</find>
-      <find>ff</find>
-      <find>vd</find>
-      <find>K9_Handler</find>
+      <find>us</find>
+      <find>Login</find>
+      <find>login</find>
+      <find>Dog_Breed</find>
+      <find>K9_Breed</find>
+      <find>Procured</find>
+      <find>can_deploy</find>
+      <find>Team_Ass</find>
+      <find>team_id</find>
+      <find>GeoFor</find>
+      <find>form.s</find>
+      <find>location.city</find>
+      <find>datetime</find>
       <find>Training</find>
-      <find>datetime.date</find>
-      <find>k9</find>
-      <find>Average</find>
-      <find>Average(</find>
-      <find>medicine_forecast</find>
-      <find>max</find>
-      <find>spendings</find>
-      <find>date.year</find>
-      <find>.latest</find>
-      <find>Ave</find>
-      <find>tree</find>
-      <find>genealogy</find>
-      <find>reassign_assets</find>
-      <find>failed</find>
-      <find>classify</find>
-      <find>classify_k9_li</find>
-      <find>fail</find>
-      <find>training</find>
-      <find>grade</find>
-      <find>form</find>
+      <find>Ha</find>
+      <find>HandlerV</find>
+      <find>Req</find>
+      <find>class</find>
+      <find>Q</find>
+      <find>load</find>
+      <find>assign_k9_s</find>
+      <find>incident_order_list</find>
+      <find>incident_type_list</find>
+      <find>endblock</find>
+      <find>Dog_Re</find>
+      <find>session</find>
+      <find>EDD_count</find>
+      <find>tabledata1</find>
+      <find>tabledata2</find>
+      <find>tabledata3</find>
     </findStrings>
+    <replaceStrings>
+      <replace>_Received_Trail</replace>
+      <replace>date_received</replace>
+      <replace>_Subtracted_Trail</replace>
+      <replace>date_subtracted</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -151,245 +629,77 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/django/contrib/gis/gdal/libgdal.py" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/Area List.html" />
+        <option value="$PROJECT_DIR$/training/models.py" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/handler_dashboard.html" />
         <option value="$PROJECT_DIR$/profiles/templates/profiles/global-base-ui/global_base_ui.html" />
-        <option value="$PROJECT_DIR$/inventory/models.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templatetags/pa_tags.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/statsmodels/tsa/tsatools.py" />
-        <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/numpy/linalg/linalg.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_detail.html" />
-        <option value="$PROJECT_DIR$/inventory/templates/inventory/medicine_inventory_list.html" />
-        <option value="$PROJECT_DIR$/deployment/forms.py" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/k9_schedule.html" />
-        <option value="$PROJECT_DIR$/profiles/admin.py" />
-        <option value="$PROJECT_DIR$/K9_insys/settings.py" />
-        <option value="$PROJECT_DIR$/profiles/models.py" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" />
-        <option value="$PROJECT_DIR$/unitmanagement/tasks.py" />
-        <option value="$PROJECT_DIR$/training/templatetags/training_tags.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/admin.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/genealogy.html" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/incident_detail.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/models.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html" />
-        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_unpartnered_list.html" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/add_User.html" />
-        <option value="$PROJECT_DIR$/profiles/views.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_sick_details.html" />
-        <option value="$PROJECT_DIR$/training/templates/training/serial_number_form.html" />
-        <option value="$PROJECT_DIR$/deployment/templatetags/index.py" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" />
-        <option value="$PROJECT_DIR$/deployment/templates/deployment/incident_list.html" />
-        <option value="$PROJECT_DIR$/unitmanagement/views.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_list.html" />
-        <option value="$PROJECT_DIR$/inventory/views.py" />
-        <option value="$PROJECT_DIR$/training/templates/training/training_update_ndd.html" />
-        <option value="$PROJECT_DIR$/unitmanagement/forms.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_record.html" />
-        <option value="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_report.html" />
-        <option value="$PROJECT_DIR$/training/forms.py" />
-        <option value="$PROJECT_DIR$/training/views.py" />
-        <option value="$PROJECT_DIR$/unitmanagement/models.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html" />
-        <option value="$PROJECT_DIR$/planningandacquiring/urls.py" />
         <option value="$PROJECT_DIR$/planningandacquiring/views.py" />
-        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/detailed_budgeting.html" />
-        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html" />
+        <option value="$PROJECT_DIR$/planningandacquiring/forms.py" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/schedule_deployment.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/area_list.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/add_area.html" />
+        <option value="$PROJECT_DIR$/deployment/admin.py" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/add_location.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_seelcted.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_replace_options.html" />
+        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_procured_k9.html" />
+        <option value="$PROJECT_DIR$/profiles/static/js/jquery.formset.js" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_selected_update.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_selected.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/location_list.html" />
         <option value="$PROJECT_DIR$/deployment/urls.py" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html" />
+        <option value="$PROJECT_DIR$/training/templates/training/assign_k9_select.html" />
+        <option value="$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_checkups.html" />
+        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_appointments.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/request_form.html" />
+        <option value="$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_detail.html" />
+        <option value="$PROJECT_DIR$/deployment/templatetags/index.py" />
+        <option value="$PROJECT_DIR$/deployment/forms.py" />
+        <option value="$PROJECT_DIR$/profiles/views.py" />
+        <option value="$PROJECT_DIR$/training/views.py" />
+        <option value="$PROJECT_DIR$/training/templates/training/classify_k9_select.html" />
+        <option value="$PROJECT_DIR$/deployment/tasks.py" />
+        <option value="$PROJECT_DIR$/inventory/models.py" />
+        <option value="$PROJECT_DIR$/planningandacquiring/models.py" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/schedule_units.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/deployment_area_details.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html" />
+        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_checkup_pending.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html" />
+        <option value="$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html" />
+        <option value="$PROJECT_DIR$/profiles/models.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_8.py" />
         <option value="$PROJECT_DIR$/deployment/views.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/templates/unitmanagement/transfer_request.html" />
+        <option value="$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html" />
+        <option value="$PROJECT_DIR$/deployment/models.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/models.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/urls.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/views.py" />
+        <option value="$PROJECT_DIR$/unitmanagement/forms.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-85" />
-    <option name="width" value="1386" />
-    <option name="height" value="682" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="261" />
+    <option name="y" value="282" />
+    <option name="width" value="622" />
+    <option name="height" value="351" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="deployment" type="462c0819:PsiDirectoryNode" />
-              <item name="templatetags" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="inventory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="inventory" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="inventory" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="inventory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="planningandacquiring" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="profiles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="training" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="K9_insys" type="b2602c69:ProjectViewProjectNode" />
-              <item name="K9_insys" type="462c0819:PsiDirectoryNode" />
-              <item name="unitmanagement" type="462c0819:PsiDirectoryNode" />
-              <item name="templatetags" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/profiles/templates/profiles/handler_dashboard.html" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -438,7 +748,7 @@
     <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24670571" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.26793557" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.037037037" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Version Control" order="9" />
@@ -449,21 +759,12 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11200586" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.037037037" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.3288889" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.037037037" />
-      <window_info anchor="bottom" id="Python Console" order="7" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.08148148" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -475,425 +776,358 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="4" />
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
+    <entry file="file://$PROJECT_DIR$/profiles/static/js/jquery.formset.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1321">
-          <caret line="267" selection-start-line="267" selection-end-line="267" />
+        <state relative-caret-position="459">
+          <caret line="140" column="17" lean-forward="true" selection-start-line="140" selection-start-column="17" selection-end-line="140" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/k9_schedule.html">
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_selected_update.html" />
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_list.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1423">
-          <caret line="129" column="7" selection-start-line="129" selection-start-column="7" selection-end-line="135" />
+        <state relative-caret-position="748">
+          <caret line="44" column="35" selection-start-line="44" selection-start-column="35" selection-end-line="46" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/incident_detail.html">
+    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_deployment.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="32" column="14" lean-forward="true" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
+        <state relative-caret-position="488">
+          <caret line="32" column="91" selection-start-line="32" selection-start-column="91" selection-end-line="32" selection-end-column="91" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/models.py">
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/ajax_load_teams.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-272">
-          <caret line="268" column="22" lean-forward="true" selection-start-line="268" selection-start-column="4" selection-end-line="268" selection-end-column="22" />
+        <state>
+          <caret column="3" lean-forward="true" selection-start-column="3" selection-end-column="3" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/on_leave_list.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_sick_details.html">
+    <entry file="file://$PROJECT_DIR$/training/templates/training/assign_k9_select.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+        <state relative-caret-position="-51">
+          <caret line="42" column="12" lean-forward="true" selection-start-line="42" selection-start-column="12" selection-end-line="46" selection-end-column="18" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/serial_number_form.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/templatetags/index.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="54" column="11" selection-start-line="54" selection-start-column="11" selection-end-line="54" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-765" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/incident_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="26" column="101" selection-start-line="26" selection-start-column="101" selection-end-line="26" selection-end-column="101" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/k9_training_list.html">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_list.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
-          <caret line="164" column="132" selection-start-line="164" selection-start-column="132" selection-end-line="164" selection-end-column="132" />
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/training_records.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/inventory/models.py">
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/choose_date.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        <state>
+          <caret selection-end-line="2" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/reassign_assets.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_unpartnered_list.html">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="505">
-          <caret line="59" column="51" selection-start-line="59" selection-start-column="51" selection-end-line="59" selection-end-column="51" />
+        <state relative-caret-position="340">
+          <caret line="140" column="16" selection-start-line="140" selection-start-column="16" selection-end-line="140" selection-end-column="119" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/physical_exam_details.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_details.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_form.html">
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-425" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/physical_exam_form.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-850" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/health_record.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="52" selection-start-line="52" selection-end-line="52" />
+        <state relative-caret-position="1241">
+          <caret line="73" selection-start-line="73" selection-end-line="85" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/views.py">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="1288" column="19" selection-start-line="1288" selection-start-column="4" selection-end-line="1288" selection-end-column="19" />
+        <state relative-caret-position="170">
+          <caret line="173" column="32" lean-forward="true" selection-start-line="173" selection-start-column="4" selection-end-line="173" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/ajax_load_units_selected.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-158">
+          <caret line="208" selection-start-line="208" selection-end-line="248" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/request_form.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="37" column="31" lean-forward="true" selection-start-line="37" selection-start-column="31" selection-end-line="39" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_procured_k9.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="13" column="3" lean-forward="true" selection-start-line="13" selection-start-column="3" selection-end-line="13" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_checkups.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="25" column="42" selection-start-line="25" selection-start-column="42" selection-end-line="25" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/unitmanagement/templatetags/um_tags.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
-          <caret line="2" column="58" selection-start-line="2" selection-start-column="58" selection-end-line="2" selection-end-column="58" />
+          <caret line="24" column="51" selection-start-line="24" selection-start-column="51" selection-end-line="24" selection-end-column="51" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/vaccination_form.html">
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/ajax_load_appointments.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="32" selection-start-line="6" selection-start-column="32" selection-end-line="6" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/request_form.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="46" column="27" selection-start-line="46" selection-start-column="27" selection-end-line="46" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/add_K9_parents.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-731">
+          <caret line="67" column="12" lean-forward="true" selection-start-line="67" selection-start-column="12" selection-end-line="67" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/K9_detail.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/assign_team_location.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/inventory/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="243" column="17" selection-start-line="243" selection-start-column="17" selection-end-line="243" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/inventory/templates/inventory/food_inventory_list.html">
+    <entry file="file://$PROJECT_DIR$/unitmanagement/tasks.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/training_update_ndd.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="111" column="1" selection-start-line="111" selection-start-column="1" selection-end-line="111" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/training_update_edd.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="89" column="24" selection-start-line="89" selection-start-column="24" selection-end-line="89" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="52" column="55" lean-forward="true" selection-start-line="52" selection-start-column="55" selection-end-line="52" selection-end-column="55" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/inventory/tasks.py">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/training/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="410">
-          <caret line="938" column="48" lean-forward="true" selection-start-line="938" selection-start-column="48" selection-end-line="938" selection-end-column="48" />
+        <state relative-caret-position="-5">
+          <caret line="800" column="44" selection-start-line="800" selection-start-column="44" selection-end-line="800" selection-end-column="44" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/templates/training/training_update_sar.html">
+    <entry file="file://$PROJECT_DIR$/training/templates/training/classify_k9_select.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="109" column="2" selection-start-line="109" selection-start-column="2" selection-end-line="109" selection-end-column="2" />
+        <state relative-caret-position="459">
+          <caret line="230" column="8" selection-start-line="230" selection-start-column="8" selection-end-line="230" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/deployment/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5187">
-          <caret line="25" column="33" lean-forward="true" selection-start-line="25" selection-start-column="33" selection-end-line="25" selection-end-column="33" />
+        <state relative-caret-position="170">
+          <caret line="23" column="11" selection-start-line="23" selection-start-column="11" selection-end-line="23" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="170" column="8" lean-forward="true" selection-start-line="170" selection-start-column="8" selection-end-line="170" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/tasks.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="590">
+          <caret line="103" column="15" selection-start-line="103" selection-start-column="15" selection-end-line="103" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/location_list.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="3" lean-forward="true" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="42" column="71" selection-start-line="42" selection-start-column="71" selection-end-line="42" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training/models.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inventory/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="48" selection-start-line="3" selection-start-column="48" selection-end-line="3" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/deployment_area_details.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2113">
+          <caret line="14" column="30" lean-forward="true" selection-start-line="14" selection-start-column="30" selection-end-line="14" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1326">
+          <caret line="78" column="47" selection-start-line="78" selection-start-column="47" selection-end-line="78" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/request_dog_details.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
-          <caret line="130" column="31" selection-start-line="130" selection-start-column="31" selection-end-line="130" selection-end-column="31" />
+          <caret line="181" selection-start-line="181" selection-end-line="181" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/schedule_units.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_8.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" selection-start-line="17" selection-end-line="17" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/handler_dashboard.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deployment/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="522">
+          <caret line="1585" selection-start-line="1585" selection-end-line="1585" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/team_location_details.html">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="287" column="61" lean-forward="true" selection-start-line="287" selection-start-column="61" selection-end-line="287" selection-end-column="61" />
+        <state relative-caret-position="114">
+          <caret line="197" column="2" selection-start-line="197" selection-start-column="2" selection-end-line="197" selection-end-column="31" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/forms.py">
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/k9_checkup_pending.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="48" column="30" lean-forward="true" selection-start-line="48" selection-start-column="30" selection-end-line="48" selection-end-column="30" />
+        <state relative-caret-position="374">
+          <caret line="22" column="6" lean-forward="true" selection-start-line="5" selection-end-line="22" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/add_User.html">
+    <entry file="file://$PROJECT_DIR$/deployment/templatetags/index.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2545">
-          <caret line="158" column="14" lean-forward="true" selection-start-line="156" selection-start-column="8" selection-end-line="158" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/templates/deployment/request_dog_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="130" column="8" lean-forward="true" selection-start-line="130" selection-start-column="8" selection-end-line="130" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/unitmanagement/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="33" column="98" selection-start-line="33" selection-start-column="57" selection-end-line="33" selection-end-column="98" />
+        <state relative-caret-position="386">
+          <caret line="277" selection-start-line="277" selection-end-line="285" selection-end-column="26" />
           <folding>
-            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting.html">
+    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_um.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="243" column="12" lean-forward="true" selection-start-line="243" selection-start-column="12" selection-end-line="243" selection-end-column="41" />
+        <state relative-caret-position="539">
+          <caret line="83" column="69" selection-start-line="83" selection-start-column="69" selection-end-line="83" selection-end-column="69" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budget_list.html">
+    <entry file="file://$PROJECT_DIR$/deployment/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="29" column="35" selection-start-line="29" selection-start-column="35" selection-end-line="29" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1020">
-          <caret line="264" column="32" lean-forward="true" selection-start-line="264" selection-start-column="32" selection-end-line="264" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3487">
-          <caret line="352" column="34" lean-forward="true" selection-start-line="352" selection-start-column="34" selection-end-line="352" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/detailed_budgeting.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+        <state relative-caret-position="280">
+          <caret line="562" selection-start-line="562" selection-end-line="562" />
           <folding>
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#4;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#4;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#4;n#table#4;n#!!top" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#654#5621#0" />
+            <element signature="e#8375#13342#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/budgeting_report.html">
+    <entry file="file://$PROJECT_DIR$/profiles/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="261" selection-start-line="261" selection-end-line="261" />
-          <folding>
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#3;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#1;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#2;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#3;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#4;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#7;n#tr#4;n#table#4;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#8;n#tr#4;n#table#4;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="508">
-          <caret line="3084" column="67" selection-start-line="3084" selection-start-column="67" selection-end-line="3084" selection-end-column="67" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planningandacquiring/templates/planningandacquiring/choose_date.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profiles/templates/profiles/sidebar_pa.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="36" column="120" selection-start-line="36" selection-start-column="120" selection-end-line="36" selection-end-column="120" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+        <state relative-caret-position="-3553">
+          <caret line="75" column="36" selection-start-line="75" selection-start-column="36" selection-end-line="75" selection-end-column="36" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/deployment/views.py">
+    <entry file="file://$PROJECT_DIR$/planningandacquiring/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="491">
-          <caret line="871" lean-forward="true" selection-start-line="871" selection-end-line="871" />
+        <state relative-caret-position="-19">
+          <caret line="160" column="8" lean-forward="true" selection-start-line="160" selection-start-column="8" selection-end-line="160" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="488">
+          <caret line="64" selection-start-line="64" selection-end-line="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/templates/unitmanagement/transfer_request.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="9" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="293" lean-forward="true" selection-start-line="293" selection-end-line="293" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="25" column="7" lean-forward="true" selection-start-line="25" selection-start-column="7" selection-end-line="25" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unitmanagement/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="2236" column="43" lean-forward="true" selection-start-line="2236" selection-start-column="43" selection-end-line="2236" selection-end-column="43" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>

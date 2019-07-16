@@ -80,6 +80,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'K9_insys.urls'
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -107,15 +114,6 @@ TEMPLATE_LOADERS = (
 
 WSGI_APPLICATION = 'K9_insys.wsgi.application'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES':(
-#         'rest_framework.authentication.TokenAuthentication'
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES':(
-#         'rest_framework.permissions.IsAuthenticated'
-#     )
-# }
-
 
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
@@ -123,7 +121,7 @@ WSGI_APPLICATION = 'K9_insys.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'k9',
+        'NAME': 'k9_db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -181,27 +179,27 @@ TIME_ZONE = 'Asia/Manila'
 STATIC_URL = '/static/'
 
 #OTHERS SETTINGS
-if os.name == 'nt':
-    import platform
-    OSGEO4W = r"C:\OSGeo4W"
-    if '64' in platform.architecture()[0]:
-        OSGEO4W += "64"
-    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-    os.environ['OSGEO4W_ROOT'] = OSGEO4W
-    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
-    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
-    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+# if os.name == 'nt':
+#     import platform
+#     OSGEO4W = r"C:\OSGeo4W"
+#     if '64' in platform.architecture()[0]:
+#         OSGEO4W += "64"
+#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+#     os.environ['OSGEO4W_ROOT'] = OSGEO4W
+#     os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+#     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+#     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
 
 
 #IAN SETTINGS
-# if os.name == 'nt':
-#     import platform
-#     OSGEO4W = r"C:\Users\Ian Eugenio\AppData\Local\Programs\Python\Python36-32\Lib\site-packages\osgeo"
-#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
-#     os.environ['PATH'] = OSGEO4W
-#     os.environ['OSGEO4W_ROOT'] = OSGEO4W
-#     os.environ['GDAL_DATA'] = OSGEO4W + r"\data\gdal"
-#     os.environ['PROJ_LIB'] = OSGEO4W + r"\data\proj"
+if os.name == 'nt':
+    import platform
+    OSGEO4W = r"C:\Users\Ian Eugenio\AppData\Local\Programs\Python\Python36-32\Lib\site-packages\osgeo"
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    os.environ['PATH'] = OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    os.environ['GDAL_DATA'] = OSGEO4W + r"\data\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\data\proj"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'profiles/media')
@@ -210,5 +208,8 @@ STATICFILES_DIRS=[
     'static'
 ]
 
-LOGIN_REDIRECT_URL = '../home'
+#LOGIN_URL = 'account/login/'
+LOGIN_REDIRECT_URL = '../home/'
+#SESSION_COOKIE_SECURE = False
+
 

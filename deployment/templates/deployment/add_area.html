@@ -8,6 +8,7 @@
                 <div class="ten wide column">
                     <h1 class="ui header">{{ title }}
                         <div class="sub header">{{ texthelp }}</div>
+
                     </h1>
                     <div class="ui inverted segment">
                         {% if messages %}
@@ -21,14 +22,16 @@
                                 <label>Area</label>
                                     {{form.name}}
                             </div>
+
                             <div class="ui inverted right aligned segment" style="padding: 0px;">
                                 <button class = "ui button green" type="submit" >{{actiontype}}</button>
                             </div>
                         </form>
                     </div>
                 </div>
-                <div class="three wide column"></div>
             </div>
         </div>
     </div>
+
+
 {% endblock%}

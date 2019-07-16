@@ -1,10 +1,30 @@
 from django import template
 # from planningandacquiring.models import Budget_allocation, Budget_medicine, Budget_equipment, Budget_food, Budget_vaccine, Budget_vet_supply
 from inventory.models import Medicine, Miscellaneous, Food
+from unitmanagement.forms import SelectUnitsForm
 
 register = template.Library()
 
+@register.filter
+def render_k9_checkbox(k9, selected_list): #check_true as form parameter to set initial value as true
+    k9_list = []
+    k9_list.append((k9.id, k9.name))
 
+    print("K9_LIST")
+    print(k9_list)
+
+    k9_is_checked = False
+
+    for item in selected_list:
+        if int(item) == int(k9.id):
+            k9_is_checked = True
+
+    if k9_is_checked == True:
+        unit_form = SelectUnitsForm(k9_dict=k9_list, check_true=True)
+    else:
+        unit_form = SelectUnitsForm(k9_dict=k9_list)
+
+    return unit_form['k9'][0].tag()
 
 @register.filter
 def list_item(List, i):

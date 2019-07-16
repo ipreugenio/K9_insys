@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
@@ -158,10 +159,6 @@ class K9(models.Model):
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
     )
-    TRAINED = (
-        ('Trained', 'Trained'),
-        ('Failed', 'Failed'),
-    )
 
     image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
     serial_number = models.CharField('serial_number', max_length=200 , default='Unassigned Serial Number')
@@ -175,7 +172,6 @@ class K9(models.Model):
     source = models.CharField('source', max_length=200, default="Not Specified", choices=SOURCE)
     year_retired = models.DateField('year_retired', null=True, blank=True)
     death_date = models.DateField('death_date', null=True, blank=True)
-    death_cert = models.FileField(upload_to='death_certificate', blank=True, null=True)
     assignment = models.CharField('assignment', max_length=200, default="None", null=True, blank=True)
     status = models.CharField('status', choices=STATUS, max_length=200, default="Material Dog")
     training_status = models.CharField('training_status', choices=TRAINING, max_length=200, default="Puppy")
@@ -192,14 +188,14 @@ class K9(models.Model):
     estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
-    date_created = models.DateField('date_created', default=timezone.now())
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
     trained = models.CharField('trained', choices=TRAINED, max_length=100, blank=True, null=True)
     fit = models.BooleanField(default=True)
+    date_created = models.DateField('date_created', default=now, blank=True, null=True)
+    #partnered = models.BooleanField(default=False)
 
-    #CELERY 
     # def best_fertile_notification(self):
     #     notif = self.estrus_date + td(days=10)
     #     notif = self.estrus_date + td(days=12)

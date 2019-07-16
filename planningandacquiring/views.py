@@ -890,68 +890,35 @@ def add_procured_k9(request):
     formset = k9_formset(request.POST, request.FILES)
     style = "ui green message"
 
-    # get percentage of k9 working dogs
-
-    edd = K9.objects.filter(capability='EDD').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Retired').exclude(status='Dead').exclude(status='Stolen').exclude(status='Lost').count()
-    
-    ndd = K9.objects.filter(capability='NDD').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Retired').exclude(status='Dead').exclude(status='Stolen').exclude(status='Lost').count()
-    
-    sar = K9.objects.filter(capability='SAR').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Retired').exclude(status='Dead').exclude(status='Stolen').exclude(status='Lost').count()
-
-    total = K9.objects.all().exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Retired').exclude(status='Dead').exclude(status='Stolen').exclude(status='Lost').count()
-
-    
-    t = total + 8
-
-    edd_p = t * .45
-    ndd_p = t * .45
-    sar_p = t * .10
-
-    # t*
-    edd_n = edd_p - edd
-    ndd_n = ndd_p - ndd
-    sar_n = sar_p - sar
-
-    print('Total', total)
-    print(edd,int(np.ceil(edd_p)),edd_n)
-    print(ndd,int(np.ceil(ndd_p)),ndd_n)
-    print(sar,int(np.ceil(sar_p)),sar_n)
-
-    k9_id = []
-    k9_breed = []
     if request.method == "POST":
         if form.is_valid():
             supplier_data = form.cleaned_data['supplier']
             supplier = K9_Supplier.objects.get(name=supplier_data)
 
             if formset.is_valid():
+                print("Formset is valid")
                 for form in formset:
-                    k9 = form.save(commit=False)
-                    k9.supplier = supplier
-                    k9.source = 'Procurement'
-                    k9.training_status = 'Unclassified'
-                    k9.save()
+                   k9 = form.save(commit=False)
+                   k9.supplier = supplier
+                   k9.source = 'Procurement'
+                   k9.training_status = 'Unclassified'
+                   k9.save()
 
-                    k9_id.append(k9.id)
-                    k9_breed.append(k9.breed)
-
-            # skill classification of dogs
-            np_arr = np.array(k9_breed)
-
-            breed = list(set(k9_breed))
-            
-            for k in k9_arr:
-                i = K9.objects.get(id=k)
-
-
-            style = "ui green message"
-            messages.success(request, 'Procured K9s has been added!')
-
-            return redirect('planningandacquiring:K9_list')
+                style = "ui green message"
+                messages.success(request, 'Procured K9s has been added!')
+                
+                return redirect('planningandacquiring:K9_list')
+            else:
+                for form in formset:
+                    print(form.errors)
+                style = "ui red message"
+                messages.warning(request, 'Invalid input data!')
         
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
+
+        return HttpResponseRedirect('../breeding_k9_confirmed/')
 
     #NOTIF SHOW
     notif_data = notif(request)

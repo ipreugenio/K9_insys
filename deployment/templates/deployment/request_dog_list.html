@@ -1,7 +1,7 @@
 {% extends "profiles/sidebar_deployment.html" %}
 
 {% block content %}
-<div class="ui inverted segment" style="padding:20px;">
+<div class="ui segment" style="padding:20px;">
     <h3 class="ui header">
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -11,11 +11,12 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
   <link rel="stylesheet" type="text/css" href="{'% static 'cal/css/styles.css' %}">
         K9 Request List
+        <div class="sub header">Select a request to start scheduling k9 units.</div>
     </h3>
 </div>
 
 
-<table id="tabledata1" class="ui nine column celled table">
+<table id="tabledata" class="ui nine column celled table">
         <thead>
             <tr>
                 <th>Start date</th>
@@ -42,9 +43,8 @@
                          <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
-                        <td>{{Data.total_dogs_demand}}</td>
-
-                        <td>{{Data.total_dogs_deployed}}</td>
+                        <td>{{Data.k9s_needed}}</td>
+                        <td>{{Data.k9s_deployed}}</td>
 
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
@@ -58,9 +58,9 @@
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
-                        <td>{{Data.total_dogs_demand}}</td>
+                        <td>{{Data.k9s_needed}}</td>
 
-                        <td>{{Data.total_dogs_deployed}}</td>
+                        <td>{{Data.k9s_deployed}}</td>
 
                         <td><center><i class="checkmark icon"></i>{{Data.status}}</center></td>
 
@@ -75,8 +75,8 @@
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
                         <td>{{Data.location}}</td>
-                        <td>{{Data.total_dogs_demand}}</td>
-                        <td>{{Data.total_dogs_deployed}}</td>
+                        <td>{{Data.k9s_needed}}</td>
+                        <td>{{Data.k9s_deployed}}</td>
                         <td><center><i class="attention icon"></i>{{Data.status}}</center></td>
                         <td style="text-align:center;">
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "ui disabled button">Select</a>
@@ -103,103 +103,15 @@
             {% endfor %}
         </tbody>
     </table>
-<button id = 'calendar_btn' class="ui blue button" type = "button">Toggle Calendar</button>
-
-<div id = "calendar">
-<div class = "ui segment">
-<div class="ui horizontal segments">
-    <div class = "ui segment">
-
-        <div class="ui segment">
-        <div class="ui statistic">
-  <div class="value">
-    {{date_today}}
-  </div>
-  <div class="label">
-    CURRENT DATE
-  </div>
-</div>
-            </div>
-
-    <a class ="ui left attached large blue button" href="{% url 'deployment:request_dog_list' %}?{{prev_month}}">Previous Month</a>
-    <a class ="right attached ui large blue button" href="{% url 'deployment:request_dog_list' %}?{{next_month}}">Next Month</a>
-        </div>
-    <div class = "ui segment">
-    <form class = "ui form" method="POST">
-        {% csrf_token %}
-        <div class="inline fields">
-        {{monthyearform}}
-        </div>
-        <button class = "ui button green" type="submit" >Select Month/Year</button>
-    </form>
-    </div>
-</div>
-{{calendar}}
-</div>
-</div>
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
-        $('.menu .item').tab();
-    });
+	 $('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ]]
+        });
 
-
-    $(document).ready(function(){
-        $('#calendar').show();
-
-        $('#calendar_btn').on("click", function(e){
-               $('#calendar').toggle();
-         });
-     });
+		$('.menu .item').tab();
 </script>
 
-<style>
-
-    .calendar {
-  width: 98%;
-  margin: auto;
-  font-size: 13px;
-}
-
-.calendar tr, .calendar td {
-  border: 1px solid black;
-}
-
-.calendar th {
-  padding: 10px;
-  text-align: center;
-  font-size: 18px;
-}
-
-.calendar td {
-  width: 200px;
-  height: 150px;
-  padding: 20px 0px 0px 5px;
-}
-
-.month {
-  font-size: 25px;
-}
-
-.date {
-  font-size: 16px;
-}
-
-ul {
-  height: 100%;
-  padding: 0px 5px 0px 20px;
-}
-
-a {
-  color: #17a2b8;
-}
-
-
-</style>
 
  {% endblock %}

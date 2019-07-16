@@ -4,21 +4,32 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
 from training.models import Training
-from profiles.models import User, Account
+from profiles.models import User
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
-from django.contrib.auth.models import User as AuthUser
 from planningandacquiring.models import K9
 
 # Create your models here.
-    
-class Meta:
-    app_label = 'unitmanagement'
 
+#TODO
+# either text or Fk from equipment
+# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
+class K9_Pre_Deployment_Items(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)    
+    collar = models.CharField('collar', max_length=200)
+    vest = models.CharField('vest', max_length=200)
+    leash = models.CharField('leash', max_length=200)
+    shipping_crate = models.CharField('shipping crate', max_length=200)
+    leash = models.CharField('leash', max_length=200)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True, blank=True)
+    food_quantity = models.IntegerField('quantity', default=0) 
+    vitamins = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, null=True, blank=True)
+    vitamins_quantity = models.IntegerField('quantity', default=0) 
+    
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
@@ -280,7 +291,10 @@ class Handler_Incident(models.Model):
         ('Made an Arrest', 'Made an Arrest'),
         ('Poor Performance', 'Poor Performance'),
         ('Violation', 'Violation'),
+        ('Accident', 'Accident'),
+        ('MIA', 'MIA'),
         ('Died', 'Died'),
+        ('Others', 'Others'),
     )
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -392,6 +406,8 @@ def create_k9_vaccines(sender, instance, **kwargs):
             VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '30 Weeks', disease='7th Heartworm Prevention', order='25')
             VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '32 Weeks', disease='7th Tick and Flea Prevention', order='26')
             VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '34 Weeks', disease='8th Heartworm Prevention', order='27')
+
+
 
 #######################################################################################################################
 

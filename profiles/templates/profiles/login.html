@@ -32,11 +32,11 @@
                         {% csrf_token %}
                         <div class="field">
                             <label>SERIAL NUMBER</label>
-                            <input placeholder="" name='serial_number' type="text">
+                            {{form.username}}
                         </div>
                         <div class="field">
                             <label>PASSWORD</label>
-                            <input placeholder="" name='password' type="password">
+                            {{form.password}}
                         </div>
                         {% if messages %}
                             {% for message in messages %}
