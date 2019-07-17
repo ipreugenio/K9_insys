@@ -17,6 +17,7 @@ urlpatterns = [
     path('training/list-classify-k9', views.classify_k9_list, name='classify_k9_list'),
     path('training/classify-k9/<int:id>', views.classify_k9_select, name='classify_k9_select'),
     path('training/training-record', views.training_records, name='training_records'),
+    path('training/training-records', views.training_records, name='training_records'),
 
     path('training/update/<int:id>', views.training_update_form, name='training_update_form'),
     path('training/finalization/<int:id>', views.assign_k9_duty, name='assign_k9_duty'),

@@ -4,8 +4,14 @@ from django.http import Http404
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed, K9_Supplier, K9_Litter, K9_Mated
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm
 
+from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, add_breed_form
+from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, K9_Breed, K9_Supplier, K9_Litter
+from .models import K9_Mated
+from .forms import DateForm
+from deployment.models import Incidents
 from planningandacquiring.models import Proposal_Budget, Proposal_Milk_Food, Proposal_Vac_Prev, Proposal_Medicine, Proposal_Vet_Supply, Proposal_Kennel_Supply, Proposal_Others, Actual_Budget, Actual_Milk_Food, Actual_Vac_Prev, Actual_Medicine, Actual_Vet_Supply, Actual_Kennel_Supply, Actual_Others
 
+from django.db.models import Sum
 from training.models import Training
 from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
@@ -21,7 +27,7 @@ from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, Vaccin
 from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail, Food_Received_Trail, Medicine_Received_Trail, Miscellaneous_Received_Trail
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
-from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
+from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
 
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
@@ -62,7 +68,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random, randint
+from random import random, randint 
 from statsmodels.tsa.stattools import adfuller, kpss
 import statsmodels.api as sm
 
@@ -107,14 +113,38 @@ def index(request):
     return render(request, 'planningandacquiring/index.html', context)
 
 def budgeting(request):
+    # k9_value = 0
+    # k9_cy = 0
+    # k9_ny = 0
+    # born_ny = 0
+    # need_procure_ny = 0
+    # total_k9 = 0,
+    # dog_food = 0
+    # total_food = 0
+    # vac_ny = 0
+    # vac_total = 0
+    # b_ny_med = 0
+    # total_medicine = 0
+    # vet_arr = 0
+    # vet_total = 0
+    # ken_arr = 0
+    # ken_total = 0
+    # oth_arr = 0
+    # oth_total = 0
+    # train_arr = 0
+    # train_total = 0 
+    # grand_total = 0
+    # stat = None
     next_year = dt.now().year + 1
     current_year = dt.now().year
+
+    stat = True
     all_k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost")
-    
-    # print(k9_distinct_breed)
+    print(stat)
 
     #K9 to be born and die
     k9_breeded = K9_Mated.objects.filter(status='Pregnant')
+    print(k9_breeded)
     ny_breeding = [] 
     ny_data = []
     for kb in k9_breeded:
@@ -126,7 +156,7 @@ def budgeting(request):
             #get k9, value, total count by breed
             
     kb_index = pd.Index(ny_breeding)
-  
+
     b_values = kb_index.value_counts().keys().tolist() #k9 breed to be born
     b_counts = kb_index.value_counts().tolist() #number of k9 to be born by breed
 
@@ -135,7 +165,7 @@ def budgeting(request):
 
     p = pd.DataFrame(ny_data, columns=['Breed', 'Litter'])
     h = p.groupby(['Breed']).sum()
-  
+
     total_born = []  
     total_born_count = []  
     for u in breed_u:
@@ -151,14 +181,14 @@ def budgeting(request):
             
 
     kd_index = pd.Index(ny_dead)
-  
+
     d_values = kd_index.value_counts().keys().tolist()
     d_counts = kd_index.value_counts().tolist()
 
     all_k = all_k9.values_list('breed', flat=True).order_by()
 
     all_ku = np.unique(all_k)
- 
+
     all_dogs = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
 
     all_kk = []
@@ -172,14 +202,21 @@ def budgeting(request):
     k9_t_ny = k9_cy+50
 
     difference_k9 = k9_cy - k9_ny
+    born_ny=0
+    for b in k9_breeded:
+        d = Dog_Breed.objects.get(breed=b.mother.breed)
+        born_ny = born_ny + d.litter_number
 
-    need_procure_ny = (50 + difference_k9) - sum(total_born_count)
+    # born_ny =  sum(total_born_count)
+
+    need_procure_ny = (50 + difference_k9) - born_ny
     if need_procure_ny <= 0:
         need_procure_ny = 0
-
-    born_ny =  sum(total_born_count)
-    k9_value = round(Dog_Breed.objects.all().aggregate(avg=Avg('value'))['avg'], 2)
-  
+    
+    try:
+        k9_value = round(Dog_Breed.objects.all().aggregate(avg=Avg('value'))['avg'], 2)
+    except:
+        k9_value = 15000
 
     #get dog food based on dog count
     # k9 = all_k9 - dead + born + Forecasted added_procured
@@ -191,7 +228,7 @@ def budgeting(request):
     total_adult_food = (need_procure_ny+k9_ny) * 12 #sack
 
     dog_food = []
-   
+
     #end
     milk = Food_Subtracted_Trail.objects.filter(inventory__foodtype='Milk').latest('date_subtracted')
     puppy = Food_Subtracted_Trail.objects.filter(inventory__foodtype='Puppy Dog Food').filter(inventory__unit='Sack - 20kg').latest('date_subtracted')
@@ -451,7 +488,7 @@ def budgeting(request):
             mi = Medicine_Inventory.objects.filter(medicine__immunization=item2).aggregate(sum=Sum('quantity'))['sum']
             m = Medicine_Inventory.objects.get(id=item1.id)
             c = mi - eny_ar_count
-            bn = (born_ny + k9_ny) - c
+            bn = int((born_ny + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
             mi_a = [m,m.medicine.price,bn,pr]
             if pr > 0:
@@ -460,7 +497,7 @@ def budgeting(request):
             mi = Medicine_Inventory.objects.filter(medicine__immunization=item2).aggregate(sum=Sum('quantity'))['sum']
             m = Medicine_Inventory.objects.get(id=item1.id)
             c = mi - eny_bbb_count
-            bn = ((born_ny*2) + k9_ny) - c
+            bn = int(((born_ny*2) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
             mi_a = [m,m.medicine.price,bn,pr]
             if pr > 0:
@@ -469,7 +506,7 @@ def budgeting(request):
             mi = Medicine_Inventory.objects.filter(medicine__immunization=item2).aggregate(sum=Sum('quantity'))['sum']
             m = Medicine_Inventory.objects.get(id=item1.id)
             c = mi - eny_dcv_count
-            bn = ((born_ny*3) + k9_ny) - c
+            bn = int(((born_ny*3) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
             mi_a = [m,m.medicine.price,bn,pr]
             if pr > 0:
@@ -478,17 +515,17 @@ def budgeting(request):
             mi = Medicine_Inventory.objects.filter(medicine__immunization=item2).aggregate(sum=Sum('quantity'))['sum']
             m = Medicine_Inventory.objects.get(id=item1.id)
             c = mi - eny_dc4_count
-            bn = ((born_ny*2) + k9_ny) - c
+            bn = int(((born_ny*2) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
             mi_a = [m,m.medicine.price,bn,pr]
             if pr > 0:
                 vac_ny.append(mi_a)
     #4 deworming, 8 heartworm, 7 tick&flee
 
-   # Deworming 
+# Deworming 
     try:
         data = Medicine_Subtracted_Trail.objects.filter(inventory__medicine__immunization='Deworming').values('inventory').annotate(sum=Sum('quantity'))
-
+        print(data)
         inv = 0
         invq = 0
         temp =[]
@@ -500,18 +537,18 @@ def budgeting(request):
                     s = value
                     a = [i, s]
                     temp.append(a)
-      
+    
         #medicine inventory, count
         for (n, (item1,item2)) in enumerate(temp):
             if item2 > invq:
                 inv = item1
                 invq = item2
-                
+        print(inv)
         md = Medicine_Inventory.objects.get(id=inv)
         dcq = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').aggregate(sum=Sum('quantity'))['sum']
         dcq = dcq - eny_dw_count
         p_deworm = md.medicine.price
-        q_deworm = (born_ny * 7) + ((k9_ny+need_procure_ny) * 2) - dcq
+        q_deworm = int((born_ny * 7) + ((k9_ny+need_procure_ny) * 2) - dcq)
         t_deworm = p_deworm*q_deworm
         mi_a = [md,md.medicine.price,q_deworm,t_deworm]
         if t_deworm > 0:
@@ -519,7 +556,7 @@ def budgeting(request):
 
     except:
         data = Medicine_Received_Trail.objects.filter(inventory__medicine__immunization='Deworming').values('inventory').annotate(sum=Sum('quantity'))
-   
+
         inv = 0
         invq = 0
         temp =[]
@@ -542,7 +579,7 @@ def budgeting(request):
         dcq = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').aggregate(sum=Sum('quantity'))['sum']
         dcq = dcq - eny_dw_count
         p_deworm = md.medicine.price
-        q_deworm = (born_ny * 7) + ((k9_ny+need_procure_ny) * 2)- dcq
+        q_deworm = int((born_ny * 7) + ((k9_ny+need_procure_ny) * 2) - dcq)
         t_deworm = p_deworm*q_deworm
         mi_a = [md,md.medicine.price,q_deworm,t_deworm]
         if t_deworm > 0:
@@ -574,7 +611,7 @@ def budgeting(request):
         hcq = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').aggregate(sum=Sum('quantity'))['sum']
         hcq = hcq - eny_hw_count
         p_heatworm = md.medicine.price
-        q_heatworm = (born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq
+        q_heatworm = int((born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq)
         t_heatworm = p_heatworm*q_heatworm
         mi_a = [md,md.medicine.price,q_heatworm,t_heatworm]
         if t_heatworm > 0:
@@ -604,7 +641,7 @@ def budgeting(request):
         hcq = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm').aggregate(sum=Sum('quantity'))['sum']
         hcq = hcq - eny_hw_count
         p_heatworm = md.medicine.price
-        q_heatworm = (born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq
+        q_heatworm = int((born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq)
         t_heatworm = p_heatworm*q_heatworm
         mi_a = [md,md.medicine.price,q_heatworm,t_heatworm]
         if t_heatworm > 0:
@@ -637,7 +674,7 @@ def budgeting(request):
         tcq = tcq - eny_tf_count
         p_tickflea = md.medicine.price
         k_tf = k9_cy % 7
-        q_tickflea = (born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq
+        q_tickflea = int((born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq)
         t_tickflea = round(Decimal(p_tickflea)*Decimal(q_tickflea), 2)
         mi_a = [md,md.medicine.price,q_tickflea,t_tickflea]
         if t_tickflea > 0:
@@ -668,7 +705,7 @@ def budgeting(request):
         tcq = tcq - eny_tf_count
         p_tickflea = md.medicine.price
         k_tf = k9_cy % 7
-        q_tickflea = (born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq
+        q_tickflea = int((born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq)
         t_tickflea = round(Decimal(p_tickflea)*Decimal(q_tickflea), 2)
         mi_a = [md,md.medicine.price,q_tickflea,t_tickflea]
         if t_tickflea > 0:
@@ -688,7 +725,7 @@ def budgeting(request):
             if key == 'inventory':
                 c = Miscellaneous.objects.get(id=value)
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
-                tq = (mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny)
+                tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
                 mv = [c,c.price, int(np.ceil(tq)), tp]
                 vet_total = vet_total+tp
@@ -707,7 +744,7 @@ def budgeting(request):
             if key == 'inventory':
                 c = Miscellaneous.objects.get(id=value)
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
-                tq = (mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny)
+                tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
                 mv = [c,c.price, int(np.ceil(tq)), tp]
                 ken_total = ken_total+tp
@@ -724,7 +761,7 @@ def budgeting(request):
             if key == 'inventory':
                 c = Miscellaneous.objects.get(id=value)
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
-                tq = (mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny)
+                tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
                 mv = [c,c.price, int(np.ceil(tq)), tp]
                 oth_total = oth_total+tp
@@ -736,6 +773,7 @@ def budgeting(request):
     train_arr = ['K9 Training',18000,mat_dog,train_total]
 
     grand_total=total_food+vac_total+total_medicine+vet_total+ken_total+oth_total+train_total
+    
     if request.method == "POST":
         
         try:
@@ -847,6 +885,7 @@ def budgeting(request):
         'train_arr':train_arr,
         'train_total':train_total,
         'grand_total': grand_total,
+        'stat': stat,
     }
     return render (request, 'planningandacquiring/budgeting.html', context)
 
@@ -1264,7 +1303,7 @@ def add_K9_offspring(request, id):
     style = ''
 
     data = K9_Mated.objects.get(id=id)
-    data.status = 'Done'
+    data.status = 'Pregnancy Done'
     if data.mother.breed != data.father.breed:
         breed = 'Mixed'
     else:
@@ -2249,6 +2288,50 @@ def budgeting_detail(request, id):
 
     return render(request, 'planningandacquiring/budgeting_detail.html', context)
 
+def breed_list(request):
+    breed = K9_Breed.objects.all()
+
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'Title': 'Breed List',
+        'breed': breed,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/breed_list.html', context)
+
+def breed_detail(request, id):
+    breed = K9_Breed.objects.get(id=id)
+
+    form = add_breed_form(request.POST or None, request.FILES or None, instance=breed)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Breed Details Updated!')
+
+            return redirect('planningandacquiring:breed_detail', id=breed.id)
+
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context = {
+        'Title': 'Breed List',
+        'breed': breed,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+    return render(request, 'planningandacquiring/breed_detail.html', context)
+
+
 def budgeting_report(request):
  
     notif_data = notif(request)
@@ -2326,6 +2409,172 @@ def load_k9_reco(request):
 
     return render(request, 'planningandacquiring/breeding_reco_data.html', context)
 
+
+def accomplishment_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('accomplishment_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/accomplishment_date.html', context)
+
+def accomplishment_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+
+    explosives = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Explosives Related")
+    narcotics = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Narcotics Related")
+    sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Search and Rescue Related")
+    others = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type="Others")
+
+    user = user_session(request)
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'explosives': explosives,
+        'narcotics': narcotics,
+        'sar': sar,
+        'others': others,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/accomplishment_report.html', context)
+
+def vet_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('vet_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/vet_date.html', context)
+
+def vet_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    # VACCINES USED
+
+    vaccineused = VaccineUsed.objects.filter(date_vaccinated__range=[from_date, to_date])
+
+    vu_data=[]
+
+    vu_disinct = vaccineused.values('vaccine').distinct()
+
+    for vu in vu_disinct:
+        for key,value in vu.items():
+            print(value)
+            v = vaccineused.filter(vaccine__id=value).count()
+            vac = vaccineused.filter(vaccine__id=value).latest('date')
+            arr = [vac.vaccine,vac.disease,v]
+            vu_data.append(arr)
+
+    print(vu_disinct)
+
+    # MEDICINES USED
+
+    health = Health.objects.filter(date_done__range=[from_date, to_date])
+    med_used = HealthMedicine.objects.filter(health__in=health)
+
+    med_data = []
+
+    med_distinct = med_used.values('medicine').distinct()
+
+    for med in med_distinct:
+        for key, value in med.items():
+            print(value)
+            k9_count = med_used.filter(medicine__id=value).count()
+            medi = med_used.filter(medicine__id=value).latest('id')
+            print(medi)
+            arr = [medi.medicine, k9_count]
+            med_data.append(arr)
+
+    print(k9_count)
+    print(med_distinct)
+
+    # SICKNESS
+
+    health = Health.objects.filter(date__range=[from_date, to_date])
+    health_distinct = health.values('problem').distinct()
+    sick_data = []
+
+    for sick in health_distinct:
+        for key, value in sick.items():
+            print(value)
+            health_count = Health.objects.filter(problem=value).count()
+            sickness = Health.objects.filter(problem=value).latest('id')
+
+            arr = [sickness.problem, health_count]
+            sick_data.append(arr)
+
+
+            print(sick_data)
+            print(health_distinct)
+            print(health_count)
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'vu_data': vu_data,
+        'med_data': med_data,
+        'sick_data': sick_data,
+    }
+
+    return render(request, 'planningandacquiring/vet_report.html', context)
+
+def inventory_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('inventory_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/inventory_date.html', context)
+
+
+def inventory_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+
+    }
+
+    return render(request, 'planningandacquiring/inventory_report.html', context)
 def load_health(request):
 
     health = None

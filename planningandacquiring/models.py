@@ -75,8 +75,7 @@ class Dog_Breed(models.Model):
     female_height = models.CharField('female_height', max_length=200, null=True)
     skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
     litter_number = models.IntegerField('litter_number', null=True)
-    value = models.DecimalField('value', default=0, max_digits=50, decimal_places=2,)
-
+    value = models.FloatField('value', max_length=200, null=True)
 
     def __str__(self):
         return str(self.breed)
@@ -108,7 +107,7 @@ class K9(models.Model):
         ('Black and White', 'Black and White'),
         ('White and Tan', 'White and Tan')
     )
-    
+
     BREED = (
         ('Belgian Malinois', 'Belgian Malinois'),
         ('Dutch Sheperd', 'Dutch Sheperd'),
@@ -126,16 +125,16 @@ class K9(models.Model):
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
         ('Sick', 'Sick'),
-        ('Stolen', 'Stolen'), 
-        ('Lost', 'Lost'), 
-        ('Accident', 'Accident'), 
+        ('Stolen', 'Stolen'),
+        ('Lost', 'Lost'),
+        ('Accident', 'Accident'),
     )
-    
+
     REPRODUCTIVE = (
         ('Proestrus', 'Proestrus'),
         ('Estrus', 'Estrus'),
         ('Metestrus', 'Metestrus'),
-        ('Anestrus', 'Anestrus'), 
+        ('Anestrus', 'Anestrus'),
     )
     SOURCE = (
         ('Procurement', 'Procurement'),
@@ -274,14 +273,14 @@ class K9(models.Model):
                 self.litter_no = int(f['litter_no__max'])
             except:
                 self.litter_no = 0
-            
+
         else:
             try:
                 m = K9_Litter.objects.filter(father__id=self.id).aggregate(Max('litter_no'))
                 self.litter_no = int(m['litter_no__max'])
             except:
                 self.litter_no = 0
-            
+
 
         self.last_proestrus_date = self.birth_date + relativedelta(months=+6)
         days = d.today() - self.birth_date
@@ -289,17 +288,17 @@ class K9(models.Model):
         self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
-        self.training_id = self.id 
+        self.training_id = self.id
         if self.age_days == 183:
             self.last_proestrus_date = d.today()
-        
+
         if self.last_proestrus_date != None:
             self.estrus_date = self.last_proestrus_date + td(days=7)
             self.metestrus_date = self.estrus_date + td(days=20)
             self.anestrus_date = self.metestrus_date + td(days=90)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
-        
-        if d.today() == self.last_proestrus_date: 
+
+        if d.today() == self.last_proestrus_date:
             self.reproductive_stage = 'Proestrus'
         elif d.today() == self.estrus_date:
             self.reproductive_stage = 'Estrus'
@@ -413,9 +412,9 @@ class K9_Mated(models.Model):
     )
 
     mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mom", blank=True, null=True)
-    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="dad", blank=True, null=True)  
+    father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="dad", blank=True, null=True)
     status = models.CharField('status', max_length=200, choices=STATUS, default = "Breeding")
-    date_mated = models.DateField('date_mated', blank=True, null=True)  
+    date_mated = models.DateField('date_mated', blank=True, null=True)
 
 class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)
@@ -482,7 +481,7 @@ class Proposal_Kennel_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    
+
 class Proposal_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
@@ -504,7 +503,7 @@ class Actual_Budget(models.Model):
     training_total = models.DecimalField('training_total', default=0, max_digits=50, decimal_places=10,)
     grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=10,)
     date_created = models.DateField('date_created', auto_now_add=True)
-    
+
 class Actual_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
@@ -544,7 +543,7 @@ class Actual_Kennel_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    
+
 class Actual_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)

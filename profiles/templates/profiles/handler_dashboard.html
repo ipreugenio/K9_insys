@@ -189,6 +189,13 @@
         {% endfor %}
         {% endif %}
     </div>
+
+    <div class="ui modal event_modal">
+      <i class="close icon"></i>
+      <div class="header">Header</div>
+      <div class="scrolling content">Something</div>
+       
+    </div>
 <style>
 
   #calendar .fc-dayGridMonth-view .fc-scroller {
@@ -317,7 +324,15 @@ $(document).ready(function() {
 
             ],
 
+          eventClick : function(event, element){
+            $('.content').text(event.title);
+            $('.event_modal').modal('show');
+            
+          },
+
           }); // end #calendar
+          
+          
 
         $('#prev').click(function() {
         $('#calendar').fullCalendar('prevYear');
