@@ -31,6 +31,8 @@ from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed
 
 from pyproj import Proj, transform
 
+
+
 #Plotly
 import plotly.offline as opy
 import plotly.graph_objs as go
@@ -58,6 +60,7 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
+from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location
 
 class MyDictionary(dict):
 
@@ -100,7 +103,24 @@ def index(request):
     }
     return render (request, 'deployment/index.html', context)
 
+#CAUTION : Only run this once
+def mass_populate():
+    # Generate all models related to a users, k9s and k9_requests (edit loop count in populate_db.py to change number of created objects
+    generate_user() #generates 400 objects
+    generate_k9() #generates 300 objects
+    generate_area() # generate all regions
+    generate_location() # generate a location per city
+    generate_event() #generates 150 objects
+    generate_incident() #generates 250 objects
+    generate_maritime() # generates 500 objects
+
+    return None
+
 def add_area(request):
+
+    #Only uncomment this if you are populating db
+    #mass_populate()
+
     form = AreaForm(request.POST or None)
     style = ""
     area = None
@@ -1634,3 +1654,5 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
 
 
     return None
+
+

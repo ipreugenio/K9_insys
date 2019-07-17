@@ -64,6 +64,10 @@ class User(models.Model):
         ('SN1/SW1', 'SN1/SW1'),
         ('SN2/SW2', 'SN2/SW2'),
         ('ASN/ASW', 'ASN/ASW'),
+    )
+
+    '''
+         #Higher Rankings
         ('CCGM', 'CCGM'),
         ('ADMIRAL', 'ADMIRAL'),
         ('VICE ADMIRAL', 'VICE ADMIRAL'),
@@ -76,7 +80,7 @@ class User(models.Model):
         ('LTJG', 'LTJG'),
         ('ENS', 'ENS'),
         ('P/ENS', 'P/ENS')
-    )
+    '''
 
     # Larger number = Higher Ranking
     RANK_SORTED = (

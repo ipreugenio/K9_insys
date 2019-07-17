@@ -16,7 +16,7 @@
 </div>
 
 
-<table id="tabledata" class="ui nine column celled table">
+<table id="tabledata" class="ui celled table">
         <thead>
             <tr>
                 <th>Start date</th>
@@ -106,11 +106,12 @@
 
 <script type="text/javascript">
 
-	 $('#tabledata').DataTable( {
+	$(document).ready(function() {
+		$('#tabledata').DataTable( {
         "order": [[ 0, "desc" ]]
-        });
-
+    });
 		$('.menu .item').tab();
+	});
 </script>
 
 

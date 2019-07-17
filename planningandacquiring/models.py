@@ -116,7 +116,6 @@ class K9(models.Model):
         ('Golden Retriever', 'Golden Retriever'),
         ('Jack Russel', 'Jack Russel'),
         ('Labrador Retriever', 'Labrador Retriever'),
-        ('Mixed', 'Mixed'),
     )
 
     STATUS = (
@@ -158,6 +157,11 @@ class K9(models.Model):
         ('Light Duty', 'Light Duty'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
+    )
+
+    TRAINED = (
+        ('Trained', 'Trained'),
+        ('Failed', 'Failed')
     )
 
     image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
