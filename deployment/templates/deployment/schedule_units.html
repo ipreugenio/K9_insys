@@ -1,0 +1,129 @@
+{% extends "profiles/sidebar_deployment.html" %}
+{% load index %}
+{% block content %}
+
+<div class="ui inverted segment" style="padding:20px;">
+    <h1 class="ui header">Schedule Units for Deployment
+     <div class="sub header">Schedule units for initial deployment</div></h1>
+    {% if messages %}
+        {% for message in messages %}
+            <div class='{{style}}'> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% if df_is_empty == False %}
+
+
+ <div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+    <i class="question icon"></i>Scheduling K9s for Initial Deployment
+  </div>
+  <ul class="list">
+      <li>Below is a list of ports where all K9s ready for deployment are already distributed with regard port requirements.</li>
+      <li>Pick a date for each port, dates should atleast have 1 week allowance to allow fullfillment of pre-deployment requirements.</li>
+      <li>Press submit to schedule initial deployment!</li>
+      <li>Pending K9s cannot yet be scheduled right now because of port requirements, come back when there are more k9s available for deployment.</li>
+  </ul>
+</div>
+
+
+<form class = "ui form" method="POST">
+    {% csrf_token %}
+<table id="tabledata" class="ui celled table">
+        	<thead>
+          	<tr>
+                <th rowspan="2">Port</th>
+				<th rowspan="2">Area</th>
+                <th rowspan="2">Maritime Count</th>
+                <th rowspan="2">Incident Count</th>
+                <th rowspan="2">Incident Order List</th>
+                <th rowspan="2">K9s Assigned</th>
+                <th colspan="3">K9s Deployed / K9s Required</th>
+                <th rowspan="2">Deployment Date</th>
+            </tr>
+            <tr>
+      <th >SAR</th>
+      <th>NDD</th>
+      <th>EDD</th>
+    </tr>
+
+    		</thead>
+    		<tbody>
+ {% for idx, location in df.iterrows %}
+            <tr>
+		                <td> {{location.Location.place}} </td>
+                        <td> {{location.Location.area}} </td>
+                         <td> {{location.Maritime_count}}</td>
+                        <td> {{location.Incident_count}}</td>
+                        <td>
+
+
+                        <ol class="ui list"> {% for item in location.Incident_Order_List %}
+                            <li>{{item.0}}</li>
+                        {%endfor%}</ol>
+                        </td>
+
+
+                        <td> <div class="ui bulleted list">{% for item in location.Temp_list %}
+                            <div class="item">{{item.k9}}</div>
+                        {% endfor %}
+                       </div> </td>
+
+
+                        <td>{{location.Team.SAR_deployed}} / {{location.Team.SAR_demand}}</td>
+                        <td>{{location.Team.NDD_deployed}} / {{location.Team.NDD_demand}}</td>
+                        <td>{{location.Team.EDD_deployed}} / {{location.Team.EDD_demand}}</td>
+                        <td>{{formset|render_formset_item:idx}}</td>
+
+
+            </tr>
+
+             {% endfor %}
+            </tbody>
+</table>
+
+     <div class="ui right aligned segment" style="padding: 0px;">
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+    </div>
+
+     {{formset.management_form}}
+    </form>
+
+
+<div class = "ui segment">
+Pending for Deployment
+    <table class="ui celled table">
+        	<thead>
+          	<tr>
+                <th>K9</th>
+                <th>Handler</th>
+            </tr>
+            </thead>
+        <tbody>
+{% for item in can_deploy %}
+  <tr>
+<td>{{item}} {{item.capability}} </td>
+      <td>{{item.handler}}</td>
+  </tr>
+{% endfor%}
+        </tbody>
+    </table>
+</div>
+
+
+{% else %}
+<div class="ui icon message">
+  <i class="exclamation icon"></i>
+  <div class="content">
+    <div class="header">
+      No units available
+    </div>
+    <p>There are no units available to be deployed right now based on current port requirement. Come back later!</p>
+  </div>
+</div>
+{% endif %}
+
+
+{% endblock%}

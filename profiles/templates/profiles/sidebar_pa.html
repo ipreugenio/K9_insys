@@ -1,6 +1,7 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %}  
 
 {% block sidebar_module %}
+
        
         <div class="ui fluid container">
         <div class='ui basic segment'>
@@ -25,10 +26,6 @@
                                         <i class="money bill alternate outline icon"></i>
                                 </a>
 
-                        <!-- <a href="{% url 'planningandacquiring:breeding_recommendation'%}" class="item">Breeding Recommendation
-                                <i class="venus mars icon"></i>
-                        </a> -->
-
                         <a href="{% url 'planningandacquiring:budgeting'%}" class="item">
                                 <i class="money bill alternate outline icon"></i>Budgeting
                         </a>
@@ -52,7 +49,7 @@
                                 <i class="list alternate icon"></i>K9 List
                         </a>
 
-                                <a href="{% url 'planningandacquiring:budget_list'%}" class="item">
+                        <a href="{% url 'planningandacquiring:budgeting'%}" class="item">
                                 <i class="money bill alternate outline icon"></i>Budgeting
                         </a>
                         </a>
@@ -66,8 +63,11 @@
                                 <a href="{% url 'planningandacquiring:inventory_date'%}" class="item">
                                 <i class="money bill alternate outline icon"></i>Inventory Report
                         </a>
-                        {% endif %}
+                        <a href="{% url 'planningandacquiring:budget_list'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>Budgeting List
+                        </a>
 
+                        {% endif %}
 
                         </div>
                 </div>

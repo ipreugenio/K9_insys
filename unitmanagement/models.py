@@ -1,16 +1,19 @@
 from django.db import models
-from planningandacquiring.models import K9
+
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
 from training.models import Training
-from profiles.models import User
+from profiles.models import User, Account
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
+from planningandacquiring.models import K9
+from django.contrib.auth.models import User as AuthUser
+
 # Create your models here.
 
 #TODO
@@ -52,9 +55,11 @@ class K9_Incident(models.Model):
     clinic = models.CharField('clinic', max_length=200, null=True, blank=True)
     reported_by = models.CharField('reported_by', max_length=200, null=True, blank=True)
 
+
 class Image(models.Model):
     incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
     image = models.FileField(upload_to='incident_image', blank=True, null=True)
+
 
 class Health(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -72,6 +77,7 @@ class Health(models.Model):
     follow_up_done = models.BooleanField(default=False)
 
     def __str__(self):
+
         return str(self.id) + ': ' + str(self.date) #+' - ' + str(self.dog.name)
 
     def expire(self):
@@ -82,7 +88,7 @@ class Health(models.Model):
     def expire_date(self):
         expired = self.date_done + timedelta(days=7) 
         return expired
-    
+
     def save(self, *args, **kwargs):
         if self.date != None:
             self.date_done = self.date + timedelta(days=self.duration)
@@ -90,6 +96,7 @@ class Health(models.Model):
         if date.today() == self.date_done:
             self.dog.status = 'Working Dog'
         super(Health, self).save(*args, **kwargs)
+
 
 class HealthMedicine(models.Model):
     TIME_OF_DAY = (
@@ -105,11 +112,12 @@ class HealthMedicine(models.Model):
     health = models.ForeignKey(Health, on_delete=models.CASCADE, related_name='health')
     medicine = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', default=0)
-    time_of_day = models.CharField('time_of_day',  choices=TIME_OF_DAY, max_length=200, default="")
-    duration = models.IntegerField('duration', default = 1)
-    
+    time_of_day = models.CharField('time_of_day', choices=TIME_OF_DAY, max_length=200, default="")
+    duration = models.IntegerField('duration', default=1)
+
     def __str__(self):
-        return str(self.id) + ': ' + str(self.health.date) #+ '-' + str(self.health.dog)
+        return str(self.id) + ': ' + str(self.health.date)  # + '-' + str(self.health.dog)
+
 
 
 class Transaction_Health(models.Model):
@@ -126,9 +134,17 @@ class PhysicalExam(models.Model):
         ('Not Examined', 'Not Examined'),
     )
 
+    BODY_SCORE = (
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+    )
+
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    cage_number = models.IntegerField('cage_number', default = "0")
+    cage_number = models.IntegerField('cage_number', default=0)
     general_appearance = models.CharField('general_appearance', choices=EXAMSTATUS, max_length=200)
     integumentary = models.CharField('integumentary', choices=EXAMSTATUS, max_length=200)
     musculo_skeletal = models.CharField('musculo_skeletal', choices=EXAMSTATUS, max_length=200)
@@ -144,17 +160,33 @@ class PhysicalExam(models.Model):
     remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
     date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
+    status = models.CharField('status', max_length=200, default="Pending")
+    body_score = models.IntegerField('body_score', choices=BODY_SCORE)
+    heart_rate = models.IntegerField('heart_rate', null=True, blank=True)
+    respiratory_rate = models.IntegerField('respiratory_rate', null=True, blank=True)
+    temperature = models.DecimalField('temperature',null=True, blank=True, max_digits=50, decimal_places=2)
+    weight = models.DecimalField('weight', null=True, blank=True, max_digits=50, decimal_places=2)
+    cleared = models.BooleanField(default=False)
 
     def due_notification(self):
         notif = self.date_next_exam - timedelta(days=7)
         return notif
 
     def save(self, *args, **kwargs):
-        #self.date_next_exam = self.date + timedelta(days=365)
+        # self.date_next_exam = self.date + timedelta(days=365)
+        if self.body_score == 1 or self.body_score == 5:
+            self.cleared == False
+        else:
+            self.cleared == True
         super(PhysicalExam, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
+
+@receiver(post_save, sender=PhysicalExam)
+def phex_next_date(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        instance.date_next_exam = instance.date + relativedelta(year=+1, )
 
 class VaccinceRecord(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -196,12 +228,14 @@ class VaccinceRecord(models.Model):
         return str(self.k9)
 
     def save(self, *args, **kwargs):
-        if self.heartworm_8 == True:
+        if self.dhppil4_2 == True:
             self.k9.training_status = 'Unclassified'
         super(VaccinceRecord, self).save(*args, **kwargs)
 
+
 class VaccineUsed(models.Model):
-    vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE, related_name='record')
+    vaccine_record = models.ForeignKey(VaccinceRecord, on_delete=models.CASCADE, related_name='record', null=True, blank=True)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     order = models.IntegerField('order', default=0)
     age = models.CharField('age', max_length=200, null=True, blank=True)
     disease = models.CharField('disease', max_length=200, null=True, blank=True)
@@ -213,7 +247,8 @@ class VaccineUsed(models.Model):
     date = models.DateField('date', auto_now_add=True)
     
     def __str__(self):
-        return str(self.vaccine_record) + ':' + str(self.disease) +'-' + str(self.date_vaccinated)
+        return str(self.vaccine_record) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
+
 
 #TODO
 # Request Equipment Connect to K9_Pre_Deployment Equipments
@@ -238,6 +273,7 @@ class Food_Request(models.Model):
     date = models.DateField('date', auto_now_add=True)
     status = models.CharField('status', max_length=200, default="Pending")
 
+
 class Handler_On_Leave(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -255,11 +291,13 @@ class Handler_On_Leave(models.Model):
         self.duration = days.days
         super(Handler_On_Leave, self).save(*args, **kwargs)
 
+
 class Handler_Incident(models.Model):
     INCIDENT = (
         ('Rescued People', 'Rescued People'),
         ('Made an Arrest', 'Made an Arrest'),
         ('Poor Performance', 'Poor Performance'),
+        ('Violation', 'Violation'),
         ('Accident', 'Accident'),
         ('MIA', 'MIA'),
         ('Died', 'Died'),
@@ -272,6 +310,14 @@ class Handler_Incident(models.Model):
     description = models.TextField('description', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='leader')
+
+    def save(self, *args, **kwargs):
+        if incident == 'Died':
+            self.handler.status = 'Died'
+            self.handler.partnered = False
+            self.handler.assigned = None
+            self.k9.handler = None
+        super(Handler_Incident, self).save(*args, **kwargs)
 
 class Notification(models.Model):
     POSITION = (
@@ -331,7 +377,7 @@ def create_training_record(sender, instance, **kwargs):
 @receiver(post_save, sender=K9)
 def create_k9_vaccines(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        if instance.source == 'Procured':
+        if instance.source == 'Procurement':
             cvr = VaccinceRecord.objects.create(k9=instance,  deworming_1=True, deworming_2=True, deworming_3=True,
             deworming_4=True, dhppil_cv_1=True, dhppil_cv_2=True, dhppil_cv_3=True, heartworm_1=True, heartworm_2=True,
             heartworm_3=True, heartworm_4=True, heartworm_5=True, heartworm_6=True, heartworm_7=True, heartworm_8=True,
@@ -340,33 +386,35 @@ def create_k9_vaccines(sender, instance, **kwargs):
 
         else:
             cvr = VaccinceRecord.objects.create(k9=instance)
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '2 Weeks', disease='1st Deworming', order='1')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '4 Weeks', disease='2nd Deworming', order='2')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '6 Weeks', disease='3rd Deworming', order='3')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '6 Weeks', disease='1st dose DHPPiL+CV Vaccination', order='4')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '6 Weeks', disease='1st Heartworm Prevention', order='5')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '8 Weeks', disease='1st dose Bordetella Bronchiseptica Bacterin', order='6')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '8 Weeks', disease='1st Tick and Flea Prevention', order='7')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '9 Weeks', disease='2nd dose DHPPiL+CV', order='8')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '9 Weeks', disease='4th Deworming', order='9')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '10 Weeks', disease='2nd Heartworm Prevention', order='10')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '11 Weeks', disease='2nd dose Bordetella Bronchiseptica Bacterin', order='11')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '12 Weeks', disease='Anti-Rabies Vaccination', order='12')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '12 Weeks', disease='2nd Tick and Flea Prevention', order='13')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '12 Weeks', disease='3rd dose DHPPiL+CV Vaccination', order='14')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '14 Weeks', disease='3rd Heartworm Prevention', order='15')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '15 Weeks', disease='1st dose DHPPiL4 Vaccination', order='16')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '16 Weeks', disease='3rd Tick and Flea Prevention', order='17')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '18 Weeks', disease='2nd dose DHPPiL4 Vaccination', order='18')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '18 Weeks', disease='4th Heartworm Prevention', order='19')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '20 Weeks', disease='4th Tick and Flea Prevention', order='20')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '22 Weeks', disease='5th Heartworm Prevention', order='21')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '24 Weeks', disease='6th Heartworm Prevention', order='22')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '26 Weeks', disease='2nd dose DHPPiL4 Vaccination', order='23')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '28 Weeks', disease='6th Tick and Flea Prevention', order='24')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '30 Weeks', disease='7th Heartworm Prevention', order='25')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '32 Weeks', disease='7th Tick and Flea Prevention', order='26')
-            VaccineUsed.objects.create(vaccine_record = cvr, age= '34 Weeks', disease='8th Heartworm Prevention', order='27')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '2 Weeks', disease='1st Deworming', order='1')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '4 Weeks', disease='2nd Deworming', order='2')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '6 Weeks', disease='3rd Deworming', order='3')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '6 Weeks', disease='1st dose DHPPiL+CV Vaccination', order='4')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '6 Weeks', disease='1st Heartworm Prevention', order='5')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '8 Weeks', disease='1st dose Bordetella Bronchiseptica Bacterin', order='6')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '8 Weeks', disease='1st Tick and Flea Prevention', order='7')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '9 Weeks', disease='2nd dose DHPPiL+CV', order='8')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '9 Weeks', disease='4th Deworming', order='9')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '10 Weeks', disease='2nd Heartworm Prevention', order='10')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '11 Weeks', disease='2nd dose Bordetella Bronchiseptica Bacterin', order='11')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '12 Weeks', disease='Anti-Rabies Vaccination', order='12')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '12 Weeks', disease='2nd Tick and Flea Prevention', order='13')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '12 Weeks', disease='3rd dose DHPPiL+CV Vaccination', order='14')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '14 Weeks', disease='3rd Heartworm Prevention', order='15')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '15 Weeks', disease='1st dose DHPPiL4 Vaccination', order='16')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '16 Weeks', disease='3rd Tick and Flea Prevention', order='17')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '18 Weeks', disease='2nd dose DHPPiL4 Vaccination', order='18')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '18 Weeks', disease='4th Heartworm Prevention', order='19')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '20 Weeks', disease='4th Tick and Flea Prevention', order='20')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '22 Weeks', disease='5th Heartworm Prevention', order='21')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '24 Weeks', disease='5th Tick and Flea Prevention', order='22')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '26 Weeks', disease='6th Heartworm Prevention', order='23')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '28 Weeks', disease='6th Tick and Flea Prevention', order='24')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '30 Weeks', disease='7th Heartworm Prevention', order='25')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '32 Weeks', disease='7th Tick and Flea Prevention', order='26')
+            VaccineUsed.objects.create(vaccine_record = cvr, k9=instance, age= '34 Weeks', disease='8th Heartworm Prevention', order='27')
+
+
 
 #######################################################################################################################
 
@@ -462,3 +510,21 @@ def location_incident(sender, instance, **kwargs):
                                 notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
+
+@receiver(post_save, sender=AuthUser)
+def account_create(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        try:
+            UserID = User.objects.last()
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+        except:
+            UserID = User.objects.create(position='Administrator',rank='PO1',firstname=instance.username, lastname='Superuser', middlename='Su',birthdate=date.today())
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+            instance.first_name = instance.username
+            instance.last_name = 'Superuser'
+            instance.save()
+            
+            
+        
+
+

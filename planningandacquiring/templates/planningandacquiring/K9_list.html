@@ -8,7 +8,7 @@
     {% endif %}
 </div>
 <div class="ui segment">
-	<table id="tabledata1" class="ui eight column celled table">
+	<table id="tabledata1" class="ui nine column celled table">
         <thead>
         <tr>
             <th>Name</th>
@@ -19,6 +19,7 @@
             <th>Skill</th>
             <th>Source</th>
             <th>Status</th>
+            <th>Date</th>
         </tr>
         </thead>
         <tbody>
@@ -32,6 +33,7 @@
                     <td>{{ K9.capability}}</td>
                     <td>{{ K9.source}}</td>
                     <td>{{ K9.status}}</td>
+                    <td>{{ K9.date_created}}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -43,7 +45,7 @@
 
 	$(document).ready(function() {
 		$('#tabledata1').DataTable( {
-        "order": [[ 0, "desc" ]]
+        "order": [[ 8, "desc" ]]
         });
       
 		$('.menu .item').tab();

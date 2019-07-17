@@ -1,11 +1,18 @@
 from django.db import models
+from django.utils.timezone import now
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
+from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from inventory.models import Medicine, Miscellaneous, Food
+from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
+
+#from unitmanagement.models import Notification
+
+
 from profiles.models import User
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
+
 
 class Date(models.Model):
     date_from = models.DateField('date_from', null=True)
@@ -20,7 +27,7 @@ class K9_Supplier(models.Model):
     def __str__(self):
         return str(self.name)
 
-class K9_Breed(models.Model):
+class Dog_Breed(models.Model):
     SKILL = (
         ('NDD', 'NDD'),
         ('EDD', 'EDD'),
@@ -60,7 +67,7 @@ class K9_Breed(models.Model):
     )
 
     breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
-    life_span = models.CharField('life_span', max_length=200, null=True)
+    life_span = models.IntegerField('life_span', blank=True, null=True)
     temperament = models.CharField('temperament', max_length=200, null=True)
     colors = models.CharField('colors', max_length=200, null=True)
     weight = models.CharField('weight', max_length=200, null=True)
@@ -131,7 +138,7 @@ class K9(models.Model):
         ('Anestrus', 'Anestrus'), 
     )
     SOURCE = (
-        ('Procured', 'Procured'),
+        ('Procurement', 'Procurement'),
         ('Breeding', 'Breeding'),
     )
 
@@ -145,10 +152,16 @@ class K9(models.Model):
         ('Breeding', 'Breeding'),
         ('For-Deployment', 'For-Deployment'),
         ('For-Adoption', 'For-Adoption'),
+        ('Adopted', 'Adopted'),
         ('Deployed', 'Deployed'),
         ('Light Duty', 'Light Duty'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
+    )
+
+    TRAINED = (
+        ('Trained', 'Trained'),
+        ('Failed', 'Failed'),
     )
 
     image = models.FileField(upload_to='k9_image', default='k9_image/k9_default.png', blank=True, null=True)
@@ -182,10 +195,60 @@ class K9(models.Model):
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
+    trained = models.CharField('trained', choices=TRAINED, max_length=100, blank=True, null=True)
+    fit = models.BooleanField(default=True)
+    date_created = models.DateField('date_created', default=now, blank=True, null=True)
     #partnered = models.BooleanField(default=False)
+
     # def best_fertile_notification(self):
-    #     notif = self.estrus_date - td(days=7)
+    #     notif = self.estrus_date + td(days=10)
+    #     notif = self.estrus_date + td(days=12)
+    #     notif = self.estrus_date + td(days=14)
     #     return notif
+
+    def num_in_heat(self):
+        return self.in_heat_months/12
+
+    def in_heat_monthly(self):
+
+        upcoming_year = int(dt.now().year) + 1
+
+        months = [0,0,0,0,0,0,0,0,0,0,0,0]
+        prostreus_temp = self.last_proestrus_date
+        prostreus_temp_year = int(prostreus_temp.year)
+        year = []
+        while prostreus_temp_year <= upcoming_year:
+            if prostreus_temp_year == upcoming_year:
+
+                if prostreus_temp.month == 1:
+                    months[0] += 1
+                elif prostreus_temp.month == 2:
+                    months[1] += 1
+                elif prostreus_temp.month == 3:
+                    months[2] += 1
+                elif prostreus_temp.month == 4:
+                    months[3] += 1
+                elif prostreus_temp.month == 5:
+                    months[4] += 1
+                elif prostreus_temp.month == 6:
+                    months[5] += 1
+                elif prostreus_temp.month == 7:
+                    months[6] += 1
+                elif prostreus_temp.month == 8:
+                    months[7] += 1
+                elif prostreus_temp.month == 9:
+                    months[8] += 1
+                elif prostreus_temp.month == 10:
+                    months[9] += 1
+                elif prostreus_temp.month == 11:
+                    months[10] += 1
+                elif prostreus_temp.month == 12:
+                    months[11] += 1
+
+            prostreus_temp += relativedelta(months = self.in_heat_months)
+            prostreus_temp_year = prostreus_temp.year
+
+        return months
 
     def calculate_age(self):
         #delta = dt.now().date() - self.birth_date
@@ -251,7 +314,8 @@ class K9(models.Model):
             self.training_status = 'Due-For-Retirement'
             self.status = 'Working Dog'
             #TODO notif 1 year
-            Notification.objects.create(message= str(k9) +' is due to retire next year.')
+            from unitmanagement.models import Notification
+            Notification.objects.create(message= str(self.name) +' is due to retire next year.')
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))
@@ -266,7 +330,6 @@ class K9(models.Model):
             self.estrus_date = None
             self.metestrus_date = None
             self.anestrus_date = None
-        
 
         # Serial Numbers and Microchips are given after training
         # lead_zero = str(self.id).zfill(5)
@@ -282,6 +345,7 @@ class K9_Litter(models.Model):
     mother = models.ForeignKey(K9, related_name='dam', on_delete=models.CASCADE, blank=True, null=True)
     father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
     litter_no = models.IntegerField('litter_no', blank=True, null=True)
+    litter_died = models.IntegerField('litter_died', blank=True, null=True)
 
 class K9_Past_Owner(models.Model):
     SEX = (
@@ -341,9 +405,16 @@ class K9_Parent(models.Model):
     offspring = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
 
 class K9_Mated(models.Model):
+    STATUS = (
+        ('Breeding', 'Breeding'),
+        ('Pregnant', 'Pregnant'),
+        ('Failed', 'Failed'),
+        ('Pregnancy Done', 'Pregnancy Done'),
+    )
+
     mother = models.ForeignKey(K9, on_delete=models.CASCADE, related_name= "mom", blank=True, null=True)
     father = models.ForeignKey(K9, on_delete=models.CASCADE, related_name="dad", blank=True, null=True)  
-    status = models.CharField('status', max_length=200, default = "Breeding")
+    status = models.CharField('status', max_length=200, choices=STATUS, default = "Breeding")
     date_mated = models.DateField('date_mated', blank=True, null=True)  
 
 class K9_Quantity(models.Model):
@@ -353,63 +424,131 @@ class K9_Quantity(models.Model):
 
 #TODO Add inventory attr > How many dogs each item can cater
 #TODO VITAMINS
-class Budget_allocation(models.Model):
-    k9_request_forecast = models.IntegerField('k9_request_forecast', default=0)
-    k9_needed_for_demand = models.IntegerField('k9s_needed_for_demand', default=0)
-    k9_cuurent = models.IntegerField('k9_current', default=0)
-    food_total = models.DecimalField('food_total', default=0, max_digits=50, decimal_places=2,)
-    equipment_total = models.DecimalField('equipment_total', default=0, max_digits=50, decimal_places=2,)
-    medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=2,)
-    vaccine_total = models.DecimalField('vaccine_total', default=0, max_digits=50, decimal_places=2,)
-    vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=2,)
-    grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
+class Proposal_Budget(models.Model):
+    k9_current = models.IntegerField('k9_current', default=0)
+    k9_needed = models.IntegerField('k9_needed', default=0)
+    k9_breeded = models.IntegerField('k9_breeded', default=0)
+    food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=10,)
+    vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=10,)
+    medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=10,)
+    vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=10,)
+    kennel_total = models.DecimalField('kennel_total', default=0, max_digits=50, decimal_places=10, )
+    others_total = models.DecimalField('others_total', default=0, max_digits=50, decimal_places=10,)
+    training_total = models.DecimalField('training_total', default=0, max_digits=50, decimal_places=10,)
+    grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=10,)
+    date_created = models.DateField('date_created')
+    year_budgeted = models.DateField('year_budgeted')
+
+    def save(self, *args, **kwargs):
+        self.year_budgeted = self.date_created  + relativedelta(years=+1)
+        super(Proposal_Budget, self).save(*args, **kwargs)
+
+class Proposal_Milk_Food(models.Model):
+    item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
+class Proposal_Vac_Prev(models.Model):
+    item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
+class Proposal_Medicine(models.Model):
+    item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default = 0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
+class Proposal_Vet_Supply(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default = 0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
+class Proposal_Kennel_Supply(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+    
+class Proposal_Others(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
+class Actual_Budget(models.Model):
+    k9_current = models.IntegerField('k9_current', default=0)
+    k9_needed = models.IntegerField('k9_needed', default=0)
+    k9_breeded = models.IntegerField('k9_breeded', default=0)
+    food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=10,)
+    vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=10,)
+    medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=10,)
+    vet_supply_total = models.DecimalField('vet_supply_total', default=0, max_digits=50, decimal_places=10,)
+    kennel_total = models.DecimalField('kennel_total', default=0, max_digits=50, decimal_places=10, )
+    others_total = models.DecimalField('others_total', default=0, max_digits=50, decimal_places=10,)
+    training_total = models.DecimalField('training_total', default=0, max_digits=50, decimal_places=10,)
+    grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=10,)
     date_created = models.DateField('date_created', auto_now_add=True)
-    date_tobe_budgeted = models.DateField('date_tobe_budgeted', null=True)
-
-class Budget_food(models.Model):
-    type = (
-        ('Adult', 'Adult'),
-        ('Puppy', 'Puppy'),
-        ('Milk', 'Milk')
-    )
-
-    food = models.CharField('food', max_length=200, default="Adult")
+    
+class Actual_Milk_Food(models.Model):
+    item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
-    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
-class Budget_equipment(models.Model):
-    equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+class Actual_Vac_Prev(models.Model):
+    item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
-    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
-class Budget_medicine(models.Model):
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+class Actual_Medicine(models.Model):
+    item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
-    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
-class Budget_vaccine(models.Model):
-    vaccine = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
+class Actual_Vet_Supply(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
-    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
-
-# class Budget_vitamins(models.Model):
-#     vitamins = models.ForeignKey(Medicine, on_delete=models.CASCADE, blank=True, null=True)
-#     quantity = models.IntegerField('quantity', default = 0)
-#     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-#     budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
-
-class Budget_vet_supply(models.Model):
-    vet_supply = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+class Actual_Kennel_Supply(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
-    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
-    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    budget_allocation = models.ForeignKey(Budget_allocation, on_delete=models.CASCADE, blank=True, null=True)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
+    
+class Actual_Others(models.Model):
+    item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=10,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=10,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)

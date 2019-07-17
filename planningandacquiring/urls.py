@@ -14,7 +14,7 @@ urlpatterns = [
     path('add_K9_parents_form/confirm_K9_parents/', views.confirm_K9_parents, name='confirm_K9_parents'),
     path('add_K9_parents_form/confirm_K9_parents/K9_parents_confirmed', views.K9_parents_confirmed, name='K9_parents_confirmed'),
     path('add_K9_offspring/<int:id>', views.add_K9_offspring, name='add_K9_offspring'),
-    path('no_litter/<int:id>', views.no_litter, name='no_litter'),
+    path('confirm_failed_pregnancy/<int:id>', views.confirm_failed_pregnancy, name='confirm_failed_pregnancy'),
     path('add_K9_parents_form/confirm_K9_parents/add_K9_offspring_form/confirm_breeding/', views.confirm_breeding, name='confirm_breeding'),
     path('breeding_confirmed/', views.breeding_confirmed, name='breeding_confirmed'),
     path('K9_list/', views.K9_listview, name='K9_list'),
@@ -22,11 +22,14 @@ urlpatterns = [
     path('report/', views.report, name='report'),
     path('index/', views.index, name='index'),
     path('K9_forecast/', views.forecast_result, name='K9_forecast'),
-    path('breeding_recommendation/', views.breeding_recommendation, name = 'breeding_recommendation'),
-
+    
     path('budgeting/', views.budgeting, name = 'budgeting'),
-    path('budget_list/budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/', views.budgeting_list, name='budget_list'),
+    path('budgeting_detail/<int:id>', views.budgeting_detail, name='budgeting_detail'),
+
+    path('choose_date/', views.choose_date, name='choose_date'),
+    path('choose_date/detailed_budget/', views.detailed_budgeting, name='detailed_budget'),
+
 
     path('budget_report/', views.budgeting_report, name='budget_report'),
 
@@ -53,5 +56,8 @@ urlpatterns = [
 
     path('inventory_date/', views.inventory_date, name='inventory_date'),
     path('inventory_date/inventory_report/', views.inventory_report, name='inventory_report'),
+    path('add_K9_parents_form/ajax_load_health', views.load_health, name='ajax_load_health'),
+    path('add_K9_offspring/ajax_load_form', views.load_form, name='ajax_load_form'),
+
 ];
 

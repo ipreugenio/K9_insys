@@ -1,4 +1,5 @@
 {% extends "profiles/sidebar_um.html" %}  
+{% load static %}
 
 {% block content %}
 <div class="ui basic segment"  style="margin-bottom:0px;">
@@ -25,6 +26,24 @@
                 {{form.cage_number}}
             </div>
             <div class="field"></div>
+        </div>
+        <div class="four fields">
+            <div class="four wide field">
+                <label>Temperature</label>
+                {{form.temperature}}
+            </div>
+            <div class="four wide field">
+                <label>Heart Rate / min</label>
+                {{form.heart_rate}}
+            </div>
+            <div class="field">
+                <label>Respiratory Rate / min</label>
+                {{form.respiratory_rate}}
+            </div>
+            <div class="field">
+                <label>Weight (Kg)</label>
+                {{form.weight}}
+            </div>
         </div>
         <div class="four fields">
             <div class="four wide field">
@@ -80,8 +99,23 @@
                 {{form.ears}}
             </div>
         </div>
+        <center>
+            <img src="{% static 'images/body_score.png' %}" alt="" style="position:relative; width: 70%;height:30%;" >
+            <table class="ui five column inverted orange center aligned table" style="width: 70%;">
+                <tr>
+                    <td> <input type="radio" name="radio_select" value=1> </td>
+                    <td> <input type="radio" name="radio_select" value=2> </td>
+                    <td> <input type="radio" name="radio_select" value=3> </td>
+                    <td> <input type="radio" name="radio_select" value=4> </td>
+                    <td> <input type="radio" name="radio_select" value=5> </td>
+                </tr>
+              
+            </table>
+
+        </center>
+
         <div class="field">
-            <label>Remarks and Recommendations</label>
+            <label>Diagnosis</label>
             {{form.remarks}}
         </div>
         <div class="ui inverted right aligned segment" style="padding: 0px;">
@@ -99,7 +133,7 @@
             $('#serialnumber').val(res);
         });
     
-    } );
+    });
     
 </script>
  {% endblock %}

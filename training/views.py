@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
-from planningandacquiring.models import K9, K9_Parent, K9_Quantity, K9_Breed
+
+from planningandacquiring.models import K9, K9_Parent, K9_Quantity, Dog_Breed
+
 from profiles.models import User, Account, Personal_Info
 from unitmanagement.models import Notification
 from .models import K9_Genealogy, K9_Handler
@@ -17,7 +19,9 @@ import datetime
 from deployment.models import Team_Assignment, Daily_Refresher
 from django.db.models import Sum
 from decimal import Decimal
+
 import itertools
+
 
 from collections import OrderedDict
 
@@ -197,9 +201,9 @@ def unified_graph():
     ndd_breed = []
     edd_breed = []
     for breed in breeds:
-        sar_breed.append("SAR - " + str(breed.breed))
-        ndd_breed.append("NDD - " + str(breed.breed))
-        edd_breed.append("EDD - " + str(breed.breed))
+        sar_breed.append("SAR - " + str(breed))
+        ndd_breed.append("NDD - " + str(breed))
+        edd_breed.append("EDD - " + str(breed))
 
     print("K9 COUNT")
     print(str(k9_set.count()))
@@ -471,6 +475,7 @@ def classify_k9_select(request, id):
     title = data.name
     style = ""
 
+    #TODO change this
     NDD_count = K9.objects.filter(capability='NDD').count()
     EDD_count = K9.objects.filter(capability='EDD').count()
     SAR_count = K9.objects.filter(capability='SAR').count()
@@ -479,9 +484,26 @@ def classify_k9_select(request, id):
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
     SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
 
-    trait_score = [0, 0, 0]
+    NDD_deployed = list(Team_Assignment.objects.aggregate(Sum('NDD_deployed')).values())[0]
+    EDD_deployed = list(Team_Assignment.objects.aggregate(Sum('EDD_deployed')).values())[0]
+    SAR_deployed = list(Team_Assignment.objects.aggregate(Sum('SAR_deployed')).values())[0]
 
-    dog_trait = K9_Breed.objects.all()
+    NDD_assigned = K9.objects.filter(training_status = "Classified").filter(capability='NDD').count()
+    EDD_assigned = K9.objects.filter(training_status = "Classified").filter(capability='EDD').count()
+    SAR_assigned = K9.objects.filter(training_status = "Classified").filter(capability='SAR').count()
+
+    NDD_difference = NDD_demand - NDD_deployed
+    EDD_difference = EDD_demand - EDD_deployed
+    SAR_difference = SAR_demand - SAR_deployed
+
+
+    # {{skill}} K9s assigned / {{skill}} K9s
+    # {{assigned}}/{{demand-deployed}}
+    # Total {{skill}} K9s Required: {{demand}} >>Note might not mean much if K9s on hand is insufficient, might stick with total count | BUT, demand/deployed usually dictates the priority
+    # Total {{skil}} K9s Deployed: {{deployed}}
+
+    trait_score = [0, 0, 0]
+    dog_trait = Dog_Breed.objects.all()
 
     select_trait = None
     for trait in dog_trait:
@@ -508,7 +530,9 @@ def classify_k9_select(request, id):
         ('Mixed', 'Mixed'),
     )
 
-    records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed = data.breed)
+
+    records = Training.objects.exclude(grade = "No Grade Yet").filter(k9__breed__contains = data.breed)
+
 
     SAR_list = []
     NDD_list = []
@@ -675,7 +699,7 @@ def classify_k9_select(request, id):
 	#if already has capability and on training from other records,
 	#previous record training will result to grade 0
 
-    graph = unified_graph()
+    #graph = unified_graph()
 
     # NOTIF SHOW
     notif_data = notif(request)
@@ -730,7 +754,7 @@ def classify_k9_select(request, id):
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
             'form': form,
-            'graph': graph,
+            # 'graph': graph,
 
 
             'skill_breed_sar': skill_breed_sar,
@@ -761,9 +785,20 @@ def classify_k9_select(request, id):
             'EDD_count': EDD_count,
             'NDD_count': NDD_count,
             'SAR_count': SAR_count,
+
             'NDD_demand': NDD_demand,
             'EDD_demand': EDD_demand,
             'SAR_demand': SAR_demand,
+            'NDD_deployed': NDD_deployed,
+            'EDD_deployed': EDD_deployed,
+            'SAR_deployed': SAR_deployed,
+            'NDD_assigned': NDD_assigned,
+            'EDD_assigned': EDD_assigned,
+            'SAR_assigned' : SAR_assigned,
+
+            'NDD_difference': NDD_difference,
+            'EDD_difference': EDD_difference,
+            'SAR_difference': SAR_difference
         }
     else:
         parent_exist = 1
@@ -782,7 +817,7 @@ def classify_k9_select(request, id):
             'ndd_recommended': ndd_recommended,
             'edd_recommended': edd_recommended,
             'form': form,
-            'graph': graph,
+            # 'graph': graph,
 
 
             'skill_breed_sar': skill_breed_sar,
@@ -813,9 +848,20 @@ def classify_k9_select(request, id):
             'EDD_count': EDD_count,
             'NDD_count': NDD_count,
             'SAR_count': SAR_count,
+
             'NDD_demand': NDD_demand,
             'EDD_demand': EDD_demand,
             'SAR_demand': SAR_demand,
+            'NDD_deployed': NDD_deployed,
+            'EDD_deployed': EDD_deployed,
+            'SAR_deployed': SAR_deployed,
+            'NDD_assigned': NDD_assigned,
+            'EDD_assigned': EDD_assigned,
+            'SAR_assigned': SAR_assigned,
+
+            'NDD_difference' : NDD_difference ,
+            'EDD_difference' :  EDD_difference,
+            'SAR_difference' : SAR_difference
         }
 
     return render (request, 'training/classify_k9_select.html', context)
@@ -844,6 +890,10 @@ def assign_k9_select(request, id):
             k9.handler = f.handler
             k9.save()
 
+
+            #Create K9_Handler Model
+            K9_Handler.objects.create(k9 = k9, handler = f.handler)
+
             #Handler Update
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
@@ -852,6 +902,7 @@ def assign_k9_select(request, id):
             messages.success(request, str(k9) + ' has been assigned to ' + str(h) + ' and is ready for Training!')
             messages.info(request, 'On-Training')
             return redirect('training:classify_k9_list')
+
 
         else:
             style = "ui red message"
@@ -1129,6 +1180,7 @@ def training_update_form(request, id):
     else:
         return render(request, 'training/training_update_sar.html', context)
 
+
 def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
     k9_handler = User.objects.get(id=data.handler.id)
@@ -1242,36 +1294,6 @@ def skill_count_between_breeds(id):
         skill_total += count
 
 
-    # SAR = go.Bar(
-    #     x=breeds,
-    #     y=sar_count,
-    #     name="SAR",
-    # )
-    #
-    # NDD = go.Bar(
-    #     x=breeds,
-    #     y=ndd_count,
-    #     name="NDD",
-    # )
-    #
-    # EDD = go.Bar(
-    #     x=breeds,
-    #     y=edd_count,
-    #     name="EDD",
-    # )
-    #
-    # data = [SAR, NDD, EDD]
-    #
-    #
-    # layout = go.Layout(
-    #     title="Skill Count of Classified Dogs Categorized by Breed (" + str(skill_total) + " Dogs)",
-    #     xaxis =  {'title': 'Breeds'},
-    #     yaxis =  {'title': 'Skill Count'},
-    # )
-    #
-    # fig = go.Figure(data=data, layout=layout)
-    # graph = opy.plot(fig, auto_open=False, output_type='div')
-
     sar = 0
     ndd = 0
     edd = 0
@@ -1308,7 +1330,7 @@ def skill_count_between_breeds(id):
         EDD_score = 1
         desc2 = "EDD"
 
-    desc = str(target_k9.name) + " is a " + str(target_k9.breed.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed.breed + "s."
+    desc = str(target_k9.name) + " is a " + str(target_k9.breed) + ". " + str(max(skill_count)) + " out of " + str(max(skill_count)) + " trained dogs of the same breed are "+ str(desc2) + ". " + str(desc2) + " is the most recurring skill among " + target_k9.breed + "s."
 
     graph = None
     classifier = []
@@ -1323,184 +1345,6 @@ def skill_count_between_breeds(id):
     classifier.append(edd)
 
     return classifier
-
-
-# def skill_percentage_between_sexes(id):
-#     k9_set = K9.objects.exclude(capability="None")
-#     m_sar_count = []
-#     m_ndd_count = []
-#     m_edd_count = []
-#
-#     f_sar_count = []
-#     f_ndd_count = []
-#     f_edd_count = []
-#     for k9 in k9_set:
-#         if (k9.sex == "Male"):
-#             if (k9.capability == "SAR"):
-#                 m_sar_count.append(None)
-#             elif (k9.capability == "NDD"):
-#                 m_ndd_count.append(None)
-#             else:
-#                 m_edd_count.append(None)
-#         else:
-#             if (k9.capability == "SAR"):
-#                 f_sar_count.append(None)
-#             elif (k9.capability == "NDD"):
-#                 f_ndd_count.append(None)
-#             else:
-#                 f_edd_count.append(None)
-#
-#
-#     fig = go.Figure(
-#     data = [
-#         {
-#             "values": [len(m_sar_count), len(m_ndd_count), len(m_edd_count)], # count for males
-#             "labels": [
-#                 "SAR", "NDD", "EDD"
-#             ],
-#             "text": ["SAR", "NDD", "EDD"],
-#             "textposition": "inside",
-#             "domain": {"x": [0, .48]},
-#             "name": "Males",
-#             "hoverinfo": "label+value+name",
-#             "hole": .4,
-#             "type": "pie"
-#         },
-#         {
-#             "values": [len(f_sar_count), len(f_ndd_count), len(f_edd_count)],
-#             "labels": [
-#                 "SAR", "NDD", "EDD"
-#             ],
-#             "text": ["SAR", "NDD", "EDD"],
-#             "textposition": "inside",
-#             "domain": {"x": [.52, 1]},
-#             "name": "Females",
-#             "hoverinfo": "label+value+name",
-#             "hole": .4,
-#             "type": "pie"
-#         }],
-#
-#     layout =  {
-#         "title": "Skill Count of Classified Dogs Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
-#         "annotations": [
-#             {
-#                 "font": {
-#                     "size": 20
-#                 },
-#                 "showarrow": False,
-#                 "text": "Males",
-#                 "x": 0.20,
-#                 "y": 0.5
-#             },
-#             {
-#                 "font": {
-#                     "size": 20
-#                 },
-#                 "showarrow": False,
-#                 "text": "Females",
-#                 "x": 0.8,
-#                 "y": 0.5
-#             }
-#         ]
-#     }
-#     )
-#
-#     k9 = K9.objects.get(id=id)
-#     k9_gender = k9.sex
-#
-#     skill_count = []
-#
-#     if k9_gender == "Male":
-#         skill_count.append(len(m_sar_count))
-#         skill_count.append(len(m_ndd_count))
-#         skill_count.append(len(m_edd_count))
-#         SAR = skill_count[0]
-#         NDD = skill_count[1]
-#         EDD = skill_count[2]
-#     else:
-#         skill_count.append(len(f_sar_count))
-#         skill_count.append(len(f_ndd_count))
-#         skill_count.append(len(f_edd_count))
-#         SAR = skill_count[0]
-#         NDD = skill_count[1]
-#         EDD = skill_count[2]
-#
-#     SAR_score = 0
-#     NDD_score = 0
-#     EDD_score = 0
-#
-#     desc2 = ""
-#     if max(skill_count) == SAR and max(skill_count) != 0:
-#         SAR_score = 1
-#         desc2 = "SAR"
-#     if max(skill_count) == NDD and max(skill_count) != 0:
-#         NDD_score = 1
-#         desc2 = "NDD"
-#     if max(skill_count) == EDD and max(skill_count) != 0:
-#         EDD_score = 1
-#         desc2 = "EDD"
-#
-#     desc = str(k9.name) + " is a " + str(k9_gender) + " dog. " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " dogs are " + str(desc2) +". " + str(desc2) + " is the most recurring skill among trained " +  str(k9_gender) + " dogs."
-#
-#     graph = opy.plot(fig, auto_open=False, output_type='div')
-#
-#     classifier = []
-#     classifier.append(graph)
-#     classifier.append(SAR_score)
-#     classifier.append(NDD_score)
-#     classifier.append(EDD_score)
-#     classifier.append(desc)
-#
-#     return classifier
-
-# def skill_count_ratio():
-#     k9_set = K9.objects.exclude(capability="None")
-#
-#     SAR = K9.objects.filter(capability="SAR")
-#     NDD = K9.objects.filter(capability="NDD")
-#     EDD = K9.objects.filter(capability="EDD")
-#
-#     labels = ['SAR', 'NDD', 'EDD']
-#     values = [SAR.count(), NDD.count(), EDD.count()]
-#
-#     trace = go.Pie(labels=labels, values=values,
-#                     hoverinfo = 'label+value', textinfo = 'percent',)
-#
-#     data = [trace]
-#
-#     layout = go.Layout(
-#         title="Skill Count of Classified Dogs (" + str(k9_set.count()) + " Dogs)",
-#     )
-#
-#     fig = go.Figure(data=data, layout=layout)
-#     graph = opy.plot(fig, auto_open=False, output_type='div')
-#
-#     SAR_score = 0
-#     NDD_score = 0
-#     EDD_score = 0
-#
-#     desc2 = ""
-#     if k9_set:
-#         if min(values) == SAR.count():
-#             SAR_score = 1
-#             desc2 = "SAR"
-#         if min(values) == NDD.count():
-#             NDD_score = 1
-#             desc2 = "NDD"
-#         if min(values) == EDD.count():
-#             EDD_score = 1
-#             desc2 = "EDD"
-#
-#     desc = "only " + str(min(values)) + " out of " + str(k9_set.count()) + " K9s are assigned to " + str(desc2) + ". " + str(desc2) + " is currently the skill with the least amount of trained dogs."
-#
-#     classifier = []
-#     classifier.append(graph)
-#     classifier.append(SAR_score)
-#     classifier.append(NDD_score)
-#     classifier.append(EDD_score)
-#     classifier.append(desc)
-#
-#     return classifier
 
 
 def make_annotations(pos, labels, M):
@@ -1715,152 +1559,6 @@ def generate_family_tree(id):
     graph = opy.plot(fig, auto_open=False, output_type='div')
 
     return graph
-
-
-# def skills_from_gender(id):
-#     k9_family = K9_Genealogy.objects.filter(zero=id)
-#
-#     k9_list = []
-#     for k9 in k9_family:
-#         if k9.o is not None:
-#             cursor = k9.o
-#             k9_list.append(cursor.id)
-#         if k9.f is not None:
-#             cursor = k9.f
-#             k9_list.append(cursor.id)
-#         if k9.m is not None:
-#             cursor = k9.m
-#             k9_list.append(cursor.id)
-#
-#     k9_list = remove_duplicates(k9_list)
-#
-#     k9_set = K9.objects.filter(pk__in=k9_list).exclude(capability="None")
-#
-#     m_sar_count = []
-#     m_ndd_count = []
-#     m_edd_count = []
-#
-#     f_sar_count = []
-#     f_ndd_count = []
-#     f_edd_count = []
-#     for k9 in k9_set:
-#         if (k9.sex == "Male"):
-#             if (k9.capability == "SAR"):
-#                 m_sar_count.append(None)
-#             elif (k9.capability == "NDD"):
-#                 m_ndd_count.append(None)
-#             else:
-#                 m_edd_count.append(None)
-#         else:
-#             if (k9.capability == "SAR"):
-#                 f_sar_count.append(None)
-#             elif (k9.capability == "NDD"):
-#                 f_ndd_count.append(None)
-#             else:
-#                 f_edd_count.append(None)
-#
-#     fig = go.Figure(
-#         data=[
-#             {
-#                 "values": [len(m_sar_count), len(m_ndd_count), len(m_edd_count)],  # count for males
-#                 "labels": [
-#                     "SAR", "NDD", "EDD"
-#                 ],
-#                 "text": ["SAR", "NDD", "EDD"],
-#                 "textposition": "inside",
-#                 "domain": {"x": [0, .48]},
-#                 "name": "Males",
-#                 "hoverinfo": "label+value+name",
-#                 "hole": .4,
-#                 "type": "pie"
-#             },
-#             {
-#                 "values": [len(f_sar_count), len(f_ndd_count), len(f_edd_count)],
-#                 "labels": [
-#                     "SAR", "NDD", "EDD"
-#                 ],
-#                 "text": ["SAR", "NDD", "EDD"],
-#                 "textposition": "inside",
-#                 "domain": {"x": [.52, 1]},
-#                 "name": "Females",
-#                 "hoverinfo": "label+value+name",
-#                 "hole": .4,
-#                 "type": "pie"
-#             }],
-#
-#         layout={
-#             "title": "Skill Count of Classified Ancestors Categorized by Gender (" + str(k9_set.count()) + " Dogs)",
-#             "annotations": [
-#                 {
-#                     "font": {
-#                         "size": 20
-#                     },
-#                     "showarrow": False,
-#                     "text": "Males",
-#                     "x": 0.20,
-#                     "y": 0.5
-#                 },
-#                 {
-#                     "font": {
-#                         "size": 20
-#                     },
-#                     "showarrow": False,
-#                     "text": "Females",
-#                     "x": 0.8,
-#                     "y": 0.5
-#                 }
-#             ]
-#         }
-#     )
-#
-#     graph = opy.plot(fig, auto_open=False, output_type='div')
-#
-#     k9 = K9.objects.get(id= id)
-#     k9_gender = k9.sex
-#
-#     skill_count = []
-#
-#
-#     if k9_gender == "Male":
-#         skill_count.append(len(m_sar_count))
-#         skill_count.append(len(m_ndd_count))
-#         skill_count.append(len(m_edd_count))
-#         SAR = skill_count[0]
-#         NDD = skill_count[1]
-#         EDD = skill_count[2]
-#     else:
-#         skill_count.append(len(f_sar_count))
-#         skill_count.append(len(f_ndd_count))
-#         skill_count.append(len(f_edd_count))
-#         SAR = skill_count[0]
-#         NDD = skill_count[1]
-#         EDD = skill_count[2]
-#
-#     SAR_score = 0
-#     NDD_score = 0
-#     EDD_score = 0
-#
-#     desc2 = ""
-#     if max(skill_count) == SAR and max(skill_count) != 0:
-#         SAR_score = 1
-#         desc2 = "SAR"
-#     if max(skill_count) == NDD and max(skill_count) != 0:
-#         NDD_score = 1
-#         desc2 = "NDD"
-#     if max(skill_count) == EDD and max(skill_count) != 0:
-#         EDD_score = 1
-#         desc2 = "EDD"
-#
-#     desc = str(k9.name) + " is a " + str(k9_gender) + " K9 and " + str(max(skill_count)) + " out of " + str(k9_set.count()) + " " + str(k9_gender) + " ancestors are trained as " + str(desc2) + ". " + str(desc2) + " is the most recurring skill among trained " + str(k9_gender) + " descendants."
-#
-#     classifier = []
-#     classifier.append(graph)
-#     classifier.append(SAR_score)
-#     classifier.append(NDD_score)
-#     classifier.append(EDD_score)
-#     classifier.append(desc)
-#
-#     return classifier
 
 
 def skill_in_general(id):
@@ -2091,7 +1789,11 @@ def daily_record_mult(request):
 
     date = request.session["session_date"]
     try:
+# <<<<<<< HEAD
+#         record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
+# =======
         record = Daily_Refresher.objects.filter(k9 = k9).get(date_today = date)
+# >>>>>>> 67603ec727f20d95ed779807086d18316555466a
     except:
         record = None
 
@@ -2110,20 +1812,24 @@ def load_handler(request):
     try:
         handler_id = request.GET.get('handler')
         handler = User.objects.get(id=handler_id)
+
         pi = Personal_Info.objects.get(UserID=handler)
         edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
         ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
         sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
         
+
     except:
         pass
 
     context = {
         'handler': handler,
+
         'pi':pi,
         'ndd':ndd,
         'edd':edd,
         'sar':sar,
+
     }
 
     return render(request, 'training/handler_data.html', context)

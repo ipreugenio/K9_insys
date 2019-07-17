@@ -1,0 +1,177 @@
+{% extends "profiles/sidebar_um.html" %}
+{% load um_tags %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="ui segment" style="padding:20px;">
+    <h1 class="ui header">Schedule Checkup
+    <div class="sub header">Schedule k9 for checkup pre-requirement before initial deployment.</div>
+    </h1>
+
+</div>
+
+<div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+    Steps
+  </div>
+  <ol class="ui ordered list">
+    <li>First select a date to view current appointments for said date.</li>
+    <li>Check the checkboxes in order to assign k9s to the date selected.</li>
+      <li>Click on confirm button to schedule k9s for checkups.</li>
+  </ol>
+</div>
+
+ <div class="ui inverted placeholder segment">
+  <div class="ui two column stackable center aligned grid">
+    <div class="ui vertical divider"></div>
+    <div class="top aligned row">
+      <div class="column">
+
+          <div class = "ui inverted segment">
+
+              <h1 class="ui header">Available Units for Checkup</h1>
+
+		<table id="tabledata" class="ui celled table">
+        	<thead>
+          	<tr>
+                <th></th>
+				<th>K9</th>
+                <th>Handler</th>
+                <th>Deployment Date</th>
+
+          	</tr>
+
+    		</thead>
+    		<tbody>
+
+            {% for item in k9_pending %}
+            <tr data-group="pending" id = {{forloop.counter0}}-unit-row >
+                <td>{{item.k9|render_k9_checkbox:selected_list}}</td>
+                <td>{{item.k9}}</td>
+                <td>{{item.k9.handler}}</td>
+                <td>{{item.date_start}}</td>
+            </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>
+
+
+      </div>
+      <div class="column">
+
+          <div  class="ui segment" >
+              <h1 class="ui header">Current Appointments</h1>
+              <div class="sub header"> for the date <div class="ui input">{{date_form}}</div></div>
+
+
+
+          <div id='id_appointment_data' > </div>
+
+
+              </div>
+
+      </div>
+    </div>
+  </div>
+ </div>
+
+    <div id="id_scheduled_data"></div>
+
+<script type="text/javascript">
+
+	 $('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ]]
+        });
+
+		$('.menu .item').tab();
+</script>
+
+<script>
+    $( document ).ready(function() {
+
+        $('input[type=checkbox]').attr('disabled','true');
+
+    });
+</script>
+
+
+
+
+<script>
+
+        $("input[name='date']").change(function () {
+      var url = 'ajax_load_appointments';
+      var date = $("input[name='date']").val();
+
+      if (date != ""){
+      $.ajax({
+        url: url,
+        data: {
+          'date': date
+        },
+        success: function (data) {
+
+         $('input[type=checkbox]').removeAttr('disabled','disabled');
+
+         $("#id_appointment_data").html(data); //The solution lies on the checkbox initial values
+
+
+
+        }
+      });
+                    }
+
+
+    });
+
+</script>
+
+
+<script>
+
+    $(document).on('click', 'input[type="checkbox"][value]', function(event) {
+  // The checkbox that was clicked
+  var actor = $(this);
+
+  // The status of that checkbox
+  var checked = actor.prop('checked');
+
+  // The value of the checkbox
+  var group = actor.val();
+
+  // All checkboxes of the same value
+  var checkboxes = $('input[type="checkbox"][value="' + group + '"]');
+
+  // All checkboxes excluding the one that was clicked
+  var otherCheckboxes = checkboxes.not(actor);
+
+  // Check those checkboxes
+  otherCheckboxes.prop('checked', checked);
+});
+
+</script>
+
+<script>
+
+$("input[name='k9']").change(function(){
+
+try{
+    var attr = $(this).closest("tr").attr("data-group");
+
+     if( attr=="pending" && $(this).is(':checked') ){
+        $(this).closest("tr").hide();}
+
+  }
+catch(err){alert(err);}
+
+
+});
+</script>
+
+
+
+{% endblock %}

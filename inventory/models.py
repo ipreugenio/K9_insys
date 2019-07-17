@@ -84,12 +84,12 @@ class Medicine(models.Model):
     medicine_fullname = models.CharField(max_length=100, blank=True, null=True)
     med_type = models.CharField('med_type', choices=TYPE, max_length=50, blank=True, null=True)
     immunization = models.CharField('immunization', choices=IMMUNIZATION, max_length=50, blank=True, null=True)
-    dose = models.DecimalField('dose', max_digits=50, default=1, decimal_places=2, blank=True, null=True)
-    uom = models.CharField('uom', max_length=10, default='unit', blank=True, null=True)
+    dose = models.IntegerField('dose', default=1, blank=True, null=True)
+    uom = models.CharField('uom', max_length=10, default='pc', blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    used_yearly = models.IntegerField('used_yearly', default=0, blank=True, null=True)
-    duration = models.IntegerField('duration', default=0, blank=True, null=True)
+    # used_yearly = models.IntegerField('used_yearly', default=0, blank=True, null=True)
+    # duration = models.IntegerField('duration', default=0, blank=True, null=True)
 
     def __str__(self):
         return self.medicine_fullname
@@ -99,8 +99,9 @@ class Medicine(models.Model):
 
     def save(self, *args, **kwargs):
         self.medicine_fullname = str(self.medicine) +' - ' + str(self.dose) + str(self.uom)
-        if self.med_type == 'Vaccine':
-            self.used_yearly = 365 / int(self.duration)
+        # if self.med_type == 'Vaccine':
+        #     self.used_yearly = 365 / int(self.duration)
+
         super(Medicine, self).save(*args, **kwargs)
 
 class Medicine_Inventory(models.Model):
@@ -129,6 +130,7 @@ class Medicine_Received_Trail(models.Model):
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
     expiration_date = models.DateField('expiration_date', null=True, blank=True)
+    status = models.CharField(max_length=100, default='Pending')
 
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
@@ -136,8 +138,8 @@ class Medicine_Received_Trail(models.Model):
 class Medicine_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, default="")
-    price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0)
+    name = models.CharField(max_length=100, default="", null=True, blank=True)
+    price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0, null=True, blank=True)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -156,19 +158,18 @@ class Food(models.Model):
         ('Puppy Dog Food', 'Puppy Dog Food'),
         ('Milk', 'Milk'),
     )
+    UNIT = (
+        ('kilograms', 'kilograms'),
+        ('Sack - 20kg', 'Sack - 20kg'),
+        ('Box - 1L', 'Box - 1L'),
+    )
 
     food = models.CharField(max_length=100)
     foodtype = models.CharField('foodtype', choices=FOODTYPE, max_length=50)
+    unit = models.CharField('unit', choices=UNIT, max_length=50)
     description = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
-    quantity = models.DecimalField('quantity', default=0, decimal_places=2, max_digits=10)
-    
-    def quantity_grams(self):
-        if self.foodtype == 'Milk':
-            grams = self.quantity 
-        else:
-            grams = self.quantity * 1000
-        return grams
+    quantity = models.IntegerField('quantity', default=0)
 
     def __str__(self):
         return self.food
@@ -228,14 +229,14 @@ class Miscellaneous(models.Model):
     )
 
     TYPE = (
-        ('Equipment', 'Equipment'),
         ('Vet Supply', 'Vet Supply'),
+        ('Kennel Supply', 'Kennel Supply'),
         ('Others', 'Others'),
     )
 
     miscellaneous = models.CharField(max_length=100)
     uom = models.CharField(max_length=100, choices=UOM, default="pack")
-    misc_type = models.CharField(max_length=100, choices=TYPE, default="Equipment")
+    misc_type = models.CharField(max_length=100, choices=TYPE, default="Others")
     description = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, null=True)
@@ -304,3 +305,5 @@ class Safety_Stock(models.Model):
     puppy_food = models.IntegerField('puppy_food', default=0)
     adult_food = models.IntegerField('adult_food', default=0)
     milk = models.IntegerField('milk', default=0)
+
+

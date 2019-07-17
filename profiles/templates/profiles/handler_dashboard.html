@@ -1,69 +1,251 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
-<!-- <p>k9 performance</p>
-  <p>Request = on leave, medicine, phyx, vaccine, equipment</p>
-  <p>refresher</p> -->
+
+{% load um_tags %}
+{% load widget_tweaks %}
+
 {% block dashboard %}
+{% load fullcalendar_tags %}
+{% fullcalendar_css %}
+{% fullcalendar_print_css %}
+{% fullcalendar_jquery_ui %}
+{% fullcalendar_javascript %}
+
   <div class="container fluid">
-    <div class="ui two column grid">
-      <div class="streched row">
-        <div class="ten wide column"  style="padding-right: 0%;">
-          <div class="ui basic segment">
-            <div class="ui stackable grid">        
-                <div class="sixteen wide column">
-                    <div class="ui raised segment">
-                        <canvas id="myChart"></canvas>
+      {{geoform.media}}
+      <div class="ui grid" style="margin: 0%; padding: 0%;">
+        <div class="two column row">
+            <div class="nine wide column"  style="margin-right:0%;">
+                  <div class="ui three column grid">
+                    <div class="column">
+                        <div class="ui raised segment">
+                          <div class="ui statistic">
+                            <div class="value">
+                              <i class="plane icon"></i> 5
+                            </div>
+                            <div class="label">
+                              Flights
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui raised segment">
+                            <div class="ui statistic">
+                              <div class="value">
+                                <i class="plane icon"></i> 5
+                              </div>
+                              <div class="label">
+                                Flights
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui raised segment">
+                            <div class="ui statistic">
+                              <div class="value">
+                                <i class="plane icon"></i> 5
+                              </div>
+                              <div class="label">
+                                Flights
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                  </div>
+                  <div class="ui raised segment" >
+                      <canvas id="myChart" height="355" ></canvas>
+                  </div>
+              </div>
+
+              <div class="seven wide column" style="padding: 0%;margin:0%;">
+                <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
+                    <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>                
+                    <div class="ui buttons">
+                      <button class="ui button"  id = "prev" >Previous Year</button>
+                      <div class="or"></div>
+                      <button class="ui button"  id = "next" >Next Year</button>
+                    </div>
+                    <div id = "calendar" style="margin-top:0%;">
+                        {{date_form.date}}
+                        {{myr_form}}
+                        
+                        {% calendar %}
+                  
+                      <output id = "out_date"></output>
+                  
                     </div>
                 </div>
-            </div>
-          </div>
+              </div>
         </div>
-        <div class="six wide column" style="padding: 0%;padding-right: 1%;">
-            <div class="ui basic segment" style="padding-left: 0%;">
-                
-                    <div class="ui black floating message">
-                        <p>Mini calendar</p>
-                      </div>
-                    <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
-    
-                        <table class="ui basic table">
-                          <tr>
-                            <td>Info Here</td>
-                            <td class="center aligned three wide">
-                              <a href="#" class="ui tiny black button">Details</a>
-                            </td>
-                          </tr>
-                        </table>
-                    </div>
+      </div>
 
-                    <div class="ui red floating message"  style="margin: 0%;padding:0%;">   
-                      <ul>
-                        <li>Reminder</li>
-                        <li>Request</li>
-                        <li>Todo List: daily, weekly, monthly</li>
-                      </ul>
+      <!--Modal--> 
+      <div class="ui modal" id = 'modal1'>
+          <i class="close icon"></i>
+          <div class="header">Add Event</div>
+         
+          <div class="scrolling content">
+              <form class="ui form" method="POST">
+                  {% csrf_token %}
+                <div class="three fields">
+                    <div class="field">
+                        <label>Requester</label>
+                        {{form.requester}}
+                      </div>
+                      <div class="field">
+                        <label>Mobile Number</label>
+                        {{form.phone_number}}
+                      </div>
+                      <div class="field">
+                        <label>Email</label>
+                        {{form.email_address}}
+                      </div>
+                </div>
+                <div class="four fields">
+                    <div class="field">
+                        <label>Event Name</label>
+                        {{form.event_name}}
+                      </div>
+                      <div class="field">
+                        <label>Type</label>
+                        {{form.event_type}}
+                      </div>
+                      <div class="field">
+                        <label>Start Date</label>
+                        {{form.start_date}}
+                      </div>
+                      <div class="field">
+                          <label>End Date</label>
+                          {{form.end_date}}
+                        </div>
+                </div>
+                <div class="three fields">
+                    <div class="field">
+                        <label>NDD Needed</label>
+                        {{form.NDD_needed}}
+                      </div>
+                      <div class="field">
+                        <label>EDD Needed</label>
+                        {{form.EDD_needed}}
+                      </div>
+                      <div class="field">
+                        <label>SAR Needed</label>
+                        {{form.SAR_needed}}
+                      </div>
+                </div>
+                <div class="field">
+                    <label>Remarks</label>
+                    {{form.remarks}}
+                </div>
+                <div class="field">
+                    <label>Place</label>
+                    {{form.location}}
+                  </div>
+  
+                  <div class="ui two column grid">
+                    <div class="seven wide column">
+                        <center>
+                            <label>Search Location</label>
+                            <div class="ui fluid category search">
+                              <div class="ui icon input">
+                                {{geosearch.search}}
+                                <i class="search icon"></i>
+                              </div>
+                              <div class="results"></div>
+                            </div>
+                            <br>
+                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
+      
+                            <div  id ="id_location_cards"></div>
+                        </center>
+  
                     </div>
-            </div>
+                    <div class="nine wide column">
+                        <label>Geotag Location</label>
+                        <div id = "id_geomap">
+                            {{geoform.point}}
+                        </div>
+                    </div>
+                  </div>
+                  <br>
+                    <center>
+                        <button class="ui green button" type="submit">Submit</button>
+                    </center>
+                </form>
           </div>
+        
         </div>
+        <!--End of Modal-->
+
+        <div class="ui mini modal" id = 'modal2'>
+          <i class="close icon"></i>
+          <div class="header">Event Added</div>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+            <input class="msg" type='hidden' value="{{message}}">
+        {% endfor %}
+        {% endif %}
     </div>
+
+    <div class="ui modal event_modal">
+      <i class="close icon"></i>
+      <div class="header">Header</div>
+      <div class="scrolling content">Something</div>
+       
     </div>
+<style>
+
+  #calendar .fc-dayGridMonth-view .fc-scroller {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  }
+
+  .fc-center>h2 {
+     font-size:  18px !important; 
+     }
+
+  .fc-header, .fc-button, #prev, #next{
+  background-color:orangered;
+  color: white;
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+  }
+</style>
+    
 <script>
 $(document).ready(function() {
-    var endpoint = '../../unitmanagement/handler/api'
-    var performance = []
-    $.ajax({
-        method: "GET",
-        url: endpoint,
-        success: function(data){
-          performance = data.performance
-          console.log(performance)
-          setChart()         
-        },
-        error: function(error_data){
-          console.log("error")
-          console.log(error_data)
-        }
-    })
+      // alert($('.msg').val());
+
+      
+      if($('.msg').val() == 'event'){
+        $('#modal2').modal('show');
+      }
+
+      var endpoint = '../../unitmanagement/handler/api'
+      var performance = []
+      var sched = []
+      $.ajax({
+          method: "GET",
+          url: endpoint,
+          success: function(data){
+            performance = data.performance
+            sched = data.sched
+            setChart()         
+          },
+          error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+          }
+      })
+
+    console.log(sched)
+
 
     function setChart(){
         var ctx = document.getElementById('myChart');
@@ -81,6 +263,8 @@ $(document).ready(function() {
                 }]
             },
             options: {
+            responsive: true,
+            maintainAspectRatio: false,
             animation: {
                 animateScale: true,
             },
@@ -105,7 +289,91 @@ $(document).ready(function() {
           }
         });
       }
-    
+
+      //Calendar
+      
+      $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+
+          eventBorderColor: "orange",
+          eventBackgroundColor: "orangered",
+          eventTextColor: "white",
+          nowIndicator: true,
+
+          events: [
+                {% for i in events %}
+                {
+                    id: "{{ i.id }}",
+                    title: "{{ i.event_name}} - {{ i.location}}",
+                    start: '{{ i.start_date|date:"Y-m-d" }} {{ i.start_date|time:"H:i:s" }}',
+                    end: '{{ i.end_date|date:"Y-m-d" }} {{ i.end_date|time:"H:i:s" }}',
+                    allDay: '{{ i.all_day|lower }}',
+                },
+                {% endfor %}
+            ],
+
+          eventClick : function(event, element){
+            $('.content').text(event.title);
+            $('.event_modal').modal('show');
+            
+          },
+
+          }); // end #calendar
+          
+          
+
+        $('#prev').click(function() {
+        $('#calendar').fullCalendar('prevYear');
+        });
+
+        $('#next').click(function() {
+        $('#calendar').fullCalendar('nextYear');
+        });
+
+        //Add event modal
+        $( "#add_event_btn" ).click(function() {
+          $('#modal1').modal('setting', 'closable', false)
+          .modal('show');
+        });
+
+         //GeoMap
+         $("#btn_search").click(function () {
+          var url = 'ajax_load_locations';  // get the url of the `load_locations` view
+          var search_query = $("#id_search").val();  // get the search query from the HTML input
+
+          $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request
+            data: {
+              'search_query': search_query, // add the search query to the GET parameters
+              'width' : 480
+            },
+            success: function (data) {   // `data` is the return of the `load_locations` view function
+              $("#id_location_cards").html(data);  // replace the contents of the #id_location_cards input with the data that came from the server
+            },
+                error:
+            function(xhr){
+                alert("Error: " + xhr.statusText);
+                //alert(xhr.responseText) --> to get the full details of error
+                return false;
+                }
+          });
+
+        });
+     
 });
 </script>
-{% endblock%}
+
+
+
+{% endblock %}

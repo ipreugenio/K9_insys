@@ -236,7 +236,10 @@ def food_inventory_list(request):
     adult_inventory = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
     puppy_inventory = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
     milk_inventory = Food.objects.filter(foodtype='Milk').aggregate(sum=Sum('quantity'))['sum']
-    ss = Safety_Stock.objects.get(id=1)
+    try:
+        ss = Safety_Stock.objects.get(id=1)
+    except:
+        ss = None
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -276,7 +279,7 @@ def medicine_inventory_details(request, id):
     data = Medicine_Inventory_Count.objects.filter(inventory=id).order_by('-date_counted').order_by('-time')
     data2 = Medicine_Received_Trail.objects.filter(inventory=id).order_by('-date_received').order_by('-time')
     data3 = Medicine_Subtracted_Trail.objects.filter(inventory=id).order_by('-date_subtracted').order_by('-time')
-    form = MedicineForm(request.POST or None, instance = i)
+    form = MedicineForm(request.POST or None, instance = i.medicine)
     style=""
     if request.method == 'POST':
         if form.is_valid():
@@ -293,6 +296,7 @@ def medicine_inventory_details(request, id):
     user = user_session(request)
     context = {
         'title': i.medicine,
+        'type': i.medicine.med_type,
         'data' : data,
         'data2': data2,
         'data3': data3,

@@ -19,11 +19,28 @@ urlpatterns = [
     path('view-schedule/<int:id>', views.view_schedule, name='view_schedule'),
     path('add-incident/', views.add_incident, name='add_incident'),
     path('view-incidents/', views.incident_list, name='view_incidents'),
+
+
+    path('incident-detail/<int:id>', views.incident_detail, name='incident_detail'),
+
+    path('choose-date/', views.choose_date, name='choose_date'),
+    path('choose-date/deployment-report/', views.deployment_report, name='deployment_report'),
+
     path('deployment-area-details/', views.deployment_area_details, name='deployment_area_details'),
     path('fou-details/', views.fou_details, name='fou_details'),
     path('daily-refresher-form', views.daily_refresher_form, name='daily_refresher_form'),
 
 
+    path('add-location/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('add-location/ajax_load_map', views.load_map, name='ajax_load_map'),
+    path('request_form/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('request_form/ajax_load_map', views.load_map, name='ajax_load_map'),
+
+    path('choose-location/', views.choose_location, name='choose_location'),
+    path('choose-location/ajax_load_units', views.load_units, name='ajax_load_units'),
+    path('choose-location/ajax_load_units_selected', views.load_units_selected, name='ajax_load_units_selected'),
+
+    path('schedule-units', views.schedule_units, name = 'schedule_units')
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),

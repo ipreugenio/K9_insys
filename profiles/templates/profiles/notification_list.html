@@ -17,13 +17,21 @@
    
         <div class="ui very basic segment">
             {% for notif_data in notif_data%}
-            <div class="ui orange message">
+             {%if notif_data.viewed == True %}
+            <div class="ui orange message" style='opacity: 0.5;'>
                 <a href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">   
                     {{notif_data.message}} 
                 </a>
                 <small style="float:right;">{{notif_data.datetime}}</small>
             </div>
-           
+              {%else%}
+            <div class="ui orange message">
+                <a href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">
+                    {{notif_data.message}}
+                </a>
+                <small style="float:right;">{{notif_data.datetime}}</small>
+            </div>
+            {%endif%}
             {% endfor%}
         </div>
           

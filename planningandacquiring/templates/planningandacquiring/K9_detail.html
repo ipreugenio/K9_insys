@@ -13,7 +13,7 @@
 <div class="ui negative message">
     <i class="close icon"></i>
     <div class="header">
-      {{k9}} is Dead....
+      {{k9}} is Deceased....
     </div>
   </p>
 </div>
@@ -23,6 +23,8 @@
   <center>
       <img src="{{k9.image.url}}" alt="" width="280">
   </center>
+
+
 
 </div>
     <form class="ui form" action="" method="POST" enctype="multipart/form-data">
@@ -68,6 +70,14 @@
                 <td>{{k9.source}}</td>
                 </tr>
             <tr>
+            {% if k9.source == "Procurement" %}
+                <tr>
+              <th>Date Procured</th>
+                <td>{{k9.date_created}}</td>
+                </tr>
+            <tr>
+                {% endif %}
+
               <th>Status</th>
                 <td>{{k9.status}}</td>
                 </tr>
@@ -83,6 +93,12 @@
               <th>Assignment</th>
                 <td>{{k9.assignment}}</td>
                 </tr>
+
+            <tr>
+              <th>Year Retired</th>
+                <td>{{k9.year_retired}}</td>
+                </tr>
+
              {% if parent_exist %}
             <tr>
                 <th>Mother</th>

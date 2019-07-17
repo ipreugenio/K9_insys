@@ -46,6 +46,11 @@ class Training(models.Model):
     def __str__(self):
         return str(self.k9) +' - ' + str(self.training) +' : ' + str(self.stage)
 
+class Training_History(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+
 class K9_Adopted_Owner(models.Model):
     SEX = (
         ('Male', 'Male'),

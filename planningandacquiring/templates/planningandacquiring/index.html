@@ -1,8 +1,10 @@
 {% extends "profiles/sidebar_pa.html" %}  
-
+{% load humanize %}
 {% block content %}
-<div class="ui inverted segment" style="padding:20px;">
-        <h3 class="ui header">{{ title }}</h3>
+<div class="ui center aligned inverted segment" style="padding:20px;">
+       
+        <h3 class="ui header">Budget Proposal as of December {{today|date:"Y"}} for the year {{next_year}}</h3>
+      
         {% if messages %}
             {% for message in messages %}
                 <div class="{{style}}" > {{ message }}</div>
@@ -10,61 +12,295 @@
         {% endif %}
     </div>
 <div class="ui segment">
-        <form class="ui form" method="POST">
-        {% csrf_token %}
-                <div class="three fields">
-                        <div class="field">
-                                <label>Date From</label>
-                                <input type="date" name="date_from" id="date_from">
-                        </div>
-                        <div class="field">
-                                <label>Date To</label>
-                                <input type="date" name="date_to" id="date_to">
-                        </div>
-                        <div class="field">
-                                <div class="ui left aligned basic segment" style="padding: 0px;margin-top: 24px;">
-                                        <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >Generate</button>
-                                </div>
-                        </div>
-                </div>
-        </form>
 
-        {% if date_from %}
-        <div class="ui center alignedbasic segment">
-                <h3>{{date_from}} to {{date_to}}</h2>
-        </div>
-        {% endif%}
-
-        <table id="tabledata" class="ui two three celled table responsive nowrap" style="width:100%">
-                <thead>
-                        <tr>
-                                <th>Inventory</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                        </tr>
-                </thead>
-                <tbody>
-                        {% for data in data %}
-                        <tr>
-                                <td>{{data.0}}</td>
-                                <td>{{data.1}}</td>    
-                                <td>{{data.2}}</td>    
-                        </tr>
-                        {% endfor %}
-                </tbody>
+    
+        <table class="ui eight column celled table">
+            <thead>
+                <tr>
+                    <th>Breeded</th>
+                    <td>{{born_ny}}</td>
+                    <th>Next Year Current</th>
+                    <td>{{k9_ny}}</td>
+                    <th>Procured</th>
+                    <td>{{need_procure_ny}}</td>
+                    <th>Total</th>
+                    <td>{{total_k9}}</td>
+                </tr>
+            </thead>
+            
         </table>
+     
+        {% if dog_food %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Dog Food & Milk</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in dog_food %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{total_food|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
 
-        <div class="ui basic segment">
-                <div style="font-weight:bold; font-size:18px;">
-                        <label>Total:</label>
-                        <span>{{total}}</span>
-                </div>
-        </div>
+        {% if vac_ny %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Prevention & Vaccination</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in vac_ny %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{vac_total|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if b_ny_med %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Medicine</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in b_ny_med %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{total_medicine|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+        
+        {% if vet_total %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Veterinarian Supplies</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in vet_arr %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{vet_total|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if ken_arr %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Kennel Supplies</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in ken_arr %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{ken_total|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if oth_arr %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Others</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in oth_arr %}
+                <tr>
+                    <td>{{data.0}}</td>
+                    <td>{{data.1|intcomma}}</td>
+                    <td>{{data.2|intcomma}}</td>
+                    <td>{{data.3|intcomma}}</td>
+                </tr>
+                {% endfor %}
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{oth_total|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if train_arr %}
+        <table class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th colspan="4">Training</th>
+                </tr>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                {% for data in train_arr %}
+                    <td>{{data|intcomma}}</td>
+                {% endfor %}
+                </tr>
+                <tr style="font-weight: bold;">
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{mat_total|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+        <table class="ui two column celled table">
+            <thead>
+                {% if total_food %}
+                <tr>
+                    <th class="twelve wide">Dog Food & Milk</th>
+                    <td>{{total_food|intcomma}}</td>
+                </tr>
+                {% endif %}
+
+                {% if vac_total %}
+                <tr>
+                    <th class="twelve wide">Vaccination & Prevention</th>
+                    <td>{{vac_total|intcomma}}</td>
+                </tr>
+                {% endif %}
+
+                {% if total_medicine %}
+                <tr>
+                    <th class="twelve wide">Medicines</th>
+                    <td>{{total_medicine|intcomma}}</td>
+                </tr>
+                {% endif %}
+                {% if vet_total %}
+                <tr>
+                    <th class="twelve wide">Veterinarian Supplies</th>
+                    <td>{{vet_total|intcomma}}</td>
+                </tr>
+                {% endif %}
+                {% if ken_total %}
+                <tr>
+                    <th class="twelve wide">Kennel Supplies</th>
+                    <td>{{ken_total|intcomma}}</td>
+                </tr>
+                {% endif %}
+                {% if oth_total %}
+                <tr>
+                    <th class="twelve wide">Others</th>
+                    <td>{{oth_total|intcomma}}</td>
+                </tr>
+                {% endif %}
+                {% if mat_total %}
+                <tr>
+                    <th class="twelve wide">K9 Training</th>
+                    <td>{{mat_total|intcomma}}</td>
+                </tr>
+                {% endif %}
+                <tr class="ui right aligned">
+                    <th class="twelve wide">Grand Total</th>
+                    <th>{{grand_total|intcomma}}</th>
+                </tr>
+            </thead>
+        </table>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <center>
+                <button class="ui green button" type="submit">Save Budget Proposal</button>
+            </center>
+        </form>
+        
 </div>
 <script type="text/javascript">
             
         $(document).ready(function() {
-        $('#tabledata').DataTable();
+        
         } );
         
     </script>

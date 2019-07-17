@@ -13,9 +13,7 @@
                         <a href="{% url 'deployment:add_location'%}" class="item">
                             <i class="plus circle icon"></i>Add Location
                         </a>
-                        <a href="{% url 'deployment:assign_team_location'%}" class="item">
-                            <i class="hand point up icon"></i>Assign Team to Location
-                        </a>
+
                         <a href="{% url 'deployment:assigned_location_list'%}" class="item">
                             <i class="list alternate icon"></i>Team Location List
                         </a>
@@ -27,6 +25,12 @@
                         </a>
                         <a href="{% url 'deployment:view_incidents'%}" class="item">
                             <i class="clipboard list icon"></i>Incident List
+                        </a>
+                         <a href="{% url 'deployment:choose_location'%}" class="item">
+                            <i class="clipboard list icon"></i>Schedule Deployment
+                        </a>
+                        <a href="{% url 'deployment:schedule_units'%}" class="item">
+                            <i class="clipboard list icon"></i>Schedule Deployment ver. 2.0
                         </a>
                     </div>
             </div>

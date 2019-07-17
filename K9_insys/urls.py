@@ -25,7 +25,7 @@ urlpatterns = [
     path('deployment/', include('deployment.urls', namespace='deployment')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
     path('planningandacquiring/', include ('planningandacquiring.urls', namespace='planningandacquiring')),
-    path('', include ('training.urls', namespace='training')),
+    path('training/', include ('training.urls', namespace='training')),
     path('unitmanagement/', include ('unitmanagement.urls', namespace='unitmanagement')),
 ]
 

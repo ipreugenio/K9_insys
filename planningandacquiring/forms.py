@@ -3,98 +3,24 @@ from django.forms import ModelForm, ValidationError, Form, widgets
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import date, datetime
 
-from .models import K9, K9_Past_Owner, K9_Parent, Date, Budget_allocation, Budget_medicine,Budget_food,Budget_equipment,Budget_vaccine,Budget_vet_supply
+from .models import K9, K9_Past_Owner, K9_Parent, Date
 from .models import K9_Mated
 import datetime
 import re
+
+from six import string_types
+
+from django.forms.widgets import Widget, Select
+from django.utils.dates import MONTHS
+from django.utils.safestring import mark_safe
 
 from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 from profiles.models import User
-from .models import K9, K9_Past_Owner, K9_Parent, Date, K9_Breed, K9_Supplier
+from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed, K9_Supplier
 from django.forms.widgets import CheckboxSelectMultiple
-
-
-# __all__ = ('MonthYearWidget',)
-#
-# RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
-#
-# class MonthYearWidget(Widget):
-#     """
-#     A Widget that splits date input into two <select> boxes for month and year,
-#     with 'day' defaulting to the first of the month.
-#
-#     Based on SelectDateWidget, in
-#
-#     django/trunk/django/forms/extras/widgets.py
-#
-#
-#     """
-#     none_value = (0, '---')
-#     month_field = '%s_month'
-#     year_field = '%s_year'
-#
-#     def __init__(self, attrs=None, years=None, required=True):
-#         # years is an optional list/tuple of years to use in the "year" select box.
-#         self.attrs = attrs or {}
-#         self.required = required
-#         if years:
-#             self.years = years
-#         else:
-#             this_year = datetime.date.today().year
-#             self.years = range(this_year, this_year+10)
-#
-#     def render(self, name, value, attrs=None):
-#         try:
-#             year_val, month_val = value.year, value.month
-#         except AttributeError:
-#             year_val = month_val = None
-#             if isinstance(value, basestring):
-#                 match = RE_DATE.match(value)
-#                 if match:
-#                     year_val, month_val, day_val = [int(v) for v in match.groups()]
-#
-#         output = []
-#
-#         if 'id' in self.attrs:
-#             id_ = self.attrs['id']
-#         else:
-#             id_ = 'id_%s' % name
-#
-#         month_choices = MONTHS.items()
-#         if not (self.required and value):
-#             month_choices.append(self.none_value)
-#         month_choices.sort()
-#         local_attrs = self.build_attrs(id=self.month_field % id_)
-#         s = Select(choices=month_choices)
-#         select_html = s.render(self.month_field % name, month_val, local_attrs)
-#         output.append(select_html)
-#
-#         year_choices = [(i, i) for i in self.years]
-#         if not (self.required and value):
-#             year_choices.insert(0, self.none_value)
-#         local_attrs['id'] = self.year_field % id_
-#         s = Select(choices=year_choices)
-#         select_html = s.render(self.year_field % name, year_val, local_attrs)
-#         output.append(select_html)
-#
-#         return mark_safe(u'\n'.join(output))
-#
-#     def id_for_label(self, id_):
-#         return '%s_month' % id_
-#     id_for_label = classmethod(id_for_label)
-#
-#     def value_from_datadict(self, data, files, name):
-#         y = data.get(self.year_field % name)
-#         m = data.get(self.month_field % name)
-#         if y == m == "0":
-#             return None
-#         if y and m:
-#             return '%s-%s-%s' % (y, m, 1)
-#         return data.get(name, None)
-
 
 
 class DateInput(forms.DateInput):
@@ -160,15 +86,17 @@ class add_donated_K9_form(forms.ModelForm):
 
     class Meta:
         model = K9
-        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date')
+        fields = ('image','name', 'breed', 'sex', 'color', 'birth_date','date_created')
         widgets = {
             'birth_date': DateInput(),
+            'date_created': DateInput(),
         }
     
     def __init__(self, *args, **kwargs):
         super(add_donated_K9_form, self).__init__(*args, **kwargs)
         self.fields['breed'].empty_label = None
         self.fields['image'].required = False
+        self.fields['date_created'].required = False
 
 class add_donator_form(forms.ModelForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'rows':'2', 'style':'resize:none;'}))
@@ -268,59 +196,67 @@ class k9_detail_form(forms.ModelForm):
 
 #class select_date(forms.Form):
 
-class budget_food(forms.Form):
-    # class Meta:
-    #     model = Budget_food
-    #     fields = ('food', 'quantity', 'price', 'total', 'budget_allocation')
-    budget_puppy = forms.DecimalField()
-    budget_milk = forms.DecimalField()
-    budget_adult = forms.DecimalField()
+# class budget_food(forms.Form):
+#     # class Meta:
+#     #     model = Budget_food
+#     #     fields = ('food', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget_puppy = forms.DecimalField()
+#     budget_milk = forms.DecimalField()
+#     budget_adult = forms.DecimalField()
 
-    quantity_puppy = forms.DecimalField()
-    quantity_milk = forms.DecimalField()
-    quantity_adult = forms.DecimalField()
+#     quantity_puppy = forms.DecimalField()
+#     quantity_milk = forms.DecimalField()
+#     quantity_adult = forms.DecimalField()
 
-    price_puppy = forms.IntegerField()
-    price_milk = forms.IntegerField()
-    price_adult = forms.IntegerField()
-
-
-class budget_equipment(forms.Form):
-    # class Meta:
-    #     model = Budget_equipment
-    #     fields = ('equipment', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
-
-class budget_medicine(forms.Form):
-    # class Meta:
-    #     model = Budget_medicine
-    #     fields = ('medicine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+#     price_puppy = forms.IntegerField()
+#     price_milk = forms.IntegerField()
+#     price_adult = forms.IntegerField()
 
 
-class budget_vaccine(forms.Form):
-    # class Meta:
-    #     model = Budget_vaccine
-    #     fields = ('vaccine', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+# class budget_equipment(forms.Form):
+#     # class Meta:
+#     #     model = Budget_equipment
+#     #     fields = ('equipment', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
 
-class budget_vet_supply(forms.Form):
-    # class Meta:
-    #     model = Budget_vet_supply
-    #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
-    budget = forms.DecimalField()
-    quantity = forms.IntegerField()
-    price = forms.DecimalField()
+# class budget_medicine(forms.Form):
+#     # class Meta:
+#     #     model = Budget_medicine
+#     #     fields = ('medicine', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
 
-class budget_date(forms.Form):
-    #date = forms.DateField()
-    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
+# class budget_vaccine(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vaccine
+#     #     fields = ('vaccine', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_vet_supply(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vet_supply
+#     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_k9(forms.Form):
+#     # class Meta:
+#     #     model = Budget_vet_supply
+#     #     fields = ('vet_supply', 'quantity', 'price', 'total', 'budget_allocation')
+#     budget = forms.DecimalField()
+#     quantity = forms.IntegerField()
+#     price = forms.DecimalField()
+
+# class budget_date(forms.Form):
+#     #date = forms.DateField()
+#     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
 
 class add_breed_form(forms.ModelForm):
     TEMPERAMENT = (
@@ -389,3 +325,18 @@ class DateForm(forms.Form):
 
 
 
+class HistDateForm(forms.Form):
+    cur_year = datetime.datetime.today().year
+
+    #year_list = []
+
+   # for x in range(cur_year - 15, cur_year + 15):
+     #   year_list.append(x)
+
+   # print(year_list)
+
+    #YEAR = (
+      #  year_list
+   # )
+    #hist_date =  forms.ChoiceField(widget = forms.Select(choices=YEAR))
+    hist_date = forms.ChoiceField(choices=[(x, x) for x in range(cur_year - 15, cur_year + 15)])

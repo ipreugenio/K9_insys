@@ -92,3 +92,13 @@ def deployment_notifs():
         elif date.today() ==  request.end_date:
             Notification.objects.create(message= str(request.location) + ' deployment requested by ' + 
             str(request.requester) + ' will end today.', notif_type='dog_request', other_id=request.id)
+
+# @periodic_task(run_every=timedelta(seconds=10))
+# def test():
+#     print('Hello')
+
+@periodic_task(run_every=crontab(hour=8, minute=30))
+def check_predeployment_requirements():
+
+
+    return None

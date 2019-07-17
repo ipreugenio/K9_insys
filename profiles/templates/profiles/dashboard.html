@@ -1,7 +1,98 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
+{% load fullcalendar_tags %}
+{% fullcalendar_css %}
+{% fullcalendar_print_css %}
+{% fullcalendar_jquery_ui %}
+{% fullcalendar_javascript %}
+
 <div class="container fluid">
   <h1>dashboard</h1>
+  <div class="ui two column grid">
+    <div class="column">
+
+        <div class="ui right aligned basic segment" style="padding:0%;margin:0%;margin-bottom: 5px;" >
+            <div class="ui buttons">
+                <button class="ui button"  id = "prev" >Previous Year</button>
+                <div class="or"></div>
+                <button class="ui button"  id = "next" >Next Year</button>
+              </div>
+        
+        </div>
+      <div id = "calendar" style="margin-top:0%;">
+          {{date_form.date}}
+          {{myr_form}}
+          
+          {% calendar %}
+    
+        <output id = "out_date"></output>
+    
+      </div>
+    </div>
+    <div class="column">
+    </div>
+  </div>
 </div>
+
+<style>
+.fc-header, .fc-button, #prev, #next{
+  background-color:orangered;
+  color: white;
+}
+
+ #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+ }
+</style>
+<script>
+  $(document).ready(function() {
+    $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+
+          eventBorderColor: "orange",
+          eventBackgroundColor: "orangered",
+          eventTextColor: "white",
+          nowIndicator: true,
+
+          events: [
+                {% for i in events %}
+                {
+                    id: "{{ i.id }}",
+                    title: "{{ i.event_name}} - {{ i.location}}",
+                    start: '{{ i.start_date|date:"Y-m-d" }} {{ i.start_date|time:"H:i:s" }}',
+                    end: '{{ i.end_date|date:"Y-m-d" }} {{ i.end_date|time:"H:i:s" }}',
+                    allDay: '{{ i.all_day|lower }}',
+                },
+                {% endfor %}
+            ],
+
+          }); // end #calendar
+
+
+
+      $('#prev').click(function() {
+      $('#calendar').fullCalendar('prevYear');
+      });
+
+      $('#next').click(function() {
+      $('#calendar').fullCalendar('nextYear');
+      });
+    
+  }); // end #document
+</script>
+
 {% endblock%}
+

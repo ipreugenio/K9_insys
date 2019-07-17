@@ -242,9 +242,11 @@
             <td>{{data_trained.color}}</td>
             <td >{{data_trained.sex}}</td>
             <td>{{data_trained.age}}</td>
+
             <td style="text-align:center;" class="five wide">
                 <a href="{% url 'training:assign_k9_duty' data_trained.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
                 <a href="{% url 'training:assign_k9_duty' data_trained.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>
+
             </td>
         </tr>
         {% endfor %}

@@ -39,7 +39,7 @@
       <div class="column">
         <div class="ui basic horizontal segments" style="border-style: none;">
          <div class="ui basic segment" style="border-style: none;">
-           <label>No. of K9 Demand: </label>
+           <label>No. of K9s Required: </label>
            {% if data.total_dogs_deployed >= data.total_dogs_demand %}
                <span class="ui green circular label">{{data.total_dogs_demand}}</span>
            {%else%}
@@ -63,7 +63,7 @@
            </table>
          </div>
          <div class="ui basic segment" style="border-style: none;">
-           <label>No. of K9 Deployed: </label>
+           <label>No. of K9s Deployed: </label>
            {% if data.total_dogs_deployed >= data.total_dogs_demand %}
                <span class="ui green circular label">{{data.total_dogs_deployed}}</span>
            {%else%}
@@ -135,112 +135,26 @@
         </div>
 
 <div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">Deploy K9's</a>
-    <a class="item" data-tab="second">Details</a>
+    <a class="active item" data-tab="second">Details</a>
     <a class="item" data-tab="third">History</a>
 </div>
-<div class="ui tab segment active" data-tab="first">
+
+
+
+<div class="ui active tab segment" data-tab="second">
+
 
     <div class="ui info message">
 <i class="close icon"></i>
 <div class="header">
-  <i class="question icon"></i> Information
+  <i class="question icon"></i>Deployed K9s
 </div>
 <ul class="list">
-  <li>Below is a list of available K9s that are not currently deployed and currently deployed in other ports.</li>
-    <li>If a K9 has a scheduled request, it will be automatically deployed on the date of request at the location of the request.</li>
-    <li>After a request has beem completed, the team is brought back to the last known deployment location.</li>
+  <li>Below is a list of K9s that are currently deployed in this port.</li>
+    <li>If a K9 has a scheduled request, it will be automatically deployed on the date of request at the requested location.</li>
+    <li>After a request has been completed, the units are brought back to the last known deployment location.</li>
 </ul>
 </div>
-
-
-  <div class="ui top attached tabular menu">
-      <a class="item active" data-tab="fourth">From PCGK9 Taguig Base</a>
-      <a class="item" data-tab="fifth">From Other Ports</a>
-  </div>
-
-  <div class="ui tab segment active " data-tab="fourth">
-<form class="ui form" method="POST">
-  {% csrf_token %}
-  <table id="tabledata2" class="ui seven column celled table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Name:SN#</th>
-            <th>Capability</th>
-            <th>Handler</th>
-            <th>Distance</th>
-            <th>Days Before Next Scheduled Request</th>
-            <th>View Schedules</th>
-          </tr>
-      </thead>
-      <tbody>
-
-          {% for can_deploy in can_deploy %}
-          <tr class="ui center aligned">
-            <td class="two wide">
-              <input type="checkbox" name="checks" value="{{can_deploy.id}}">
-            </td>
-            <td>{{can_deploy}}</td>
-            <td>{{can_deploy.capability}}</td>
-            <td>{{can_deploy.handler}}</td>
-            <td>{{can_deploy|calculate_distance_from_current_team:can_deploy.id}} miles</td>
-            <td>{{can_deploy|days_before_next_request:forloop.counter0}}</td>
-            <td><a href="{% url 'deployment:view_schedule' can_deploy.id %}">View Schedule</a></td>
-          </tr>
-            {% endfor %}
-
-      </tbody>
-  </table>
-    </div>
-
-    <div class="ui tab segment" data-tab="fifth">
-        <table id="tabledata4" class="ui nine column celled table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Name:SN#</th>
-            <th>Capability</th>
-            <th>Handler</th>
-            <th>Current Location</th>
-            <th>Distance(current location)</th>
-            <th>Number of Incidents (current location)</th>
-            <th>Days Before Next Scheduled Request</th>
-            <th>View Schedules</th>
-          </tr>
-      </thead>
-      <tbody>
-
-          {% for can_transfer in can_transfer %}
-          <tr class="ui center aligned">
-            <td class="one wide">
-              <input type="checkbox" name="checks" value="{{can_transfer.id}}">
-            </td>
-            <td>{{can_transfer.name}}</td>
-            <td>{{can_transfer.serial_number}}</td>
-            <td class="two wide">{{can_transfer.capability}}</td>
-            <td>{{can_transfer.handler}}</td>
-            <td>{{can_transfer|current_location:forloop.counter0}}</td>
-            <td>{{can_transfer|calculate_distance_from_current_team:data.id}} miles</td>
-            <td>{{can_transfer|incident_count:forloop.counter0}}</td>
-            <td>{{can_transfer|days_before_next_request:forloop.counter0}}</td>
-            <td><a href="{% url 'deployment:view_schedule' can_transfer.id %}">View Schedule</a></td>
-          </tr>
-            {% endfor %}
-
-      </tbody>
-  </table>
-    </div>
-
-  <div class="ui basic center aligned segment" style="padding: 0px;">
-      <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
-  </div>
-</form>
-
-</div>
-
-
-<div class="ui tab segment" data-tab="second">
 
 <h2 class="ui header">
     <i class="paw icon"></i>
@@ -275,6 +189,19 @@
 </div>
 
 <div class="ui tab segment" data-tab="third">
+
+    <div class="ui info message">
+<i class="close icon"></i>
+<div class="header">
+  <i class="question icon"></i>History
+</div>
+<ul class="list">
+  Below is the deployment history for this port.
+</ul>
+</div>
+
+
+
   <table id="tabledata3" class="ui five column celled table">
         <thead>
           <tr>

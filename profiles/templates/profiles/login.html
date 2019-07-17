@@ -28,19 +28,23 @@
             <div class="column center aligned" style="background:transparent;border-radius:20px;margin-top: 3%;" class ='screen_centered'>
                 <img src="{% static 'images/k9_logo.png' %}">
                 <div class="ui inverted segment">
-                    <form class="ui inverted equal width form" action="{%url 'profiles:login' %}" method="POST">
+                    <form class="ui inverted equal width form" method="POST">
                         {% csrf_token %}
                         <div class="field">
                             <label>SERIAL NUMBER</label>
-                            {{form.username}}
+                            <input placeholder="" name='serial_number' type="text">
                         </div>
                         <div class="field">
                             <label>PASSWORD</label>
-                            {{form.password}}
+                            <input placeholder="" name='password' type="password">
                         </div>
-                    
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div style="color: red;margin-bottom: 2px;"> {{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
                         <div class="center aligned">
-                            <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Login</button>
+                        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Login</button>
                         </div>
                     </form>
                 </div>

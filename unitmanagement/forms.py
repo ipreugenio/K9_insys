@@ -10,6 +10,7 @@ from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Inciden
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
+from django.db.models import Q
 
 def user_in_session(request):
     serial = request.session['session_serial']
@@ -19,6 +20,39 @@ def user_in_session(request):
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class SelectUnitsForm(forms.Form):
+    k9_list = []
+
+    k9 = forms.ChoiceField(choices=k9_list,
+                             widget=forms.CheckboxSelectMultiple())
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            k9_dict  = kwargs.pop("k9_dict", None)
+        except:
+            pass
+
+        try:
+            check_true = kwargs.pop("check_true", None)
+        except:
+            pass
+
+        try:
+            disable_cb = kwargs.pop("disable_cb", None)
+        except:
+            pass
+
+        super(SelectUnitsForm, self).__init__(*args, **kwargs)
+        if k9_dict:
+            self.fields['k9'].choices = k9_dict
+
+        if check_true:
+            self.fields['k9'].widget.attrs['checked'] = True
+
+        if disable_cb:
+            self.fields['k9'].widget.attrs['readonly'] = True
 
 class PhysicalExamForm(forms.ModelForm):
     EXAMSTATUS = (
@@ -45,7 +79,8 @@ class PhysicalExamForm(forms.ModelForm):
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
         'musculo_skeletal', 'respiratory', 'genito_urinary', 'nervous', 'circulatory', 'digestive',
-        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam')
+        'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam',
+        'heart_rate','respiratory_rate','temperature','weight')
 
     def __init__(self, *args, **kwargs):
         super(PhysicalExamForm, self).__init__(*args, **kwargs)
@@ -141,6 +176,7 @@ class VaccinationRecordForm(forms.ModelForm):
         self.fields['tick_flea_7'].required = False
         self.fields['heartworm_8'].required = False
 
+
 class VaccinationUsedForm(forms.ModelForm):
     vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
     date_vaccinated = forms.DateField(widget = DateInput(), label=None)
@@ -160,6 +196,49 @@ class VaccinationUsedForm(forms.ModelForm):
         self.fields['image'].required = False
         self.fields['veterinary'].required = False
         self.fields['done'].required = False
+
+class VaccinationYearlyForm(forms.ModelForm):
+    vaccine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.all(), label=None)
+    date_vaccinated = forms.DateField(widget = DateInput(), label=None)
+    image = forms.ImageField()
+
+    class Meta:
+        model = VaccineUsed
+ 
+        fields=('disease', 'vaccine', 'date_vaccinated', 'image', 'veterinary', 'done')
+    
+    def __init__(self, *args, **kwargs):
+        super(VaccinationYearlyForm, self).__init__(*args, **kwargs)
+        self.fields['disease'].required = False
+        self.fields['vaccine'].required = False
+        self.fields['date_vaccinated'].required = False
+        self.fields['image'].required = False
+        self.fields['veterinary'].required = False
+        self.fields['done'].required = False
+
+class RequestEquipment(forms.ModelForm):
+    class Meta:
+        model = Equipment_Request
+        fields = ('equipment', 'quantity')
+
+    def __init__(self, *args, **kwargs):
+        super(RequestEquipment, self).__init__(*args, **kwargs)
+
+class RequestMedicine(forms.ModelForm):
+    class Meta:
+        model = Medicine_Request
+        fields = ('medicine', 'quantity')
+
+    def __init__(self, *args, **kwargs):
+        super(RequestMedicine, self).__init__(*args, **kwargs)
+
+class RequestFood(forms.ModelForm):
+    class Meta:
+        model = Food_Request
+        fields = ('food', 'quantity')
+
+    def __init__(self, *args, **kwargs):
+        super(RequestFood, self).__init__(*args, **kwargs)
         
 class K9IncidentForm(forms.ModelForm):
     CONCERN = (
@@ -178,6 +257,7 @@ class K9IncidentForm(forms.ModelForm):
         super(K9IncidentForm, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['reported_by'].required = False
+        self.fields['title'].required = False
         self.fields['incident'].required = False
         self.fields['clinic'].required = False
 
@@ -207,14 +287,10 @@ class HandlerOnLeaveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
+        self.fields['handler'].widget.attrs['readonly'] = "readonly"
 
 class DateForm(forms.Form):
-    date = forms.DateField()
-
-    widgets = {
-        'date': DateInput(),
-    }
-       
+    date = forms.DateField(widget=DateInput)
 
 class ReassignAssetsForm(forms.Form):
     k9 = forms.ModelChoiceField(queryset = K9.objects.filter(training_status='For-Deployment').filter(handler=None))

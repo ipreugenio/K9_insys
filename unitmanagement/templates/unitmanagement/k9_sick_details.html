@@ -219,7 +219,9 @@
                 <div class="ui grid">
                     {% for image in image%}
                         <div class="five wide column center aligned">
-                            <img src="{{image.image.url}}" alt="" style="position:relative;max-width: 300px;">
+                            <a href="#">
+                                <img src="{{image.image.url}}" class= 'img' alt="" id = '{{image.id}}'style="position:relative;max-width: 300px;">
+                            </a>
                         </div>
                     {%endfor%}
                 </div>
@@ -302,6 +304,8 @@
 
 <div id ="id_health_data" class="ui longer modal"></div>
 
+<div class="ui modal" id = 'id_image_data'></div>
+
 <script type="text/javascript">
 
     $(document).ready(function() {
@@ -324,6 +328,25 @@
                 $('#id_follow_up_date').prop('disabled', 'disabled');
             }
         });
+
+
+        $( ".img" ).bind('click', function() {
+            var url = 'ajax_load_image';  
+            var image_id = $(this).attr('id')
+            $('#id_image_data').modal('show');
+
+            $.ajax({                      
+                url: url,                    
+                data: {
+                'image': image_id      
+                },
+                success: function (data) {   
+                $("#id_image_data").html(data); 
+                }
+            });
+        });
+        
+
 
         $( ".flip" ).bind('click', function() {
             var url = 'ajax_load_health';  
