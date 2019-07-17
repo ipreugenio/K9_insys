@@ -123,7 +123,7 @@ def dashboard(request):
     on_training = K9.objects.filter(training_level="Stage 1").count()
     trained = K9.objects.filter(training_status="Trained").count()
 
-    equipment_requests = Equipment_Request.objects.filter(request_status="Pending").count()
+    #equipment_requests = Equipment_Request.objects.filter(request_status="Pending").count()
 
     for_breeding = K9.objects.filter(training_status="For-Breeding").count()
 
@@ -140,7 +140,7 @@ def dashboard(request):
         'untrained_k9': untrained_k9,
         'on_training': on_training,
         'trained': trained,
-        'equipment_requests': equipment_requests,
+        #'equipment_requests': equipment_requests,
         'for_breeding': for_breeding,
 
         'notif_data':notif_data,

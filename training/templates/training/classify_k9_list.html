@@ -49,21 +49,21 @@
         {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
             {% if message.message == 'Trained' %}
             <a class="item" data-tab="first">Unclassified</a>
-            <a class="item" data-tab="second">Classified</a>
+           <!-- <a class="item" data-tab="second">Classified</a>-->
             <a class="item" data-tab="third">On-Training</a>
-            <a class="item active" data-tab="fourth">Trained</a>
+          <!--  <a class="item active" data-tab="fourth">Trained</a>-->
 
             {% elif message.message == 'On-Training' %}
             <a class="item" data-tab="first">Unclassified</a>
-            <a class="item" data-tab="second">Classified</a>
+          <!--  <a class="item" data-tab="second">Classified</a>-->
             <a class="item active" data-tab="third">On-Training</a>
-            <a class="item" data-tab="fourth">Trained</a>
+          <!--  <a class="item" data-tab="fourth">Trained</a>-->
 
             {% else %}
             <a class="item" data-tab="first">Unclassified</a>
-            <a class="item active" data-tab="second">Classified</a>
+          <!--  <a class="item active" data-tab="second">Classified</a>-->
             <a class="item" data-tab="third">On-Training</a>
-            <a class="item" data-tab="fourth">Trained</a>
+          <!--  <a class="item" data-tab="fourth">Trained</a>-->
             
             {% endif %}
         {% endif %}
@@ -71,9 +71,9 @@
 
     {%else%}
         <a class="item active" data-tab="first">Unclassified</a>
-        <a class="item" data-tab="second">Classified</a>
+        <!--<a class="item" data-tab="second">Classified</a>-->
         <a class="item" data-tab="third">On-Training</a>
-        <a class="item" data-tab="fourth">Trained</a>
+       <!-- <a class="item" data-tab="fourth">Trained</a>-->
     {%endif%}
 </div>
            
@@ -125,7 +125,7 @@
         </tbody>
     </table>
 </div>
-<div class="ui tab segment" data-tab="second">
+<!--<div class="ui tab segment" data-tab="second">
     <table id="tabledata2" class="ui seven column celled table">
         <thead>
             <tr>
@@ -154,7 +154,7 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
+</div>-->
 
 {% if messages %}
 {% for message in messages %}
@@ -208,7 +208,7 @@
     </tbody>
 </table>
 </div>
-{% if messages %}
+<!--{% if messages %}
 {% for message in messages %}
 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
     {% if message.message == 'Trained' %}
@@ -250,8 +250,8 @@
         {% endfor %}
     </tbody>
 </table>
-</div>
-
+</div>-->
+    </div></div></div></div></div></div>
 
 
 <script type="text/javascript">

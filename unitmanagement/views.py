@@ -13,8 +13,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, RequestForm, HandlerOnLeaveForm
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History, Medicine_Request, Food_Request, Equipment_Request
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestEquipment, RequestFood, RequestMedicine
 from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
@@ -850,31 +850,48 @@ def vaccination_form(request):
 def requests_form(request):
     style=""
 
-    form = RequestForm(request.POST or None)
-    
-    if request.method == 'POST':
-        print(form.errors)
-        if form.is_valid():
-            
-            no_id = form.save()
-            no_id.handler =user_session(request)
-            no_id.save()
+    medicine_formset = formset_factory(RequestMedicine, extra=1, can_delete=True)
+    food_formset = formset_factory(RequestFood, extra=1, can_delete=True)
+    equipment_formset = formset_factory(RequestEquipment, extra=1, can_delete=True)
 
-            style = "ui green message"
-            messages.success(request, 'Request has been successfully recorded!')
-            form = RequestForm()
-        else:
-            style = "ui red message"
-            messages.warning(request, 'Invalid input data!')
-    
+    if request.method == "POST":
+        # print(form)
+        formset1 = medicine_formset(request.POST or None)
+        formset2 = food_formset(request.POST or None)
+        formset3 = equipment_formset(request.POST or None)
+
+        med = []
+        med_quantity = []
+        equipment = []
+        equipment_quantity = []
+        food = []
+        food_quantity = []
+
+        if formset1.is_valid():
+            for form in formset1:
+                m = Medicine.objects.get(medicine_fullname=form.cleaned_data['medicine']).filter()
+                med.append(m)
+                med_quantity.append(form.cleaned_data['quantity'])
+                mi = Medicine_Inventory.objects.filter(medicine__in=med)
+
+        if formset2.is_valid():
+            for form in formset1:
+                f = Food.objects.get(food_fullname=form.cleaned_data['food']).filter()
+                food.append(f)
+                food_quantity.append(form.cleaned_data['quantity'])
+
+
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'title': "Request of equipment",
+        'title': "Replenish Assets",
         'actiontype': "Submit",
         'style': style,
-        'form': form,
+        'formset1': medicine_formset(),
+        'formset2': food_formset(),
+        'formset3': equipment_formset(),
         'notif_data':notif_data,
         'count':count,
         'user':user,

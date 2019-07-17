@@ -136,8 +136,10 @@
                 <div class="ui teal label" style="width:80px;">
                     Grade
                 </div>
-                {% if data.grade == 0 %}
+                {% if data.grade == "0" %}
                     No Grade Yet
+                {% else %}
+                    {{training.grade}}
                 {% endif %}
             </div>
         </div>

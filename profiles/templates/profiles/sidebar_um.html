@@ -65,7 +65,7 @@
                                 <i class="paw icon"></i>K9-Incident Form
                             </a>
                             <a href="{% url 'unitmanagement:request_form'%}" class="item">
-                                <i class="exclamation icon"></i>Damaged Equipment
+                                <i class="exclamation icon"></i>Replenish Assets
                             </a>
                             <a href="{% url 'unitmanagement:health_history_handler'%}" class="item">
                                 <i class="h square icon"></i>Health Records
@@ -76,7 +76,12 @@
                             <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
                                 <i class="question icon"></i>On-Leave Request
                             </a>
-                          
+
+                            {% elif request.session.session_user_position == "Team Leader" %}
+                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
+                                <i class="exclamation icon"></i>Replenish Assets
+                            </a>
+
                             {% else %}
                             <a href="{% url 'deployment:deployment_area_details'%}" class="item">
                                 <i class="building icon"></i>Assigned Area Details

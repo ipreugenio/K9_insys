@@ -50,3 +50,7 @@ class add_user_account(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
         }
+
+class DateForm(forms.Form):
+    from_date = forms.DateField(widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())

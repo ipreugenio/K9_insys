@@ -8,7 +8,9 @@ from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, a
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Budget_allocation, Budget_equipment, Budget_food, Budget_medicine, K9_Breed, K9_Supplier, K9_Litter
 from .models import K9_Mated
 from .forms import DateForm
+from deployment.models import Incidents
 
+from django.db.models import Sum
 from training.models import Training
 from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
@@ -21,10 +23,10 @@ from .forms import ReportDateForm, add_breed_form, k9_detail_form, SupplierForm,
 from deployment.models import Dog_Request, Team_Assignment
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
-from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
+from inventory.models import Food, Food_Subtracted_Trail, Miscellaneous_Subtracted_Trail
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
-from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous
+from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
 
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
@@ -61,7 +63,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random, randint
+from random import random, randint 
 from statsmodels.tsa.stattools import adfuller, kpss
 import statsmodels.api as sm'''
 
@@ -2543,3 +2545,170 @@ def load_k9_reco(request):
     }
 
     return render(request, 'planningandacquiring/breeding_reco_data.html', context)
+
+
+def accomplishment_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('accomplishment_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/accomplishment_date.html', context)
+
+def accomplishment_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+
+    explosives = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Explosives Related")
+    narcotics = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Narcotics Related")
+    sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Search and Rescue Related")
+    others = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type="Others")
+
+    user = user_session(request)
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'explosives': explosives,
+        'narcotics': narcotics,
+        'sar': sar,
+        'others': others,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/accomplishment_report.html', context)
+
+def vet_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('vet_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/vet_date.html', context)
+
+def vet_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    # VACCINES USED
+
+    vaccineused = VaccineUsed.objects.filter(date_vaccinated__range=[from_date, to_date])
+
+    vu_data=[]
+
+    vu_disinct = vaccineused.values('vaccine').distinct()
+
+    for vu in vu_disinct:
+        for key,value in vu.items():
+            print(value)
+            v = vaccineused.filter(vaccine__id=value).count()
+            vac = vaccineused.filter(vaccine__id=value).latest('date')
+            arr = [vac.vaccine,vac.disease,v]
+            vu_data.append(arr)
+
+    print(vu_disinct)
+
+    # MEDICINES USED
+
+    health = Health.objects.filter(date_done__range=[from_date, to_date])
+    med_used = HealthMedicine.objects.filter(health__in=health)
+
+    med_data = []
+
+    med_distinct = med_used.values('medicine').distinct()
+
+    for med in med_distinct:
+        for key, value in med.items():
+            print(value)
+            k9_count = med_used.filter(medicine__id=value).count()
+            medi = med_used.filter(medicine__id=value).latest('id')
+            print(medi)
+            arr = [medi.medicine, k9_count]
+            med_data.append(arr)
+
+    print(k9_count)
+    print(med_distinct)
+
+    # SICKNESS
+
+    health = Health.objects.filter(date__range=[from_date, to_date])
+    health_distinct = health.values('problem').distinct()
+    sick_data = []
+
+    for sick in health_distinct:
+        for key, value in sick.items():
+            print(value)
+            health_count = Health.objects.filter(problem=value).count()
+            sickness = Health.objects.filter(problem=value).latest('id')
+
+            arr = [sickness.problem, health_count]
+            sick_data.append(arr)
+
+
+            print(sick_data)
+            print(health_distinct)
+            print(health_count)
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'vu_data': vu_data,
+        'med_data': med_data,
+        'sick_data': sick_data,
+    }
+
+    return render(request, 'planningandacquiring/vet_report.html', context)
+
+def inventory_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('inventory_report/')
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/inventory_date.html', context)
+
+
+def inventory_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+
+
+
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+
+    }
+
+    return render(request, 'planningandacquiring/inventory_report.html', context)

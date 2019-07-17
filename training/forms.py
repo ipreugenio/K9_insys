@@ -59,6 +59,7 @@ class assign_handler_form(forms.ModelForm):
 
 class TrainingUpdateForm(forms.ModelForm):
     GRADE = (
+        ("0", "0"),
         ("75", "75"),
         ("80", "80"),
         ("85", "85"),

@@ -383,5 +383,9 @@ class add_breed_form(forms.ModelForm):
         fields = ('breed', 'life_span', 'litter_number', 'value', 'temperament', 'colors', 'weight', 'male_height',
                   'female_height', 'skill_recommendation')
 
+class DateForm(forms.Form):
+    from_date = forms.DateField(widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())
+
 
 
