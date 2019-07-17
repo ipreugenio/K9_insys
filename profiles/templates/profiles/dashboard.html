@@ -71,14 +71,22 @@
           events: [
                 {% for i in events %}
                 {
-                    id: "{{ i.id }}",
-                    title: "{{ i.event_name}} - {{ i.location}}",
-                    start: '{{ i.start_date|date:"Y-m-d" }} {{ i.start_date|time:"H:i:s" }}',
-                    end: '{{ i.end_date|date:"Y-m-d" }} {{ i.end_date|time:"H:i:s" }}',
-                    allDay: '{{ i.all_day|lower }}',
+                    id: '{{ i.id }}',
+                    title: '{{i.event_name}}',
+                    start: '{{ i.start_date|date:"Y-m-d" }}',
+                    end: '{{ i.end_date|date:"Y-m-d" }}',
+                    allDay: 'true',
                 },
                 {% endfor %}
             ],
+            dayClick: function(date) {
+                new_date = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+                var view = $('#calendar').fullCalendar('getView');
+
+                    $('#calendar').fullCalendar('gotoDate',date);
+                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+
+                },
 
           });
 

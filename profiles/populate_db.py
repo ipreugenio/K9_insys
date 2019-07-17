@@ -250,15 +250,15 @@ def generate_user():
 
         if ctr <= 300:
             position = "Handler"
-        if ctr >= 301 and ctr <= 314:
+        elif ctr >= 301 and ctr <= 314:
             position = "Commander"
-        if ctr >= 315 and ctr <= 360:
+        elif ctr >= 315 and ctr <= 360:
             position = "Team Leader"
-        if ctr >= 361 and ctr <= 380:
+        elif ctr >= 361 and ctr <= 380:
             position = "Veterinarian"
-        if ctr == 381:
+        elif ctr == 381:
             position = "Operations"
-        if ctr >= 382 and ctr <= 385:
+        elif ctr >= 382 and ctr <= 385:
             position = "Trainer"
         else:
             position = 'Administrator'
@@ -422,32 +422,15 @@ def generate_k9():
         print("Breed : " + generate_breed())
         breed = generate_breed()
 
-        generated_date = fake.date_between(start_date="-4y", end_date="today")
+        generated_date = fake.date_between(start_date="-4y", end_date="-2y")
         date_time = generated_date.strftime("%m/%d/%Y")
         print("Birthdate : " + date_time)
 
-        randomizer = random.randint(0, 1)
-
-        source = "?"
-        if randomizer == 0:
-            print("Source : Procurement")
-            source = "Procurement"
-        else:
-            print("Source : Breeding")
-            source = "Breeding"
-        print()
-
-        randomizer = random.randint(0, 1)
 
         #TODO Add K9s that are For-deployment and For-Breeding
         #Classifies other K9s
-        if randomizer == 0:
-            k9 = K9.objects.create(name=name, breed=breed, sex=gender, color=color, birth_date=generated_date,
-                                   source=source, training_status = "Classified", capability = generate_skill())
-            k9.save()
-        else:
-            k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = source)
-            k9.save()
+        k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement")
+        k9.save()
 
         if k9.source == "Procurement":
             contact = "+63" + fake.msisdn()[:10]
@@ -707,7 +690,7 @@ def generate_event():
             print("Event Type : Small Event")
             event_type = "Small Event"
             print("Number of K9s. Required : " + str(random.randint(1, 5)))
-            k9s_required = random.randint(1, 5)
+            k9s_required = random.randint(2, 5)
 
         print("Location : " + fake.address())
         location = fake.address()
@@ -726,6 +709,7 @@ def generate_event():
 
         print("Remarks : " + fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None))
         remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        event_name = fake.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None)
         print()
 
         email = requester.lower() + "@gmail.com"
@@ -734,7 +718,7 @@ def generate_event():
         print("Area : " + str(area_list[randomizer]))
         area = area_list[randomizer]
 
-        request = Dog_Request.objects.create(requester = requester, location = location, city = city, sector_type = event_type, phone_number = cell, email_address = email,
+        request = Dog_Request.objects.create(requester = requester, location = location, city = city, sector_type = event_type, phone_number = cell, email_address = email, event_name = event_name,
                                              remarks = remarks, area = area, k9s_needed = k9s_required, start_date = start_date, end_date = end_date, latitude = coordinates[0], longtitude = coordinates[1])
         request.save()
 
@@ -835,3 +819,8 @@ def generate_maritime():
     return None
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>END OF Maritimes and Incidents CREATION
+
+
+#ADVANCED POPULATE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+

@@ -111,7 +111,7 @@ class EditTeamForm(forms.ModelForm):
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Dog_Request
-        fields = ('requester', 'location', 'email_address', 'phone_number', 'area', 'city', 'k9s_needed', 'start_date', 'end_date', 'remarks')
+        fields = ('requester', 'event_name', 'location', 'email_address', 'phone_number', 'area', 'city', 'k9s_needed', 'start_date', 'end_date', 'remarks')
 
         widgets = {
             'start_date': DateInput(),

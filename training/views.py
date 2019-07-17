@@ -26,11 +26,11 @@ import itertools
 from collections import OrderedDict
 
 #graphing imports
-#import igraph
-#from igraph import *
-#import plotly.offline as opy
-#import plotly.graph_objs as go
-#import plotly.graph_objs.layout as lout
+import igraph
+from igraph import *
+import plotly.offline as opy
+import plotly.graph_objs as go
+import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
 
@@ -540,11 +540,20 @@ def classify_k9_select(request, id):
 
     for record in records:
         if record.training == "SAR":
-            SAR_list.append(round(Decimal(record.grade), 1))
+            try:
+                SAR_list.append(round(Decimal(record.grade), 1))
+            except:
+                SAR_list.append(0)
         if record.training == "NDD":
-            NDD_list.append(round(Decimal(record.grade), 1))
+            try:
+                NDD_list.append(round(Decimal(record.grade), 1))
+            except:
+                NDD_list.append(0)
         if record.training == "EDD":
-            EDD_list.append(round(Decimal(record.grade), 1))
+            try:
+                EDD_list.append(round(Decimal(record.grade), 1))
+            except:
+                EDD_list.append(0)
 
     if not SAR_list:
         SAR_list.append(0.0)
@@ -732,6 +741,7 @@ def classify_k9_select(request, id):
 
         style = "ui green message"
         messages.success(request, 'K9 has been successfully Classified!')
+
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
@@ -999,7 +1009,7 @@ def training_update_form(request, id):
     #form2 = RecordForm(request.POST or None)
     average = "0"
 
-
+    stage = ""
     if request.method == 'POST':
         if data.training_status == 'On-Training':
 
