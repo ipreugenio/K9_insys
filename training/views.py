@@ -1003,11 +1003,11 @@ def training_records(request):
 
 def training_update_form(request, id):
     data = K9.objects.get(id=id)  # get k9
-    training = Training.objects.filter(k9=data).get(training=data.capability)  # get training record
+    training = Training.objects.filter(k9=data).get(training=data.capability)  #get training record
     form = TrainingUpdateForm(request.POST or None, instance=training)
     handlerID = K9_Handler.objects.filter(k9=data)
     #form2 = RecordForm(request.POST or None)
-    average = "0"
+    average = 0
 
     stage = ""
     if request.method == 'POST':
@@ -1020,9 +1020,10 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = (int(average) + int(stage1_1))
+                    average = (Decimal(average) + Decimal(stage1_1))
                     stage = "Stage 1.1"
                     print(stage1_1)
+
                     print(average)
                     training.stage = stage
                     training.stage1_1 = stage1_1
@@ -1032,12 +1033,14 @@ def training_update_form(request, id):
                     return redirect('training:classify_k9_list')
             elif training.stage == "Stage 1.1":
                 stage1_2 = request.POST.get('stage1_2')
+                print("STAGE 1")
+                print(stage1_2)
                 if stage1_2 == '0':
                     data.training_status = "For-Adoption"
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = (int(average) + int(stage1_2))
+                    average = (Decimal(average) + Decimal(stage1_2))
                     stage = "Stage 1.2"
                     print(stage1_2)
                     print(average)
@@ -1054,7 +1057,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = (int(average) + int(stage1_3))
+                    average = (Decimal(average) + Decimal(stage1_3))
                     stage = "Stage 1.3"
                     training.stage = stage
                     training.stage1_3 = stage1_3
@@ -1071,7 +1074,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = int(average) + int(stage2_1)
+                    average = Decimal(average) + Decimal(stage2_1)
                     stage = "Stage 2.1"
                     training.stage = stage
                     training.stage2_1 = stage2_1
@@ -1086,7 +1089,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = int(average) + int(stage2_2)
+                    average = Decimal(average) + Decimal(stage2_2)
                     stage = "Stage 2.2"
                     training.stage = stage
                     training.stage2_2 = stage2_2
@@ -1101,7 +1104,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = int(average) + int(stage2_3)
+                    average = Decimal(average) + Decimal(stage2_3)
                     stage = "Stage 2.3"
                     training.stage = stage
                     training.stage2_3 = stage2_3
@@ -1116,7 +1119,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = int(average) + int(stage3_1)
+                    average = Decimal(average) + Decimal(stage3_1)
                     stage = "Stage 3.1"
                     training.stage = stage
                     training.stage3_1 = stage3_1
@@ -1131,7 +1134,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:classify_k9_list')
                 else:
-                    average = int(average) + int(stage3_2)
+                    average = Decimal(average) + Decimal(stage3_2)
                     stage = "Stage 3.2"
                     training.stage = stage
                     training.stage3_2 = stage3_2
@@ -1146,7 +1149,7 @@ def training_update_form(request, id):
                     data.save()
                     return redirect('training:training_update_form', id=id)
                 else:
-                    average = int(average) + int(stage3_3)
+                    average = Decimal(average) + Decimal(stage3_3)
                     stage = "Finished Training"
                     training.stage = stage
                     training.stage3_3 = stage3_3
@@ -1156,7 +1159,7 @@ def training_update_form(request, id):
                     return redirect('training:training_update_form', id=id)
 
             if training.stage == "Finished Training":
-                training.grade = (float(average) / 9)
+                training.grade = (Decimal(average) / 9)
                 training.remarks = request.POST.get('remarks')
                 data.training_status = "Trained"
                 data.training_level = stage
