@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed, K9_Supplier, K9_Litter, K9_Mated
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm
@@ -248,9 +249,9 @@ def budgeting(request):
     tap = adult.inventory.price
     tat = round((ta*tap),2)
 
-    dm = [milk,tmp,int(tm),tmt]
-    dp = [puppy,tpp,int(tp),tpt]
-    da = [adult,tap,int(ta),tat]
+    dm = [milk,tmp,int(tm),tmt,int(born_ny)]
+    dp = [puppy,tpp,int(tp),tpt,int(born_ny)]
+    da = [adult,tap,int(ta),tat,int(need_procure_ny+k9_ny)]
     
     if tmt > 0:
         dog_food.append(dm)
@@ -259,7 +260,7 @@ def budgeting(request):
     if tat > 0:
         dog_food.append(da) 
     
-    for (n,(item1,item2,item3,item4)) in enumerate(dog_food):
+    for (n,(item1,item2,item3,item4,item5)) in enumerate(dog_food):
         total_food =+ item4
 
     #MEDICINE EXPIRATION
@@ -337,7 +338,7 @@ def budgeting(request):
         if np.ceil(r) > 0:
             s = Decimal(np.ceil(r)) * Decimal(item3)
             ss = round(s, 2)
-            b = [item1,item3,int(np.ceil(r)),ss]
+            b = [item1,item3,int(np.ceil(r)),ss,int((k9_ny+born_ny+need_procure_ny))]
             b_ny_med.append(b)
             total_medicine = total_medicine+ss
     
@@ -484,7 +485,7 @@ def budgeting(request):
             c = mi - eny_ar_count
             bn = int((born_ny + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
-            mi_a = [m,m.medicine.price,bn,pr]
+            mi_a = [m,m.medicine.price,bn,pr,int(born_ny + k9_ny)]
             if pr > 0:
                 vac_ny.append(mi_a)
         elif item2 == 'Bordetella Bronchiseptica Bacterin':
@@ -493,7 +494,7 @@ def budgeting(request):
             c = mi - eny_bbb_count
             bn = int(((born_ny*2) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
-            mi_a = [m,m.medicine.price,bn,pr]
+            mi_a = [m,m.medicine.price,bn,pr,int(born_ny + k9_ny)]
             if pr > 0:
                 vac_ny.append(mi_a)
         elif item2 == 'DHPPiL+CV':
@@ -502,7 +503,7 @@ def budgeting(request):
             c = mi - eny_dcv_count
             bn = int(((born_ny*3) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
-            mi_a = [m,m.medicine.price,bn,pr]
+            mi_a = [m,m.medicine.price,bn,pr,int(born_ny + k9_ny)]
             if pr > 0:
                 vac_ny.append(mi_a)
         elif item2 == 'DHPPiL4':
@@ -511,7 +512,7 @@ def budgeting(request):
             c = mi - eny_dc4_count
             bn = int(((born_ny*2) + k9_ny) - c)
             pr = round(bn*m.medicine.price, 2)
-            mi_a = [m,m.medicine.price,bn,pr]
+            mi_a = [m,m.medicine.price,bn,pr,int(born_ny + k9_ny)]
             if pr > 0:
                 vac_ny.append(mi_a)
     #4 deworming, 8 heartworm, 7 tick&flee
@@ -544,7 +545,7 @@ def budgeting(request):
         p_deworm = md.medicine.price
         q_deworm = int((born_ny * 7) + ((k9_ny+need_procure_ny) * 2) - dcq)
         t_deworm = p_deworm*q_deworm
-        mi_a = [md,md.medicine.price,q_deworm,t_deworm]
+        mi_a = [md,md.medicine.price,q_deworm,t_deworm,int(born_ny+k9_ny+need_procure_ny)]
         if t_deworm > 0:
             vac_ny.append(mi_a)
 
@@ -575,7 +576,7 @@ def budgeting(request):
         p_deworm = md.medicine.price
         q_deworm = int((born_ny * 7) + ((k9_ny+need_procure_ny) * 2) - dcq)
         t_deworm = p_deworm*q_deworm
-        mi_a = [md,md.medicine.price,q_deworm,t_deworm]
+        mi_a = [md,md.medicine.price,q_deworm,t_deworm,int(born_ny+k9_ny+need_procure_ny)]
         if t_deworm > 0:
             vac_ny.append(mi_a)
 
@@ -607,7 +608,7 @@ def budgeting(request):
         p_heatworm = md.medicine.price
         q_heatworm = int((born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq)
         t_heatworm = p_heatworm*q_heatworm
-        mi_a = [md,md.medicine.price,q_heatworm,t_heatworm]
+        mi_a = [md,md.medicine.price,q_heatworm,t_heatworm,int(born_ny+k9_ny+need_procure_ny)]
         if t_heatworm > 0:
             vac_ny.append(mi_a)
     except:
@@ -637,7 +638,7 @@ def budgeting(request):
         p_heatworm = md.medicine.price
         q_heatworm = int((born_ny * 8) + ((k9_ny+need_procure_ny) * 12) - hcq)
         t_heatworm = p_heatworm*q_heatworm
-        mi_a = [md,md.medicine.price,q_heatworm,t_heatworm]
+        mi_a = [md,md.medicine.price,q_heatworm,t_heatworm,int(born_ny+k9_ny+need_procure_ny)]
         if t_heatworm > 0:
             vac_ny.append(mi_a)
 
@@ -670,7 +671,7 @@ def budgeting(request):
         k_tf = k9_cy % 7
         q_tickflea = int((born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq)
         t_tickflea = round(Decimal(p_tickflea)*Decimal(q_tickflea), 2)
-        mi_a = [md,md.medicine.price,q_tickflea,t_tickflea]
+        mi_a = [md,md.medicine.price,q_tickflea,t_tickflea,int(born_ny+k9_ny+need_procure_ny)]
         if t_tickflea > 0:
             vac_ny.append(mi_a)
     except:
@@ -701,12 +702,12 @@ def budgeting(request):
         k_tf = k9_cy % 7
         q_tickflea = int((born_ny * 7 ) + ((k_tf/k9_cy) * (k9_ny+need_procure_ny)) - tcq)
         t_tickflea = round(Decimal(p_tickflea)*Decimal(q_tickflea), 2)
-        mi_a = [md,md.medicine.price,q_tickflea,t_tickflea]
+        mi_a = [md,md.medicine.price,q_tickflea,t_tickflea,int(born_ny+k9_ny+need_procure_ny)]
         if t_tickflea > 0:
             vac_ny.append(mi_a)
 
     vac_total = 0
-    for (n, (item1, item2, item3,item4)) in enumerate(vac_ny):
+    for (n, (item1, item2, item3,item4,item5)) in enumerate(vac_ny):
         vac_total = vac_total + item4
     #Vet Supply
     #item,quantity,total
@@ -721,7 +722,7 @@ def budgeting(request):
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
                 tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
-                mv = [c,c.price, int(np.ceil(tq)), tp]
+                mv = [c,c.price, int(np.ceil(tq)), tp,int(born_ny+k9_ny+need_procure_ny)]
                 vet_total = vet_total+tp
                 vet_arr.append(mv)
     
@@ -740,7 +741,7 @@ def budgeting(request):
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
                 tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
-                mv = [c,c.price, int(np.ceil(tq)), tp]
+                mv = [c,c.price, int(np.ceil(tq)), tp,int(born_ny+k9_ny+need_procure_ny)]
                 ken_total = ken_total+tp
                 ken_arr.append(mv)
 
@@ -757,11 +758,12 @@ def budgeting(request):
                 mvi_i = Miscellaneous_Subtracted_Trail.objects.filter(inventory=c).filter(date_subtracted__year=current_year).aggregate(sum=Sum('quantity'))['sum']
                 tq = int((mvi_i/k9_cy) * (k9_ny+need_procure_ny+born_ny))
                 tp = round(Decimal(tq)*Decimal(c.price), 2)
-                mv = [c,c.price, int(np.ceil(tq)), tp]
+                mv = [c,c.price, int(np.ceil(tq)), tp,int(born_ny+k9_ny+need_procure_ny)]
                 oth_total = oth_total+tp
                 oth_arr.append(mv)
 
     mat_dog = K9.objects.filter(status='Material Dog').count() + born_ny + need_procure_ny
+    train_count = int(mat_dog)
     train_total = Decimal(mat_dog * 18000)
     
     train_arr = ['K9 Training',18000,mat_dog,train_total]
@@ -769,9 +771,11 @@ def budgeting(request):
     grand_total=total_food+vac_total+total_medicine+vet_total+ken_total+oth_total+train_total
     
     if request.method == "POST":
-        
+        #k9_value
+        #k9_total_price = need_procure_ny * k9_value
+
         try:
-            pb = Proposal_Budget.objects.filter(date_created__year=dt.today().year).latest('date_created')
+            pb = Proposal_Budget.objects.get(date_created__year=dt.today().year)
             pb.k9_current = k9_ny
             pb.k9_needed = need_procure_ny
             pb.k9_breeded = born_ny
@@ -782,6 +786,7 @@ def budgeting(request):
             pb.kennel_total = ken_total
             pb.others_total = oth_total
             pb.training_total = train_total
+            pb.train_count = train_count
             pb.grand_total = grand_total
             pb.date_created = dt.today()
             pb.save()
@@ -794,59 +799,57 @@ def budgeting(request):
             Proposal_Others.objects.filter(proposal=pb).delete()
             
             #item, price, quantity, total
-            for (n,(item1,item2,item3,item4)) in enumerate(dog_food):
+            for (n,(item1,item2,item3,item4,item5)) in enumerate(dog_food):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Milk_Food.objects.create(item=item1.inventory, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Milk_Food.objects.create(item=item1.inventory, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
 
-            for (n, (item1, item2, item3,item4)) in enumerate(vac_ny):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(vac_ny):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Vac_Prev.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Vac_Prev.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(b_ny_med):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(b_ny_med):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Medicine.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Medicine.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(vet_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(vet_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Vet_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Vet_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
             
-            for (n, (item1, item2, item3,item4)) in enumerate(ken_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(ken_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Kennel_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Kennel_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(oth_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(oth_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Others.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Others.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
         except:
             pb = Proposal_Budget.objects.create(k9_current=k9_ny, k9_needed=need_procure_ny, k9_breeded=born_ny, food_milk_total=total_food, vac_prev_total=vac_total, medicine_total=total_medicine, vet_supply_total=vet_total, kennel_total=ken_total, others_total=oth_total, training_total=train_total, grand_total=grand_total, date_created=dt.today())
 
             #item, price, quantity, total
-            for (n,(item1,item2,item3,item4)) in enumerate(dog_food):
+            for (n,(item1,item2,item3,item4,item5)) in enumerate(dog_food):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Milk_Food.objects.create(item=item1.inventory, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Milk_Food.objects.create(item=item1.inventory, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
 
-            for (n, (item1, item2, item3,item4)) in enumerate(vac_ny):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(vac_ny):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Vac_Prev.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Vac_Prev.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(b_ny_med):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(b_ny_med):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Medicine.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Medicine.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(vet_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(vet_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Vet_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Vet_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
             
-            for (n, (item1, item2, item3,item4)) in enumerate(ken_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(ken_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Kennel_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
+                Proposal_Kennel_Supply.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
                 
-            for (n, (item1, item2, item3,item4)) in enumerate(oth_arr):
+            for (n, (item1, item2, item3,item4,item5)) in enumerate(oth_arr):
                 percentage = Decimal(item4/grand_total)
-                Proposal_Others.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb)
-                
-
+                Proposal_Others.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2270,16 +2273,281 @@ def choose_date(request):
     return render(request, 'planningandacquiring/choose_date.html', context)
 
 def budgeting_detail(request, id):
+    pb = Proposal_Budget.objects.get(id=id)
+    mf = Proposal_Milk_Food.objects.filter(proposal=pb)
+    vp = Proposal_Vac_Prev.objects.filter(proposal=pb)
+    pm = Proposal_Medicine.objects.filter(proposal=pb)
+    pvs = Proposal_Vet_Supply.objects.filter(proposal=pb)
+    pks = Proposal_Kennel_Supply.objects.filter(proposal=pb)
+    po = Proposal_Others.objects.filter(proposal=pb)
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+
+    train_k9 = pb.k9_current +  pb.k9_needed + pb.k9_breeded
+
+    k9_val = pb.grand_total/train_k9
+
+    ab = None
+    amf = None
+    avp = None
+    am = None
+    avs = None
+    aks = None
+    ao = None
+    total_new = 0
+   
+    try: 
+        pass
+        ab = Actual_Budget.objects.get(year_budgeted__year=pb.year_budgeted.year)
+        
+        amf = Actual_Milk_Food.objects.filter(proposal=ab)
+        avp = Actual_Vac_Prev.objects.filter(proposal=ab)
+        am = Actual_Medicine.objects.filter(proposal=ab)
+        avs = Actual_Vet_Supply.objects.filter(proposal=ab)
+        aks = Actual_Kennel_Supply.objects.filter(proposal=ab)
+        ao = Actual_Others.objects.filter(proposal=ab)
+        total_new = ab.k9_current + ab.k9_needed + ab.k9_breeded
+
+    except ObjectDoesNotExist:
+        ab = None
+
+    if request.method == 'POST':
+        lump_sum = request.POST.get('lump_sum')
+        lump_sum = Decimal(lump_sum)
+        
+        petty_cash = 0
+        food_milk_total = 0
+        vac_prev_total = 0
+        medicine_total = 0
+        vet_supply_total = 0
+        kennel_total = 0
+        others_total = 0
+        training_total = 0
+        grand_total = 0
+        k9_value = 0
+
+        ab = None
+        try: 
+            ab = Actual_Budget.objects.get(year_budgeted__year=pb.year_budgeted.year)
+            Actual_Milk_Food.objects.filter(proposal=ab).delete()
+            Actual_Vac_Prev.objects.filter(proposal=ab).delete()
+            Actual_Medicine.objects.filter(proposal=ab).delete()
+            Actual_Vet_Supply.objects.filter(proposal=ab).delete()
+            Actual_Kennel_Supply.objects.filter(proposal=ab).delete()
+            Actual_Others.objects.filter(proposal=ab).delete()
+
+            #food 
+            for mfd in mf:
+                t_amount = lump_sum*mfd.percent # new total amount by percentage
+                q_item = int(t_amount / mfd.price) # Quantity by new total amount 
+                t_item = t_amount - (q_item*mfd.price) #total amount per item
+                new_t_amount = q_item * mfd.price
+                food_milk_total = food_milk_total + new_t_amount #Total Amount
+                k9_value = k9_value + (t_amount/mfd.k9_count) #k9 Value
+                Actual_Milk_Food.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+                
+            #vaccine
+            for mfd in vp:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                vac_prev_total = vac_prev_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Vac_Prev.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+            
+            #medicine
+            for mfd in pm:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                medicine_total = medicine_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Medicine.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+            
+            #vet supply
+            for mfd in pvs:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                vet_supply_total = vet_supply_total + t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Vet_Supply.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            #kennel supply
+            for mfd in pks:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                kennel_total = kennel_total + t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Kennel_Supply.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            #others
+            for mfd in po:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                others_total = others_total + t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Others.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            k9_perc = int(lump_sum/k9_val)
+            k9_needed = k9_perc - (pb.k9_breeded + pb.k9_current)
+            
+            o_total = (food_milk_total+vac_prev_total+medicine_total+vet_supply_total+kennel_total+others_total)
+            for_train = lump_sum - o_total
+            train_quantity = int(for_train/18000)
+            train_t = (train_quantity*18000)
+            total_k9 = pb.k9_current+k9_needed
+            total_total = o_total + train_t
+            petty_cash = lump_sum - total_total 
+
+            #save Actual Budget
+            ab.k9_needed = k9_needed
+            ab.food_milk_total = food_milk_total
+            ab.vac_prev_total = vac_prev_total
+            ab.medicine_total = medicine_total
+            ab.vet_supply_total = vet_supply_total
+            ab.kennel_total = kennel_total 
+            ab.others_total = others_total
+            ab.training_total = train_t
+            ab.train_count = train_quantity
+            ab.petty_cash = petty_cash
+            ab.grand_total = lump_sum
+            ab.save()
+
+        except ObjectDoesNotExist:
+           
+            ab = Actual_Budget.objects.create(k9_current=pb.k9_current,k9_breeded=pb.k9_breeded,grand_total=lump_sum,year_budgeted=pb.year_budgeted)
+          
+            #food 
+            for mfd in mf:
+                t_amount = lump_sum*mfd.percent # new total amount by percentage
+                q_item = int(t_amount / mfd.price) # Quantity by new total amount 
+                t_item = t_amount - (q_item*mfd.price) 
+                new_t_amount = q_item * mfd.price #total amount per item
+                food_milk_total = food_milk_total + new_t_amount #Total Amount
+                k9_value = k9_value + (t_amount/mfd.k9_count) #k9 Value
+                Actual_Milk_Food.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            #vaccine
+            for mfd in vp:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                vac_prev_total = vac_prev_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Vac_Prev.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+            
+            #medicine
+            for mfd in pm:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                medicine_total = medicine_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Medicine.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+            
+            #vet supply
+            for mfd in pvs:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                vet_supply_total = vet_supply_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Vet_Supply.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            #kennel supply
+            for mfd in pks:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                kennel_total = kennel_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Kennel_Supply.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            #others
+            for mfd in po:
+                t_amount = lump_sum*mfd.percent
+                q_item = int(t_amount / mfd.price)
+                t_item = t_amount - (q_item*mfd.price)
+                new_t_amount = q_item * mfd.price
+                others_total = others_total + new_t_amount
+                k9_value = k9_value + (t_amount/mfd.k9_count)
+                Actual_Others.objects.create(item=mfd.item,quantity=q_item,price=mfd.price,total=new_t_amount,percent=mfd.percent,proposal=ab)
+
+            k9_perc = int(lump_sum/k9_val)
+            k9_needed = k9_perc - (pb.k9_breeded + pb.k9_current)
+
+            o_total = (food_milk_total+vac_prev_total+medicine_total+vet_supply_total+kennel_total+others_total)
+            for_train = lump_sum - o_total
+            train_quantity = int(for_train/18000)
+            train_t = (train_quantity*18000)
+            total_k9 = pb.k9_current+k9_needed
+            total_total = o_total + train_t
+            petty_cash = lump_sum - total_total 
+
+            #save Actual Budget
+            ab.k9_needed = k9_needed
+            ab.food_milk_total = food_milk_total
+            ab.vac_prev_total = vac_prev_total
+            ab.medicine_total = medicine_total
+            ab.vet_supply_total = vet_supply_total
+            ab.kennel_total = kennel_total 
+            ab.others_total = others_total
+            ab.training_total = train_t
+            ab.train_count = train_quantity
+            ab.petty_cash = petty_cash
+            ab.save()
+
+        return redirect('planningandacquiring:budgeting_detail', id = id)
+           
+        print('CURRENT:',pb.k9_current)
+        print('BREEDED:',pb.k9_breeded)
+        print('PETTY CASH: ', petty_cash)
+        print('TRAINING TOTAL: ', train_t)
+        print('FOOD MILK: ', food_milk_total)
+        print('VACCINE: ', vac_prev_total)
+        print('MEDICINE: ', medicine_total)
+        print('VET SUPPLY: ', vet_supply_total)
+        print('KENNEL SUPPLY: ', kennel_total)
+        print('OTHERS: ', others_total)
+        print('TOTAL: ', lump_sum)
+        print('NEEDED  K9: ', k9_needed)
+        print('TOTAL  K9: ', total_k9)
 
     context = {
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'pb':pb,
+        'mf':mf,
+        'vp':vp,
+        'pm':pm,
+        'pvs':pvs,
+        'pks':pks,
+        'po':po,
+        'train_k9':train_k9,
+        'ab':ab,
+        'amf':amf,
+        'avp':avp,
+        'am':am,
+        'avs':avs,
+        'aks':aks,
+        'ao':ao,
+        'total_new':total_new,
     }
-
     return render(request, 'planningandacquiring/budgeting_detail.html', context)
 
 def budgeting_report(request):

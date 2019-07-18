@@ -13,17 +13,23 @@
     </div>
 {% if stat == True %}
 <div class="ui segment">
-        <table class="ui eight column celled table">
+        <table class="ui five column celled table">
             <thead>
                 <tr>
-                    <th>Breeded</th>
+                    <!-- <th>Estimated K9 Born Next Year</th>
                     <td>{{born_ny}}</td>
-                    <th>Next Year Current</th>
+                </tr>
+                <tr>
+                    <th>Estimated K9 Next Year</th>
                     <td>{{k9_ny}}</td>
-                    <th>Procured</th>
+                </tr>
+                <tr>
+                    <th>K9 Count to be Procured</th>
                     <td>{{need_procure_ny}}</td>
-                    <th>Total</th>
-                    <td>{{total_k9}}</td>
+                </tr> -->
+                <tr style="font-weight: bold;">
+                    <th colspan="4">Total K9</th>
+                    <td colspan="1">{{total_k9}}</td>
                 </tr>
             </thead>
             
@@ -225,7 +231,7 @@
         <table class="ui four column celled table">
             <thead>
                 <tr>
-                    <th colspan="5">Training</th>
+                    <th colspan="4">Training</th>
                 </tr>
                 <tr>
                     <th>Item</th>
@@ -241,8 +247,8 @@
                 {% endfor %}
                 </tr>
                 <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{mat_total|intcomma}}</td>
+                    <td colspan="3">Total Amount</td>
+                    <td colspan="1">{{train_total|intcomma}}</td>
                 </tr>
             </tbody>
         </table>

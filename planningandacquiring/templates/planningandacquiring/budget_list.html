@@ -10,32 +10,31 @@
     {% endif %}
 </div>
 
-<a class = "ui button green right aligned" href="">Generate Budget Proposal</a>
+<a class = "ui button green right aligned" href="{% url 'planningandacquiring:budgeting'%}">Generate Budget Proposal</a>
 
 
 <div class = "ui segment">
-
-		<table id="tabledata" class="ui four column celled table center aligned">
-        	<thead>
-          	<tr>
+        <table id="tabledata" class="ui four column celled table center aligned">
+        <thead>
+            <tr>
                 <th>Date Created</th>
                 <th>Year to Budget</th>
                 <th>Budget</th>
                 <th></th>
-          	</tr>
-    		</thead>
-            <tbody>
-                {% for data in data%}
-                <tr>
-                    <td>{{data.date_created}}</td>
-                    <td>{{data.year_budgeted|date:"Y"}}</td>>
-                    <td>{{data.grand_total|intcomma}}</td>
-                    <td>
-                        <a href="{% url 'planningandacquiring:budgeting_detail' data.id %}" class="ui basic tiny blue button">Select</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in data%}
+            <tr>
+                <td>{{data.date_created}}</td>
+                <td>{{data.year_budgeted|date:"Y"}}</td>
+                <td>{{data.grand_total|intcomma}}</td>
+                <td>
+                    <a href="{% url 'planningandacquiring:budgeting_detail' data.id %}" class="ui basic tiny blue button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 
