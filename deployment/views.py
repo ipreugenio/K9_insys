@@ -96,7 +96,9 @@ def user_session(request):
 
 def index(request):
     d = Daily_Refresher.objects.get(id=4)
-
+    # CAUTION : Only run this once
+    #Only uncomment this if you are populating db
+    mass_populate()
     context = {
       'title':'Deployment',
       'd':d,
@@ -106,13 +108,13 @@ def index(request):
 
 def mass_populate():
     # Generate all models related to a users, k9s and k9_requests (edit loop count in populate_db.py to change number of created objects
-    # generate_user() #generates 400 objects
-    # generate_k9() #generates 300 objects
-    # generate_area() # generate all regions
-    # generate_location() # generate a location per city
-    # generate_event() #generates 150 objects
-    # generate_incident() #generates 250 objects
-    # generate_maritime() # generates 500 objects
+    generate_user() #generates 400 objects
+    generate_k9() #generates 300 objects
+    generate_area() # generate all regions
+    generate_location() # generate a location per city
+    generate_event() #generates 150 objects
+    generate_incident() #generates 250 objects
+    generate_maritime() # generates 500 objects
 
     return None
 

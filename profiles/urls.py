@@ -15,6 +15,10 @@ urlpatterns = [
     path('handler-dashboard/', views.handler_dashboard, name='handler_dashboard'),
     path('vet-dashboard/', views.vet_dashboard, name='vet_dashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('commander-dashboard/', views.commander_dashboard, name='commander_dashboard'),
+    path('operations-dashboard/', views.operations_dashboard, name='operations_dashboard'),
+    path('trainer-dashboard/', views.trainer_dashboard, name='trainer_dashboard'),
+
     path('profile/', views.profile, name='profile'),
     path('notifications/', views.notif_list, name='notif_list'),
     path('register/', views.register, name='register'),
