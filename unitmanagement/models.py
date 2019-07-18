@@ -253,19 +253,25 @@ class VaccineUsed(models.Model):
 #TODO
 # Request Equipment Connect to K9_Pre_Deployment Equipments
 class Equipment_Request(models.Model):
-    CONCERN = (
-        ('Broken', 'Broken'),
-        ('Lost', 'Lost'),
-        ('Stolen', 'Stolen'),
-    )
-
     equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
-    concern = models.CharField('concern', max_length=100, choices=CONCERN, default="")
-    remarks = models.CharField('remarks', max_length=200, blank=True)
-    request_status = models.CharField('request_status', max_length=200, default="Pending")
-    date_approved = models.DateField('date_approved', blank=True, null=True)
+    status = models.CharField('status', max_length=200, default="Pending")
+
+class Medicine_Request(models.Model):
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField('date', auto_now_add=True)
+    status = models.CharField('status', max_length=200, default="Pending")
+
+class Food_Request(models.Model):
+    food = models.ForeignKey(Food, on_delete=models.CASCADE)
+    quantity = models.IntegerField('quantity', null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField('date', auto_now_add=True)
+    status = models.CharField('status', max_length=200, default="Pending")
 
 
 class Handler_On_Leave(models.Model):
@@ -306,7 +312,7 @@ class Handler_Incident(models.Model):
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='leader')
 
     def save(self, *args, **kwargs):
-        if incident == 'Died':
+        if self.incident == 'Died':
             self.handler.status = 'Died'
             self.handler.partnered = False
             self.handler.assigned = None
@@ -517,8 +523,6 @@ def account_create(sender, instance, **kwargs):
             instance.first_name = instance.username
             instance.last_name = 'Superuser'
             instance.save()
-            
-            
         
 
 

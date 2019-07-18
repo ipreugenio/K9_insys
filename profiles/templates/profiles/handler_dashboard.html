@@ -316,11 +316,12 @@ $(document).ready(function() {
                 {
                     id: "{{ i.id }}",
                     title: "{{ i.event_name}} - {{ i.location}}",
-                    start: '{{ i.start_date|date:"Y-m-d" }} {{ i.start_date|time:"H:i:s" }}',
-                    end: '{{ i.end_date|date:"Y-m-d" }} {{ i.end_date|time:"H:i:s" }}',
+                    start: '{{ i.start_date|date:"Y-m-d" }}',
+                    end: '{{ i.end_date|date:"Y-m-d" }}',
                     allDay: '{{ i.all_day|lower }}',
                 },
                 {% endfor %}
+
             ],
 
           eventClick : function(event, element){

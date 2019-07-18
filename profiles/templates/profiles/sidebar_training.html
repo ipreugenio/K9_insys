@@ -16,6 +16,12 @@
                             <i class="clipboard check icon"></i>Classify K9's
                         </a>
                     {% endif %}
+                    {% if request.session.session_user_position == "Trainer" %}
+                        <a class="item"> <b>Training Menu</b></a>
+                        <a href="{% url 'training:classify_k9_list'%}" class="item">
+                            <i class="clipboard check icon"></i>Classify K9's
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             <!>

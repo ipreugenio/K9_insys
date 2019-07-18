@@ -47,5 +47,16 @@ class add_education_form(forms.ModelForm):
 class add_user_account(UserCreationForm):
    
     class Meta:
-        model = Auth_User
-        fields = ('email', 'password1')
+        model = Account
+        fields = ('email_address', 'password')
+
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+        #model = Auth_User
+        #fields = ('email', 'password1')
+
+class DateForm(forms.Form):
+    from_date = forms.DateField(widget=DateInput())
+    to_date = forms.DateField(widget=DateInput())

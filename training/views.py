@@ -540,11 +540,20 @@ def classify_k9_select(request, id):
 
     for record in records:
         if record.training == "SAR":
-            SAR_list.append(round(Decimal(record.grade), 1))
+            try:
+                SAR_list.append(round(Decimal(record.grade), 1))
+            except:
+                SAR_list.append(0)
         if record.training == "NDD":
-            NDD_list.append(round(Decimal(record.grade), 1))
+            try:
+                NDD_list.append(round(Decimal(record.grade), 1))
+            except:
+                NDD_list.append(0)
         if record.training == "EDD":
-            EDD_list.append(round(Decimal(record.grade), 1))
+            try:
+                EDD_list.append(round(Decimal(record.grade), 1))
+            except:
+                EDD_list.append(0)
 
     if not SAR_list:
         SAR_list.append(0.0)
@@ -732,6 +741,7 @@ def classify_k9_select(request, id):
 
         style = "ui green message"
         messages.success(request, 'K9 has been successfully Classified!')
+
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
@@ -990,103 +1000,179 @@ def training_records(request):
     }
     return render(request, 'training/training_records.html', context)
 
+
 def training_update_form(request, id):
-    data = K9.objects.get(id=id) # get k9
-    training = Training.objects.filter(k9=data).get(training=data.capability) # get training record
-    form = TrainingUpdateForm(request.POST or None, instance = training)
+    data = K9.objects.get(id=id)  # get k9
+    training = Training.objects.filter(k9=data).get(training=data.capability)  #get training record
+    form = TrainingUpdateForm(request.POST or None, instance=training)
     handlerID = K9_Handler.objects.filter(k9=data)
-    form2 = RecordForm(request.POST or None)
+    #form2 = RecordForm(request.POST or None)
+    average = 0
 
+    stage = ""
     if request.method == 'POST':
-        if form2.is_valid():
-            record = form2.save(commit=False)
-            record.k9 = data
-            record.handler = handlerID.handler
-            record.save()
+        if data.training_status == 'On-Training':
 
-        #save training status
-        if training.stage1_1 == True:
-            training.stage1_1 = training.stage1_1
-        else:
-            training.stage1_1 = bool(request.POST.get('stage1_1'))
-        if training.stage1_2 == True:
-            training.stage1_2 = training.stage1_2
-        else:
-            training.stage1_2 = bool(request.POST.get('stage1_2'))
-        if training.stage1_3 == True:
-            training.stage1_3 = training.stage1_3
-        else:
-            training.stage1_3 = bool(request.POST.get('stage1_3'))
-        if training.stage2_1 == True:
-            training.stage2_1 = training.stage2_1
-        else:
-            training.stage2_1 = bool(request.POST.get('stage2_1'))
-        if training.stage2_2 == True:
-            training.stage2_2 = training.stage2_2
-        else:
-            training.stage2_2 = bool(request.POST.get('stage2_2'))
-        if training.stage2_3 == True:
-            training.stage2_3 = training.stage2_3
-        else:
-            training.stage2_3 = bool(request.POST.get('stage2_3'))
-        if training.stage3_1 == True:
-            training.stage3_1 = training.stage3_1
-        else:
-            training.stage3_1 = bool(request.POST.get('stage3_1'))
-        if training.stage3_2 == True:
-            training.stage3_2 = training.stage3_2
-        else:
-            training.stage3_2 = bool(request.POST.get('stage3_2'))
-        if training.stage3_3 == True:
-            training.stage3_3 = training.stage3_3
-        else:
-            training.stage3_3 = bool(request.POST.get('stage3_3'))
+            if training.stage == "Stage 0":
+                stage1_1 = request.POST.get('stage1_1')
+                if stage1_1 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = (Decimal(average) + Decimal(stage1_1))
+                    stage = "Stage 1.1"
+                    print(stage1_1)
 
-        training.remarks = request.POST.get('remarks')
-        training.grade = request.POST.get('grade')
+                    print(average)
+                    training.stage = stage
+                    training.stage1_1 = stage1_1
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 1.1":
+                stage1_2 = request.POST.get('stage1_2')
+                print("STAGE 1")
+                print(stage1_2)
+                if stage1_2 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = (Decimal(average) + Decimal(stage1_2))
+                    stage = "Stage 1.2"
+                    print(stage1_2)
+                    print(average)
+                    training.stage = stage
+                    training.stage1_2 = stage1_2
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 1.2":
+                stage1_3 = request.POST.get('stage1_3')
+                if stage1_3 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = (Decimal(average) + Decimal(stage1_3))
+                    stage = "Stage 1.3"
+                    training.stage = stage
+                    training.stage1_3 = stage1_3
+                    data.training_level = stage
+                    print(stage1_3)
+                    print(average)
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 1.3":
+                stage2_1 = request.POST.get('stage2_1')
+                if stage2_1 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = Decimal(average) + Decimal(stage2_1)
+                    stage = "Stage 2.1"
+                    training.stage = stage
+                    training.stage2_1 = stage2_1
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 2.1":
+                stage2_2 = request.POST.get('stage2_2')
+                if stage2_2 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = Decimal(average) + Decimal(stage2_2)
+                    stage = "Stage 2.2"
+                    training.stage = stage
+                    training.stage2_2 = stage2_2
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 2.2":
+                stage2_3 = request.POST.get('stage2_3')
+                if stage2_3 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = Decimal(average) + Decimal(stage2_3)
+                    stage = "Stage 2.3"
+                    training.stage = stage
+                    training.stage2_3 = stage2_3
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 2.3":
+                stage3_1 = request.POST.get('stage3_1')
+                if stage3_1 == '0':
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = Decimal(average) + Decimal(stage3_1)
+                    stage = "Stage 3.1"
+                    training.stage = stage
+                    training.stage3_1 = stage3_1
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 3.1":
+                stage3_2 = request.POST.get('stage3_2')
+                if stage3_2 == 0:
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:classify_k9_list')
+                else:
+                    average = Decimal(average) + Decimal(stage3_2)
+                    stage = "Stage 3.2"
+                    training.stage = stage
+                    training.stage3_2 = stage3_2
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:classify_k9_list')
+            elif training.stage == "Stage 3.2":
+                stage3_3 = request.POST.get('stage3_3')
+                if stage3_3 == 0:
+                    data.training_status = "For-Adoption"
+                    data.save()
+                    return redirect('training:training_update_form', id=id)
+                else:
+                    average = Decimal(average) + Decimal(stage3_3)
+                    stage = "Finished Training"
+                    training.stage = stage
+                    training.stage3_3 = stage3_3
+                    data.training_level = stage
+                    data.save()
+                    training.save()
+                    return redirect('training:training_update_form', id=id)
 
-        training.save()
-        data.save()
+            if training.stage == "Finished Training":
+                training.grade = (Decimal(average) / 9)
+                training.remarks = request.POST.get('remarks')
+                data.training_status = "Trained"
+                data.training_level = stage
+                data.save()
+                training.save()
+            else:
+                data.training_status = "On-Training"
 
-        stage = "Stage 0"
+            messages.success(request, 'Training Progress has been successfully Updated!')
 
-        if training.stage3_3 == True:
-            stage = "Finished Training"
-        elif training.stage3_2 == True:
-            stage = "Stage 3.2"
-        elif training.stage3_1 == True:
-            stage= "Stage 3.1"
-        elif training.stage2_3 == True:
-            stage = "Stage 2.3"
-        elif training.stage2_2 == True:
-            stage = "Stage 2.2"
-        elif training.stage2_1 == True:
-            stage = "Stage 2.1"
-        elif training.stage1_3 == True:
-            stage = "Stage 1.3"
-        elif training.stage1_2 == True:
-            stage = "Stage 1.2"
-        elif training.stage1_1 == True:
-            stage = "Stage 1.1"
+            return redirect('training:classify_k9_list')
 
-        training.stage = stage
-        training.save()
-
-        if training.stage == "Finished Training":
-            data.training_status = "Trained"
-
-            if training.grade == "75.0":
-                data.training_status = "For-Adoption"
-        else:
-            data.training_status = "On-Training"
-
-        data.training_level = stage
-        data.save()
-        messages.success(request, 'Training Progress has been successfully Updated!')
-
-        return redirect('training:training_update_form', id = id)
-    
-    #NOTIF SHOW
+    # NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
@@ -1094,10 +1180,10 @@ def training_update_form(request, id):
         'title': data.name,
         'data': data,
         'form': form,
-        'form2': form2,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'training': training,
     }
 
     if data.capability == 'EDD':

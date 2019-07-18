@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="ui segment" style="padding:20px;">
-    <h3 class="ui header">
+    <h2 class="ui header">
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,19 +12,20 @@
   <link rel="stylesheet" type="text/css" href="{'% static 'cal/css/styles.css' %}">
         K9 Request List
         <div class="sub header">Select a request to start scheduling k9 units.</div>
-    </h3>
+    </h2>
 </div>
 
-
-<table id="tabledata" class="ui nine column celled table">
+<div class = "ui segment">
+<table id="tabledata" class="ui celled table">
         <thead>
             <tr>
                 <th>Start date</th>
                 <th>End date</th>
                 <th>Duration</th>
                 <th>Requester</th>
-                <th>Place</th>
+                <th>Event Name</th>
 
+                <th>Place</th>
                 <th>K9s Requested</th>
                 <th>K9s Deployed</th>
 
@@ -42,6 +43,7 @@
                         <td>{{Data.end_date}}</td>
                          <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
+                        <td>{{Data.event_name}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.k9s_needed}}</td>
                         <td>{{Data.k9s_deployed}}</td>
@@ -57,6 +59,7 @@
                          <td>{{Data.end_date}}</td>
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
+                        <td>{{Data.event_name}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.k9s_needed}}</td>
 
@@ -74,6 +77,7 @@
                         <td>{{Data.end_date}}</td>
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
+                        <td>{{Data.event_name}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.k9s_needed}}</td>
                         <td>{{Data.k9s_deployed}}</td>
@@ -89,6 +93,7 @@
                         <td>{{Data.requester}}</td>
                         <td>{{Data.duration}} days</td>
                         <td>{{Data.requester}}</td>
+                        <td>{{Data.event_name}}</td>
                         <td>{{Data.location}}</td>
                         <td>{{Data.total_dogs_demand}}</td>
 
@@ -103,14 +108,16 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 
 <script type="text/javascript">
 
-	 $('#tabledata').DataTable( {
+	$(document).ready(function() {
+		$('#tabledata').DataTable( {
         "order": [[ 0, "desc" ]]
-        });
-
+    });
 		$('.menu .item').tab();
+	});
 </script>
 
 

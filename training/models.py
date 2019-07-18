@@ -6,6 +6,8 @@ from deployment.models import Location
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import date as d
+import ast
+from decimal import *
 # Create your models here.
 
 class K9_Genealogy(models.Model):
@@ -31,20 +33,29 @@ class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     training = models.CharField('training', max_length=50, default="None")
     stage = models.CharField('stage', max_length=200, default="Stage 0")
-    stage1_1 = models.BooleanField(default=False)
-    stage1_2 = models.BooleanField(default=False)
-    stage1_3 = models.BooleanField(default=False)
-    stage2_1 = models.BooleanField(default=False)
-    stage2_2 = models.BooleanField(default=False)
-    stage2_3 = models.BooleanField(default=False)
-    stage3_1 = models.BooleanField(default=False)
-    stage3_2 = models.BooleanField(default=False)
-    stage3_3 = models.BooleanField(default=False)
-    grade = models.CharField('grade', max_length=50, default='No Grade Yet')
+    stage1_1 = models.CharField('stage1_1', blank=True, null=True, max_length=500, default="0")
+    stage1_2 = models.CharField('stage1_2', blank=True, null=True, max_length=500, default="0")
+    stage1_3 = models.CharField('stage1_3', blank=True, null=True, max_length=500, default="0")
+    stage2_1 = models.CharField('stage2_1', blank=True, null=True, max_length=500, default="0")
+    stage2_2 = models.CharField('stage2_2', blank=True, null=True, max_length=500, default="0")
+    stage2_3 = models.CharField('stage2_3', blank=True, null=True, max_length=500, default="0")
+    stage3_1 = models.CharField('stage3_1', blank=True, null=True, max_length=500, default="0")
+    stage3_2 = models.CharField('stage3_2', blank=True, null=True, max_length=500, default="0")
+    stage3_3 = models.CharField('stage3_3', blank=True, null=True, max_length=500, default="0")
+    grade = models.CharField('grade', blank=True, null=True, max_length=500)
     remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
         return str(self.k9) +' - ' + str(self.training) +' : ' + str(self.stage)
+
+    def save(self, *args, **kwargs):
+
+        average = Decimal(self.stage1_1) + Decimal(self.stage1_2) + Decimal(self.stage1_3) + Decimal(self.stage2_1) + Decimal(self.stage2_2) + Decimal(self.stage2_3) + Decimal(self.stage3_1) + Decimal(self.stage3_2) + Decimal(self.stage3_3)
+        average = average/ Decimal(9)
+        average = round(average)
+        self.grade = average
+
+        super(Training, self).save(*args, **kwargs)
 
 class Training_History(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)

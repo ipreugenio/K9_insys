@@ -51,5 +51,3 @@ def capability(List, i):
 
     return capability
 
-
-
