@@ -432,6 +432,7 @@ def generate_k9():
         k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement")
         k9.save()
 
+        #TODO get supplier and randomize the k9's supplier
         if k9.source == "Procurement":
             contact = "+63" + fake.msisdn()[:10]
             supplier = K9_Supplier.objects.create(name = fake.name(), organization = fake.company(), address = fake.address(), contact_no = contact)
@@ -824,3 +825,9 @@ def generate_maritime():
 #ADVANCED POPULATE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+def generate_breed():
+   
+    arr = ['Belgian Malinois','Dutch Sheperd','German Sheperd','Golden Retriever','Jack Russel','Labrador Retriever']
+
+    for data in arr:
+        Dog_Breed.objects.create(breed=data,life_span=10,temperament='Friendly',colors='Black',weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)

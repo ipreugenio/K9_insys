@@ -857,6 +857,8 @@ def budgeting(request):
                 percentage = Decimal(item4/grand_total)
                 Proposal_Others.objects.create(item=item1, price=item2,quantity=item3, total=item4,percent=percentage,proposal=pb,k9_count=item5)
 
+        return redirect('planningandacquiring:budget_list')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -2622,62 +2624,6 @@ def detailed_budgeting(request):
 
 ################# END BUDGETING ###################
 
-
-def load_supplier(request):
-
-    supplier = None
-
-    try:
-        supplier_id = request.GET.get('supplier')
-        supplier = K9_Supplier.objects.get(id=supplier_id)
-    except:
-        pass
-    context = {
-        'supplier': supplier,
-    }
-
-    return render(request, 'planningandacquiring/supplier_data.html', context)
-
-def load_k9_reco(request):
-
-    h_count_arr = []
-    k9_arr = []
-    b_arr = []
-
-    try:
-        id = request.GET.get('id')
-        k9 = K9.objects.get(id=id)
-        k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte = 1).order_by('-litter_no')
-        
-        for k in k9_data:
-            h_count = Health.objects.filter(dog=k).count()
-            h_count_arr.append(h_count)   
-            k9_arr.append(k)
-
-            birth = K9_Litter.objects.filter(father=k).aggregate(sum=Sum('litter_no'))['sum']
-            death = K9_Litter.objects.filter(father=k).aggregate(sum=Sum('litter_died'))['sum']
-
-            if birth != None or death != None:
-                total = (birth / (birth+death)) * 100
-            else:
-                total=100
-            
-            b_arr.append(int(total))
-
-    except:
-        pass
-    print(k9_arr)
-    print(b_arr)
-    flist = zip(k9_arr,h_count_arr, b_arr)
-
-    context = {
-        'k9': k9,
-        'flist':flist,
-    }
-
-    return render(request, 'planningandacquiring/breeding_reco_data.html', context)
-
-
 def accomplishment_date(request):
     form = DateForm(request.POST or None)
 
@@ -2688,8 +2634,14 @@ def accomplishment_date(request):
         request.session["to_date"] = to_date
         return HttpResponseRedirect('accomplishment_report/')
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/accomplishment_date.html', context)
@@ -2703,8 +2655,10 @@ def accomplishment_report(request):
     sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Search and Rescue Related")
     others = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type="Others")
 
-    user = user_session(request)
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
 
     context = {
         'from_date': from_date,
@@ -2713,6 +2667,8 @@ def accomplishment_report(request):
         'narcotics': narcotics,
         'sar': sar,
         'others': others,
+        'notif_data': notif_data,
+        'count': count,
         'user': user,
     }
 
@@ -2728,8 +2684,14 @@ def vet_date(request):
         request.session["to_date"] = to_date
         return HttpResponseRedirect('vet_report/')
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/vet_date.html', context)
@@ -2798,6 +2760,9 @@ def vet_report(request):
             print(health_distinct)
             print(health_count)
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
 
     context = {
         'from_date': from_date,
@@ -2806,6 +2771,9 @@ def vet_report(request):
         'vu_data': vu_data,
         'med_data': med_data,
         'sick_data': sick_data,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/vet_report.html', context)
@@ -2820,8 +2788,14 @@ def inventory_date(request):
         request.session["to_date"] = to_date
         return HttpResponseRedirect('inventory_report/')
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/inventory_date.html', context)
@@ -2832,9 +2806,9 @@ def inventory_report(request):
     to_date = request.session["to_date"]
     user = user_session(request)
 
-
-
-
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
     context = {
         'from_date': from_date,
         'to_date': to_date,
@@ -2843,6 +2817,63 @@ def inventory_report(request):
     }
 
     return render(request, 'planningandacquiring/inventory_report.html', context)
+    
+
+###################################### AJAX LOAD FUNCTIONS ##################################################
+def load_supplier(request):
+
+    supplier = None
+
+    try:
+        supplier_id = request.GET.get('supplier')
+        supplier = K9_Supplier.objects.get(id=supplier_id)
+    except:
+        pass
+    context = {
+        'supplier': supplier,
+    }
+
+    return render(request, 'planningandacquiring/supplier_data.html', context)
+
+def load_k9_reco(request):
+
+    h_count_arr = []
+    k9_arr = []
+    b_arr = []
+
+    try:
+        id = request.GET.get('id')
+        k9 = K9.objects.get(id=id)
+        k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte = 1).order_by('-litter_no')
+        
+        for k in k9_data:
+            h_count = Health.objects.filter(dog=k).count()
+            h_count_arr.append(h_count)   
+            k9_arr.append(k)
+
+            birth = K9_Litter.objects.filter(father=k).aggregate(sum=Sum('litter_no'))['sum']
+            death = K9_Litter.objects.filter(father=k).aggregate(sum=Sum('litter_died'))['sum']
+
+            if birth != None or death != None:
+                total = (birth / (birth+death)) * 100
+            else:
+                total=100
+            
+            b_arr.append(int(total))
+
+    except:
+        pass
+    print(k9_arr)
+    print(b_arr)
+    flist = zip(k9_arr,h_count_arr, b_arr)
+
+    context = {
+        'k9': k9,
+        'flist':flist,
+    }
+
+    return render(request, 'planningandacquiring/breeding_reco_data.html', context)
+    
 def load_health(request):
 
     health = None
