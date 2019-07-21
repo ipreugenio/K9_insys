@@ -38,15 +38,16 @@ urlpatterns = [
     path('breed_list/', views.breed_list, name='breed_list'),
     path('breed_detail/<int:id>', views.breed_detail, name='breed_detail'),
     path('mating_confirmed/', views.mating_confirmed, name='mating_confirmed'),
-
     path('breeding_list/', views.breeding_list, name='breeding_list'),
     path('breeding_k9_confirmed/', views.breeding_k9_confirmed, name='breeding_k9_confirmed'),
-    
     path('add_supplier/', views.add_supplier, name='add_supplier'),
     path('add_procured_k9/', views.add_procured_k9, name='add_procured_k9'),
     
     path('add_procured_k9/ajax_load_supplier', views.load_supplier, name='ajax_load_supplier'),
     path('add_K9_parents_form/ajax_load_k9_reco', views.load_k9_reco, name='ajax_load_k9_reco'),
+    
+
+    path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
 
     path('accomplishment_date/', views.accomplishment_date, name='accomplishment_date'),
     path('accomplishment_date/accomplishment_report/', views.accomplishment_report, name='accomplishment_report'),
@@ -58,6 +59,7 @@ urlpatterns = [
     path('inventory_date/inventory_report/', views.inventory_report, name='inventory_report'),
     path('add_K9_parents_form/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('add_K9_offspring/ajax_load_form', views.load_form, name='ajax_load_form'),
+    path('add_procured_k9/ajax_load_form_procured', views.load_form_procured, name='ajax_load_form_procured'),
 
 ];
 

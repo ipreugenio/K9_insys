@@ -69,9 +69,16 @@
 <script>
   $(document).ready(function() {
 
-      $("input[name='litter_died']").change(function () {
+    $("input[name='litter_died']").change(function () {
         var url = 'ajax_load_form';  
-        var num =  $("input[name='litter_number']").val() - $("input[name='litter_died']").val()
+        var litter_died = $("input[name='litter_died']").val();
+        var litter_number = $("input[name='litter_number']").val();
+        
+        if (litter_died == null){
+            litter_died=0
+        }
+        
+        var num =  litter_number - litter_died
         
         $.ajax({                       
         url: url,                    
@@ -83,6 +90,29 @@
         }
         });
     });
+
+    $("input[name='litter_number']").change(function () {
+        var url = 'ajax_load_form';  
+        var litter_died = $("input[name='litter_died']").val();
+        var litter_number = $("input[name='litter_number']").val();
+        
+        if (litter_died == null){
+            litter_died=0
+        }
+        
+        var num =  litter_number - litter_died
+        
+        $.ajax({                       
+        url: url,                    
+        data: {
+            'num': num      
+        },
+        success: function (data) {   
+            $("#id_form_data").html(data);  
+        }
+        });
+    });
+
   });
 </script>
 {% endblock %}

@@ -1,18 +1,21 @@
 {% extends "profiles/sidebar_pa.html" %} {% block content %}
 {% load humanize %}
 {% load um_tags %}
-
-<div class="ui inverted segment">
-    <center>
-        <h2>Budget for the Year {{pb.year_budgeted|date:"Y"}}</h2>
-    </center>
-</div>
 {% if ab %}
 <div class="ui top attached tabular menu">
     <a class="active item" data-tab="first">Actual Budget</a>
     <a class="item" data-tab="second">Proposed Budget</a>
   </div>
   <div class="ui bottom attached active tab segment" data-tab="first">
+        <center>
+                <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+                <br>Philippine Coast Guard
+                <br>Maritime Security Command
+                    <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
+                <br>Coast Guard Base Taguig
+                <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
+                    <br><b>Budget for the Year {{pb.year_budgeted|date:"Y"}}</b>
+        </center>
     <table class="ui five column celled table">
         <thead>
             <tr>
@@ -311,6 +314,15 @@
   </div>
   <div class="ui bottom attached tab segment" data-tab="second">
     {% if mf %}
+    <center>
+            <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+            <br>Philippine Coast Guard
+            <br>Maritime Security Command
+                <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
+            <br>Coast Guard Base Taguig
+            <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
+                <br><b>Budget for the Year {{pb.year_budgeted|date:"Y"}}</b>
+    </center>
 <table class="ui five column celled table">
         <thead>
             <tr>

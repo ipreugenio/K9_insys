@@ -37,6 +37,7 @@ urlpatterns = [
     path('view_graph/<int:id>', views.view_graphs, name='view_graph'),
 
     path('training/assign-k9/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
+    # path('training/list-classify-k9/ajax_load_k9', views.load_k9, name='ajax_load_k9'),
     #path('/<int:id>/', views., name=''),
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
 ];

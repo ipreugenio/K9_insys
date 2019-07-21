@@ -1,0 +1,60 @@
+
+{% load static %}
+{% block content %}
+{%if k9%}
+    <div class="header">{{k9}}</div>
+    <div class="image scrolling content">
+        <img class="image" src="{{k9.image.url}}" style="position:relative; width: 350px;height: 300px;" >
+        <div class="description">
+            <form action="" class="ui form">
+                <div class="four fields">
+                    <div class="field">
+                        <label>Name</label>
+                        <input type="text" value="{{k9.name}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Breed</label>
+                        <input type="text" value="{{k9.breed}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Sex</label>
+                        <input type="text" value="{{k9.sex}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Age</label>
+                        <input type="number" value="{{k9.age}}" readonly>
+                    </div>
+                </div>
+                <div class="four fields">
+                        <div class="field">
+                            <label>Capability</label>
+                            <input type="text" value="{{k9.capability}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Height</label>
+                            <input type="number" value="{{k9.height}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Weight</label>
+                            <input type="number" value="{{k9.weight}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Training Score</label>
+                            <input type="text" value="training Score" readonly>
+                        </div>
+                    </div>
+                    <div>
+                        <h1>TRAINING REMARKS HERE</h1>
+                    </div>
+                </form>
+
+            
+        </div>
+    </div>
+    <div class="actions">
+        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
+        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>    
+    </div>
+{%endif%}
+{% endblock %}
+

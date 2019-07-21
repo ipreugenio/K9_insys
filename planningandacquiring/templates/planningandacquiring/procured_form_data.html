@@ -1,0 +1,53 @@
+
+{% load static %}
+{% block content %}
+
+<div class="six fields center aligned">
+    <div class="field">
+        <label>Name</label>
+    </div>    
+    <div class="field">
+        <label>Birthdate</label>
+    </div> 
+    <div class="field">
+        <label>Breed</label>
+    </div> 
+    <div class="field">
+        <label>Color</label>
+    </div> 
+    <div class="field">
+        <label>Sex</label>
+    </div> 
+    <div class="field">
+        <label>Image</label>
+    </div>    
+</div>
+
+<div class="ui inverted segment">
+    {% for form in formset %}
+    <div class="formset_class " id="{{ form.prefix }}-row">
+        <div class="six fields">
+        <div class="field">
+            {{form.name}}
+        </div>    
+        <div class="field">
+            {{form.birth_date}}
+        </div> 
+        <div class="field">
+            {{form.breed}}
+        </div> 
+        <div class="field">
+            {{form.color}}
+        </div> 
+        <div class="field">
+            {{form.sex}}
+        </div> 
+        <div class="field">
+            {{form.image}}
+        </div>    
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

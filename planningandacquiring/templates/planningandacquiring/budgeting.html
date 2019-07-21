@@ -1,18 +1,17 @@
 {% extends "profiles/sidebar_pa.html" %}  
 {% load humanize %}
 {% block content %}
-<div class="ui center aligned inverted segment" style="padding:20px;">
-       
-        <h3 class="ui header">Budget Proposal as of {{today|date:"F Y"}} for the year {{next_year}}</h3>
-      
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{{style}}" > {{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
 {% if stat == True %}
 <div class="ui segment">
+        <center>
+                <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+                <br>Philippine Coast Guard
+                <br>Maritime Security Command
+                    <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
+                <br>Coast Guard Base Taguig
+                <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
+                    <br><b>Budget Proposal as of {{today|date:"F Y"}} for the year {{next_year}}</b>
+        </center>
         <table class="ui five column celled table">
             <thead>
                 <tr>
@@ -319,6 +318,12 @@
     Dont have enought data on k9's and inventory.
 </div>
 {% endif %}
+{{need_procure_ny}}
+<input type="number" id = 'input1' oninput="theinput.value=input1.value-input2.value">
+<input type="number" id = 'input2' oninput="theinput.value=input1.value-input2.value">
+
+<input type="number" name="" id="theinput" readonly>
+
 <script type="text/javascript">
             
         $(document).ready(function() {

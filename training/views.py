@@ -19,6 +19,7 @@ import datetime
 from deployment.models import Team_Assignment, Daily_Refresher
 from django.db.models import Sum
 from decimal import Decimal
+from django.db.models import Q
 
 import itertools
 
@@ -33,7 +34,6 @@ import plotly.graph_objs as go
 import plotly.graph_objs.layout as lout
 
 #print(pd.__version__) #Version retrieved is not correct
-
 def notif(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
@@ -304,12 +304,6 @@ def classify_k9_list(request):
     if not SAR_demand:
         SAR_demand = 0
 
-    print("UNCLASSIFIED DOGS")
-    print(data_unclassified)
-
-    '''
-    if k9 has failed 2 training records, disable reasign button
-    '''
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()

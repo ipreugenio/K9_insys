@@ -13,6 +13,8 @@
     {% endif %}
 
 </div>
+
+{% if request.session.session_user_position == "Trainer"%}
 <center>
         <div class="ui three statistics">
       <div class="statistic">
@@ -41,57 +43,42 @@
       </div>
     </div>
     </center>
-
+{% endif %}
 
 <div class="ui top attached tabular menu">
-    {% if messages %}
-        {% for message in messages %}
+        {% if messages %}
+            {% for message in messages %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                {% if message.message == 'On-Training' %}
+                <a class="item" data-tab="first">Unclassified</a>
+                <a class="item active" data-tab="third">On-Training</a>
+                {% else %}
+                <a class="item active" data-tab="first">Unclassified</a>
+                    <a class="item" data-tab="third">On-Training</a>
+                {% endif %}
+            {% endif %}
+            {% endfor %}
+        {%else%}
+        <a class="item active" data-tab="first">Unclassified</a>
+        <a class="item" data-tab="third">On-Training</a>
+        {% endif %}
+</div>
+
+{% if messages %}
+    {% for message in messages %}
         {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-            {% if message.message == 'Trained' %}
-            <a class="item" data-tab="first">Unclassified</a>
-           <!-- <a class="item" data-tab="second">Classified</a>-->
-            <a class="item" data-tab="third">On-Training</a>
-          <!--  <a class="item active" data-tab="fourth">Trained</a>-->
-
-            {% elif message.message == 'On-Training' %}
-            <a class="item" data-tab="first">Unclassified</a>
-          <!--  <a class="item" data-tab="second">Classified</a>-->
-            <a class="item active" data-tab="third">On-Training</a>
-          <!--  <a class="item" data-tab="fourth">Trained</a>-->
-
+            {% if message.message == 'Unclassified' %}
+            <div class="ui tab segment active" data-tab="first">
             {% else %}
-            <a class="item" data-tab="first">Unclassified</a>
-          <!--  <a class="item active" data-tab="second">Classified</a>-->
-            <a class="item" data-tab="third">On-Training</a>
-          <!--  <a class="item" data-tab="fourth">Trained</a>-->
-            
+            <div class="ui tab segment" data-tab="first">
             {% endif %}
         {% endif %}
     {% endfor %}
 
-    {%else%}
-        <a class="item active" data-tab="first">Unclassified</a>
-        <!--<a class="item" data-tab="second">Classified</a>-->
-        <a class="item" data-tab="third">On-Training</a>
-       <!-- <a class="item" data-tab="fourth">Trained</a>-->
-    {%endif%}
-</div>
-           
-{% if messages %}
-{% for message in messages %}
-{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    {% if message.message == 'Trained' %}
-    <div class="ui tab segment" data-tab="first">
-    {% else %}
-    <div class="ui tab segment" data-tab="first">
-    {% endif %}
-{% endif %}
-{% endfor %}
-
 {%else%}
-<div class="ui tab segment active" data-tab="first">
+    <div class="ui tab segment active" data-tab="first">
 {%endif%}           
-
+  
     <table id="tabledata1" class="ui seven column celled table">
         <thead>
             <tr>
@@ -100,7 +87,6 @@
                 <th>Color</th>
                 <th>Sex</th>
                 <th>Age</th>
-                <th>Classification</th>
                 <th></th>
             </tr>
         </thead>
@@ -112,11 +98,6 @@
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
                 <td>{{data_unclassified.age}}</td>
-                {% if data_unclassified.capability == "None" %}
-                    <td>Unassigned</td>
-                {% else %}
-                    <td>{{data_unclassified.capability}}</td>
-                {% endif %}
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -125,47 +106,17 @@
         </tbody>
     </table>
 </div>
-<!--<div class="ui tab segment" data-tab="second">
-    <table id="tabledata2" class="ui seven column celled table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Breed</th>
-                <th>Color</th>
-                <th>Sex</th>
-                <th>Age</th>
-                <th>Classification</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data_classified in data_classified %}
-            <tr>
-                <td>{{data_classified.name}}</td>
-                <td >{{data_classified.breed}}</td>
-                <td>{{data_classified.color}}</td>
-                <td >{{data_classified.sex}}</td>
-                <td>{{data_classified.age}}</td>
-                <td>{{data_classified.capability}}</td>
-                <td style="text-align:center;">
-                    <a href="{% url 'training:assign_k9_select' data_classified.id %}" class = "tiny ui blue basic button">Select</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>-->
 
 {% if messages %}
-{% for message in messages %}
-{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    {% if message.message == 'On-Training' %}
-    <div class="ui tab segment active" data-tab="third">
-    {% else %}
-    <div class="ui tab segment" data-tab="third">
-    {% endif %}
-{% endif %}
-{% endfor %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            {% if message.message == 'On-Training' %}
+            <div class="ui tab segment active" data-tab="third">
+            {% else %}
+            <div class="ui tab segment" data-tab="third">
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
 {%else%}
 <div class="ui tab segment" data-tab="third">
@@ -199,7 +150,6 @@
               {% else %}
 
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <!-- <a href="{% url 'training:classify_k9_select' data_ontraining.id %}" class = "tiny ui orange basic button reassign">Reassign</a> -->
               <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
               {% endif %}
             </td>
@@ -208,62 +158,14 @@
     </tbody>
 </table>
 </div>
-<!--{% if messages %}
-{% for message in messages %}
-{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    {% if message.message == 'Trained' %}
-    <div class="ui tab segment active" data-tab="fourth">
-    {% else %}
-    <div class="ui tab segment" data-tab="fourth">
-    {% endif %}
-{% endif %}
-{% endfor %}
-
-{%else%}
-<div class="ui tab segment" data-tab="fourth">
-{%endif%}           
-
-<table id="tabledata4" class="ui celled table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Breed</th>
-            <th>Color</th>
-            <th>Sex</th>
-            <th>Age</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data_trained in data_trained %}
-        <tr>
-            <td>{{data_trained.name}}</td>
-            <td >{{data_trained.breed}}</td>
-            <td>{{data_trained.color}}</td>
-            <td >{{data_trained.sex}}</td>
-            <td>{{data_trained.age}}</td>
-
-            <td style="text-align:center;" class="five wide">
-                <a href="{% url 'training:assign_k9_duty' data_trained.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
-                <a href="{% url 'training:assign_k9_duty' data_trained.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>
-
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</div>-->
-    </div></div></div></div></div></div>
-
 
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
         $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
         $('.menu .item').tab();
+
     });
 
 </script>

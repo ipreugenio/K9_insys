@@ -1,0 +1,55 @@
+{% extends "profiles/sidebar_um.html" %}
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ title }}</h3>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="ui green message" > {{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+</div>
+<div class="ui segment">
+    <table id="tabledata1" class="ui celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Breed</th>
+                <th>Color</th>
+                <th>Sex</th>
+                <th>Age</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in data %}
+            <tr>
+                <td>{{data.name}}</td>
+                <td >{{data.breed}}</td>
+                <td>{{data.color}}</td>
+                <td >{{data.sex}}</td>
+                <td>{{data.age}}</td>
+                <td style="text-align:center;" class="two wide">
+                    <a href="{% url 'unitmanagement:choose_handler_list' data.id %}" class="ui tiny basic blue button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable();
+        $('.menu .item').tab();
+
+    });
+
+</script>
+ {% endblock %}
