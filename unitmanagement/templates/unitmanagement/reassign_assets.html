@@ -1,98 +1,106 @@
-{% extends "profiles/sidebar_um.html" %}  
+{% extends "profiles/sidebar_training.html" %}
 
 {% block content %}
-{% load static %}
-<div class="ui basic segment" style="margin-bottom:0px;">
-    <h2 class="ui header">
-        {{title}}
-        <div class="sub header">Reassign K9 and Handler</div>
-    </h2>
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui header">{{ Title }}</h3>
     {% if messages %}
         {% for message in messages %}
-            <div class="{{style}}" > {{ message }}</div>
+            <div class="ui green message" > {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
-<div class="ui inverted segment"  ng-controller="cont2" ng-app='notification'>
-        <form class="ui inverted form" method="POST">
-                {% csrf_token %}
-                <div class="ui inverted placeholder segment">
-                    <div class="ui two column stackable center aligned grid">
-                        <div class="ui inverted vertical divider">AND</div>
-                        <div class="middle aligned row">
-                            <div class="column">
-                                <div class="ui inverted icon header">
-                                    <i class="paw icon"></i>K9
-                                </div>
-                                <div class="field">
-                                    {{form.k9}}
-                                </div>
-                            </div>
-                            <div class="column">
-                                <div class="ui inverted icon header">
-                                <i class="male icon"></i>Handler
-                                </div>
-                                <div class="field">
-                                    {{form.handler}}
-                                </div>
-                            </div>
-                        </div>
+
+<div class="ui segment">
+   <div class='ui centered grid'>
+        <div class='two column row'>
+            <div class='column center aligned'>
+               
+            <div class="image">
+                <center>
+                    <img src="{{k9.image.url}}" style="max-width: 280px;">
+                </center>
+                    
+            </div>
+            <div class="content">
+                    <a class="header">{{k9}}</a>
+                    <div class="meta">
+                        <strong>Age: {{k9.age}}</strong><br>
+                        <strong>Breed: {{k9.breed}}</strong><br>
+                        <strong>Sex: {{k9.sex}}</strong>
                     </div>
                 </div>
-                <div class="ui inverted center aligned segment" style="padding: 0px;">
-                        <button ng-click="reassign()" onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+                <div class="extra content">
+                    <h3>{{k9.capability}}</h3>
                 </div>
-            </form> 
-    <div>{{num}}</div>
-    <p id= 'k9_id'>this is</p>
+            </div>
+            <div class='column center aligned' id='id_handler_data'> 
+            </div>
 
-   
-    <select name="k" id="k">
-            {% for k9 in k9 %}
-            <option value="{{k9.capability}}">{{k9.name}}</option>
-            {% endfor %}
-    </select>
-    
-    <select name="h" id="h">
-            {% for handler in handler %}
-            <option value="{{handler.id}}" data-add = '{{handler.capability}}'>{{handler.fullname}}</option>
-            {% endfor %}
-    </select>
+        </div>
+   </div>
 
-    <select name="s" id="s">
-        <option value=""></option>
-    </select>
+   <h4 class="ui horizontal divider header">
+        <i class="user icon"></i>
+        Handler
+    </h4>
+
+    <form class = "ui fluid form" method="POST">
+        {% csrf_token %}
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <table class="ui column celled inverted orange table" id = 'tabledata'>
+                    <thead class="center aligned">
+                        <th class="four wide"></th>
+                        <th class="eight wide">Name</th>
+                        <th class="four wide">{{k9.capability}} Handled</th>
+                    </thead>
+                    <tbody>
+                            {% for a in form.handler %}
+                            {% for g in g%} {% if forloop.counter == forloop.parentloop.counter %}
+                            <tr>
+                                <td class="center aligned">{{a.tag}}</td>
+                                <td>{{a.choice_label}}</td>
+                                <td  class="center aligned">{{g.0}}</td>
+                            </tr>
+                            {%endif%}{% endfor %}
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        
+        </div>
+
+        <div class="ui center aligned basic segment" style="padding: 0px;">
+            <button id = "submit" class = "ui button green" type="submit" >Submit</button>
+        </div>
+
+    </form>
 </div>
+
 <script>
+
     $(document).ready(function() {
-
-        var capa = $("#k9_id").text()
-
-        $("#k").change(function(){
-            var itemlist= [];
-            b = $("#k").val()
-          
-            $(this).text()
-            $("#h option").each(function()
-            {
-                if(this.getAttribute('data-add')==b){
-                    itemlist.push({
-                        id :  $(this).val(),
-                        name :  $(this).text()
-                    })
-                }
-            });
-           
-            $.each(itemlist, function( index, obj) {
-                $.each(obj['id']['name'], function(key, value) {
-                    console.log(key);
-                    console.log(value);
-                });
-            });
-
-            $('#s').append($('', { value: 7, text: 'Dynamic Append' }));
+        $('#tabledata').DataTable({
+        "order": [[ 2, "desc" ]]
         });
 
+        $("input[name='handler']").change(function () {
+        var url = 'ajax_load_handler';  // get the url of the `load_handler` view
+        var handlerId = $("input[name='handler']:checked"). val(); // get the selected handler ID from the HTML input
+
+        $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-handler/)
+            data: {
+            'handler': handlerId       // add the handler id to the GET parameters
+            },
+            success: function (data) {   // `data` is the return of the `load_handler` view function
+            $("#id_handler_data").html(data);  // replace the contents of the #id_handler_data input with the data that came from the server
+            }
+        });
+
+        });
     });
-</script>
-{% endblock %}
+
+  </script>
+
+ {% endblock %}

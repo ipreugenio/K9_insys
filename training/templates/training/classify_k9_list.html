@@ -13,6 +13,8 @@
     {% endif %}
 
 </div>
+
+{% if request.session.session_user_position == "Trainer"%}
 <center>
         <div class="ui three statistics">
       <div class="statistic">
@@ -41,7 +43,7 @@
       </div>
     </div>
     </center>
-
+{% endif %}
 
 <div class="ui top attached tabular menu">
     {% if messages %}
@@ -64,35 +66,33 @@
            <a class="item active" data-tab="second">Classified</a>
             <a class="item" data-tab="third">On-Training</a>
            <a class="item" data-tab="fourth">Trained</a>
-            
-            {% endif %}
-        {% endif %}
-    {% endfor %}
 
-    {%else%}
+            {% endif %}
+            {% endfor %}
+        {%else%}
         <a class="item active" data-tab="first">Unclassified</a>
         <a class="item" data-tab="second">Classified</a>
         <a class="item" data-tab="third">On-Training</a>
         <a class="item" data-tab="fourth">Trained</a>
     {%endif%}
 </div>
-           
+
 {% if messages %}
-{% for message in messages %}
-{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    {% if message.message == 'Trained' %}
-    <div class="ui tab segment" data-tab="first">
-    {% else %}
-    <div class="ui tab segment" data-tab="first">
-    {% endif %}
-{% endif %}
-{% endfor %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            {% if message.message == 'Unclassified' %}
+            <div class="ui tab segment active" data-tab="first">
+            {% else %}
+            <div class="ui tab segment" data-tab="first">
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
 {%else%}
-<div class="ui tab segment active" data-tab="first">
-{%endif%}           
+    <div class="ui tab segment active" data-tab="first">
+{%endif%}
 
-    <table id="tabledata1" class="ui six column celled table">
+    <table id="tabledata1" class="ui seven column celled table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -166,19 +166,19 @@
 </div>
 
 {% if messages %}
-{% for message in messages %}
-{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    {% if message.message == 'On-Training' %}
-    <div class="ui tab segment active" data-tab="third">
-    {% else %}
-    <div class="ui tab segment" data-tab="third">
-    {% endif %}
-{% endif %}
-{% endfor %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            {% if message.message == 'On-Training' %}
+            <div class="ui tab segment active" data-tab="third">
+            {% else %}
+            <div class="ui tab segment" data-tab="third">
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
 {%else%}
 <div class="ui tab segment" data-tab="third">
-{%endif%}   
+{%endif%}
 
 <table id="tabledata3" class="ui celled table">
     <thead>
@@ -208,7 +208,6 @@
               {% else %}
 
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <!-- <a href="{% url 'training:classify_k9_select' data_ontraining.id %}" class = "tiny ui orange basic button reassign">Reassign</a> -->
               <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
               {% endif %}
             </td>
@@ -230,7 +229,7 @@
 
 {%else%}
 <div class="ui tab segment" data-tab="fourth">
-{%endif%}           
+{%endif%}
 
 <table id="tabledata4" class="ui celled table">
     <thead>
@@ -283,6 +282,7 @@
         "order": [[ 4, "desc" ]]
         });
         $('.menu .item').tab();
+
     });
 
 </script>

@@ -4,13 +4,13 @@
  {{Title}}
   <div class="sub header">Input K9 data here</div>
 </h2>
-<div class="ui inverted segment">
+<div class="ui segment">
     {% if messages %}
         {% for message in messages %}
             <div class="{{ style }} row"> {{ message }}</div>
         {% endfor %}
     {% endif %}
-<form class = "ui inverted form" enctype="multipart/form-data" method="POST" id="myForm"  data-url="">
+<form class = "ui form" enctype="multipart/form-data" method="POST" id="myForm"  data-url="">
     {% csrf_token %}
     <div class="field">
         <label>Supplier</label>
@@ -22,47 +22,35 @@
     <h4 class="ui horizontal divider header">
         <i class="teal paw icon"></i>
     </h4>
-    {% for form in formset %}
-    <div class="formset_class" id="{{ form.prefix }}-row">
-        <div class="three fields">
-            <div class="field">
-                <label>Name</label>
-                {{form.name}}
-            </div>    
-            <div class="field">
-                <label>Birthdate</label>
-                {{form.birth_date}}
-            </div> 
-            <div class="field">
-                <label>Breed</label>
-                {{form.breed}}
-            </div> 
+
+    <div class="inline three fields">
+        <div class="field">
+          <label>How many K9's?</label>
+          <input type="number" name="count" id="count">
         </div>
-        <div class="three fields">
-            <div class="field">
-                <label>Color</label>
-                {{form.color}}
-            </div> 
-            <div class="field">
-                <label>Sex</label>
-                {{form.sex}}
-            </div> 
-            <div class="field">
-                <label>Image</label>
-                {{form.image}}
-            </div>    
-        </div>    
+        <div class="field"></div>
+        <div class="field"></div>
     </div>
-    {% endfor %}
-    <div class="ui inverted right aligned segment" style="padding: 0px;">
-        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+
+    <div id="id_form_data"></div>
+
+    <div class="ui right aligned basic segment" style="padding: 0px;">
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Next</button>
     </div>
     {{formset.management_form}}
 </form>
 </div>
 
 <script>
-    $("#id_supplier").change(function () {
+
+    $(document).ready(function() {
+        $(function() {
+            $('#myForm .formset_class').formset({
+                prefix: '{{ formset.prefix }}'
+            });            
+        });
+
+        $("#id_supplier").change(function () {
         var url = 'ajax_load_supplier';  // get the url of the `load_handler` view
         var supplierId = $(this).val();  // get the selected handler ID from the HTML input
 
@@ -76,14 +64,28 @@
         }
         });
 
-    });
+        });
 
-    $(document).ready(function() {
-        $(function() {
-            $('#myForm .formset_class').formset({
-                prefix: '{{ formset.prefix }}'
-            });            
-        })
+        $("input[name='count']").change(function () {
+            var url = 'ajax_load_form_procured';  
+            var number = $("input[name='count']").val();
+            if(number==null){
+                number = 0
+            }
+
+            var num = number
+            
+            $.ajax({                       
+            url: url,                    
+            data: {
+                'num': num      
+            },
+            success: function (data) {   
+                $("#id_form_data").html(data);  
+            }
+            });
+        });
+
     });
 </script>
 

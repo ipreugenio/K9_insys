@@ -13,13 +13,12 @@
             <a class="item" href="{% url 'inventory:medicine_inventory_list'%}"><i class="warehouse icon"></i>Inventory</a>
             <a class="item" href="{% url 'profiles:user_list'%}"><i
             class="folder open icon"></i>Unit Management</a>
-            
+            <a class="item" href="{% url 'planningandacquiring:accomplishment_date'%}"><i class="folder open icon"></i>Reports</a>
             {% elif request.session.session_user_position == "Veterinarian" %}
             <a class="item" href="{% url 'profiles:vet_dashboard'%}"><i class="chart line icon"></i>Homepage</a>
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
             <a class="item" href="{% url 'planningandacquiring:K9_list'%}"><i class="clipboard list icon"></i>Planning and Acquiring</a>
             <a class="item" href="{% url 'inventory:medicine_inventory_list'%}"><i class="warehouse icon"></i>Inventory</a>
-            <a class="item" href="{% url 'training:training_records'%}"><i class="paw icon"></i>Training</a>
             <a class="item" href="{% url 'profiles:user_list'%}"><i class="folder open icon"></i>Unit Management</a>
             <a class="item" href="{% url 'training:adoption_list'%}"><i class="handshake icon"></i>Adoption</a>
 
@@ -31,6 +30,13 @@
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
             <a class="item" href="{% url 'unitmanagement:health_history_handler'%}"><i class="folder open icon"></i>Unit Management</a>
             
+            {% elif request.session.session_user_position == "Trainer"%}
+            <a class="item" href="{% url 'profiles:trainer_dashboard'%}"><i class="chart line icon"></i>Homepage</a>
+            <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
+            <a class="item" href="{% url 'training:classify_k9_list'%}"><i class="paw icon"></i>Training</a>
+            <a class="item" href="{% url 'unitmanagement:health_history_handler'%}"><i class="folder open icon"></i>Unit Management</a>
+
+
             {% else %}
             <a class="item" href="{% url 'profiles:team_leader_dashboard'%}"><i class="chart line icon"></i>Homepage</a>
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>

@@ -14,7 +14,7 @@ class User(models.Model):
         ('Team Leader', 'Team Leader'),
         ('Commander', 'Commander'),
         ('Operations', 'Operations'),
-        ('Trainor', 'Trainor'),
+        ('Trainer', 'Trainer'),
     )
 
     CIVILSTATUS = (

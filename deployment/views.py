@@ -75,14 +75,14 @@ def notif(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
-    
+
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
-   
+
     return notif
 
 
@@ -94,7 +94,9 @@ def user_session(request):
 
 def index(request):
     d = Daily_Refresher.objects.get(id=4)
-
+    # CAUTION : Only run this once
+    #Only uncomment this if you are populating db
+    mass_populate()
     context = {
       'title':'Deployment',
       'd':d,
@@ -262,7 +264,7 @@ def assign_team_location(request):
             f.team_leader.assigned=True
             f.location.status='assigned'
             f.save()
-            
+
             #Location
             l=Location.objects.get(id=f.location.id)
             l.status = 'assigned'
@@ -358,8 +360,8 @@ def team_location_details(request, id):
 
     #filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data.location.city)
-    
-    user_deploy = [] 
+
+    user_deploy = []
     for h in handlers:
        user_deploy.append(h.UserID)
 
@@ -367,7 +369,7 @@ def team_location_details(request, id):
     can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
     dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
-  
+
 
     if request.method == 'POST':
         checks =  request.POST.getlist('checks') # get the id of all the dogs checked
@@ -502,7 +504,7 @@ def dog_request(request):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -524,7 +526,7 @@ def dog_request(request):
 
     }
     return render (request, 'deployment/request_form.html', context)
-    
+
 
 def request_dog_list(request):
     data = Dog_Request.objects.all()
@@ -773,7 +775,7 @@ def request_dog_details(request, id):
             #TODO automatic approve pag operations (+ admin na rin siguro pero wala naman dapat access admin dito lol)
 
             Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname)) #TODO Only save k9.assignment when system datetime is same as request
-            
+
             K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
 
             # TODO: if dog is equal capability increment
@@ -890,7 +892,7 @@ def deployment_area_details(request):
     data = Team_Assignment.objects.get(team_leader=user)
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    
+
     sar_inc = Incidents.objects.filter(location=data.location).filter(type='Search and Rescue Related').count()
     ndd_inc = Incidents.objects.filter(location=data.location).filter(type='Narcotics Related').count()
     edd_inc = Incidents.objects.filter(location=data.location).filter(type='Explosives Related').count()
@@ -902,7 +904,7 @@ def deployment_area_details(request):
         mn.append(pi.mobile_number)
 
     data_list = zip(tdd, mn)
-    
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -939,14 +941,14 @@ def add_incident(request):
     ta = Team_Assignment.objects.get(team_leader=current_user)
 
 
-    form.initial['date'] = date.today() 
+    form.initial['date'] = date.today()
     form.fields['location'].queryset = Location.objects.filter(id=ta.location.id)
-    
+
     if request.method == 'POST':
         if form.is_valid():
             f = form.save(commit=False)
             f.user = user
-            f.save() 
+            f.save()
 
             style = "ui green message"
             messages.success(request, 'Incident has been successfully added!')
@@ -983,7 +985,7 @@ def incident_list(request):
         'title': title,
         'notif_data':notif_data,
         'count':count,
-        'user':user,        
+        'user':user,
     }
 
     return render(request, 'deployment/incident_list.html', context)
@@ -997,7 +999,7 @@ def fou_details(request):
     data = Team_Assignment.objects.get(team_leader=user)
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    
+
     a = []
     for td in tdd:
         a.append(td.handler)
@@ -1006,7 +1008,7 @@ def fou_details(request):
     pi = Personal_Info.objects.filter(UserID__in = a)
 
     data_list = zip(tdd,pi)
-   
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1025,7 +1027,7 @@ def daily_refresher_form(request):
     form = DailyRefresherForm(request.POST or None)
     style = "ui green message"
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.date.today())
-    
+
     dr = None
     if drf.exists():
         dr = 1
@@ -1057,7 +1059,7 @@ def daily_refresher_form(request):
             print(f.port_time)
             ######################
             f.save()
-            
+
             style = "ui green message"
             messages.success(request, 'Refresher Form has been Recorded!')
             return redirect('deployment:daily_refresher_form')
@@ -1710,5 +1712,3 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
 
 
     return None
-
-

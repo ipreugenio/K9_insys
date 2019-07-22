@@ -357,6 +357,45 @@ def vet_dashboard(request):
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
+def commander_dashboard(request):
+    user = user_session(request)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/commander_dashboard.html', context)
+
+def operations_dashboard(request):
+    user = user_session(request)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/operations_dashboard.html', context)
+
+def trainer_dashboard(request):
+    user = user_session(request)
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'profiles/trainer_dashboard.html', context)
+
 def profile(request):
    
     # first_day = datetime.date.today().replace(day=1)
@@ -478,6 +517,11 @@ def login(request):
                 return HttpResponseRedirect('../handler-dashboard')
             elif user.position == 'Commander':
                 return HttpResponseRedirect('../commander-dashboard')
+            elif user.position == 'Operations':
+                return HttpResponseRedirect('../operations-dashboard')
+            elif user.position == 'Trainer':
+                return HttpResponseRedirect('../trainer-dashboard')
+
             else:
                 return HttpResponseRedirect('../dashboard')
         else:
