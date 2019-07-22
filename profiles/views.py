@@ -22,6 +22,7 @@ from profiles.forms import add_User_form, add_personal_form, add_education_form,
 from planningandacquiring.models import K9
 from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification
+from training.models import Training_Schedule, Training
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
 from datetime import datetime, date
@@ -203,23 +204,59 @@ def handler_dashboard(request):
     user = user_session(request)
 
     form = RequestForm(request.POST or None)
-    geoform = GeoForm(request.POST or None, lat=120.993173, lng=14.564752)
+    geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
     
     dr = 0
     k9 = None
+    training_sched = None
+
     try:
         k9 = K9.objects.get(handler=user)
-        drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
-        if drf.exists():
-            dr = 1
-        else:
-            dr = 0
+
+        training = None
+        training_sched = None
+        today = datetime.today()
+
+        # TODO try except for when handler does not yet have a k9
+        # TODO try except for when k9s still don't have a skill
+        # TODO try except when k9 has finished training
+        training = Training.objects.get(k9=k9, training=k9.capability)
+        training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
     except:
         pass
 
+    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+
+    if drf.exists():
+        dr = 1
+    else:
+        dr = 0
+
+    show_start = False
+    show_end = False
+
     if request.method == 'POST':
-        print(form.errors)
+        start_training = request.POST.get('start_training')
+        end_training = request.POST.get('end_training')
+
+        if start_training:
+            print("START TRAINING VALUE")
+            print(start_training)
+
+            try:
+                training_sched.date_start = today
+                training_sched.save()
+            except: pass
+        if end_training:
+            print("END TRAINING VALUE")
+            print(end_training)
+
+            try:
+                training_sched.date_end = today
+                training_sched.save()
+            except: pass
+
         if form.is_valid():
             checks = geoform['point'].value()
             checked = ast.literal_eval(checks)
@@ -239,6 +276,23 @@ def handler_dashboard(request):
 
     events = Dog_Request.objects.all()
 
+    try:
+        if training_sched.date_start is None and training_sched.date_end is None:
+            show_start = True
+
+        elif training_sched.date_start is not None and training_sched.date_end is None:
+            show_end = True
+
+        elif training_sched.date_start is not None and training_sched.date_end is not None:
+            show_start = True
+            show_end = True
+
+        else:
+                pass
+    except:
+        pass
+
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -252,6 +306,10 @@ def handler_dashboard(request):
         'geoform': geoform,
         'geosearch': geosearch,
         'events': events,
+
+        'show_start': show_start,
+        'show_end': show_end,
+        'training_sched' : training_sched
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -301,14 +359,14 @@ def vet_dashboard(request):
 
 def profile(request):
    
-    first_day = datetime.date.today().replace(day=1)
-    last_day = datetime.date.today().replace(day=calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1])
+    # first_day = datetime.date.today().replace(day=1)
+    # last_day = datetime.date.today().replace(day=calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1])
 
     # print(first_day, last_day)
     # phex = PhysicalExam.objects.filter(date_next_exam__range=[first_day, last_day])
     # vac = VaccinceRecord.objects.filter(date_validity__range=[first_day, last_day])
     # list = zip(phex,vac)
-    today = datetime.date.today()
+    today = datetime.today()
 
     serial = request.session['session_serial']
     print(serial)

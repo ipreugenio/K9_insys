@@ -3,7 +3,7 @@ from django.db import models
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
 from inventory.models import Medicine_Inventory
-from training.models import Training
+from training.models import Training, Training_Schedule
 from profiles.models import User, Account
 from deployment.models import K9_Schedule, Incidents
 from django.db.models.signals import post_save
@@ -365,6 +365,7 @@ class Notification(models.Model):
 def create_medicine_inventory(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
+
 # K9 Training
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
@@ -372,6 +373,8 @@ def create_training_record(sender, instance, **kwargs):
         Training.objects.create(k9=instance, training='EDD')
         Training.objects.create(k9=instance, training='NDD')
         Training.objects.create(k9=instance, training='SAR')
+
+        Training_Schedule.objects.create(k9 = instance)
 
 #create vaccine record, and vaccine used
 @receiver(post_save, sender=K9)

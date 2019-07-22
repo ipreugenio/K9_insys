@@ -49,9 +49,9 @@
         {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
             {% if message.message == 'Trained' %}
             <a class="item" data-tab="first">Unclassified</a>
-           <!-- <a class="item" data-tab="second">Classified</a>-->
+            <a class="item" data-tab="second">Classified</a>
             <a class="item" data-tab="third">On-Training</a>
-          <!--  <a class="item active" data-tab="fourth">Trained</a>-->
+            <a class="item active" data-tab="fourth">Trained</a>
 
             {% elif message.message == 'On-Training' %}
             <a class="item" data-tab="first">Unclassified</a>
@@ -61,9 +61,9 @@
 
             {% else %}
             <a class="item" data-tab="first">Unclassified</a>
-          <!--  <a class="item active" data-tab="second">Classified</a>-->
+           <a class="item active" data-tab="second">Classified</a>
             <a class="item" data-tab="third">On-Training</a>
-          <!--  <a class="item" data-tab="fourth">Trained</a>-->
+           <a class="item" data-tab="fourth">Trained</a>
             
             {% endif %}
         {% endif %}
@@ -71,9 +71,9 @@
 
     {%else%}
         <a class="item active" data-tab="first">Unclassified</a>
-        <!--<a class="item" data-tab="second">Classified</a>-->
+        <a class="item" data-tab="second">Classified</a>
         <a class="item" data-tab="third">On-Training</a>
-       <!-- <a class="item" data-tab="fourth">Trained</a>-->
+        <a class="item" data-tab="fourth">Trained</a>
     {%endif%}
 </div>
            
@@ -92,7 +92,7 @@
 <div class="ui tab segment active" data-tab="first">
 {%endif%}           
 
-    <table id="tabledata1" class="ui seven column celled table">
+    <table id="tabledata1" class="ui six column celled table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -100,7 +100,6 @@
                 <th>Color</th>
                 <th>Sex</th>
                 <th>Age</th>
-                <th>Classification</th>
                 <th></th>
             </tr>
         </thead>
@@ -112,11 +111,6 @@
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
                 <td>{{data_unclassified.age}}</td>
-                {% if data_unclassified.capability == "None" %}
-                    <td>Unassigned</td>
-                {% else %}
-                    <td>{{data_unclassified.capability}}</td>
-                {% endif %}
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -125,7 +119,22 @@
         </tbody>
     </table>
 </div>
-<!--<div class="ui tab segment" data-tab="second">
+
+{% if messages %}
+{% for message in messages %}
+{% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+    {% if message.message == 'Classified' %}
+    <div class="ui tab segment active" data-tab="second">
+    {% else %}
+    <div class="ui tab segment" data-tab="second">
+    {% endif %}
+{% endif %}
+{% endfor %}
+
+{%else%}
+<div class="ui tab segment" data-tab="second">
+{%endif%}
+
     <table id="tabledata2" class="ui seven column celled table">
         <thead>
             <tr>
@@ -134,7 +143,7 @@
                 <th>Color</th>
                 <th>Sex</th>
                 <th>Age</th>
-                <th>Classification</th>
+                <th>Capability</th>
                 <th></th>
             </tr>
         </thead>
@@ -154,7 +163,7 @@
             {% endfor %}
         </tbody>
     </table>
-</div>-->
+</div>
 
 {% if messages %}
 {% for message in messages %}
@@ -208,7 +217,7 @@
     </tbody>
 </table>
 </div>
-<!--{% if messages %}
+{% if messages %}
 {% for message in messages %}
 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
     {% if message.message == 'Trained' %}
@@ -231,6 +240,7 @@
             <th>Color</th>
             <th>Sex</th>
             <th>Age</th>
+            <th>Capability</th>
             <th></th>
         </tr>
     </thead>
@@ -242,6 +252,7 @@
             <td>{{data_trained.color}}</td>
             <td >{{data_trained.sex}}</td>
             <td>{{data_trained.age}}</td>
+            <td>{{data_trained.capability}}</td>
 
             <td style="text-align:center;" class="five wide">
                 <a href="{% url 'training:assign_k9_duty' data_trained.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
@@ -252,17 +263,25 @@
         {% endfor %}
     </tbody>
 </table>
-</div>-->
+</div>
     </div></div></div></div></div></div>
 
 
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
+        $('#tabledata1').DataTable({
+        "order": [[ 4, "desc" ]]
+        } );
+        $('#tabledata2').DataTable({
+        "order": [[ 4, "desc" ]]
+        });
+        $('#tabledata3').DataTable({
+        "order": [[ 4, "desc" ]]
+        });
+        $('#tabledata4').DataTable({
+        "order": [[ 4, "desc" ]]
+        });
         $('.menu .item').tab();
     });
 

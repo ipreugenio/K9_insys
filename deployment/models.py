@@ -477,8 +477,9 @@ class K9_Schedule(models.Model):
         return notif
 
     def save(self, *args, **kwargs):
-        self.date_start = self.dog_request.start_date
-        self.date_end = self.dog_request.end_date
+        if self.dog_request:
+            self.date_start = self.dog_request.start_date
+            self.date_end = self.dog_request.end_date
         super(K9_Schedule, self).save(*args, **kwargs)
 
 class Incidents(models.Model):

@@ -41,7 +41,6 @@ class Dog_Breed(models.Model):
         ('Golden Retriever', 'Golden Retriever'),
         ('Jack Russel', 'Jack Russel'),
         ('Labrador Retriever', 'Labrador Retriever'),
-        ('Mixed', 'Mixed'),
     )
 
     COLORS = (
@@ -73,7 +72,9 @@ class Dog_Breed(models.Model):
     weight = models.CharField('weight', max_length=200, null=True)
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
-    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+    skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True, blank=True)
+    skill_recommendation2 = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True, blank=True)
+    skill_recommendation3 = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True, blank=True)
     litter_number = models.IntegerField('litter_number', null=True)
     value = models.FloatField('value', max_length=200, null=True)
 

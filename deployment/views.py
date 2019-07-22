@@ -29,15 +29,11 @@ from inventory.models import Medicine
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment,K9_Pre_Deployment_Items
 
+
+from training.models import Training_Schedule, Training
+
 from pyproj import Proj, transform
 
-
-
-#Plotly
-import plotly.offline as opy
-import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
-import plotly.figure_factory as ff
 
 #GeoDjango
 from math import sin, cos, radians, degrees, acos
@@ -60,7 +56,9 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
-from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location
+from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location, generate_training
+
+import random
 
 class MyDictionary(dict):
 
@@ -106,15 +104,20 @@ def index(request):
 
 def mass_populate():
     # Generate all models related to a users, k9s and k9_requests (edit loop count in populate_db.py to change number of created objects
-    # generate_user() #generates 400 objects
-    # generate_k9() #generates 300 objects
-    # generate_area() # generate all regions
-    # generate_location() # generate a location per city
-    # generate_event() #generates 150 objects
-    # generate_incident() #generates 250 objects
-    # generate_maritime() # generates 500 objects
+    generate_user() #generates 400 objects
+    generate_k9() #generates 300 objects
+    generate_area() # generate all regions
+    generate_location() # generate a location per city
+    generate_event() #generates 150 objects
+    generate_incident() #generates 250 objects
+    generate_maritime() # generates 500 objects
+
+    #>>advanced
+
+    generate_training() #Classify k9s
 
     return None
+
 
 def add_area(request):
     # CAUTION : Only run this once
@@ -1119,6 +1122,8 @@ def deployment_report(request):
     }
     return render(request, 'deployment/deployment_report.html', context)
 
+def Average(lst):
+    return sum(lst) / len(lst)
 
 def choose_location(request):
 
@@ -1320,6 +1325,49 @@ def schedule_units(request):
     removal = TempDeployment.objects.all() #TODO add user field then only delete objects from said user
     removal.delete()
 
+    #TODO Get number of k9s done with training (or include in list with blue highlight
+    #TODO Estimated time a K9 will finish training (red highlight)
+    #TODO ^ Or tab them both
+
+
+    sar_done = K9.objects.filter(training_status = "Trained").filter(capability = "SAR").count()
+    ndd_done = K9.objects.filter(training_status = "Trained").filter(capability = "NDD").count()
+    edd_done = K9.objects.filter(training_status = "Trained").filter(capability = "EDD").count()
+
+
+    k9s_training = K9.objects.filter(training_status = "On-Training")
+
+    k9_training_list = []
+    duration_estimate_list = []
+    train_end_estimate_list = []
+    for k9 in k9s_training:
+        train_sched = Training_Schedule.objects.filter(k9=k9).exclude(date_start = None).exclude(date_end = None)
+
+        duration_list = []
+        if train_sched:
+            k9_training_list.append(k9)
+
+
+            for item in train_sched:
+                delta = item.date_end - item.date_start
+                duration_list.append(int(delta.days))
+
+            duration_average = Average(duration_list)
+            duration_estimate_list.append(duration_average)
+
+            days_estimate_before_end = duration_average * (9 - len(duration_list))
+            train_end_estimate_list.append(days_estimate_before_end)
+
+    df_training_data = {
+        'K9': k9_training_list,
+        'Duration': duration_estimate_list,
+        'End_Estimate': train_end_estimate_list,
+    }
+
+    training_dataframe = df(data=df_training_data)
+    training_dataframe = training_dataframe.sort_values(by=['End_Estimate'],
+                                                        ascending=[True])
+
     # Prioritize Locations
     locations = Location.objects.all()
     location_incident_list = []
@@ -1396,7 +1444,7 @@ def schedule_units(request):
         'Dogs_deployed': total_dogs_deployed_list
         }
     location_dataframe = df(data=df_data)
-    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[True, False, False])
+    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[True, False, False], inplace=True)
 
 
          #End Sort incidents
@@ -1432,10 +1480,12 @@ def schedule_units(request):
             for item in temp:
                 k9_id_list.append(item.k9.id)
 
-            # Get K9s ready for deployment #TODO Include schedule K9s
+            # Get K9s ready for deployment #exclude already scheduled K9s
             can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
                 assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
             # End Get K9s ready for deployment
+
+            #TODO can_deploy is empty for some reason
 
             k9s_assigned = 0
             finish_location_assignment = 0
@@ -1447,7 +1497,7 @@ def schedule_units(request):
                         sar_count = 0
                         ndd_count = 0
                         edd_count = 0
-                        for item in TempDeployment.objects.filter(location = location):
+                        for item in TempDeployment.objects.filter(location = location): #this code also checks temporarily assigned k9s
                             if item.k9.capability == "SAR":
                                 sar_count += 1
                             elif item.k9.capability == "NDD":
@@ -1481,8 +1531,6 @@ def schedule_units(request):
                         print("Units per Location " + str(location))
                         print(team.total_dogs_deployed + k9s_assigned)
                         finish_location_assignment = 1
-
-
 
 
         if iteration == 2:
@@ -1528,10 +1576,6 @@ def schedule_units(request):
 
     location_dataframe['Temp_list'] = temp_list
 
-    # data = location_dataframe.set_index("Temp_list")
-    # data = data.drop(None, axis=0)
-
-
     temp_list = list(location_dataframe['Temp_list'])
 
     idx = 0
@@ -1544,8 +1588,12 @@ def schedule_units(request):
     print("DELETE INDEXES")
     print(delete_indexes)
 
+    #TODO Issue with current code where 2 k9s with varying skills cannot be put in the same port together because of incident order list
     location_dataframe.drop(location_dataframe.index[delete_indexes], inplace=True) #Delete rows without any K9s assigned
     location_dataframe.reset_index(drop=True, inplace=True)
+
+    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'],
+                                   ascending=[True, False, False], inplace=True)
 
     team_list = list(location_dataframe['Team'])
     locations = list(location_dataframe['Location'])
@@ -1585,15 +1633,19 @@ def schedule_units(request):
                             for item in temp:
                                 print("Item")
                                 print(item)
+                                #TODO error when saving for some reason
                                 #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
                                 deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
+                                print(deploy)
                                 deploy.save()
                                 pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                                 pre_req_item.save()
                             style = "ui green message"
                             messages.success(request, 'Units have been successfully scheduled for deployment!')
                     except:
-                        pass
+                        style = "ui red message"
+                        messages.warning(request, 'Error!')
+                        print(form.errors)
 
     df_is_empty = False
     if location_dataframe.empty:
@@ -1606,6 +1658,10 @@ def schedule_units(request):
         'formset' :schedFormset,
         'style': style,
         'df_is_empty' : df_is_empty,
+        'sar_done': sar_done,
+        'ndd_done' : ndd_done,
+        'edd_done' : edd_done,
+        'train_df' : training_dataframe
     }
 
     return render(request, 'deployment/schedule_units.html', context)
