@@ -26,7 +26,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 class DateInput(forms.DateInput):
     input_type = 'date'
 
-class DateForm(forms.ModelForm):
+class DateK9Form(forms.ModelForm):
     class Meta:
         model = K9
         fields = ('birth_date',)
