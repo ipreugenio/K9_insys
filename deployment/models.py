@@ -12,7 +12,8 @@ from django.utils import timezone
 
 # Create your models here.
 class Area(models.Model):
-    name = models.CharField('name', max_length=100, default='')
+    name = models.CharField('name', max_length=150, default='')
+    commander = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -173,7 +174,7 @@ class Location(models.Model):
         ('Zamboanga', 'Zamboanga'),
     )
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
-    place = models.CharField('place', max_length=200, default='Undefined')
+    place = models.CharField('place', max_length=500, default='Undefined')
     city = models.CharField('city', choices=CITY, max_length=100, default='None')
     #sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     status = models.CharField('status', max_length=100, default="unassigned")
@@ -393,7 +394,7 @@ class Dog_Request(models.Model):
     sector_type = models.CharField('sector_type', choices=TYPE, max_length=100, null=True, blank=True)
     phone_number = models.CharField('phone_number', max_length=100, default="n/a")
     email_address = models.EmailField('email', max_length=100, blank=True, null=True)
-    remarks = models.CharField('remarks', max_length=200, blank=True, null=True)
+    remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     k9s_needed = models.IntegerField('k9s_needed', default=0)
     k9s_deployed = models.IntegerField('k9s_deployed', default=0)
@@ -494,7 +495,7 @@ class Incidents(models.Model):
     incident = models.CharField('incident', max_length=100, null=True, blank=True)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField('type', choices=TYPE, max_length=100, default='Others')
-    remarks = models.TextField('remarks', max_length=200, blank=True, null=True)
+    remarks = models.TextField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
         return str(self.type) + " : " + str(date)

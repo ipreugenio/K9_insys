@@ -1019,7 +1019,7 @@ def training_update_form(request, id):
     stage = ""
     if request.method == 'POST':
         if data.training_status == 'On-Training':
-
+            remarks = request.POST.get('remarks')
             if training.stage == "Stage 0":
                 stage1_1 = request.POST.get('stage1_1')
                 if stage1_1 == '0':
@@ -1041,7 +1041,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9 = data, stage = stage)
+                    train_sched = Training_Schedule.objects.create(k9 = data, stage = stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1067,7 +1067,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1091,7 +1091,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1113,7 +1113,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1135,7 +1135,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1157,7 +1157,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     return redirect('training:classify_k9_list')
             elif training.stage == "Stage 2.3":
                 stage3_1 = request.POST.get('stage3_1')
@@ -1177,7 +1177,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1199,7 +1199,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:classify_k9_list')
@@ -1221,7 +1221,7 @@ def training_update_form(request, id):
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage)
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
                     return redirect('training:training_update_form', id=id)

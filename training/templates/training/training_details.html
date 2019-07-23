@@ -119,9 +119,9 @@
                     <br>- Socialization
                     <br>- Acclimatization
                 </th>
-                {% if edd.stage1_1 == True %}
+                {% if edd.stage1_1 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage1_1 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -136,9 +136,9 @@
                     <br>- Introduction to Training Equipments/Aides
                     <br>- K9 Training Areas
                 </th>
-                {% if edd.stage1_2 == True %}
+                {% if edd.stage1_2 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif  edd.stage1_2 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -155,9 +155,9 @@
                     <br>- Alert Signs
                     <br>- Handling Skills Development
                 </th>
-                {% if edd.stage1_3 == True %}
+                {% if edd.stage1_3 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage1_3 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -171,9 +171,9 @@
                     <br>- Proper Use of Training Substances/Aides
                     <br>- Contamination and decontamination
                 </th>
-                {% if edd.stage2_1 == True %}
+                {% if edd.stage2_1 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage2_1 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -187,9 +187,9 @@
                     <br>- Mind Focus
                     <br>- Stress Level
                 </th>
-                {% if edd.stage2_2 == True %}
+                {% if edd.stage2_2 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage2_2 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -206,9 +206,9 @@
                     <br>- Finds (Low, Medium, High)
                     <br>- Difficulty of Finds (Easy, Medium, Hard)
                 </th>
-                {% if edd.stage1_3 == True %}
+                {% if edd.stage2_3 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage2_3 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -222,9 +222,9 @@
                     <br>- Target Assessment
                     <br>- Indoor/Outdoor Searches
                 </th>
-                {% if edd.stage3_1 == True %}
+                {% if edd.stage3_1 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage3_1 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -233,9 +233,9 @@
             <tr>
                 <th>Stage 3.2: Field Proofing</th>
                 <td></td>
-                {% if edd.stage3_2 == True %}
+                {% if edd.stage3_2 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage3_2 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -244,9 +244,9 @@
             <tr>
                 <th>Stage 3.3: On-The-Job Training/Field</th>
                 <td></td>
-                {% if edd.stage3_3 == True %}
+                {% if edd.stage3_3 != '0' %}
                 <td>Passed</td>
-                {%elif edd.grade == '0'%}
+                {%elif edd.stage3_3 == '0' and edd.grade == '0' and edd.remarks is not None%}
                 <td>Failed</td>
                 {%else%}
                 <td>Pending</td>
@@ -291,9 +291,9 @@
                     <br>- Socialization
                     <br>- Acclimatization
                 </th>
-              {% if ndd.stage1_1 == True %}
+              {% if ndd.stage1_1 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage1_1 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -308,9 +308,9 @@
                     <br>- Introduction to Training Equipments/Aides
                     <br>- K9 Training Areas
                 </th>
-              {% if ndd.stage1_2 == True %}
+              {% if ndd.stage1_2 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage1_2 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -327,9 +327,9 @@
                     <br>- Alert Signs
                     <br>- Handling Skills Development
                 </th>
-              {% if ndd.stage1_3 == True %}
+              {% if ndd.stage1_3 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage1_3 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -343,9 +343,9 @@
                     <br>- Proper Use of Training Substances/Aides
                     <br>- Contamination and decontamination
                 </th>
-              {% if ndd.stage2_1 == True %}
+              {% if ndd.stage2_1 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage2_1 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -359,9 +359,9 @@
                     <br>- Mind Focus
                     <br>- Stress Level
                 </th>
-              {% if ndd.stage2_2 == True %}
+              {% if ndd.stage2_2 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage2_2 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -378,9 +378,9 @@
                     <br>- Finds (Low, Medium, High)
                     <br>- Difficulty of Finds (Easy, Medium, Hard)
                 </th>
-              {% if ndd.stage1_3 == True %}
+              {% if ndd.stage2_3 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage2_3 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -394,9 +394,9 @@
                     <br>- Target Assessment
                     <br>- Indoor/Outdoor Searches
                 </th>
-              {% if ndd.stage3_1 == True %}
+              {% if ndd.stage3_1 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage3_1 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -405,9 +405,9 @@
           <tr>
               <th>Stage 3.2: Field Proofing</th>
                 <td></td>
-              {% if ndd.stage3_2 == True %}
+              {% if ndd.stage3_2 != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage3_2 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -416,9 +416,9 @@
           <tr>
                <th>Stage 3.3: On-The-Job Training/Field</th>
                 <td></td>
-              {% if ndd.stage3_3 == True %}
+              {% if ndd.stage3_3  != '0' %}
               <td>Passed</td>
-              {%elif ndd.grade == '0'%}
+              {%elif ndd.stage3_3 == '0' and ndd.grade == '0' and ndd.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -463,9 +463,9 @@
                     <br>- Socialization
                     <br>- Acclimatization
                 </th>
-              {% if sar.stage1_1 == True %}
+              {% if sar.stage1_1 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage1_1 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -480,9 +480,9 @@
                     <br>- Introduction to Training Equipments/Aides
                     <br>- K9 Training Areas
                 </th>
-              {% if sar.stage1_2 == True %}
+              {% if sar.stage1_2 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage1_2 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -499,9 +499,9 @@
                     <br>- Alert Signs
                     <br>- Handling Skills Development
                 </th>
-              {% if sar.stage1_3 == True %}
+              {% if sar.stage1_3  != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage1_3 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -515,9 +515,9 @@
                     <br>- Proper Use of Training Substances/Aides
                     <br>- Contamination and decontamination
                 </th>
-              {% if sar.stage2_1 == True %}
+              {% if sar.stage2_1 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage2_1 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -531,9 +531,9 @@
                     <br>- Mind Focus
                     <br>- Stress Level
                 </th>
-              {% if sar.stage2_2 == True %}
+              {% if sar.stage2_2 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage2_2 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -550,9 +550,9 @@
                     <br>- Finds (Low, Medium, High)
                     <br>- Difficulty of Finds (Easy, Medium, Hard)
                 </th>
-              {% if sar.stage1_3 == True %}
+              {% if sar.stage2_3 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage2_3 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -566,9 +566,9 @@
                     <br>- Target Assessment
                     <br>- Indoor/Outdoor Searches
                 </th>
-              {% if sar.stage3_1 == True %}
+              {% if sar.stage3_1 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage3_1 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -577,9 +577,9 @@
           <tr>
               <th>Stage 3.2: Field Proofing</th>
                 <td></td>
-              {% if sar.stage3_2 == True %}
+              {% if sar.stage3_2 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage3_2 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>
@@ -588,9 +588,9 @@
           <tr>
               <th>Stage 3.3: On-The-Job Training/Field</th>
                 <td></td>
-              {% if sar.stage3_3 == True %}
+              {% if sar.stage3_3 != '0' %}
               <td>Passed</td>
-              {%elif sar.grade == '0'%}
+              {%elif sar.stage3_3 == '0' and sar.grade == '0' and sar.remarks is not None%}
               <td>Failed</td>
               {%else%}
               <td>Pending</td>

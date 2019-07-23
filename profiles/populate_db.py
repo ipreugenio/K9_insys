@@ -508,8 +508,9 @@ def generate_training():
 
             if idx <= 7:
 
+                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
                 train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
-                                                               date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage)
+                                                               date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
                 train_sched.save()
 
 

@@ -66,14 +66,16 @@
            <a class="item active" data-tab="second">Classified</a>
             <a class="item" data-tab="third">On-Training</a>
            <a class="item" data-tab="fourth">Trained</a>
-
             {% endif %}
-            {% endfor %}
+
         {%else%}
         <a class="item active" data-tab="first">Unclassified</a>
         <a class="item" data-tab="second">Classified</a>
         <a class="item" data-tab="third">On-Training</a>
         <a class="item" data-tab="fourth">Trained</a>
+        {%endif%}
+
+        {% endfor %}
     {%endif%}
 </div>
 

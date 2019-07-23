@@ -513,7 +513,7 @@ class Actual_Budget(models.Model):
     grand_total = models.DecimalField('grand_total', default=0, max_digits=50, decimal_places=2,)
     train_count = models.IntegerField('train_count', default=0)
     date_created = models.DateField('date_created', auto_now_add=True)
-    year_budgeted = models.DateField('year_budgeted')
+    year_budgeted = models.DateField('year_budgeted', blank=True, null=True)
     
 class Actual_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
