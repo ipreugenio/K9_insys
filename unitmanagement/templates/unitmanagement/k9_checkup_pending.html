@@ -3,6 +3,12 @@
 {% load widget_tweaks %}
 {% block content %}
 
+{% load fullcalendar_tags %}
+{% fullcalendar_css %}
+{% fullcalendar_print_css %}
+{% fullcalendar_jquery_ui %}
+{% fullcalendar_javascript %}
+
 <div class="ui segment" style="padding:20px;">
     <h1 class="ui header">Schedule Checkup
     <div class="sub header">Schedule k9 for checkup pre-requirement before initial deployment.</div>
@@ -65,6 +71,9 @@
 
           <div  class="ui segment" >
               <h1 class="ui header">Current Appointments</h1>
+
+              <button class = "ui blue button" id = "view_calendar">View Calendar</button>
+
               <div class="sub header"> for the date <div class="ui input">{{date_form}}</div></div>
 
 
@@ -80,6 +89,17 @@
  </div>
 
     <div id="id_scheduled_data"></div>
+
+
+<div class="ui longer modal" id ="calendar_modal">
+  <div class="header">Current Appointments</div>
+  <div class="content">
+
+                        {% calendar %}
+
+  </div>
+</div>
+
 
 <script type="text/javascript">
 
@@ -99,8 +119,6 @@
 </script>
 
 
-
-
 <script>
 
         $("input[name='date']").change(function () {
@@ -118,8 +136,6 @@
          $('input[type=checkbox]').removeAttr('disabled','disabled');
 
          $("#id_appointment_data").html(data); //The solution lies on the checkbox initial values
-
-
 
         }
       });
@@ -172,6 +188,72 @@ catch(err){alert(err);}
 });
 </script>
 
+<style>
+
+  #calendar .fc-dayGridMonth-view .fc-scroller {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  }
+
+  .fc-center>h2 {
+     font-size:  18px !important;
+     }
+
+  .fc-header, .fc-button, #prev, #next{
+  background-color:orangered;
+  color: white;
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+  }
+</style>
+
+<script>
+
+$( "#view_calendar" ).click(function() {
+   $('#calendar_modal').modal('show');
+   $('.fc-button.fc-button-today ').click();
+});
+
+
+
+     $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+
+          eventTextColor: "white",
+
+
+          events: [
+                {% for i in events %}
+                {
+                     id: '{{ i.id }}',
+                    title: '{{i.k9}}',
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                },
+                {% endfor %}
+
+            ],
+
+
+          }); // end #calendar
+
+
+</script>
 
 
 {% endblock %}

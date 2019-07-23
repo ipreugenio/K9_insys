@@ -2,7 +2,7 @@ from faker import Faker
 import random
 from datetime import timedelta, datetime
 from profiles.models import User, Account, Personal_Info, Education
-from planningandacquiring.models import K9, K9_Supplier
+from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule
@@ -966,15 +966,68 @@ def generate_maritime():
 #TODO Fix K9.training_stage set at "Stage 0" regardless of training progress
 
 #ADVANCED POPULATE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#TODO Assign commanders to areas
-#TODO Fix duplicate dog names
 #TODO Assign  a number of k9s to ports
 #TODO assign a number of k9s to events(take into account the restrictions)
 
 
-def generate_breed():
+def generate_dogbreed():
    
     arr = ['Belgian Malinois','Dutch Sheperd','German Sheperd','Golden Retriever','Jack Russel','Labrador Retriever']
 
+    temperament_list = ['Friendly', 'Skittish', 'Timid', 'Wild', 'Adventurous']
+
     for data in arr:
-        Dog_Breed.objects.create(breed=data,life_span=10,temperament='Friendly',colors='Black',weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+        randomizer = random.randint(0, 4)
+        temperament = temperament_list[randomizer]
+
+        Dog_Breed.objects.create(breed=data,life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+
+    return None
+
+
+def assign_commander_random():
+
+    if Area is None:
+        generate_area()
+    else:
+        areas = Area.objects.all()
+        commanders = User.objects.filter(position = "Commander")
+
+        area_list = []
+        for area in areas:
+            area_list.append(area)
+
+        commander_list = []
+        for commander in commanders:
+            commander_list.append(commander)
+
+        commander_list = random.sample(commander_list, len(commander_list)-1)
+
+        partnership = zip(commander_list, area_list)
+
+        for item in partnership:
+            area = item[1]
+            area.commander = item[0]
+            area.save()
+
+    return None
+
+def fix_dog_duplicates():
+
+    k9s = K9.objects.all()
+
+    k9_list = []
+    for k9 in k9s:
+        k9_list.append(k9.name)
+
+    # Get unique names
+    k9_list = list(set(k9_list))
+
+    for item in k9_list:
+        k9s = K9.objects.filter(name = item)
+        ctr = 1
+        for k9 in k9s:
+            k9.name = k9.name + " " + str(ctr)
+            k9.save()
+
+    return None

@@ -2579,6 +2579,7 @@ def k9_checkup_pending(request):
 
     context = {
         'k9_pending': pending_schedule,
+        'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
         'selected_list': []
     }
