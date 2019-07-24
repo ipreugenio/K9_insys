@@ -3,12 +3,6 @@
 {% load widget_tweaks %}
 {% block content %}
 
-{% load fullcalendar_tags %}
-{% fullcalendar_css %}
-{% fullcalendar_print_css %}
-{% fullcalendar_jquery_ui %}
-{% fullcalendar_javascript %}
-
 <div class="ui segment" style="padding:20px;">
     <h1 class="ui header">Schedule Checkup
     <div class="sub header">Schedule k9 for checkup pre-requirement before initial deployment.</div>
@@ -95,7 +89,7 @@
   <div class="header">Current Appointments</div>
   <div class="content">
 
-                        {% calendar %}
+                       <div id = "calendar"></div>
 
   </div>
 </div>
@@ -214,7 +208,7 @@ catch(err){alert(err);}
 
 $( "#view_calendar" ).click(function() {
    $('#calendar_modal').modal('show');
-   $('.fc-button.fc-button-today ').click();
+   $('.fc-today-button.fc-button ').click();
 });
 
 

@@ -4,11 +4,6 @@
 {% load widget_tweaks %}
 
 {% block dashboard %}
-{% load fullcalendar_tags %}
-{% fullcalendar_css %}
-{% fullcalendar_print_css %}
-{% fullcalendar_jquery_ui %}
-{% fullcalendar_javascript %}
 
   <div class="container fluid">
       {{geoform.media}}
@@ -117,15 +112,8 @@
                       <div class="or"></div>
                       <button class="ui button"  id = "next" >Next Year</button>
                     </div>
-                    <div id = "calendar" style="margin-top:0%;">
-                        {{date_form.date}}
-                        {{myr_form}}
-                        
-                        {% calendar %}
-                  
-                      <output id = "out_date"></output>
-                  
-                    </div>
+
+                    <div id = "calendar" style="margin-top:0%;"></div>
                 </div>
               </div>
         </div>
@@ -354,7 +342,7 @@ $(document).ready(function() {
           weekNumbers: 'true',
           editable: true,
           selectable: true,
-          eventLimit: true,
+          eventLimit: 3,
           showNonCurrentDates: true,
 
 

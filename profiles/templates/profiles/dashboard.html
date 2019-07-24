@@ -1,11 +1,6 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
-{% load fullcalendar_tags %}
-{% fullcalendar_css %}
-{% fullcalendar_print_css %}
-{% fullcalendar_jquery_ui %}
-{% fullcalendar_javascript %}
 
 
 
@@ -22,16 +17,13 @@
               </div>
         
         </div>
+
       <div id = "calendar" style="margin-top:0%;">
-          {{date_form.date}}
-          {{myr_form}}
-          
-          {% calendar %}
+
     
-        <output id = "out_date"></output>
-    
-      </div>
-    </div>
+      </div></div>
+
+
     <div class="column">
     </div>
   </div>
@@ -62,13 +54,11 @@
           weekNumbers: 'true',
           editable: true,
           selectable: true,
-          eventLimit: true,
-          showNonCurrentDates: true,
-
-          eventBorderColor: "orange",
-          eventBackgroundColor: "orangered",
-          eventTextColor: "white",
+          eventLimit: 3,
           nowIndicator: true,
+
+          eventTextColor: "white",
+
 
           events: [
                 {% for i in events %}

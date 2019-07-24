@@ -113,6 +113,13 @@ def incident_count_location(Location, id):
     return incident_count
 
 @register.filter
+def maritime_count_location(Location, id):
+
+    maritime_count = Maritime.objects.filter(location = Location).count()
+
+    return maritime_count
+
+@register.filter
 def incident_count(K9, request_id):
     incident_count = 0
 

@@ -342,7 +342,7 @@ def assigned_location_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
+        'title' : 'K9s and Handlers Assigned Field Officer Units',
         'data' : data,
         'notif_data':notif_data,
         'count':count,

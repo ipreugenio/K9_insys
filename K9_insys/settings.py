@@ -63,10 +63,11 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'widget_tweaks',
     'rest_framework',
-    'fullcalendar',
+
     # 'rest_framework.authtoken',
 
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -5,7 +5,7 @@ from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Fo
 from inventory.models import Medicine_Inventory
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
-from deployment.models import K9_Schedule, Incidents
+from deployment.models import K9_Schedule, Incidents, Location
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -318,6 +318,14 @@ class Handler_Incident(models.Model):
             self.handler.assigned = None
             self.k9.handler = None
         super(Handler_Incident, self).save(*args, **kwargs)
+
+
+class Request_Transfer(models.Model):
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date_created =  models.DateField('date_created', auto_now_add=True)
+    date_of_transfer = models.DateField('date_created', null=True, blank=True)
+    location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
+    location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
 
 class Notification(models.Model):
     POSITION = (

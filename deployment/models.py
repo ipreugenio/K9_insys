@@ -570,11 +570,6 @@ class TempCheckup(models.Model):
     def __str__(self):
         return str(self.k9)
 
-# class TransferRequest(models.Model):
-#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     from_location = models.ForeignKey(Location, on_delete=models.CASCADE)
-#     to_location = models.ForeignKey(Location, on_delete=models.CASCADE)
-
 
 
 #TODO
