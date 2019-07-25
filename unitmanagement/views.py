@@ -33,7 +33,7 @@ from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipm
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler, Training_History
+from training.models import K9_Handler, Training_History,Training_Schedule
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -1079,9 +1079,9 @@ def requests_form(request):
 def trained_list(request):
     data = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
     
-    NDD_count = K9.objects.filter(capability='NDD').count()
-    EDD_count = K9.objects.filter(capability='EDD').count()
-    SAR_count = K9.objects.filter(capability='SAR').count()
+    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
 
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
@@ -1187,12 +1187,20 @@ def trained_list(request):
     ndd = ndd_f+ndd_m
     edd = edd_f + edd_m
     sar = sar_f + sar_m
+
+    #finished training data
+    ts =[]
+    for d in data:
+        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
+        ts.append(a.date_end.date)
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
         'data': data,
+        'ts': ts,
         'title': 'Trained K9 List',
         'notif_data':notif_data,
         'count':count,
@@ -2540,15 +2548,23 @@ def load_physical(request):
 def load_k9_data(request):
 
     k9 = None
-
+    remarks = None
+    h_count = None
+    health = None
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
+        remarks = Training_Schedule.objects.filter(k9=k9)
+        h_count = Health.objects.filter(dog=k9).count()
+        health = Health.objects.filter(dog=k9)
     except:
         pass
 
     context = {
         'k9': k9,
+        'remarks': remarks,
+        'h_count': h_count,
+        'health': health,
     }
 
     return render(request, 'unitmanagement/k9_data_trained.html', context)

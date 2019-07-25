@@ -62,6 +62,16 @@ class Training_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
 
+class Training_Schedule(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
+    stage = models.CharField('stage', max_length=200, default="Stage 0")
+    date_start = models.DateTimeField('date_start', null=True, blank=True)
+    date_end = models.DateTimeField('date_end', null=True, blank=True)
+    remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.k9) +'  - ' + str(self.stage)
+
 class K9_Adopted_Owner(models.Model):
     SEX = (
         ('Male', 'Male'),

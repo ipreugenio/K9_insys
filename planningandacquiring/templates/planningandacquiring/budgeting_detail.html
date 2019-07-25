@@ -16,27 +16,58 @@
                 <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
                     <br><b>Budget for the Year {{pb.year_budgeted|date:"Y"}}</b>
         </center>
-    <table class="ui five column celled table">
+        <table class="ui three column celled table" style="width:50%;">
+            <thead>
+                <tr>
+                    <th colspan="2">Estimated K9 Born</th>
+                    <td colspan="1" class="right aligned" id='born_ny'>{{ab.k9_breeded}}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Estimated Current K9 (Alive)</th>
+                    <td colspan="1" class="right aligned" id='k9_ny'>{{ab.k9_current}}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Number of Procured k9</th>
+                    <td colspan="1" class="right aligned" id='p_count'>{{ab.k9_needed}}</td>
+                </tr>
+                <tr style="font-weight: bold;" class="right aligned">
+                    <th colspan="2">Total K9</th>
+                    <td colspan="1" id='total_k9'>{{total_new}}</td>
+                </tr>
+            </thead>
+            
+        </table>
+        
+        {% if ak9 %}
+        <table class="ui four column celled table">
         <thead>
             <tr>
-                <!-- <th>Estimated K9 Born Next Year</th>
-                <td>{{born_ny}}</td>
+                <th colspan="4">K9 Acquisition</th>
             </tr>
             <tr>
-                <th>Estimated K9 Next Year</th>
-                <td>{{k9_ny}}</td>
-            </tr>
-            <tr>
-                <th>K9 Count to be Procured</th>
-                <td>{{need_procure_ny}}</td>
-            </tr> -->
-            <tr style="font-weight: bold;">
-                <th colspan="4">Total K9</th>
-                <td colspan="1">{{total_new}}</td>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Amount</th>
             </tr>
         </thead>
-        
-    </table>
+        <tbody>
+            {% for data in ak9 %}
+            <tr>
+                <td class="food">{{data.item}}</td>
+                <td>{{data.price|intcomma}}</td>
+                <td>{{data.quantity|intcomma}}</td>
+                <td>{{data.total|intcomma}}</td>
+            </tr>
+            {% endfor %}
+            <tr style="font-weight: bold;">
+                <td colspan="3">Total Amount</td>
+                <td colspan="1">{{ab.k9_total|intcomma}}</td>
+            </tr>
+        </tbody>
+        </table>
+        {% endif %}
+
 
     {% if amf %}
     <table class="ui five column celled table">
@@ -255,6 +286,12 @@
     {% endif %}
     <table class="ui  two column celled table">
         <thead>
+            {% if ab.k9_total != 0%}
+            <tr>
+                <th>K9 Acquisition</th>
+                <td>{{ab.k9_total|intcomma}}</td>
+            </tr>
+            {% endif %}
             {% if ab.food_milk_total != 0%}
             <tr>
                 <th>Food & Milk</th>
@@ -313,7 +350,6 @@
       </table>
   </div>
   <div class="ui bottom attached tab segment" data-tab="second">
-    {% if mf %}
     <center>
             <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
             <br>Philippine Coast Guard
@@ -323,27 +359,59 @@
             <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
                 <br><b>Budget for the Year {{pb.year_budgeted|date:"Y"}}</b>
     </center>
-<table class="ui five column celled table">
+    {% if pb %}
+    <table class="ui five column celled table">
+            <table class="ui three column celled table" style="width:50%;">
+                <thead>
+                    <tr>
+                        <th colspan="2">Estimated K9 Born</th>
+                        <td colspan="1" class="right aligned" id='born_ny'>{{pb.k9_breeded}}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Estimated Current K9 (Alive)</th>
+                        <td colspan="1" class="right aligned" id='k9_ny'>{{pb.k9_current}}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Number of Procured k9</th>
+                        <td colspan="1" class="right aligned" id='p_count'>{{pb.k9_needed}}</td>
+                    </tr>
+                    <tr style="font-weight: bold;" class="right aligned">
+                        <th colspan="2">Total K9</th>
+                        <td colspan="1" id='total_k9'>{{train_k9}}</td>
+                    </tr>
+                </thead>
+                
+            </table>
+    {% endif %}
+    {% if pk9 %}
+    <table class="ui four column celled table">
         <thead>
             <tr>
-                <!-- <th>Estimated K9 Born Next Year</th>
-                <td>{{born_ny}}</td>
+                <th colspan="4">K9 Acquisition</th>
             </tr>
             <tr>
-                <th>Estimated K9 Next Year</th>
-                <td>{{k9_ny}}</td>
-            </tr>
-            <tr>
-                <th>K9 Count to be Procured</th>
-                <td>{{need_procure_ny}}</td>
-            </tr> -->
-            <tr style="font-weight: bold;">
-                <th colspan="4">Total K9</th>
-                <td colspan="1">{{train_k9}}</td>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Amount</th>
             </tr>
         </thead>
-        
+        <tbody>
+            {% for data in pk9 %}
+            <tr>
+                <td class="k9">{{data.item}}</td>
+                <td>{{data.price|intcomma}}</td>
+                <td>{{data.quantity|intcomma}}</td>
+                <td>{{data.total|intcomma}}</td>
+            </tr>
+            {% endfor %}
+            <tr style="font-weight: bold;">
+                <td colspan="3">Total Amount</td>
+                <td colspan="1">{{pb.k9_total|intcomma}}</td>
+            </tr>
+        </tbody>
     </table>
+    {% endif %}
     {% if mf %}
     <table class="ui five column celled table">
         <thead>
@@ -375,8 +443,6 @@
         </tbody>
     </table>
     {% endif %}
-{% endif %}
-
 {% if vp %}
 <table class="ui five column celled table">
     <thead>
@@ -566,6 +632,12 @@
 
 <table class="ui  two column celled table">
     <thead>
+        {% if pb.k9_total != 0%}
+        <tr>
+            <th>K9 Acquisition</th>
+            <td>{{pb.k9_total|intcomma}}</td>
+        </tr>
+        {% endif %}
         {% if pb.food_milk_total != 0%}
         <tr>
             <th>Food & Milk</th>
@@ -633,61 +705,99 @@
   </div>
 {% else %}
 
+<center>
+        <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+        <br>Philippine Coast Guard
+        <br>Maritime Security Command
+            <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
+        <br>Coast Guard Base Taguig
+        <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
+            <br><b>Budget for the Year {{pb.year_budgeted|date:"Y"}}</b>
+</center>
+{% if pb %}
+<table class="ui five column celled table">
+        <table class="ui three column celled table" style="width:50%;">
+            <thead>
+                <tr>
+                    <th colspan="2">Estimated K9 Born</th>
+                    <td colspan="1" class="right aligned" id='born_ny'>{{pb.k9_breeded}}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Estimated Current K9 (Alive)</th>
+                    <td colspan="1" class="right aligned" id='k9_ny'>{{pb.k9_current}}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Number of Procured k9</th>
+                    <td colspan="1" class="right aligned" id='p_count'>{{pb.k9_needed}}</td>
+                </tr>
+                <tr style="font-weight: bold;" class="right aligned">
+                    <th colspan="2">Total K9</th>
+                    <td colspan="1" id='total_k9'>{{train_k9}}</td>
+                </tr>
+            </thead>
+            
+        </table>
+{% endif %}
+{% if pk9 %}
+<table class="ui four column celled table">
+    <thead>
+        <tr>
+            <th colspan="4">K9 Acquisition</th>
+        </tr>
+        <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in pk9 %}
+        <tr>
+            <td class="k9">{{data.item}}</td>
+            <td>{{data.price|intcomma}}</td>
+            <td>{{data.quantity|intcomma}}</td>
+            <td>{{data.total|intcomma}}</td>
+        </tr>
+        {% endfor %}
+        <tr style="font-weight: bold;">
+            <td colspan="3">Total Amount</td>
+            <td colspan="1">{{pb.k9_total|intcomma}}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
 {% if mf %}
 <table class="ui five column celled table">
-        <thead>
-            <tr>
-                <!-- <th>Estimated K9 Born Next Year</th>
-                <td>{{born_ny}}</td>
-            </tr>
-            <tr>
-                <th>Estimated K9 Next Year</th>
-                <td>{{k9_ny}}</td>
-            </tr>
-            <tr>
-                <th>K9 Count to be Procured</th>
-                <td>{{need_procure_ny}}</td>
-            </tr> -->
-            <tr style="font-weight: bold;">
-                <th colspan="4">Total K9</th>
-                <td colspan="1">{{train_k9}}</td>
-            </tr>
-        </thead>
-        
-    </table>
-    {% if mf %}
-    <table class="ui five column celled table">
-        <thead>
-            <tr>
-                <th colspan="5">Dog Food & Milk</th>
-            </tr>
-            <tr>
-                <th>Item</th>
-                <th>Unit</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in mf %}
-            <tr>
-                <td class="food">{{data.item}}</td>
-                <td>{{data.item.unit}}</td>
-                <td>{{data.price|intcomma}}</td>
-                <td>{{data.quantity|intcomma}}</td>
-                <td>{{data.total|intcomma}}</td>
-            </tr>
-            {% endfor %}
-            <tr style="font-weight: bold;">
-                <td colspan="4">Total Amount</td>
-                <td colspan="1">{{pb.food_milk_total|intcomma}}</td>
-            </tr>
-        </tbody>
-    </table>
-    {% endif %}
+    <thead>
+        <tr>
+            <th colspan="5">Dog Food & Milk</th>
+        </tr>
+        <tr>
+            <th>Item</th>
+            <th>Unit</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in mf %}
+        <tr>
+            <td class="food">{{data.item}}</td>
+            <td>{{data.item.unit}}</td>
+            <td>{{data.price|intcomma}}</td>
+            <td>{{data.quantity|intcomma}}</td>
+            <td>{{data.total|intcomma}}</td>
+        </tr>
+        {% endfor %}
+        <tr style="font-weight: bold;">
+            <td colspan="4">Total Amount</td>
+            <td colspan="1">{{pb.food_milk_total|intcomma}}</td>
+        </tr>
+    </tbody>
+</table>
 {% endif %}
-
 {% if vp %}
 <table class="ui five column celled table">
     <thead>
@@ -864,8 +974,8 @@
         <tr>
             <td>K9 Training</td>
             <td>18,000.00</td>
-            <td>{{train_k9}}</td>
-            <td>{{pb.training_total}}</td>
+            <td>{{train_k9|intcomma}}</td>
+            <td>{{pb.training_total|intcomma}}</td>
         </tr>
         <tr style="font-weight: bold;">
                 <td colspan="3">Total Amount</td>
@@ -877,6 +987,12 @@
 
 <table class="ui  two column celled table">
     <thead>
+        {% if pb.k9_total != 0%}
+        <tr>
+            <th>K9 Acquisition</th>
+            <td>{{pb.k9_total|intcomma}}</td>
+        </tr>
+        {% endif %}
         {% if pb.food_milk_total != 0%}
         <tr>
             <th>Food & Milk</th>

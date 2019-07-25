@@ -19,14 +19,14 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
 from profiles.models import User
-from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed, K9_Supplier
+from .models import K9, K9_Past_Owner, K9_Parent, Date, Dog_Breed, K9_Supplier,Proposal_K9
 from django.forms.widgets import CheckboxSelectMultiple
 
 
 class DateInput(forms.DateInput):
     input_type = 'date'
 
-class DateForm(forms.ModelForm):
+class DateK9Form(forms.ModelForm):
     class Meta:
         model = K9
         fields = ('birth_date',)
@@ -35,7 +35,7 @@ class DateForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(DateForm, self).__init__(*args, **kwargs)
+        super(DateK9Form, self).__init__(*args, **kwargs)
         self.fields['birth_date'].initial = date.today()
 
 
@@ -61,7 +61,6 @@ class ProcuredK9Form(forms.ModelForm):
         fields = ('name', 'birth_date', 'breed', 'color', 'sex', 'image')
         widgets = {
             'birth_date': DateInput(),
-            'image': forms.ImageField()
         }
 
 class ReportDateForm(forms.ModelForm):
@@ -175,6 +174,32 @@ class date_mated_form(forms.ModelForm):
         widgets = {
             'date_mated': DateInput(),
         }
+
+class k9_acquisition_form(forms.ModelForm):
+    item = forms.ModelChoiceField(queryset=Dog_Breed.objects.all())
+    # value = forms.DecimalField(decimal_places=2, localize=True)
+    # quantity = forms.IntegerField(localize=True)
+    # total = forms.DecimalField(decimal_places=2,localize=True)
+    class Meta:
+        model = Proposal_K9
+        fields = ('item','quantity','price','total')
+    
+    def __init__(self, *args, **kwargs):
+        super(k9_acquisition_form, self).__init__(*args, **kwargs)
+        self.fields['item'].widget.attrs['class'] = 'select_breed'
+        self.fields['price'].widget.attrs['class'] = 'select_value'
+        self.fields['quantity'].widget.attrs['class'] = 'select_quantity'
+        self.fields['total'].widget.attrs['class'] = 'select_total'
+        self.fields['total'].widget.attrs['readonly'] = True
+        # self.fields['value'].localize = True
+        # self.fields['value'].is_localized = True
+        # self.fields['quantity'].localize = True
+        # self.fields['quantity'].is_localized = True
+        # self.fields['total'].localize = True
+        # self.fields['total'].is_localized = True
+        self.fields['price'].widget.attrs['data-value'] = 0
+        self.fields['quantity'].widget.attrs['data-quantity'] = 0
+        self.fields['total'].widget.attrs['data-total'] = 0
 
 class k9_detail_form(forms.ModelForm):
     image = forms.ImageField()
@@ -316,14 +341,11 @@ class add_breed_form(forms.ModelForm):
 
     class Meta:
         model = Dog_Breed
-        fields = ('breed', 'life_span', 'litter_number', 'value', 'temperament', 'colors', 'weight', 'male_height',
-                  'female_height', 'skill_recommendation')
+        fields = ('breed', 'life_span', 'litter_number', 'value','sex', 'temperament', 'colors', 'weight', 'male_height','female_height', 'skill_recommendation','skill_recommendation2','skill_recommendation3',)
 
 class DateForm(forms.Form):
     from_date = forms.DateField(widget=DateInput())
     to_date = forms.DateField(widget=DateInput())
-
-
 
 class HistDateForm(forms.Form):
     cur_year = datetime.datetime.today().year

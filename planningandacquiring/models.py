@@ -66,7 +66,14 @@ class Dog_Breed(models.Model):
         ('White and Tan', 'White and Tan')
     )
 
+    SEX = (
+        ('Female', 'Female'),
+        ('Male', 'Male'),
+    )
+
     breed = models.CharField('breed', choices=BREED,  max_length=200, null=True)
+    sex = models.CharField('sex', choices=SEX,  max_length=200, null=True)
+    value = models.DecimalField('value',max_digits=50, decimal_places=2,blank=True, null=True)
     life_span = models.IntegerField('life_span', blank=True, null=True)
     temperament = models.CharField('temperament', max_length=200, null=True)
     colors = models.CharField('colors', max_length=200, null=True)
@@ -74,11 +81,12 @@ class Dog_Breed(models.Model):
     male_height = models.CharField('male_height', max_length=200, null=True)
     female_height = models.CharField('female_height', max_length=200, null=True)
     skill_recommendation = models.CharField('skill_recommendation', choices=SKILL, max_length=200, null=True)
+    skill_recommendation2 = models.CharField('skill_recommendation2', choices=SKILL, max_length=200, null=True)
+    skill_recommendation3 = models.CharField('skill_recommendation3', choices=SKILL, max_length=200, null=True)
     litter_number = models.IntegerField('litter_number', null=True)
-    value = models.FloatField('value', max_length=200, null=True)
 
     def __str__(self):
-        return str(self.breed)
+        return str(self.breed) +' - '+ str(self.sex)
 
 class K9(models.Model):
     SEX = (
@@ -195,6 +203,8 @@ class K9(models.Model):
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
     trained = models.CharField('trained', choices=TRAINED, max_length=100, blank=True, null=True)
+    height = models.DecimalField('height',max_digits=50, decimal_places=2,blank=True, null=True)
+    weight = models.DecimalField('weight',max_digits=50, decimal_places=2,blank=True, null=True)
     fit = models.BooleanField(default=True)
     date_created = models.DateField('date_created', default=now, blank=True, null=True)
     #partnered = models.BooleanField(default=False)
@@ -281,33 +291,35 @@ class K9(models.Model):
             except:
                 self.litter_no = 0
 
-
-        self.last_proestrus_date = self.birth_date + relativedelta(months=+6)
+        
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
         self.training_id = self.id
-        if self.age_days == 183:
-            self.last_proestrus_date = d.today()
 
-        if self.last_proestrus_date != None:
-            self.estrus_date = self.last_proestrus_date + td(days=7)
-            self.metestrus_date = self.estrus_date + td(days=20)
-            self.anestrus_date = self.metestrus_date + td(days=90)
+        #last_proestrus_date in heat
+        #estrus_date start of session,10,12,14
+        if self.sex == 'Female':
+            if self.last_proestrus_date == None:
+                self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
+            
+            self.estrus_date = self.last_proestrus_date + relativedelta(days=10)
+            self.metestrus_date = self.estrus_date + relativedelta(month=2)
+            self.anestrus_date = self.metestrus_date + relativedelta(months=4)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
 
-        if d.today() == self.last_proestrus_date:
-            self.reproductive_stage = 'Proestrus'
-        elif d.today() == self.estrus_date:
-            self.reproductive_stage = 'Estrus'
-        elif d.today() == self.metestrus_date:
-            self.reproductive_stage = 'Metestrus'
-        elif d.today() == self.anestrus_date:
-            self.reproductive_stage = 'Anestrus'
-        else:
-            pass
+            if d.today() == self.last_proestrus_date:
+                self.reproductive_stage = 'Proestrus'
+            elif d.today() == self.estrus_date:
+                self.reproductive_stage = 'Estrus'
+            elif d.today() == self.metestrus_date:
+                self.reproductive_stage = 'Metestrus'
+            elif d.today() == self.anestrus_date:
+                self.reproductive_stage = 'Anestrus'
+            else:
+                pass
 
         if self.age == 9:
             self.training_status = 'Due-For-Retirement'
@@ -420,13 +432,13 @@ class K9_Quantity(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     date_bought = models.DateField('date_bought', null=True)
 
-
-
 #TODO K9 Value Price
 class Proposal_Budget(models.Model):
-    k9_current = models.IntegerField('k9_current', default=0)
-    k9_needed = models.IntegerField('k9_needed', default=0)
-    k9_breeded = models.IntegerField('k9_breeded', default=0)
+    k9_current = models.IntegerField('k9_current', default=0) #current k9
+    k9_needed = models.IntegerField('k9_needed', default=0) #needed to procure k9
+    k9_breeded = models.IntegerField('k9_breeded', default=0) # born k9
+    k9_current_train = models.IntegerField('k9_current_train', default=0) #current k9 that needs training
+    k9_total = models.DecimalField('k9_total', default=0, max_digits=50, decimal_places=2,)
     food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=2,)
     vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=2,)
     medicine_total = models.DecimalField('medicine_total', default=0, max_digits=50, decimal_places=2,)
@@ -442,6 +454,15 @@ class Proposal_Budget(models.Model):
     def save(self, *args, **kwargs):
         self.year_budgeted = self.date_created  + relativedelta(years=+1)
         super(Proposal_Budget, self).save(*args, **kwargs)
+
+class Proposal_K9(models.Model):
+    item = models.ForeignKey(Dog_Breed, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
+    k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
@@ -501,6 +522,7 @@ class Actual_Budget(models.Model):
     k9_current = models.IntegerField('k9_current', default=0)
     k9_needed = models.IntegerField('k9_needed', default=0)
     k9_breeded = models.IntegerField('k9_breeded', default=0)
+    k9_total = models.DecimalField('k9_total', default=0, max_digits=50, decimal_places=2,)
     petty_cash = models.DecimalField('petty_cash', default=0, max_digits=50, decimal_places=2,)
     food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=2,)
     vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=2,)
@@ -514,6 +536,14 @@ class Actual_Budget(models.Model):
     date_created = models.DateField('date_created', auto_now_add=True)
     year_budgeted = models.DateField('year_budgeted')
     
+class Actual_K9(models.Model):
+    item = models.ForeignKey(Dog_Breed, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
+
 class Actual_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)

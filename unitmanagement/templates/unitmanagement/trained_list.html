@@ -16,13 +16,13 @@
 
 <button class="ui teal button" id="btn">K9's Summmary</button>
 
-    <div class="ui segment" id="summary">
+    <div class="ui segment" id="summary" style="display: none;">
         <div class="ui two column grid">
             <div class="ten wide column">
                 <center>
                     <h4 class='ui horizontal divider header'>For-Breeding</h4>
                 </center>
-                <table class="ui celled structured table">
+                <table class="ui small celled structured table">
                 <thead class="center aligned">
                     <tr>
                         <th rowspan="2">Breed</th>
@@ -131,7 +131,7 @@
                         <br><br><br><br><br><br>
                         <div class="ui two column grid">
                             <div class="column">
-                                <div class="ui statistic">
+                                <div class="ui small statistic">
                                     <div class="value">
                                         {{NDD_count}} / {{NDD_demand}}
                                     </div>
@@ -141,7 +141,7 @@
                                 </div>
                             </div>
                             <div class="column">
-                                <div class="ui statistic">
+                                <div class="ui small statistic">
                                     <div class="value">
                                         {{EDD_count}} / {{EDD_demand}}
                                     </div>
@@ -154,7 +154,7 @@
                         <div class="ui two column centered grid">
                                
                                 <div class="column">
-                                    <div class="ui statistic">
+                                    <div class="ui small statistic">
                                         <div class="value">
                                             {{SAR_count}} / {{SAR_demand}}
                                         </div>
@@ -174,25 +174,29 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Serial Number</th>
                     <th>Breed</th>
-                    <th>Color</th>
-                    <th>Sex</th>
-                    <th>Age</th>
+                    <th>Capability</th>
+                    <th>Finished Training</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for data in data %}
+                {% for ts in ts %}
                 <tr>
                     <td>{{data.name}}</td>
+                    <td>{{data.serial_number}}</td>
                     <td >{{data.breed}}</td>
-                    <td>{{data.color}}</td>
-                    <td >{{data.sex}}</td>
-                    <td>{{data.age}}</td>
+                    <td>{{data.capability}}</td>
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                    <td>{{ts}}</td>
+                    {% endif %}
                     <td style="text-align:center;" class="two wide">
                         <a href="#" class="ui tiny basic blue button btn_modal" id='{{data.id}}' >Select</a>
                     </td>
                 </tr>
+                {% endfor %}
                 {% endfor %}
             </tbody>
         </table>
