@@ -29,6 +29,7 @@ class K9_Handler(models.Model):
         # k9_name = k9.name
         return str(self.handler.lastname) + " : " + str(self.k9.name)
 
+#TODO save grade as 0 if grade input is 0
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     training = models.CharField('training', max_length=50, default="None")
@@ -52,10 +53,23 @@ class Training(models.Model):
 
         average = Decimal(self.stage1_1) + Decimal(self.stage1_2) + Decimal(self.stage1_3) + Decimal(self.stage2_1) + Decimal(self.stage2_2) + Decimal(self.stage2_3) + Decimal(self.stage3_1) + Decimal(self.stage3_2) + Decimal(self.stage3_3)
         average = average/ Decimal(9)
-        average = round(average)
+        average = round(average, 1)
         self.grade = average
 
         super(Training, self).save(*args, **kwargs)
+
+
+class Training_Schedule(models.Model):
+
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
+    stage = models.CharField('stage', max_length=200, default="Stage 0")
+    date_start = models.DateTimeField('date_start', null=True, blank=True)
+    date_end = models.DateTimeField('date_end', null=True, blank=True)
+    remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.k9) +'  - ' + str(self.stage)
+
 
 class Training_History(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)

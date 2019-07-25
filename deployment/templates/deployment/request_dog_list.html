@@ -28,9 +28,6 @@
                 <th>Place</th>
                 <th>K9s Requested</th>
                 <th>K9s Deployed</th>
-
-                <th>Total Dogs Requested</th>
-
                 <th>Status</th>
                 <th></th>
             </tr>
@@ -71,6 +68,7 @@
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
                         </td>
                     </tr>
+
                 {% elif Data.status == "Denied" %}
                     <tr class = "error">
                         <td>{{Data.start_date}}</td>
@@ -86,6 +84,7 @@
                             <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "ui disabled button">Select</a>
                         </td>
                     </tr>
+
                 {%else%}
                 <tr>
                         <td>{{Data.start_date}}</td>
@@ -105,6 +104,7 @@
                         </td>
                 </tr>
                 {% endif %}
+
             {% endfor %}
         </tbody>
     </table>
@@ -114,7 +114,7 @@
 
 	$(document).ready(function() {
 		$('#tabledata').DataTable( {
-        "order": [[ 0, "desc" ]]
+        "order": [[ 0, "asc" ]]
     });
 		$('.menu .item').tab();
 	});

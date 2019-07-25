@@ -1,10 +1,12 @@
 from faker import Faker
 import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 from profiles.models import User, Account, Personal_Info, Education
-from planningandacquiring.models import K9, K9_Supplier
+from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment
 from django.contrib.auth.models import User as AuthUser
+from training.models import Training, Training_Schedule
+
 
 
 def generate_city_ph():
@@ -397,6 +399,146 @@ def generate_skill():
 
     return SKILL[randomizer][0]
 
+
+# Get 90% of all k9s then assign a random skill to each one
+def assign_skill_random():
+    k9s = K9.objects.all()
+
+    k9_id_list = []
+    for k9 in k9s:
+        k9_id_list.append(k9.id)
+
+    k9_sample = random.sample(k9_id_list, int(len(k9_id_list)*.90))
+
+    k9s = K9.objects.filter(pk__in = k9_sample)
+
+    for k9 in k9s:
+        k9.capability = generate_skill()
+        k9.training_status = "Classified"
+        k9.save()
+
+    return k9_sample
+
+
+# Get 80% of all classified k9s then assign a random handler to each one
+def assign_handler_random():
+
+    k9_sample = assign_skill_random()
+
+    users = User.objects.filter(position = "Handler")
+
+    user_id_list = []
+    for user in users:
+        user_id_list.append(user.id)
+
+    k9_sample = random.sample(k9_sample, int(len(k9_sample)*.80))
+    user_sample = random.sample(user_id_list, len(k9_sample)) #user sample now have the same length as k9 sample
+    partnership = zip(k9_sample, user_sample)
+
+
+    for item in partnership:
+        k9 = K9.objects.get(id = item[0])
+        user = User.objects.get(id = item[1])
+
+        k9.handler = user
+        k9.training_status = 'On-Training'
+        k9.save()
+
+    return k9_sample
+
+#Get 70% of all k9s with handlers then end their training
+def generate_training():
+    fake = Faker()
+
+    k9_sample = assign_handler_random() #Get all k9s with available handlers
+    k9_sample = random.sample(k9_sample, int(len(k9_sample) * .70))
+
+    k9s = K9.objects.filter(pk__in = k9_sample)
+
+    GRADE = (
+        # ("0", "0"),
+        ("75", "75"),
+        ("80", "80"),
+        ("85", "85"),
+        ("90", "90"),
+        ("95", "95"),
+        ("100", "100"),
+    )
+
+    for k9 in k9s:
+        birthdate = k9.birth_date
+
+        training_start_alpha = datetime.combine(birthdate, datetime.min.time())
+        training_start_alpha = training_start_alpha + timedelta(days=365)
+
+
+        training = Training.objects.filter(k9 = k9).get(training = k9.capability)
+
+        remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+
+        train_sched = Training_Schedule.objects.get(k9 = k9) #Because we have 1 instance of this per k9 instance
+        train_sched.date_start = training_start_alpha
+        train_sched.date_end = training_start_alpha + timedelta(days=20)
+
+        grade_list = []
+        stage = "Stage 0"
+        for idx in range(9):
+            randomizer = random.randint(0, 5)
+            grade = GRADE[randomizer][0]
+            grade_list.append(grade)
+
+            if idx == 0:
+                stage = "Stage 1.1"
+            elif idx == 1:
+                stage = "Stage 1.2"
+            elif idx == 2:
+                stage = "Stage 1.3"
+            elif idx == 3:
+                stage = "Stage 2.1"
+            elif idx == 4:
+                stage = "Stage 2.2"
+            elif idx == 5:
+                stage = "Stage 2.3"
+            elif idx == 6:
+                stage = "Stage 3.1"
+            elif idx == 7:
+                stage = "Stage 3.2"
+            elif stage == 8:
+                stage = "Stage 3.3"
+
+            if idx <= 7:
+
+                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+                                                               date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
+                train_sched.save()
+
+
+        training.stage1_1 = grade_list[0]
+        training.stage1_2 = grade_list[1]
+        training.stage1_3 = grade_list[2]
+
+        training.stage2_1 = grade_list[3]
+        training.stage2_2 = grade_list[4]
+        training.stage2_3 = grade_list[5]
+
+        training.stage3_1 = grade_list[6]
+        training.stage3_2 = grade_list[7]
+        training.stage3_3 = grade_list[8]
+
+        training.remarks = remark
+        training.stage = "Finished Training"
+        training.save()
+
+        k9.training_status = 'Trained'
+        k9.training_level = "Finished Training"
+        k9.save()
+
+        print(str(k9))
+        print("Grade : " + str(training.grade))
+
+    return None
+
 #Half of K9s are classified
 def generate_k9():
     fake = Faker()
@@ -422,7 +564,7 @@ def generate_k9():
         print("Breed : " + generate_breed())
         breed = generate_breed()
 
-        generated_date = fake.date_between(start_date="-4y", end_date="-2y")
+        generated_date = fake.date_between(start_date="-3y", end_date="-1y")
         date_time = generated_date.strftime("%m/%d/%Y")
         print("Birthdate : " + date_time)
 
@@ -821,13 +963,71 @@ def generate_maritime():
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>END OF Maritimes and Incidents CREATION
 
+#TODO Fix K9.training_stage set at "Stage 0" regardless of training progress
 
 #ADVANCED POPULATE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#TODO Assign  a number of k9s to ports
+#TODO assign a number of k9s to events(take into account the restrictions)
 
 
-def generate_breed():
+def generate_dogbreed():
    
     arr = ['Belgian Malinois','Dutch Sheperd','German Sheperd','Golden Retriever','Jack Russel','Labrador Retriever']
 
+    temperament_list = ['Friendly', 'Skittish', 'Timid', 'Wild', 'Adventurous']
+
     for data in arr:
-        Dog_Breed.objects.create(breed=data,life_span=10,temperament='Friendly',colors='Black',weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+        randomizer = random.randint(0, 4)
+        temperament = temperament_list[randomizer]
+
+        Dog_Breed.objects.create(breed=data,life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+
+    return None
+
+
+def assign_commander_random():
+
+    if Area is None:
+        generate_area()
+    else:
+        areas = Area.objects.all()
+        commanders = User.objects.filter(position = "Commander")
+
+        area_list = []
+        for area in areas:
+            area_list.append(area)
+
+        commander_list = []
+        for commander in commanders:
+            commander_list.append(commander)
+
+        commander_list = random.sample(commander_list, len(commander_list)-1)
+
+        partnership = zip(commander_list, area_list)
+
+        for item in partnership:
+            area = item[1]
+            area.commander = item[0]
+            area.save()
+
+    return None
+
+def fix_dog_duplicates():
+
+    k9s = K9.objects.all()
+
+    k9_list = []
+    for k9 in k9s:
+        k9_list.append(k9.name)
+
+    # Get unique names
+    k9_list = list(set(k9_list))
+
+    for item in k9_list:
+        k9s = K9.objects.filter(name = item)
+        ctr = 1
+        for k9 in k9s:
+            k9.name = k9.name + " " + str(ctr)
+            k9.save()
+
+    return None

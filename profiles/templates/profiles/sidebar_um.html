@@ -29,6 +29,9 @@
                             <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
                                 <i class="clipboard list icon"></i>K9 Incident List
                             </a>
+                            <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
+                                <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
+                            </a>
                             {% elif request.session.session_user_position == "Veterinarian" %}
                             <!-- <a href="{% url 'profiles:add_User_form'%}" class="item">
                                 <i class="user plus icon"></i>Add User Form

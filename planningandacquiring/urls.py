@@ -21,7 +21,7 @@ urlpatterns = [
     path('K9_detail/<int:id>', views.K9_detailview, name='K9_detail'),
     path('report/', views.report, name='report'),
     path('index/', views.index, name='index'),
-    path('K9_forecast/', views.forecast_result, name='K9_forecast'),
+
     
     path('budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/', views.budgeting_list, name='budget_list'),

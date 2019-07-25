@@ -9,14 +9,16 @@
 			{% endfor %}
 		{% endif %}
 	</div>
-		<table id="tabledata" class="ui five column celled table">
+		<table id="tabledata" class="ui seven column celled table">
         	<thead>
           	<tr>
               <th>Team</th>
 							<th>Area</th>
 							<th>City</th>
 							<th>Place</th>
+							<th>No. of Maritime</th>
 							<th>No. of Incidents</th>
+							<th>No. of Units Deployed</th>
 							<th></th>
           	</tr>
     		</thead>
@@ -29,7 +31,9 @@
 							<td>{{data.location.area}}</td>
 							<td>{{data.location.city}}</td>
 							<td>{{data.location.place}}</td>
+							<td>{{data.location|maritime_count_location:0 }}</td>
 							<td>{{data.location|incident_count_location:0 }}</td>
+							<td>{{data.total_dogs_deployed}} out of 5</td>
 							<td class="ui center aligned">
 								<a href="{% url 'deployment:edit_team' data.id %}" class="ui basic blue button">Edit</a>
 							</td>
