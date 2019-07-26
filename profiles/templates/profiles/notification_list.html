@@ -20,7 +20,7 @@
 
         <div class="ui very basic tab segment active" data-tab="first">
                 {% for notif_data in notif_data%}
-                {% if notif_data.notif_type != "location_incident"%}
+                {% if notif_data.notif_type != "location_incident" or notif_data.notif_type != "request_dog"%}
                 {% if notif_data.viewed == True%}
                 <div class="ui orange message" style='opacity: 0.5;'>
                         <div class="ui feed">

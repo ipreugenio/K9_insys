@@ -3,7 +3,7 @@
     <div style="background-color: transparent;" class="ui icon top left pointing dropdown button" >
         <i class="blue bell icon"></i>
         <span style="color:red;font-size: 12px;">{{count}}</span>
-        <div class="ui vertical scrollable menu" style="width:350px;max-height:300px; overflow-x: auto;">
+        <div class="ui vertical scrollable menu" style="width:330px;max-height:300px; overflow-x: auto;">
             {% for notif_data in notif_data%}
                 {%if notif_data.viewed == True %}
                 <a class="item" style='color: black;opacity: 0.6;' href="{% url 'unitmanagement:redirect_notif' notif_data.id %}">{{notif_data.message}} 

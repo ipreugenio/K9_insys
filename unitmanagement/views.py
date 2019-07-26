@@ -155,7 +155,14 @@ def yearly_vaccine_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
 
-    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(age__gte=1)
+    vr = VaccinceRecord.objects.filter(deworming_4=True,dhppil_cv_3=True,anti_rabies=True,bordetella_2=True,dhppil4_2=True)
+    
+    list_k9 = []
+
+    for v in vr:
+        list_k9.append(v.k9.id) 
+    
+    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
     
     k9_ar = []
     k9_dh = []
@@ -220,10 +227,16 @@ def yearly_vaccine_list(request):
             f.disease = request.POST.get('type')
             f.k9 = k9
 
-            f.save()
-
-            messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
-
+            #minus 
+            mi = Medicine_Inventory.objects.get(vaccine=f.vaccine)
+            mi.quantity = mi.quantity - 1
+         
+            if mi.quantity > 0 :
+                f.save()
+                mi.save()
+                messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
+            else:
+                messages.warning(request, 'Insufficient Quantity')
             return redirect('unitmanagement:yearly_vaccine_list')
 
     context = {
@@ -245,6 +258,7 @@ def yearly_vaccine_list(request):
 #TODO Initialize treatment
 #TODO fix missing form
 def health_form(request):
+    form = HealthForm(request.POST or None)
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
 
@@ -261,8 +275,7 @@ def health_form(request):
 
             dog = K9.objects.get(id=form_instance.dog.id)
             print('from query ', dog)
-            
-            print(request.session['problem'])
+           
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
             form_med = []
@@ -327,6 +340,16 @@ def health_form(request):
                     for form in formset:
                         form.save()
                     dog.status = 'Sick'
+                    dog.save()
+
+                    minus_list = zip(form_med,form_quantity)
+
+                    #subtract item
+                    for a,b in minus_list:
+                        mm = Medicine_Inventory.objects.get(id=a.id)
+                        mm.quantity = mm.quantity - b
+                        mm.save()
+
                     style = "ui green message"
                     messages.success(request, 'Health Form has been successfully recorded!')
 
@@ -1077,8 +1100,15 @@ def requests_form(request):
     return render (request, 'unitmanagement/request_form.html', context)
 
 def trained_list(request):
-    data = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
-    
+    k9s_for_grading = []
+    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+
+    for item in train_sched:
+        if item.k9.training_level == item.stage:
+            k9s_for_grading.append(item.k9.id)
+
+    data = K9.objects.filter(id__in=k9s_for_grading)
+
     NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
     EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
     SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
@@ -2375,6 +2405,35 @@ class CommanderView(APIView):
 
         data = {
             "team_items":team_items,
+        }
+        return Response(data)
+
+class TrainerView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+
+
+        NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+        EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+        SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+
+        current = [NDD_count,EDD_count,SAR_count]
+        demand = [NDD_demand,EDD_demand,SAR_demand]
+
+        ndd_train = K9.objects.filter(capability='NDD').filter(training_status='On-Training').count()
+        edd_train = K9.objects.filter(capability='EDD').filter(training_status='On-Training').count()
+        sar_train = K9.objects.filter(capability='SAR').filter(training_status='On-Training').count()
+        
+        pie_data = [ndd_train,edd_train,sar_train]
+        data = {
+            "current":current,
+            "demand":demand,
+            "pie_data":pie_data,
         }
         return Response(data)
 

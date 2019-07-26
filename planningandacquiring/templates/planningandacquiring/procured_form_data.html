@@ -22,37 +22,51 @@
         <label>Image</label>
     </div>    
 </div>
-
-<div class="ui inverted segment">
     {% for form in formset %}
+
+    <div class="ui inverted raised segment">
     <div class="formset_class " id="{{ form.prefix }}-row">
-        <div class="six fields">
-        <div class="field">
-            {{form.name}}
-        </div>    
-        <div class="field">
-            {{form.birth_date}}
-        </div> 
-        <div class="field">
-            {{form.breed}}
-        </div> 
-        <div class="field">
-            {{form.color}}
-        </div> 
-        <div class="field">
-            {{form.sex}}
-        </div> 
-        <div class="field">
-            {{form.image}}
-        </div>    
+            <div class="six fields">
+            <div class="field">
+                {{form.name}}
+            </div>    
+            <div class="field">
+                {{form.birth_date}}
+            </div> 
+            <div class="field">
+                {{form.breed}}
+            </div> 
+            <div class="field">
+                {{form.color}}
+            </div> 
+            <div class="field">
+                {{form.sex}}
+            </div> 
+            <div class="field">
+                {{form.image}}
+            </div>    
+            </div>
+        </div>
+        <div class="four fields">
+            <div class="field">
+                <label for="">DHPP</label>
+                {{form.date_dhhp}}
+            </div>   
+            <div class="field">
+                <label for="">ANTI RABIES</label>
+                {{form.date_rabies}}
+            </div>   
+            <div class="field">
+                <label for="">DEWORMING</label>
+                {{form.date_deworm}}
+            </div>   
+            <div class="field">
+                <label for="">BORDERTELLA</label>
+                {{form.date_bordertela}}
+            </div>    
         </div>
     </div>
-    <div>
-        <label>Date</label>
-        <input type="date" name="" id="">
-    </div>
+  
     {% endfor %}
-
-</div>
-
+    {{formset.management_form}}
 {% endblock %}

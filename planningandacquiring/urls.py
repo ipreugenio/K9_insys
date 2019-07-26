@@ -48,7 +48,7 @@ urlpatterns = [
     path('add_K9_parents_form/ajax_load_k9_reco', views.load_k9_reco, name='ajax_load_k9_reco'),
     
 
-    path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
+    # path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
 
     path('accomplishment_date/', views.accomplishment_date, name='accomplishment_date'),
     path('accomplishment_date/accomplishment_report/', views.accomplishment_report, name='accomplishment_report'),

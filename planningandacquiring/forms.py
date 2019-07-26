@@ -55,13 +55,56 @@ class SupplierForm(forms.Form):
         model = K9_Supplier
         fields = ('supplier',)
 
-class ProcuredK9Form(forms.ModelForm):
-    class Meta:
-        model = K9
-        fields = ('name', 'birth_date', 'breed', 'color', 'sex', 'image')
-        widgets = {
-            'birth_date': DateInput(),
-        }
+class ProcuredK9Form(forms.Form):
+    COLORS = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+    SEX = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+    
+    BREED = (
+        ('Belgian Malinois', 'Belgian Malinois'),
+        ('Dutch Sheperd', 'Dutch Sheperd'),
+        ('German Sheperd', 'German Sheperd'),
+        ('Golden Retriever', 'Golden Retriever'),
+        ('Jack Russel', 'Jack Russel'),
+        ('Labrador Retriever', 'Labrador Retriever'),
+    )
+
+    date_dhhp = forms.DateField(widget = DateInput(), label='DHPP')
+    date_rabies = forms.DateField(widget = DateInput(), label='ANTI-RABIES')
+    date_deworm = forms.DateField(widget = DateInput(), label='DEWORMING')
+    date_bordertela = forms.DateField(widget = DateInput(), label='BORDERTELLA')
+    birth_date = forms.DateField(widget = DateInput(), label='birth_date')
+    name = forms.CharField()
+    breed = forms.ChoiceField(choices=BREED)
+    color = forms.ChoiceField(choices=COLORS)
+    sex = forms.ChoiceField(choices=SEX)
+    image = forms.ImageField()
+
+    def __init__(self, *args, **kwargs):
+        super(ProcuredK9Form, self).__init__(*args, **kwargs)
+        self.fields['image'].required = False
 
 class ReportDateForm(forms.ModelForm):
     class Meta:

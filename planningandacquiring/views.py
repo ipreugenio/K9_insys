@@ -6,8 +6,7 @@ from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_B
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm,DateK9Form
 
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, add_breed_form
-from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, K9_Supplier, K9_Litter
-from .models import K9_Mated
+
 from deployment.models import Incidents
 from planningandacquiring.models import Proposal_Budget, Proposal_K9,Proposal_Milk_Food, Proposal_Vac_Prev, Proposal_Medicine, Proposal_Vet_Supply, Proposal_Kennel_Supply, Proposal_Others, Actual_Budget, Actual_K9,Actual_Milk_Food, Actual_Vac_Prev, Actual_Medicine, Actual_Vet_Supply, Actual_Kennel_Supply, Actual_Others
 
@@ -20,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.http import JsonResponse
 from django.contrib import messages
-from .forms import ReportDateForm, add_breed_form, k9_detail_form, SupplierForm, ProcuredK9Form,k9_acquisition_form
+from .forms import ReportDateForm, k9_detail_form, SupplierForm, ProcuredK9Form,k9_acquisition_form
 from deployment.models import Dog_Request, Team_Assignment
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
@@ -210,9 +209,8 @@ def report(request):
 
 def add_procured_k9(request):
     form = SupplierForm(request.POST or None)
-    k9_formset = formset_factory(add_donated_K9_form, extra=1, can_delete=True)
+    k9_formset = formset_factory(ProcuredK9Form, extra=1, can_delete=True)
     formset = k9_formset(request.POST, request.FILES)
-
     style = "ui green message"
 
     try:
@@ -223,20 +221,30 @@ def add_procured_k9(request):
         if form.is_valid():
             supplier_data = form.cleaned_data['supplier']
             supplier = K9_Supplier.objects.get(name=supplier_data)
-            request.session['procured'] = []
 
             if formset.is_valid():
                 print("Formset is valid")
                 for forms in formset:
-                    k9 = forms.save(commit=False)
-                    k9.supplier = supplier
-                    k9.source = 'Procurement'
-                    k9.training_status = 'Unclassified'
-                    saved_list = request.session['procured']
-                    saved_list.append(k9.id)
-                    request.session['procured'] = saved_list
-                    k9.save()
+                    cd = forms.cleaned_data
+                    name = cd.get('name')
+                    bday = cd.get('birth_date')
+                    sex = cd.get('sex')
+                    color = cd.get('color')
+                    dhpp = cd.get('date_dhhp')
+                    rabies = cd.get('date_rabies')
+                    bordertella = cd.get('date_bordertela')
+                    deworm = cd.get('date_deworm')
 
+                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color)
+                    
+                    VaccineUsed.objects.create(k9=k9,disease='DHPPiL4',date_vaccinated=dhpp,done=True)
+                    
+                    VaccineUsed.objects.create(k9=k9,disease='Anti-Rabies',date_vaccinated=rabies,done=True)
+                    
+                    VaccineUsed.objects.create(k9=k9,disease='Deworming',date_vaccinated=deworm,done=True)
+                    
+                    VaccineUsed.objects.create(k9=k9,disease='Bordetella',date_vaccinated=bordertella,done=True)
+             
                 style = "ui green message"
                 messages.success(request, 'Procured K9s has been added!')
                 
@@ -260,20 +268,6 @@ def add_procured_k9(request):
         'style':style,
         }
     return render (request, 'planningandacquiring/add_procured_k9.html', context)
-
-def procured_form_data(request):
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-     
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-        }
-    return render (request, 'planningandacquiring/procured_form_data.html', context)
-    
 
 def add_supplier(request):
     form = K9SupplierForm(request.POST)
@@ -1018,37 +1012,8 @@ def breeding_confirmed(request):
 def K9_listview(request):
 
     k9 = K9.objects.all()
-
-    #Test trunc
-    #print(K9_Quantity.objects.annotate(day=TruncDay('date_bought')).values('day').annotate(total=Sum('quantity')).order_by('date_bought'))
-
-    #Sample Aggregation by year
-    '''
-    k9_quantities = K9_Quantity.objects.all()
+    style = 'ui green message'
     
-    my_list = []
-    for k9_quantity in k9_quantities:
-        date = k9_quantity.date_bought
-        my_list.append(date.year)
-
-    my_list = list(set(my_list))
-    my_quantities = []
-
-    for item in my_list:
-        sum = 0
-        for k9_quantity in k9_quantities:
-            date = k9_quantity.date_bought
-            if date.year == item:
-                sum += k9_quantity.quantity
-        my_quantities.append(sum)
-    '''
-
-    '''
-    for x in range(50):
-        date = fake.date_between(start_date='-6y', end_date='-1y')
-        name = fake.name()
-        dog = K9(name = name, birth_date = date)
-        dog.save()'''
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1059,6 +1024,7 @@ def K9_listview(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'style':style,
     }
 
     return render(request, 'planningandacquiring/K9_list.html', context)
@@ -1856,10 +1822,11 @@ def load_form(request):
 
 def load_form_procured(request):
     formset = None
+    formset2 = None
     try:
         num = request.GET.get('num')
         num = int(num)
-        k9_formset = formset_factory(add_donated_K9_form, extra=num, can_delete=False)
+        k9_formset = formset_factory(ProcuredK9Form, extra=num, can_delete=False)
         formset = k9_formset(request.POST, request.FILES)
 
     except:
@@ -2660,11 +2627,14 @@ def budgeting(request):
        
     #last year budget
     last_year = next_year - 2
-    abb = None
+    print(last_year)
     try:
-        abb = Actual_Budget.objects.get(date_created__year=last_year)
-    except:
+        abb = Actual_Budget.objects.get(year_budgeted__year=last_year)
+    except ObjectDoesNotExist:
         abb = None
+
+    print(abb)
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()

@@ -36,7 +36,7 @@
                             <thead>
                                 <tr>
                                     <th>Breed</th>
-                                    <th>Dead (count)</th>
+                                    <th>Diseased (count)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,15 +97,15 @@
             <table class="ui four column celled table right aligned">
                 <thead>
                     <th class="four wide column">Last Year's Budget</th>
-                    <th class="four wide column">
-                        {% if abb%}
-                            {{abb.grand_total}}
+                    <th class="four wide column" style="color: teal">
+                        {% if abb != None %}
+                            {{abb.grand_total|intcomma}}
                         {%else%}
                             No saved budget last year
                         {%endif%}
                     </th>
                     <th class="four wide column">Budget Proposal</th>
-                    <th class="four wide column"id='bp_show'>0</th>
+                    <th class="four wide column"id='bp_show' style="color: green;"></th>
                 </thead>
             </table>
             <br>

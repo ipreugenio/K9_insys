@@ -141,74 +141,77 @@
       <form class = "ui form" action="" method="post">
           {% csrf_token %}
         <div class="ui two column grid">
-          <div class="column">
-             <center>
-               <h4 class='ui horizontal divider header'>Dam (Mother)</h4>
-             </center>
-        
-              <table id="tabledata1" class="ui nine column inverted pink celled
-              collapsing small table">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>Breed</th>
-                            <th>Capability</th>
-                            <th>Birth Success</th>
-                            <th>Litter</th>
-                            <th>Sick Record</th>
-                            <th>In-Heat Date</th>
-                        </tr>
-                    </thead>
-            
-                    <tbody>
-                        {% for m, s, b in mlist %}
-
-                        {% if m.estrus_date >= today.date %}
-                        <tr class="positive">
-                            <td class="center aligned"> 
-                                <input type="radio" id="radiom" name="radiom" value="{{m.id}}">
-                            </td>
-                            <td>
-                                <a href="#" class="show_modal" id='{{m.id}}' style="color:green;">{{m.name}}</a>
-                            </td>
-                            <td>{{m.age}}</td>
-                            <td>{{m.breed}}</td>
-                            <td>{{m.capability}}</td>
-                            <td>{{b}}%</td>
-                            <td>{{m.litter_no}}</td>
-                            <td>{{s}}</td>
-                            <td>Mate Today!</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td class="center aligned"> 
-                                <input type="radio" id="radiom" name="radiom" value="{{m.id}}">
-                            </td>
-                            <td>
-                                <a href="#" class="show_modal" id='{{m.id}}' style="color:powderblue;">{{m.name}}</a>
-                            </td>
-                            <td>{{m.age}}</td>
-                            <td>{{m.breed}}</td>
-                            <td>{{m.capability}}</td>
-                            <td>{{b}}%</td>
-                            <td>{{m.litter_no}}</td>
-                            <td>{{s}}</td>
-                            <td>{{m.last_proestrus_date|date:'m/d/Y'}}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+          <div class="row">
+              <div class="column">
+                  <center>
+                    <h4 class='ui horizontal divider header'>Dam (Mother)</h4>
+                  </center>
+             
+                   <table id="tabledata1" class="ui nine column inverted pink celled
+                   collapsing small table" style="font-size:12px;">
+                         <thead>
+                             <tr>
+                                 <th></th>
+                                 <th>Name</th>
+                                 <th>Age</th>
+                                 <th>Breed</th>
+                                 <th>Capability</th>
+                                 <th>Birth Success</th>
+                                 <th>Litter</th>
+                                 <th>Sick Record</th>
+                                 <th>In-Heat Date</th>
+                             </tr>
+                         </thead>
+                 
+                         <tbody>
+                             {% for m, s, b in mlist %}
+     
+                             {% if m.estrus_date >= today.date %}
+                             <tr class="positive">
+                                 <td class="center aligned"> 
+                                     <input type="radio" id="radiom" name="radiom" value="{{m.id}}">
+                                 </td>
+                                 <td>
+                                     <a href="#" class="show_modal" id='{{m.id}}' style="color:green;">{{m.name}}</a>
+                                 </td>
+                                 <td>{{m.age}}</td>
+                                 <td>{{m.breed}}</td>
+                                 <td>{{m.capability}}</td>
+                                 <td>{{b}}%</td>
+                                 <td>{{m.litter_no}}</td>
+                                 <td>{{s}}</td>
+                                 <td>Mate Today!</td>
+                             </tr>
+                             {% else %}
+                             <tr>
+                                 <td class="center aligned"> 
+                                     <input type="radio" id="radiom" name="radiom" value="{{m.id}}">
+                                 </td>
+                                 <td>
+                                     <a href="#" class="show_modal" id='{{m.id}}' style="color:powderblue;">{{m.name}}</a>
+                                 </td>
+                                 <td>{{m.age}}</td>
+                                 <td>{{m.breed}}</td>
+                                 <td>{{m.capability}}</td>
+                                 <td>{{b}}%</td>
+                                 <td>{{m.litter_no}}</td>
+                                 <td>{{s}}</td>
+                                 <td>{{m.last_proestrus_date|date:'m/d/Y'}}</td>
+                             </tr>
+                             {% endif %}
+                             {% endfor %}
+                         </tbody>
+                     </table>
+               </div>
+                 
+                 <div class="column" id = 'id_father_data'>
+                   <center>
+                     <h4 class='ui horizontal divider header'>Sire (Father)</h4>
+                   </center>
+                 </div>
+             </div>
           </div>
-            
-            <div class="column" id = 'id_father_data'>
-              <center>
-                <h4 class='ui horizontal divider header'>Sire (Father)</h4>
-              </center>
-            </div>
-        </div>
+     
           <div class="ui center aligned basic segment" style="padding: 0px;">
               <button id = "submit" class = "ui button green" type="submit" >Next Step</button>
           </div>
@@ -288,10 +291,10 @@
         </div>
       </div>
     </div>
-
 <script type="text/javascript">
 
 	$(document).ready(function() {
+    $('.menu .item').tab();
 
     $("#summary").hide();
 
@@ -309,7 +312,6 @@
     $('#tabledata3').DataTable({
       "order": [[ 4, "desc" ],[ 5, "desc" ],[ 6, "asc" ]]
     });
-		$('.menu .item').tab();
 
     $('.ui.radiom.checkbox').checkbox();     
 

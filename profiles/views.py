@@ -385,7 +385,17 @@ def operations_dashboard(request):
 
 def trainer_dashboard(request):
     user = user_session(request)
-    
+
+    k9s_for_grading = []
+    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+
+    for item in train_sched:
+        if item.k9.training_level == item.stage:
+            k9s_for_grading.append(item.k9.id)
+
+    grade = K9.objects.filter(id__in=k9s_for_grading).count()
+    unclassified = K9.objects.filter(training_status='Unclassified').count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -393,6 +403,9 @@ def trainer_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'grade':grade,
+        'unclassified':unclassified,
     }
     return render (request, 'profiles/trainer_dashboard.html', context)
 

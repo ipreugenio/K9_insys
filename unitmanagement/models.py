@@ -247,7 +247,7 @@ class VaccineUsed(models.Model):
     date = models.DateField('date', auto_now_add=True)
     
     def __str__(self):
-        return str(self.vaccine_record) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
+        return str(self.k9) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
 
 
 #TODO
