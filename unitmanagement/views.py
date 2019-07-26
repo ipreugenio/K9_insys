@@ -33,7 +33,7 @@ from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipm
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler, Training_History,Training_Schedule
+from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -2610,12 +2610,14 @@ def load_k9_data(request):
     remarks = None
     h_count = None
     health = None
+    train = None
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
         remarks = Training_Schedule.objects.filter(k9=k9)
         h_count = Health.objects.filter(dog=k9).count()
         health = Health.objects.filter(dog=k9)
+        train = Training.objects.get(k9=k9)
     except:
         pass
 
@@ -2624,6 +2626,7 @@ def load_k9_data(request):
         'remarks': remarks,
         'h_count': h_count,
         'health': health,
+        'train': train,
     }
 
     return render(request, 'unitmanagement/k9_data_trained.html', context)

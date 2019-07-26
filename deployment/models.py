@@ -555,7 +555,6 @@ class Daily_Refresher(models.Model):
     
 
 class TempDeployment(models.Model):
-
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
 
@@ -570,13 +569,12 @@ class TempCheckup(models.Model):
     def __str__(self):
         return str(self.k9)
 
-
-
 #TODO
 class K9_Pre_Deployment_Items(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
-        ('Complete', 'Complete'),
+        ('Confirmed', 'Confirmed'),
+        ('Done', 'Done'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True, related_name='k9_pre_requirement')

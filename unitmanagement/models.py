@@ -1,8 +1,7 @@
 from django.db import models
 
 from profiles.models import User
-from inventory.models import Medicine, Miscellaneous, Food, DamagedEquipemnt, Food
-from inventory.models import Medicine_Inventory
+from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
 from deployment.models import K9_Schedule, Incidents, Location
@@ -15,22 +14,6 @@ from planningandacquiring.models import K9
 from django.contrib.auth.models import User as AuthUser
 
 # Create your models here.
-
-#TODO
-# either text or Fk from equipment
-# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
-class K9_Pre_Deployment_Items(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)    
-    collar = models.CharField('collar', max_length=200)
-    vest = models.CharField('vest', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    shipping_crate = models.CharField('shipping crate', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True, blank=True)
-    food_quantity = models.IntegerField('quantity', default=0) 
-    vitamins = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, null=True, blank=True)
-    vitamins_quantity = models.IntegerField('quantity', default=0) 
-    
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
@@ -118,8 +101,6 @@ class HealthMedicine(models.Model):
     def __str__(self):
         return str(self.id) + ': ' + str(self.health.date)  # + '-' + str(self.health.dog)
 
-
-
 class Transaction_Health(models.Model):
     health = models.ForeignKey(Health, on_delete=models.CASCADE, null=True, blank=True, related_name='initial_health')
     health2 = models.ForeignKey(Health, on_delete=models.CASCADE, null=True, blank=True,  related_name='follow_health')
@@ -182,11 +163,6 @@ class PhysicalExam(models.Model):
 
     def __str__(self):
         return str(self.date) + ': ' + str(self.dog.name)
-
-@receiver(post_save, sender=PhysicalExam)
-def phex_next_date(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        instance.date_next_exam = instance.date + relativedelta(year=+1, )
 
 class VaccinceRecord(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -275,7 +251,8 @@ class Food_Request(models.Model):
 
 
 class Handler_On_Leave(models.Model):
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='handler_leave')
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, default="On-Leave")
     date = models.DateField('date', auto_now_add=True)
@@ -284,7 +261,6 @@ class Handler_On_Leave(models.Model):
     date_from = models.DateField('date_from', null=True, blank=True)
     date_to = models.DateField('date_to', null=True, blank=True)
     duration = models.IntegerField('duration', null=True, blank=True)
-    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
 
     def save(self, *args, **kwargs):
         days = self.date_to - self.date_from
@@ -303,7 +279,7 @@ class Handler_Incident(models.Model):
         ('Died', 'Died'),
         ('Others', 'Others'),
     )
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='handler_incident')
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', choices=INCIDENT,max_length=100, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
@@ -320,12 +296,12 @@ class Handler_Incident(models.Model):
         super(Handler_Incident, self).save(*args, **kwargs)
 
 
-class Request_Transfer(models.Model):
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date_created =  models.DateField('date_created', auto_now_add=True)
-    date_of_transfer = models.DateField('date_created', null=True, blank=True)
-    location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
-    location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
+# class Request_Transfer(models.Model):
+#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     date_created =  models.DateField('date_created', auto_now_add=True)
+#     date_of_transfer = models.DateField('date_created', null=True, blank=True)
+#     location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
+#     location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
 
 class Notification(models.Model):
     POSITION = (
@@ -378,10 +354,7 @@ def create_medicine_inventory(sender, instance, **kwargs):
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Training.objects.create(k9=instance, training='EDD')
-        Training.objects.create(k9=instance, training='NDD')
-        Training.objects.create(k9=instance, training='SAR')
-
+        Training.objects.create(k9=instance, training=instance.capability)
         Training_Schedule.objects.create(k9 = instance)
 
 #create vaccine record, and vaccine used
@@ -433,7 +406,8 @@ def create_k9_vaccines(sender, instance, **kwargs):
 @receiver(post_save, sender=PhysicalExam)
 def phex_next_date(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        instance.date_next_exam = instance.date + relativedelta(year=+1,)
+        instance.date_next_exam = instance.date + relativedelta(year=+1)
+        instance.save()
 
 #TODO EDIT    
 # HANDLER INCIDENT repored
