@@ -33,7 +33,7 @@ from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipm
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler, Training_History
+from training.models import K9_Handler, Training_History, Training_Schedule
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -245,6 +245,9 @@ def yearly_vaccine_list(request):
 #TODO Initialize treatment
 #TODO fix missing form
 def health_form(request):
+    form = HealthForm(request.POST or None)
+
+
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
 
@@ -327,6 +330,15 @@ def health_form(request):
                     for form in formset:
                         form.save()
                     dog.status = 'Sick'
+                    dog.save()
+
+                    minus_list = zip(form_med, form_quantity)
+
+                    # subtract item
+                    for a, b in minus_list:
+                        mm = Medicine_Inventory.objects.get(id=a.id)
+                        mm.quantity = mm.quantity - b
+                        mm.save()
                     style = "ui green message"
                     messages.success(request, 'Health Form has been successfully recorded!')
 
@@ -1077,6 +1089,13 @@ def requests_form(request):
     return render (request, 'unitmanagement/request_form.html', context)
 
 def trained_list(request):
+    k9s_for_grading = []
+    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+
+    for item in train_sched:
+        if item.k9.training_level == item.stage:
+            k9s_for_grading.append(item.k9.id)
+
     data = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
     
     NDD_count = K9.objects.filter(capability='NDD').count()

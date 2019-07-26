@@ -56,7 +56,8 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
-from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates
+from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
+    generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed
 
 import random
 
@@ -116,6 +117,7 @@ def mass_populate():
 
     #>>advanced
 
+    generate_dogbreed()
     generate_training() #Classify k9s
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
@@ -582,7 +584,7 @@ def request_dog_details(request, id):
     # print(can_deploy)
 
     # dogs deployed to Dog Request
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(Q(status='Deployed') | Q(status='Scheduled'))
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(status='Deployed')
 
     sar_deployed = 0
     ndd_deployed = 0
@@ -629,7 +631,6 @@ def request_dog_details(request, id):
                 if location.area == AOR:
                     k9s_within_AOR.append(k9.id)
 
-
     #TODO Combine df of within AOR and ouside AOR if event is small
 
     can_deploy_list = []
@@ -639,6 +640,7 @@ def request_dog_details(request, id):
     location_list =[]
     area_list = []
 
+    #Note that can_deploy is same as usual if event is Big
     if data2.sector_type == "Small Event":
         can_deploy_inside_AOR = can_deploy.filter(pk__in = k9s_within_AOR)
         can_deploy_outside_AOR = can_deploy.exclude(pk__in = k9s_within_AOR)
@@ -774,9 +776,9 @@ def request_dog_details(request, id):
         # print(checked_dogs)
 
         for checked_dogs in checked_dogs:
-            #TODO automatic approve pag operations (+ admin na rin siguro pero wala naman dapat access admin dito lol)
-
-            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname)) #TODO Only save k9.assignment when system datetime is same as request
+            # TODO Only save k9.assignment when system datetime is same as request
+            # TODO Don't create Team_Dog_Deployed if hindi pa officially "Deployed"
+            # Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname))
 
             K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
 
@@ -1698,15 +1700,24 @@ def schedule_units(request):
     return render(request, 'deployment/schedule_units.html', context)
 
 
+
+# Step 3
+#Input from TL if team has arrived(a checklist of team members)
+def confirm_arrival(request):
+
+    #if request == "POST": #TL confirms arrival through a post submit
+
+    return None
+
 def transfer_request(request, k9_id, team_assignment_id, location_id):
 
     #TODO check if date of transfer has conflict
     #TODO if unit is transferring, prompt commander/operations if he wants to replace units assigned to a request
 
     k9 = K9.objects.get(id = k9_id)
-    team = Team_Assignment.objects.get(id = team_assignment_id)
-    location = Location.objects.get(id = location_id)
-    team_to_transfer = Team_Assignment.objects.get(location = location)
+    team = Team_Assignment.objects.get(id = team_assignment_id) #Current Team
+    location = Location.objects.get(id = location_id)  #Location to transfer to (user input)
+    team_to_transfer = Team_Assignment.objects.get(location = location) #Team to transfer to
 
     can_transfer = 0
 

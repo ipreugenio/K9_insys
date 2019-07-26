@@ -27,10 +27,10 @@
                         <div class="ui raised segment">
                             <div class="ui statistic">
                               <div class="value">
-                                <i class="plane icon"></i> 5
+                                07/30/18
                               </div>
                               <div class="label">
-                                Sample Item
+                                Upcoming Deployment
                               </div>
                             </div>
                           </div>
@@ -42,7 +42,7 @@
                                 <i class="plane icon"></i> 5
                               </div>
                               <div class="label">
-                                Sample Item
+                                (Add info on port/request details)
                               </div>
                             </div>
                           </div>
@@ -58,7 +58,7 @@
                     <th>Type: {{k9.status}}</th>
                     <th>Capability: {{k9.capability}}</th>
 
-                        {% if k9.training_level %}
+                        {% if k9.training_status == "On-Training" %}
                     <th>Training Stage: {{k9.training_level}} </th>
 
                         <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
@@ -90,6 +90,22 @@
                         </form>
                         {% endif %}
 
+                        {% if reveal_items == True %}
+                            <div class="ui two column grid">
+                                <div class="four wide column">
+                                    <input class = "ui green button" type="submit"  value="Confirm Initial Deployment" id = "reveal_predep_checklist">
+                                </div>
+                                 <div class="ten wide column">
+                                     <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
+                                      <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
+                                </div>
+                            </div>
+                        {% elif all_clear == True %}
+                         <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
+                        <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
+                        {% else %}
+                        {% endif %}
+
                         </div>
                         {% else %}
                         <div class = "ui segment">
@@ -119,7 +135,10 @@
         </div>
       </div>
 
-      <!--Modal--> 
+      <!--Pre Deployment Items Modal-->
+
+
+      <!--Event Modal-->
       <div class="ui modal" id = 'modal1'>
           <i class="close icon"></i>
           <div class="header">Add Event</div>
@@ -235,6 +254,35 @@
       <div class="scrolling content">Something</div>
        
     </div>
+
+
+<div class="ui mini modal" id = 'modal3'>
+      <i class="close icon"></i>
+    <div class="header"><h2>Pre Deployment Requirements</h2></div>
+    <div class="scrolling content">
+             {% for item in items_list %}
+                    {% if item.0 == True %}
+                    <h4><i class="green check icon"></i>{{item.1}}</h4>
+                    {%else%}
+                    <h4><i class="red close icon"></i>{{item.1}}</h4>
+                    {%endif%}
+                {% endfor %}
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+            {% if all_clear == True %}
+            <button class="ui green button" type="submit" name = "confirm_deployment" value="Confirm Deployment"><i class="ship icon"></i>Confirm Deployment</button>
+
+            {% else %}
+            <button class="ui disabled green button"><i class="ship icon"></i>Confirm Deployment</button>
+
+            {% endif %}
+        </form>
+
+    </div>
+</div>
+
 <style>
 
   #calendar .fc-dayGridMonth-view .fc-scroller {
@@ -352,7 +400,7 @@ $(document).ready(function() {
           events: [
                 {% for i in events %}
                 {
-                     id: '{{ i.id }}',
+                    id: '{{ i.id }}',
                     title: '{{i.event_name}}',
                     start: '{{ i.start_date|date:"Y-m-d" }}',
                     end: '{{ i.end_date|date:"Y-m-d" }}',
@@ -413,6 +461,13 @@ $(document).ready(function() {
 });
 </script>
 
+
+<script>
+
+    $( "#reveal_predep_checklist" ).click(function() {
+  $('#modal3').modal('setting', 'closable', false).modal('show');
+});
+</script>
 
 
 {% endblock %}

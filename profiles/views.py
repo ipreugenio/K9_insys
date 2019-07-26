@@ -16,13 +16,15 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
-from unitmanagement.models import Equipment_Request, Notification
+from unitmanagement.models import Equipment_Request, Notification, PhysicalExam
 from training.models import Training_Schedule, Training
+from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
+from django.db.models import Sum
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
 from datetime import datetime, date
@@ -200,31 +202,198 @@ def team_leader_dashboard(request):
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
-def handler_dashboard(request):
-    user = user_session(request)
 
+# Step 1
+# Access this view/function when TL opens dashboard
+def check_pre_deployment_items(user):
+    all_clear = False
+    items_list = [False]
+
+    all_clear = True
+    k9 = K9.objects.get(handler = user)
+
+
+    items_list = []
+
+    collar = False
+    vest = False
+    leash = False
+    shipping_crate = False
+    food = False
+    vitamins = False
+    grooming_kit = False
+    first_aid_kit = False
+    oral_dextrose = False
+    ball = False
+    phex = False
+
+    items_list.append(all_clear)
+
+    try:
+        checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
+        if checkup.cleared == True:
+            phex = True
+    except: phex = False
+    items_list.append((phex, "Physical Exam"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains = "Collar").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        collar = True
+    items_list.append((collar , "Collar"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains = "Vest").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if  agg >= 1:
+        vest = True
+    items_list.append((vest , "Vest"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        leash = True
+    items_list.append((leash , "Leash"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        shipping_crate = True
+    items_list.append((shipping_crate , "Shipping Crate"))
+
+    agg = Food.objects.filter(foodtype = "Adult Dog Food").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        food = True
+    items_list.append((food , "Dog Food"))
+
+    medicines = Medicine.objects.filter(med_type = "Vitamins")
+    agg = Medicine_Inventory.objects.filter(medicine__in = medicines).aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        vitamins = True
+    items_list.append((vitamins , "Vitamins"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        grooming_kit = True
+    items_list.append((grooming_kit , "Grooming Kit"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        first_aid_kit = True
+    items_list.append((first_aid_kit , "First Aid Kit"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        oral_dextrose = True
+    items_list.append((oral_dextrose , "Oral Dextrose"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        ball = True
+    items_list.append((ball , "Ball"))
+
+    #Check if items are complete
+
+    check_list = [collar, vest, leash, shipping_crate, food, vitamins, grooming_kit, first_aid_kit, oral_dextrose, ball, phex]
+
+    for item in check_list:
+        if item == False:
+            all_clear = False
+
+    items_list[0] = all_clear
+
+    return items_list
+
+
+#Step 2
+#Handler confirms items and will be part of the team officially deployed
+def confirm_pre_deployment_items(request, k9):
+
+    pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+    pre_deployment_items.status = "Confirmed"
+    pre_deployment_items.save()
+
+    return False
+
+def handler_dashboard(request):
+
+    user = user_session(request)
     form = RequestForm(request.POST or None)
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
+
     
     dr = 0
     k9 = None
     training_sched = None
+    training = None
+
+    pre_deployment_items = False
+    all_clear = False
+    reveal_items = False
+
+
+    k9 = K9.objects.get(handler=user)
+    today = datetime.today()
+
+    items_list = []
+    if k9.training_status == "For-Deployment":
+
+        items_list = check_pre_deployment_items(user)
+        all_clear = items_list[0]
+
+        del items_list[0]
+
+        print("Items List")
+        print(items_list)
+
+        pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+        initial_sched = pre_deployment_items.initial_sched
+
+        delta = initial_sched.date_start - today.date()
+        if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
+            reveal_items = True
+
+
+    # TODO try except for when handler does not yet have a k9
+    # TODO try except for when k9s still don't have a skill
+    # TODO try except when k9 has finished training
 
     try:
-        k9 = K9.objects.get(handler=user)
-
-        training = None
-        training_sched = None
-        today = datetime.today()
-
-        # TODO try except for when handler does not yet have a k9
-        # TODO try except for when k9s still don't have a skill
-        # TODO try except when k9 has finished training
         training = Training.objects.get(k9=k9, training=k9.capability)
         training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
-    except:
-        pass
+    except: pass
+
+
+    print("ALL CLEAR")
+    print(all_clear)
+    print("REVEAL ITEMS")
+    print(reveal_items)
 
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
 
@@ -239,6 +408,11 @@ def handler_dashboard(request):
     if request.method == 'POST':
         start_training = request.POST.get('start_training')
         end_training = request.POST.get('end_training')
+
+        confirm_deployment = request.POST.get('confirm_deployment')
+        if confirm_deployment:
+            confirm_pre_deployment_items(request, k9)
+            return redirect("profiles:handler_dashboard")
 
         if start_training:
             print("START TRAINING VALUE")
@@ -309,7 +483,12 @@ def handler_dashboard(request):
 
         'show_start': show_start,
         'show_end': show_end,
-        'training_sched' : training_sched
+        'training_sched' : training_sched,
+
+        'pre_deployment_item' : pre_deployment_items,
+        'reveal_items' : reveal_items,
+        'all_clear' : all_clear,
+        'items_list' : items_list
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 

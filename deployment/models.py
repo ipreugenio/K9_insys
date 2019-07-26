@@ -460,12 +460,13 @@ class K9_Schedule(models.Model):
         ('Initial Deployment', 'Initial Deployment'),
         ('Checkup', 'Checkup'),
         ('Request', 'Request'),
+        ('Transfer Deployment', 'Transfer Deployment')
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     dog_request = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, null=True, blank=True)
     team = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, null=True, blank=True)
-    status = models.CharField('status', max_length=100, null=True, blank=True, default='Pending')
+    status = models.CharField('status', choices=CHOICES, max_length=100, null=True, blank=True, default='Pending')
     date_start = models.DateField('date_start', null=True, blank=True)
     date_end = models.DateField('date_end', null=True, blank=True)
 
@@ -572,11 +573,11 @@ class TempCheckup(models.Model):
 
 
 
-#TODO
+#TODO 1 isntance lang per k9, if bumalik pcg idelete yung luma
 class K9_Pre_Deployment_Items(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
-        ('Complete', 'Complete'),
+        ('Confirmed', 'Confirmed'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True, related_name='k9_pre_requirement')
@@ -595,3 +596,25 @@ class K9_Pre_Deployment_Items(models.Model):
     oral_dextrose = models.IntegerField('oral_dextrose', default=0)
     ball = models.IntegerField('ball,.', default=0)
     status = models.CharField('status', max_length=100, choices=STATUS, default='Pending')
+    arrived = models.BooleanField('arrived', default=False)
+
+    # def check_items(self):
+
+
+    def remove_old_instance(self):
+
+        try:
+            recent = K9_Pre_Deployment_Items.objects.filter(k9 = self.k9).latest()
+            old_instances = K9_Pre_Deployment_Items.objects.exclude(recent)
+            old_instances.delete()
+        except:
+            pass
+
+        return None
+
+
+    def save(self, *args, **kwargs):
+
+        self.remove_old_instance()
+
+        super(K9_Pre_Deployment_Items, self).save(*args, **kwargs)

@@ -16,20 +16,6 @@ from django.contrib.auth.models import User as AuthUser
 
 # Create your models here.
 
-#TODO
-# either text or Fk from equipment
-# verify: grooming kit, first aid kit, vitamins, and oral dextrose.
-class K9_Pre_Deployment_Items(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)    
-    collar = models.CharField('collar', max_length=200)
-    vest = models.CharField('vest', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    shipping_crate = models.CharField('shipping crate', max_length=200)
-    leash = models.CharField('leash', max_length=200)
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True, blank=True)
-    food_quantity = models.IntegerField('quantity', default=0) 
-    vitamins = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, null=True, blank=True)
-    vitamins_quantity = models.IntegerField('quantity', default=0) 
     
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
