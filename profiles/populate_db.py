@@ -506,12 +506,12 @@ def generate_training():
             elif stage == 8:
                 stage = "Stage 3.3"
 
-            if idx <= 7:
+            # if idx <= 8: 
 
-                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+            sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
                                                                date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
-                train_sched.save()
+            train_sched.save()
 
 
         training.stage1_1 = grade_list[0]
@@ -1029,5 +1029,7 @@ def fix_dog_duplicates():
         for k9 in k9s:
             k9.name = k9.name + " " + str(ctr)
             k9.save()
+            print(str(k9.name))
+            ctr += 1
 
     return None

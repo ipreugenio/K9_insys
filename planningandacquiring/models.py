@@ -299,12 +299,12 @@ class K9(models.Model):
                 self.litter_no = 0
 
         
-        # try:
-        td = Team_Dog_Deployed.objects.filter(k9__id=self.id).filter(date_pulled=None)[0]
-        loc = Team_Assignment.objects.get(id=td.id)
-        self.assignment = str(loc)
-        # except:
-        #     self.assignment = None
+        try:
+            td = Team_Dog_Deployed.objects.filter(k9__id=self.id).filter(date_pulled=None)[0]
+            loc = Team_Assignment.objects.get(id=td.id)
+            self.assignment = str(loc)
+        except:
+            self.assignment = None
 
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)

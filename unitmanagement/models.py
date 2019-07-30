@@ -380,10 +380,19 @@ def create_medicine_inventory(sender, instance, **kwargs):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
 
 # K9 Training
+# @receiver(post_save, sender=K9)
+# def create_training_record(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Training.objects.create(k9=instance, training=instance.capability)
+#         Training_Schedule.objects.create(k9 = instance)
+
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Training.objects.create(k9=instance, training=instance.capability)
+        Training.objects.create(k9=instance, training='EDD')
+        Training.objects.create(k9=instance, training='NDD')
+        Training.objects.create(k9=instance, training='SAR')
+
         Training_Schedule.objects.create(k9 = instance)
 
 #create vaccine record, and vaccine used

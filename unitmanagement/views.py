@@ -1101,14 +1101,16 @@ def requests_form(request):
     return render (request, 'unitmanagement/request_form.html', context)
 
 def trained_list(request):
-    k9s_for_grading = []
-    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+    # k9s_for_grading = []
+    # train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+    #
+    # for item in train_sched:
+    #     if item.k9.training_level == item.stage:
+    #         k9s_for_grading.append(item.k9.id)
 
-    for item in train_sched:
-        if item.k9.training_level == item.stage:
-            k9s_for_grading.append(item.k9.id)
+    # data = K9.objects.filter(id__in=k9s_for_grading)
 
-    data = K9.objects.filter(id__in=k9s_for_grading)
+    data = K9.objects.filter(training_status = "Trained")
 
     NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
     EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
