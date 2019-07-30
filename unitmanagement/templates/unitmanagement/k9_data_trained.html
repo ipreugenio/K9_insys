@@ -6,6 +6,13 @@
     <div class="image scrolling content">
         <img class="image" src="{{k9.image.url}}" style="position:relative; width: 350px;height: 300px;" >
         <div class="description">
+                <div class="ui tiny info message">
+                    <ul class="list">
+                        <li>Less Sickly K9 would be prefered For-Breeding</li>
+                        <li>Training Score 85 and above would be ideal for For-Deployment.</li>
+                        <li>Dont forget to check the remarks!</li>
+                    </ul>
+                </div>
             <form action="" class="ui form">
                 <div class="four fields">
                     <div class="field">
@@ -40,12 +47,38 @@
                         </div>
                         <div class="field">
                             <label>Training Score</label>
-                            <input type="text" value="training Score" readonly>
+                            <input type="text" value="{{train.grade}}" readonly>
                         </div>
                     </div>
-                    <div>
-                        <h1>TRAINING REMARKS HERE</h1>
+                    <div class="field">
+                      <div class="ui large red label">
+                            <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
+                      </div>
                     </div>
+                    <div id = 'sick' class="ui segment"> 
+                        <table class="ui small two celled table">
+                            <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Treatment</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in health %}
+                                    <tr>
+                                        <td>{{data.problem}}</td>
+                                        <td>{{data.treatment}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% for data in remarks%}
+                    <div class="field">
+                        <label>{{data.stage}}</label>
+                        <textarea name="" id="" rows="2">{{data.remarks}}</textarea>
+                    </div>
+                    {% endfor %}
                 </form>
 
             
@@ -55,6 +88,18 @@
         <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
         <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>    
     </div>
+
+
+    <script>   
+        $(document).ready(function() {
+            $("#sick").hide();
+
+            $("#btn2").click(function(){
+                $("#sick").slideToggle();
+            });
+
+        });
+    </script>
 {%endif%}
 {% endblock %}
 

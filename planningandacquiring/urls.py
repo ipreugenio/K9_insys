@@ -39,6 +39,7 @@ urlpatterns = [
     path('breed_detail/<int:id>', views.breed_detail, name='breed_detail'),
     path('mating_confirmed/', views.mating_confirmed, name='mating_confirmed'),
     path('breeding_list/', views.breeding_list, name='breeding_list'),
+    path('breeding_list/<int:id>', views.breeding_list, name='breeding_list'),
     path('breeding_k9_confirmed/', views.breeding_k9_confirmed, name='breeding_k9_confirmed'),
     path('add_supplier/', views.add_supplier, name='add_supplier'),
     path('add_procured_k9/', views.add_procured_k9, name='add_procured_k9'),
@@ -47,7 +48,7 @@ urlpatterns = [
     path('add_K9_parents_form/ajax_load_k9_reco', views.load_k9_reco, name='ajax_load_k9_reco'),
     
 
-    path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
+    # path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
 
     path('accomplishment_date/', views.accomplishment_date, name='accomplishment_date'),
     path('accomplishment_date/accomplishment_report/', views.accomplishment_report, name='accomplishment_report'),
@@ -57,9 +58,28 @@ urlpatterns = [
 
     path('inventory_date/', views.inventory_date, name='inventory_date'),
     path('inventory_date/inventory_report/', views.inventory_report, name='inventory_report'),
+
+    path('deployment_date/', views.deployment_date, name='deployment_date'),
+    path('deployment_date/deployment_report/', views.deployment_report, name='deployment_report'),
+
+    path('handler_date/', views.handler_date, name='handler_date'),
+    path('handler_date/handler_report/', views.handler_report, name='handler_report'),
+
+    path('k9_report/', views.k9_report, name='k9_report'),
+    path('training_report/', views.training_report, name='training_report'),
+
+    path('k9_performance_date/', views.k9_performance_date, name='k9_performance_date'),
+    path('k9_performance_date/k9_performance_report/', views.k9_performance_report, name='k9_performance_report'),
+
+    path('dog_request_date/', views.dog_request_date, name='dog_request_date'),
+    path('dog_request_date/dog_request_report/', views.dog_request_report, name='dog_request_report'),
+
     path('add_K9_parents_form/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('add_K9_offspring/ajax_load_form', views.load_form, name='ajax_load_form'),
     path('add_procured_k9/ajax_load_form_procured', views.load_form_procured, name='ajax_load_form_procured'),
+    
+    path('budgeting/ajax_load_budget_data', views.load_budget_data, name='ajax_load_budget_data'),
+    path('budgeting/ajax_load_budget', views.load_budget, name='ajax_load_budget'),
 
 ];
 

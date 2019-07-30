@@ -58,9 +58,12 @@ class Training(models.Model):
 
         super(Training, self).save(*args, **kwargs)
 
+class Training_History(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
 
 class Training_Schedule(models.Model):
-
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     stage = models.CharField('stage', max_length=200, default="Stage 0")
     date_start = models.DateTimeField('date_start', null=True, blank=True)
@@ -69,12 +72,6 @@ class Training_Schedule(models.Model):
 
     def __str__(self):
         return str(self.k9) +'  - ' + str(self.stage)
-
-
-class Training_History(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
 
 class K9_Adopted_Owner(models.Model):
     SEX = (

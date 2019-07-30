@@ -1285,10 +1285,11 @@ def fail_dog(request, id):
 
 def training_details(request, id):
     data = K9.objects.get(id=id) # get k9
-    edd = Training.objects.filter(k9=data).get(training='EDD') # get training record
-    ndd = Training.objects.filter(k9=data).get(training='NDD')
-    sar = Training.objects.filter(k9=data).get(training='SAR')
-
+    
+    try:
+        train = Training.objects.filter(k9=data).get(training=data.capability) # get training record
+    except:
+        train=None
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1296,9 +1297,7 @@ def training_details(request, id):
     context = {
         'title': str(data),
         'data': data,
-        'edd':edd,
-        'ndd':ndd,
-        'sar':sar,
+        'train': train,
         'notif_data':notif_data,
         'count':count,
         'user':user,

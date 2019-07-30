@@ -1,0 +1,43 @@
+{% extends "profiles/sidebar_reports.html" %}
+
+{% block content %}
+<div class="ui inverted segment" style="padding:20px;">
+    <h3>Generate Handler Performance Report</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ui green message" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+    
+    <form class="ui form" action="" method="POST">
+        {% csrf_token %}
+        <div class="ui basic segment">
+            <div class="ui three column very relaxed stackable center aligned grid">
+                <div class="column">
+                    {{form.from_date}}
+                </div>
+                <div class="middle aligned column">
+                    {{form.to_date}} 
+                </div>
+                <div class="ui vertical divider">
+                    to
+                </div>
+            </div>
+        </div>
+        <center>
+            <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>  
+        </center>
+    </form>
+
+<script type="text/javascript">
+
+     $(document).ready(function() {a
+        $('#tabledata1');
+        $('#tabledata2');
+        $('.menu .item').tab();
+    });
+
+</script>
+{% endblock %}

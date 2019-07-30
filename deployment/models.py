@@ -408,7 +408,7 @@ class Dog_Request(models.Model):
     def due_start(self):
         notif = self.date_start - timedelta(days=7)
         return notif
-    
+
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
@@ -473,7 +473,7 @@ class K9_Schedule(models.Model):
     def due_start(self):
         notif = self.date_start - timedelta(days=7)
         return notif
-    
+
     def due_end(self):
         notif = self.date_end - timedelta(days=7)
         return notif
@@ -556,10 +556,9 @@ class Daily_Refresher(models.Model):
     others_find = models.IntegerField('others_find', blank=True, null=True)
     others_time = models.TimeField('others_time', blank=True, null=True)
     mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
-    
+
 
 class TempDeployment(models.Model):
-
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
 

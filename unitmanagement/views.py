@@ -33,7 +33,7 @@ from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipm
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler, Training_History, Training_Schedule
+from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -53,14 +53,14 @@ def notif(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
-    
+
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime').exclude(notif_type='handler_on_leave').exclude(notif_type='handler_died')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
-   
+
     return notif
 
 def currrent_user(request):
@@ -127,12 +127,12 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('unitmanagement:on_leave_details', id = notif.other_id)
-    #TODO location incident view details 
+    #TODO location incident view details
     elif notif.notif_type == 'location_incident' :
         notif.viewed = True
         notif.save()
         return redirect('deployment:incident_detail', id = notif.other_id)
-    
+
 
 def index(request):
     notif_data = notif(request)
@@ -145,8 +145,8 @@ def index(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
-     
-    }        
+
+    }
     return render (request, 'unitmanagement/index.html', context)
 
 
@@ -155,8 +155,15 @@ def yearly_vaccine_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
 
-    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(age__gte=1)
-    
+    vr = VaccinceRecord.objects.filter(deworming_4=True,dhppil_cv_3=True,anti_rabies=True,bordetella_2=True,dhppil4_2=True)
+
+    list_k9 = []
+
+    for v in vr:
+        list_k9.append(v.k9.id)
+
+    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
+
     k9_ar = []
     k9_dh = []
     k9_br = []
@@ -209,7 +216,7 @@ def yearly_vaccine_list(request):
     #form = VaccinationYearlyForm
     form = VaccinationUsedForm(request.POST or None)
 
-    if request.method == "POST":    
+    if request.method == "POST":
         if form.is_valid():
             id = request.POST.get('k9')
             k9 = K9.objects.get(id=id)
@@ -220,10 +227,16 @@ def yearly_vaccine_list(request):
             f.disease = request.POST.get('type')
             f.k9 = k9
 
-            f.save()
+            #minus
+            mi = Medicine_Inventory.objects.get(vaccine=f.vaccine)
+            mi.quantity = mi.quantity - 1
 
-            messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
-
+            if mi.quantity > 0 :
+                f.save()
+                mi.save()
+                messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
+            else:
+                messages.warning(request, 'Insufficient Quantity')
             return redirect('unitmanagement:yearly_vaccine_list')
 
     context = {
@@ -239,7 +252,7 @@ def yearly_vaccine_list(request):
         'count_dh':len(k9_dh),
         'count_br':len(k9_br),
         'count_dw':len(k9_dw),
-    }        
+    }
     return render (request, 'unitmanagement/yearly_vaccination.html', context)
 
 #TODO Initialize treatment
@@ -264,8 +277,7 @@ def health_form(request):
 
             dog = K9.objects.get(id=form_instance.dog.id)
             print('from query ', dog)
-            
-            print(request.session['problem'])
+
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
             form_med = []
@@ -274,7 +286,7 @@ def health_form(request):
             insufficient_quantity = []
             insufficient_med = []
             days = []
-            
+
             msg = 'Insuficient quantity! Availability for '
 
             if formset.is_valid():
@@ -286,7 +298,7 @@ def health_form(request):
                     print(form_quantity)
 
                 mi = Medicine_Inventory.objects.filter(medicine__in=form_med)
-                
+
                 for mi in mi:
                     inventory_quantity.append(mi.quantity)
 
@@ -325,7 +337,7 @@ def health_form(request):
                     form_instance.delete()
                     style = "ui red message"
                     messages.warning(request, msg)
-                    
+
                 else:
                     for form in formset:
                         form.save()
@@ -358,7 +370,7 @@ def health_form(request):
     }
     return render (request, 'unitmanagement/health_form.html', context)
 
-#TODO MAKE INITIAL VALUE OF DOG 
+#TODO MAKE INITIAL VALUE OF DOG
 def physical_exam_form(request):
     form = PhysicalExamForm(request.POST or None)
     user_serial = request.session['session_serial']
@@ -367,7 +379,7 @@ def physical_exam_form(request):
 
     if 'phex_k9_id' in request.session:
         form.initial['dog'] = K9.objects.get(id=request.session['phex_k9_id'])
-    
+
     style=""
     if request.method == 'POST':
         if form.is_valid():
@@ -385,8 +397,8 @@ def physical_exam_form(request):
                 k9.fit = True
 
             new_form.save()
-            k9.save()    
-            
+            k9.save()
+
             style = "ui green message"
             messages.success(request, 'Physical Exam has been successfully recorded!')
             form = PhysicalExamForm()
@@ -414,7 +426,7 @@ def unfit_list(request):
     k9 = K9.objects.filter(fit=False)
     form = PhysicalExamForm(request.POST or None)
     user = user_session(request)
-    
+
     data = []
     for k9 in k9:
         try:
@@ -440,11 +452,11 @@ def unfit_list(request):
                 k9.fit = True
 
             new_form.save()
-            k9.save()    
-            
+            k9.save()
+
             style = "ui green message"
             messages.success(request, 'Physical Exam has been successfully recorded!')
-           
+
             return redirect('unitmanagement:unfit_list')
 
         else:
@@ -516,17 +528,17 @@ def health_history(request, id):
 
         formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
 
-        
+
         if formset.is_valid():
             for forms in formset:
                 if forms.is_valid():
                     f = forms.save(commit=False)
-                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:
                         ctr1=ctr1+1
                         f.veterinary = current_user
                         f.done = True
                         f.save()
-                       
+
                         if f.disease == '1st Deworming':
                             vr.deworming_1 = True
                         elif f.disease == '2nd Deworming':
@@ -582,11 +594,11 @@ def health_history(request, id):
                         elif f.disease == '8th Heartworm Prevention':
                             vr.heartworm_8 = True
                         vr.save()
-                        
-                        
-                    else: 
+
+
+                    else:
                         pass
-                    
+
                     if f.image != None:
                         ctr1=ctr1+1
                         f.save(update_fields=["image"])
@@ -609,7 +621,7 @@ def health_history(request, id):
     for forms in formset:
         if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
-           
+
         if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
 
@@ -621,13 +633,13 @@ def health_history(request, id):
 
         if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
-    
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -675,17 +687,17 @@ def health_history_handler(request):
     ctr1=0
     if request.method == 'POST':
         formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
-        
+
         if formset.is_valid():
             for forms in formset:
                 if forms.is_valid():
                     f = forms.save(commit=False)
-                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:
                         ctr1=ctr1+1
                         f.veterinary = current_user
                         f.done = True
                         f.save()
-                       
+
                         if f.disease == '1st Deworming':
                             vr.deworming_1 = True
                         elif f.disease == '2nd Deworming':
@@ -741,11 +753,11 @@ def health_history_handler(request):
                         elif f.disease == '8th Heartworm Prevention':
                             vr.heartworm_8 = True
                         vr.save()
-                        
-                        
-                    else: 
+
+
+                    else:
                         pass
-                    
+
                     if f.image != None:
                         ctr1=ctr1+1
                         f.save(update_fields=["image"])
@@ -768,7 +780,7 @@ def health_history_handler(request):
     for forms in formset:
         if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
-           
+
         if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
 
@@ -777,16 +789,16 @@ def health_history_handler(request):
 
         if forms.initial['disease'] == 'Anti-Rabies Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -814,7 +826,7 @@ def health_details(request, id):
     i = K9_Incident.objects.get(id=data.incident_id.id)
     medicine = HealthMedicine.objects.filter(health=data)
     dog = K9.objects.get(id = data.dog.id)
-    
+
 
     th = Transaction_Health.objects.filter(health=data).filter(status='Pending')
 
@@ -913,7 +925,7 @@ def vaccination_form(request):
     for forms in formset:
         if forms.initial['disease'] == '1st Deworming' or forms.initial['disease'] == '2nd Deworming' or forms.initial['disease'] == '3rd Deworming' or forms.initial['disease'] == '4th Deworming':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)
-           
+
         if forms.initial['disease'] == '1st dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL+CV Vaccination' or forms.initial['disease'] == '3rd dose DHPPiL+CV Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV').exclude(quantity=0)
 
@@ -922,30 +934,30 @@ def vaccination_form(request):
 
         if forms.initial['disease'] == 'Anti-Rabies Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st Tick and Flea Prevention' or forms.initial['disease'] == '2nd Tick and Flea Prevention' or forms.initial['disease'] == '3rd Tick and Flea Prevention' or forms.initial['disease'] == '4th Tick and Flea Prevention' or forms.initial['disease'] == '5th Tick and Flea Prevention' or forms.initial['disease'] == '6th Tick and Flea Prevention' or forms.initial['disease'] == '7th Tick and Flea Prevention':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose Bordetella Bronchiseptica Bacterin' or forms.initial['disease'] == '2nd dose Bordetella Bronchiseptica Bacterin':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
-            
+
         if forms.initial['disease'] == '1st dose DHPPiL4 Vaccination' or forms.initial['disease'] == '2nd dose DHPPiL4 Vaccination':
             forms.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4').exclude(quantity=0)
 
     if request.method == 'POST':
         formset = VaccinationUsedFormset(request.POST, request.FILES, prefix='record', instance=vr)
-        
+
         if formset.is_valid():
             for forms in formset:
                 if forms.is_valid():
                     f = forms.save(commit=False)
-                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:  
+                    if f.vaccine != None and f.date_vaccinated != None and f.done == False:
                         f.veterinary = user
                         f.done = True
                         f.save()
 
                         ctr1=ctr1+1
-                        
+
                         if f.disease == '1st Deworming':
                             vr.deworming_1 = True
                         elif f.disease == '2nd Deworming':
@@ -1001,10 +1013,10 @@ def vaccination_form(request):
                         elif f.disease == '8th Heartworm Prevention':
                             vr.heartworm_8 = True
                         vr.save()
-                        
-                    else: 
+
+                    else:
                         pass
-                        
+
                     if f.image != None:
                         ctr1=ctr1+1
                         f.save(update_fields=["image"])
@@ -1022,7 +1034,7 @@ def vaccination_form(request):
             if ctr>0:
                 messages.success(request, 'Incomplete input. Please check again.')
                 style='ui red message'
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1096,11 +1108,11 @@ def trained_list(request):
         if item.k9.training_level == item.stage:
             k9s_for_grading.append(item.k9.id)
 
-    data = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
-    
-    NDD_count = K9.objects.filter(capability='NDD').count()
-    EDD_count = K9.objects.filter(capability='EDD').count()
-    SAR_count = K9.objects.filter(capability='SAR').count()
+    data = K9.objects.filter(id__in=k9s_for_grading)
+
+    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
 
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
@@ -1120,7 +1132,7 @@ def trained_list(request):
     #Belgian Malinois
     bm_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(sex='Male').count()
     bm_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(sex='Female').count()
-    
+
     bm_m_edd =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='EDD').filter(sex='Male').count()
     bm_m_ndd =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='NDD').filter(sex='Male').count()
     bm_m_sar =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='SAR').filter(sex='Male').count()
@@ -1128,11 +1140,11 @@ def trained_list(request):
     bm_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='EDD').filter(sex='Female').count()
     bm_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='NDD').filter(sex='Female').count()
     bm_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='SAR').filter(sex='Female').count()
-    
+
     #Dutch Sheperd
     ds_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(sex='Male').count()
     ds_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(sex='Female').count()
-    
+
     ds_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='EDD').filter(sex='Male').count()
     ds_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='NDD').filter(sex='Male').count()
     ds_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='SAR').filter(sex='Male').count()
@@ -1144,7 +1156,7 @@ def trained_list(request):
     #German Sheperd
     gs_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(sex='Male').count()
     gs_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(sex='Female').count()
-    
+
     gs_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='EDD').filter(sex='Male').count()
     gs_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='NDD').filter(sex='Male').count()
     gs_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='SAR').filter(sex='Male').count()
@@ -1152,11 +1164,11 @@ def trained_list(request):
     gs_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='EDD').filter(sex='Female').count()
     gs_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='NDD').filter(sex='Female').count()
     gs_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='SAR').filter(sex='Female').count()
-    
-    
+
+
     gr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(sex='Male').count()
     gr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(sex='Female').count()
-    
+
     gr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='EDD').filter(sex='Male').count()
     gr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='NDD').filter(sex='Male').count()
     gr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='SAR').filter(sex='Male').count()
@@ -1164,10 +1176,10 @@ def trained_list(request):
     gr_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='EDD').filter(sex='Female').count()
     gr_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='NDD').filter(sex='Female').count()
     gr_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='SAR').filter(sex='Female').count()
-    
+
     jr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(sex='Male').count()
     jr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(sex='Female').count()
-    
+
     jr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='EDD').filter(sex='Male').count()
     jr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='NDD').filter(sex='Male').count()
     jr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='SAR').filter(sex='Male').count()
@@ -1175,10 +1187,10 @@ def trained_list(request):
     jr_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='EDD').filter(sex='Female').count()
     jr_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='NDD').filter(sex='Female').count()
     jr_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='SAR').filter(sex='Female').count()
-    
+
     lr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(sex='Male').count()
     lr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(sex='Female').count()
-    
+
     lr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='EDD').filter(sex='Male').count()
     lr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='NDD').filter(sex='Male').count()
     lr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='SAR').filter(sex='Male').count()
@@ -1198,7 +1210,7 @@ def trained_list(request):
     edd_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='EDD').filter(sex='Female').count()
     ndd_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='NDD').filter(sex='Female').count()
     sar_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='SAR').filter(sex='Female').count()
-    
+
     edd_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='EDD').filter(sex='Male').count()
     ndd_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='NDD').filter(sex='Male').count()
     sar_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='SAR').filter(sex='Male').count()
@@ -1206,12 +1218,20 @@ def trained_list(request):
     ndd = ndd_f+ndd_m
     edd = edd_f + edd_m
     sar = sar_f + sar_m
+
+    #finished training data
+    ts =[]
+    for d in data:
+        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
+        ts.append(a.date_end.date)
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
         'data': data,
+        'ts': ts,
         'title': 'Trained K9 List',
         'notif_data':notif_data,
         'count':count,
@@ -1302,7 +1322,7 @@ def trained_list(request):
 
 def classified_list(request):
     data = K9.objects.filter(training_status="Classified").filter(status="Material Dog")
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1385,7 +1405,7 @@ def k9_incident(request):
             dog.save()
 
             return redirect('unitmanagement:k9_incident')
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1410,7 +1430,7 @@ def k9_incident_list(request):
         ta = Team_Assignment.objects.get(team_leader=user)
 
         tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
-        
+
         k9 = []
         for td in tdd:
             k9.append(td.k9)
@@ -1420,14 +1440,14 @@ def k9_incident_list(request):
         data = K9_Incident.objects.filter(status='Pending').filter(incident='Accident')
     else:
         data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
-   
+
 
     if request.method == "POST":
         i = request.POST.get('input_id')
         dc = request.POST.get('death_cert')
         date = request.POST.get('date_died')
         ki = K9_Incident.objects.get(id=i)
-        
+
         k9 = K9.objects.get(id=ki.k9.id)
         k9.status= 'Dead'
         k9.training_status = 'Dead'
@@ -1461,7 +1481,7 @@ def follow_up(request, id):
     th = Transaction_Health.objects.create(health=data, incident=i)
     data.follow_up = True
     data.save()
-     
+
     request.session['health'] = th.id
 
     return redirect('unitmanagement:k9_sick_form')
@@ -1475,7 +1495,7 @@ def k9_sick_form(request):
     form.fields['k9'].queryset =  handler
     health = None
     h = None
-    
+
     if 'health' in request.session:
         h = request.session['health']
 
@@ -1519,7 +1539,7 @@ def k9_sick_form(request):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1544,16 +1564,16 @@ def k9_retreived(request, id):
     data.k9.status = 'Working Dog'
     data.save()
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
-    return redirect('unitmanagement:k9_incident_list') 
+    return redirect('unitmanagement:k9_incident_list')
 
 def k9_accident(request, id):
     accident = request.GET.get('accident')
     data = K9_Incident.objects.get(id=id)
     data.status = 'Done'
     data.save()
-    
+
     k9 = K9.objects.get(id=data.k9.id)
-    
+
     if accident == 'recovered':
         k9.status = 'Working Dog'
         messages.success(request, 'K9 has recovered!')
@@ -1561,9 +1581,9 @@ def k9_accident(request, id):
         k9.status = 'Died'
         k9.training_status = 'Died'
         messages.success(request, 'K9 died..')
-   
+
     k9.save()
-    return redirect('unitmanagement:k9_incident_list') 
+    return redirect('unitmanagement:k9_incident_list')
 
 def health_list_handler(request):
     user = user_session(request)
@@ -1602,7 +1622,7 @@ def handler_incident_form(request):
     user = user_session(request)
     form = HandlerIncidentForm(request.POST or None)
     style='ui green message'
-    
+
     data = Team_Assignment.objects.get(team_leader=user)
 
     team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
@@ -1631,19 +1651,19 @@ def handler_incident_form(request):
                 user.assigned = False
                 b.handler = None
                 #if MIA, kasama ba ang aso?
-            
+
             user.save()
             b.save()
             f.save()
 
             style = "ui green message"
             messages.success(request, 'Incident has been successfully Reported!')
-            return redirect('unitmanagement:handler_incident_form') 
+            return redirect('unitmanagement:handler_incident_form')
 
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-            
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1665,7 +1685,7 @@ def on_leave_request(request):
     style=''
 
     form.fields['handler'].queryset = User.objects.filter(id=user.id)
-    
+
     data = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave')
     num = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave').count()
 
@@ -1673,7 +1693,7 @@ def on_leave_request(request):
     if request.method == "POST":
         if form.is_valid():
             incident_save = form.save()
-            
+
             form = HandlerOnLeaveForm()
             style = "ui green message"
             messages.success(request, 'Request has been successfully Submited!')
@@ -1702,7 +1722,7 @@ def on_leave_request(request):
 def reassign_assets(request, id):
     form = assign_handler_form(request.POST or None)
     style = ""
-    k9 = K9.objects.get(id=id)  
+    k9 = K9.objects.get(id=id)
 
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
 
@@ -1715,7 +1735,7 @@ def reassign_assets(request, id):
             cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
         else:
             cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
-       
+
         s=[cap]
         g.append(s)
 
@@ -1742,7 +1762,7 @@ def reassign_assets(request, id):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-        
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1759,12 +1779,12 @@ def reassign_assets(request, id):
     }
     return render (request, 'unitmanagement/reassign_assets.html', context)
 
-# TODO 
+# TODO
 # On Leave List
 def on_leave_list(request):
     style='ui green message'
-    data1 = Handler_On_Leave.objects.filter(status='Pending').filter(incident='On-Leave') 
-    data2 = Handler_On_Leave.objects.filter(status='Approved').filter(incident='On-Leave') 
+    data1 = Handler_On_Leave.objects.filter(status='Pending').filter(incident='On-Leave')
+    data2 = Handler_On_Leave.objects.filter(status='Approved').filter(incident='On-Leave')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1795,14 +1815,14 @@ def on_leave_decision(request, id):
         data.approved_by = user
     elif leave == 'deny':
         data.status = 'Denied'
-    
+
     data.save()
 
     messages.success(request, 'You have ' + str(data.status) + ' ' + str(data.handler) + 's Leave Request.')
     return redirect('unitmanagement:on_leave_list')
 
 
-# TODO 
+# TODO
 # Reproductive Cycle
 def reproductive_list(request):
     style=''
@@ -1810,7 +1830,7 @@ def reproductive_list(request):
     estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female')
     metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female')
     anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female')
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1856,7 +1876,7 @@ def reproductive_edit(request, id):
     }
     return render (request, 'unitmanagement/reproductive_details.html', context)
 
-# TODO 
+# TODO
 # k9_unpartnered_list Cycle
 def k9_unpartnered_list(request):
     style=''
@@ -1877,12 +1897,12 @@ def k9_unpartnered_list(request):
     }
     return render (request, 'unitmanagement/k9_unpartnered_list.html', context)
 
-# TODO 
+# TODO
 # choose_handler Cycle
 def choose_handler_list(request, id):
     form = assign_handler_form(request.POST or None)
     style = ""
-    k9 = K9.objects.get(id=id)  
+    k9 = K9.objects.get(id=id)
 
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     g = []
@@ -1897,13 +1917,13 @@ def choose_handler_list(request, id):
         else:
             cap = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Trained').count()
             cap_f = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Failed').count()
-        
-        c = 0 
+
+        c = 0
         f = 0
         ct = cap+cap_f
         if cap != 0:
-            c = int((cap / ct) * 100) 
-     
+            c = int((cap / ct) * 100)
+
         s = [cap,ct,c]
         g.append(s)
     if request.method == 'POST':
@@ -1912,7 +1932,7 @@ def choose_handler_list(request, id):
             f = form.save(commit=False)
             f.k9 = k9
             f.save()
-            
+
             #K9 Update
             k9.training_status = 'On-Training'
             k9.handler = f.handler
@@ -1933,7 +1953,7 @@ def choose_handler_list(request, id):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    
+
     context = {
         'Title': "Available Handlers for " + k9.name,
         'form': form,
@@ -1946,7 +1966,7 @@ def choose_handler_list(request, id):
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
 
-# TODO 
+# TODO
 # K9 Died
 def confirm_death(request, id):
     i = K9_Incident.objects.get(id=id)
@@ -1962,7 +1982,7 @@ def confirm_death(request, id):
 
     return redirect('unitmanagement:k9_incident_list')
 
-# TODO 
+# TODO
 # choose_handler Cycle
 def choose_handler(request, id):
     k9_id_partnered = request.session["k9_id_partnered"]
@@ -1979,13 +1999,13 @@ def choose_handler(request, id):
     Handler_K9_History.objects.create(k9=k9, handler=handler)
     messages.success(request, k9.name + ' and ' + handler.fullname + ' has been successfully Partnered!')
 
-     
+
     return redirect('unitmanagement:k9_unpartnered_list')
 
 #TODO
 #sick list
 def k9_sick_list(request):
-    
+
     t = Transaction_Health.objects.filter(incident__status='Pending').exclude(health__follow_up=True)
     a = []
     for t in t:
@@ -2002,7 +2022,7 @@ def k9_sick_list(request):
         f.append(d.health.id)
 
     th = Health.objects.filter(follow_up_date__gte=dt.date.today()).exclude(follow_up_done=True)
-    
+
     print(th)
 
     #NOTIF SHOW
@@ -2025,7 +2045,7 @@ def k9_sick_list(request):
 #TODO
 #sick list
 def k9_sick_details(request, id):
-    
+
     data = K9_Incident.objects.get(id=id)
 
     health_id = Health.objects.filter(dog=data.k9)
@@ -2092,7 +2112,7 @@ def k9_sick_details(request, id):
             insufficient_quantity = []
             insufficient_med = []
             days = []
-            
+
             msg = 'Insuficient quantity! Availability for '
 
             if formset.is_valid():
@@ -2103,13 +2123,13 @@ def k9_sick_details(request, id):
                     days.append(form.cleaned_data['duration'])
 
                 mi = Medicine_Inventory.objects.filter(medicine__in=form_med)
-                
+
                 for mi in mi:
                     inventory_quantity.append(mi.quantity)
 
                 ctr1 = 0
                 ctr2 = len(form_quantity)
-              
+
                 while ctr1 < ctr2:
                     if inventory_quantity[ctr1] >= form_quantity[ctr1]:
                         pass
@@ -2130,7 +2150,7 @@ def k9_sick_details(request, id):
                         ctr4=ctr4+1
                     form_instance.delete()
                     style = "ui red message"
-                    messages.warning(request, msg)        
+                    messages.warning(request, msg)
                 else:
 
                     for form in formset:
@@ -2139,7 +2159,7 @@ def k9_sick_details(request, id):
                         med.quantity = med.quantity - f.quantity
                         med.save()
                         Medicine_Subtracted_Trail.objects.create(inventory = med, user=user_in_session, quantity = f.quantity)
-                        
+
                     health.duration =  max(days)
                     health.save() #health instance
                     dog.status = 'Sick'
@@ -2177,7 +2197,7 @@ class TeamLeaderView(APIView):
         user = user_session(request)
         ta = Team_Assignment.objects.get(team_leader=user)
         tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
-        
+
         # Incident
         er = Incidents.objects.filter(location = ta.location).filter(type='Explosives Related').count()
         nr = Incidents.objects.filter(location = ta.location).filter(type='Narcotics Related').count()
@@ -2194,9 +2214,9 @@ class TeamLeaderView(APIView):
 
         s_edd = ta.EDD_deployed
         s_ndd = ta.NDD_deployed
-        s_sar = ta.SAR_deployed      
+        s_sar = ta.SAR_deployed
 
-       
+
         demand_items = [d_edd, d_ndd, d_sar]
         supply_items = [s_edd, s_ndd, s_sar]
 
@@ -2210,12 +2230,12 @@ class TeamLeaderView(APIView):
             k9_id.append(td.k9.id)
 
         k9 = K9.objects.filter(id__in=k9_id)
-        
+
         k9_perf = []
 
-        #get all k9s 
+        #get all k9s
         for k in k9:
-        
+
             jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
             feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
             mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
@@ -2253,11 +2273,11 @@ class TeamLeaderView(APIView):
                 nov = 0
             if dec == None:
                 dec = 0
-            
+
 
             perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
             k9_perf.append(perf_items)
-            
+
         fou = []
 
         for td in tdd:
@@ -2310,13 +2330,13 @@ class HandlerView(APIView):
 
         if k9 != None:
             sched = K9_Schedule.objects.filter(k9=k9).filter(date_end__gte=today)
-            
+
             for items in sched:
                 i = [items.dog_request.location,items.dog_request.event_name,items.dog_request.total_dogs_demand,items.dog_request.total_dogs_deployed, items.date_start, items.date_end]
                 sched_items.append(i)
 
         perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
-    
+
         data = {
             "performance":perf_items,
             "sched":sched_items,
@@ -2364,10 +2384,10 @@ class VetView(APIView):
             nov = 0
         if dec == None:
             dec = 0
-        
+
 
         in_heat_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
-        
+
         data = {
             "in_heat":in_heat_items,
         }
@@ -2389,6 +2409,35 @@ class CommanderView(APIView):
         }
         return Response(data)
 
+class TrainerView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+
+
+        NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+        EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+        SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+
+        current = [NDD_count,EDD_count,SAR_count]
+        demand = [NDD_demand,EDD_demand,SAR_demand]
+
+        ndd_train = K9.objects.filter(capability='NDD').filter(training_status='On-Training').count()
+        edd_train = K9.objects.filter(capability='EDD').filter(training_status='On-Training').count()
+        sar_train = K9.objects.filter(capability='SAR').filter(training_status='On-Training').count()
+
+        pie_data = [ndd_train,edd_train,sar_train]
+        data = {
+            "current":current,
+            "demand":demand,
+            "pie_data":pie_data,
+        }
+        return Response(data)
+
 
 def load_handler(request):
 
@@ -2402,7 +2451,7 @@ def load_handler(request):
         edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
         ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
         sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
-        
+
     except:
         pass
 
@@ -2454,7 +2503,7 @@ def load_health(request):
     h = None
     try:
         health_id = request.GET.get('health')
-        health = Health.objects.get(id=health_id) 
+        health = Health.objects.get(id=health_id)
 
         h = HealthMedicine.objects.filter(health=health)
 
@@ -2473,7 +2522,7 @@ def load_image(request):
     image = None
     try:
         image_id = request.GET.get('image')
-        image = Image.objects.get(id=image_id) 
+        image = Image.objects.get(id=image_id)
     except:
         pass
     context = {
@@ -2488,10 +2537,10 @@ def load_incident(request):
     data_load = None
     try:
         id = request.GET.get('id')
-        data_load = K9_Incident.objects.get(id=id) 
+        data_load = K9_Incident.objects.get(id=id)
     except:
         pass
-   
+
     context = {
         'data_load': data_load,
     }
@@ -2520,7 +2569,7 @@ def load_yearly_vac(request):
             form.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin').exclude(quantity=0)
     except:
         pass
-   
+
     context = {
         'data': data,
         'form': form,
@@ -2536,7 +2585,7 @@ def load_physical(request):
     try:
         id = request.GET.get('id')
         type = request.GET.get('type')
-        
+
         if type == 'details':
             phex = PhysicalExam.objects.filter(dog=id).latest('date')
             form = PhysicalExamForm(request.POST or None, instance=phex)
@@ -2559,15 +2608,26 @@ def load_physical(request):
 def load_k9_data(request):
 
     k9 = None
-
+    remarks = None
+    h_count = None
+    health = None
+    train = None
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
+        remarks = Training_Schedule.objects.filter(k9=k9)
+        h_count = Health.objects.filter(dog=k9).count()
+        health = Health.objects.filter(dog=k9)
+        train = Training.objects.get(k9=k9)
     except:
         pass
 
     context = {
         'k9': k9,
+        'remarks': remarks,
+        'h_count': h_count,
+        'health': health,
+        'train': train,
     }
 
     return render(request, 'unitmanagement/k9_data_trained.html', context)

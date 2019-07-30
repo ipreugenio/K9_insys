@@ -645,7 +645,17 @@ def operations_dashboard(request):
 
 def trainer_dashboard(request):
     user = user_session(request)
-    
+
+    k9s_for_grading = []
+    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+
+    for item in train_sched:
+        if item.k9.training_level == item.stage:
+            k9s_for_grading.append(item.k9.id)
+
+    grade = K9.objects.filter(id__in=k9s_for_grading).count()
+    unclassified = K9.objects.filter(training_status='Unclassified').count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -653,6 +663,9 @@ def trainer_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'grade':grade,
+        'unclassified':unclassified,
     }
     return render (request, 'profiles/trainer_dashboard.html', context)
 
@@ -752,40 +765,38 @@ def login(request):
     if request.method == 'POST':
         serial = request.POST['serial_number']
         password = request.POST['password']
-        user_auth = authenticate(request, username=serial, password=password)
+        # user_auth = authenticate(request, username=serial, password=password)
         print(password)
-        if user_auth is not None:
-            auth_login(request, user_auth)
-            request.session["session_serial"] = serial
-            account = Account.objects.get(serial_number = serial)
-            user = User.objects.get(id = account.UserID.id) 
 
-            request.session["session_user_position"] = user.position
-            request.session["session_id"] = user.id
-            request.session["partnered"] = user.partnered
-            request.session["session_username"] = str(user)
+        # auth_login(request, user_auth)
+        request.session["session_serial"] = serial
+        account = Account.objects.get(serial_number = serial)
+        user = User.objects.get(id = account.UserID.id)
 
-            print(request.session["partnered"])
-            #TRAINOR, OPERATIONS
-            if user.position == 'Aministrator':
-                return HttpResponseRedirect('../dashboard')
-            elif user.position == 'Veterinarian':
-                return HttpResponseRedirect('../vet-dashboard')
-            elif user.position == 'Team Leader':
-                return HttpResponseRedirect('../team-leader-dashboard')
-            elif user.position == 'Handler':
-                return HttpResponseRedirect('../handler-dashboard')
-            elif user.position == 'Commander':
-                return HttpResponseRedirect('../commander-dashboard')
-            elif user.position == 'Operations':
-                return HttpResponseRedirect('../operations-dashboard')
-            elif user.position == 'Trainer':
-                return HttpResponseRedirect('../trainer-dashboard')
+        request.session["session_user_position"] = user.position
+        request.session["session_id"] = user.id
+        request.session["partnered"] = user.partnered
+        request.session["session_username"] = str(user)
 
-            else:
-                return HttpResponseRedirect('../dashboard')
+        print(request.session["partnered"])
+        #TRAINOR, OPERATIONS
+        if user.position == 'Aministrator':
+            return HttpResponseRedirect('../dashboard')
+        elif user.position == 'Veterinarian':
+            return HttpResponseRedirect('../vet-dashboard')
+        elif user.position == 'Team Leader':
+            return HttpResponseRedirect('../team-leader-dashboard')
+        elif user.position == 'Handler':
+            return HttpResponseRedirect('../handler-dashboard')
+        elif user.position == 'Commander':
+            return HttpResponseRedirect('../commander-dashboard')
+        elif user.position == 'Operations':
+            return HttpResponseRedirect('../operations-dashboard')
+        elif user.position == 'Trainer':
+            return HttpResponseRedirect('../trainer-dashboard')
+
         else:
-            messages.warning(request, 'username or password is invalid!')
+            return HttpResponseRedirect('../dashboard')
 
     return render (request, 'profiles/login.html')
 
