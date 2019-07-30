@@ -480,6 +480,7 @@ def generate_training():
         train_sched.date_start = training_start_alpha
         train_sched.date_end = training_start_alpha + timedelta(days=20)
 
+        #TODO populate does not reach stage 3.3
         grade_list = []
         stage = "Stage 0"
         for idx in range(9):
@@ -503,7 +504,7 @@ def generate_training():
                 stage = "Stage 3.1"
             elif idx == 7:
                 stage = "Stage 3.2"
-            elif stage == 8:
+            elif idx == 8:
                 stage = "Stage 3.3"
 
             # if idx <= 8: 
@@ -981,8 +982,8 @@ def generate_dogbreed():
         temperament = temperament_list[randomizer]
 
         Dog_Breed.objects.create(breed=data,sex='Male',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
-		
-	for data in arr:
+
+    for data in arr:
         randomizer = random.randint(0, 4)
         temperament = temperament_list[randomizer]
 
@@ -1032,10 +1033,11 @@ def fix_dog_duplicates():
     for item in k9_list:
         k9s = K9.objects.filter(name = item)
         ctr = 1
-        for k9 in k9s:
-            k9.name = k9.name + " " + str(ctr)
-            k9.save()
-            print(str(k9.name))
-            ctr += 1
+        if k9s.count() > 1:
+            for k9 in k9s:
+                k9.name = k9.name + " " + str(ctr)
+                k9.save()
+                print(str(k9.name))
+                ctr += 1
 
     return None
