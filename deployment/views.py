@@ -1671,11 +1671,28 @@ def schedule_units(request):
     print(location_dataframe)
 
     if request.method == 'POST':
+        invalid = False
         if  formset.is_valid:
+            for form in formset:
+                if form.is_valid:
+                    try:
+                        deployment_date = form['deployment_date'].value()
+                        deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
+                        print("Deployment Date")
+                        print(deployment_date)
+
+                        delta = deployment_date - datetime.date.today()
+                        print("Delta")
+                        print(delta.days)
+                        if delta.days < 7:
+                            style = "ui red message"
+                            messages.warning(request, 'Dates should have atleast 1 week allowance')
+                            invalid = True
+                    except:pass
 
             idx = 0
             for form in  formset:
-                if form.is_valid:
+                if form.is_valid and invalid == False:
                     try:
                         deployment_date = form['deployment_date'].value()
                         deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
