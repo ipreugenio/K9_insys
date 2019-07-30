@@ -31,6 +31,7 @@ class K9_Incident(models.Model):
         ('Lost', 'Lost'),
         ('Accident', 'Accident'),
         ('Sick', 'Sick'),
+        ('Missing', 'Missing')
     )
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
@@ -306,12 +307,12 @@ class Handler_Incident(models.Model):
         super(Handler_Incident, self).save(*args, **kwargs)
 
 
-class Request_Transfer(models.Model):
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date_created =  models.DateField('date_created', auto_now_add=True)
-    date_of_transfer = models.DateField('date_created', null=True, blank=True)
-    location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
-    location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
+# class Request_Transfer(models.Model):
+#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     date_created =  models.DateField('date_created', auto_now_add=True)
+#     date_of_transfer = models.DateField('date_created', null=True, blank=True)
+#     location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
+#     location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
 
 class Notification(models.Model):
     POSITION = (

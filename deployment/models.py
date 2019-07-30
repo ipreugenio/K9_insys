@@ -478,6 +478,9 @@ class K9_Schedule(models.Model):
         notif = self.date_end - timedelta(days=7)
         return notif
 
+    def __str__(self):
+        return str(self.k9) + " : " + str(self.date_start) + " - " + str(self.date_end)
+
     def save(self, *args, **kwargs):
         if self.dog_request:
             self.date_start = self.dog_request.start_date
@@ -578,6 +581,7 @@ class K9_Pre_Deployment_Items(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
+        ('Done', 'Done')
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True, related_name='k9_pre_requirement')
@@ -596,10 +600,10 @@ class K9_Pre_Deployment_Items(models.Model):
     oral_dextrose = models.IntegerField('oral_dextrose', default=0)
     ball = models.IntegerField('ball,.', default=0)
     status = models.CharField('status', max_length=100, choices=STATUS, default='Pending')
-    arrived = models.BooleanField('arrived', default=False)
 
-    # def check_items(self):
 
+    def __str__(self):
+        return str(self.initial_sched) + "( " + str(self.status) + " )"
 
     def remove_old_instance(self):
 

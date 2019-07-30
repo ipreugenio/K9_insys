@@ -8,7 +8,7 @@ from datetime import timedelta, date, datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 
-@periodic_task(run_every=crontab(hour=9, minute=0))
-def test():
-   Notification.objects.create(message='meassage sent') 
+# @periodic_task(run_every=crontab(hour=9, minute=0))
+# def test():
+#    Notification.objects.create(message='meassage sent')
        

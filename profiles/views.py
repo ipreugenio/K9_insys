@@ -18,7 +18,7 @@ from geopy.extra.rate_limiter import RateLimiter
 from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
-from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
+from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
 from planningandacquiring.models import K9
 from django.db.models import Sum
 from unitmanagement.models import Equipment_Request, Notification, PhysicalExam
@@ -36,6 +36,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from profiles.serializers import NotificationSerializer, UserSerializer
+
+from deployment.views import load_map, load_locations
 # Create your views here.
 
 def notif(request):
@@ -168,26 +170,95 @@ def dashboard(request):
 
     return render (request, 'profiles/dashboard.html', context)
 
+
+#TODO all Team dogs deployed under the team of TL with "Pending status)
 def team_leader_dashboard(request):
     user = user_session(request)
     ta = None
     incident_count = 0
     tdd = None
     tdd_count= 0
+
+    form = RequestForm(request.POST or None)
+    geoform = GeoForm(request.POST or None)
+    geosearch = GeoSearch(request.POST or None)
+
+
+    k9 = None
+    for_arrival = None
+    check_arrival = None
+    reveal_arrival = False
+
     try:
-        ta = Team_Assignment.objects.get(team_leader=user)
+        k9 = K9.objects.get(handler = user)
+    except:pass
 
-        incident_count = Incidents.objects.filter(location = ta.location).count()
+    ta = Team_Assignment.objects.get(team_leader=user)
 
-        tdd_count = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').count()
-        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
-    except:
-        pass
+    incident_count = Incidents.objects.filter(location = ta.location).count()
+
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_pulled = None) #only currently deployed k9s
+    tdd_count = tdd.count()
+
+    # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
+    for_arrival = tdd.filter(status = "Pending")
+
+    if for_arrival:
+        reveal_arrival = True
+
+    print("For arrival")
+    print(for_arrival)
+
+    check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
+
+    events = Dog_Request.objects.all()
 
     year = datetime.now().year
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+
+    if request.method == 'POST':
+        if form.is_valid():
+            checks = geoform['point'].value()
+            checked = ast.literal_eval(checks)
+
+            toList = list(checked['coordinates'])
+
+            lon = Decimal(toList[0])
+            lat = Decimal(toList[1])
+
+            f = form.save(commit=False)
+            f.longtitude = lon
+            f.latitude = lat
+            f.save()
+
+            messages.success(request, 'Event succesfully saved!')
+            return redirect("profiles:team_leader_dashboard")
+
+
+        if check_arrival.is_valid():
+
+            handlers_arrived_id = check_arrival['team_member'].value()
+            print("Handlers Arrived")
+            print(handlers_arrived_id)
+
+            handlers_arrived = User.objects.filter(pk__in = handlers_arrived_id)
+
+            for handler in handlers_arrived:
+                try:
+                    deploy = Team_Dog_Deployed.objects.get(handler = handler)
+                    deploy.status = "Deployed"
+                    deploy.save()
+                except: pass
+
+            #Team Leader
+
+            messages.success(request, 'Arrival succesfully confirmed')
+            return redirect("profiles:team_leader_dashboard")
+        else:
+            print(check_arrival.errors)
+
 
     context = {
         'incident_count':incident_count,
@@ -199,6 +270,16 @@ def team_leader_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'k9' : k9,
+        'form': form,
+        'geoform': geoform,
+        'geosearch': geosearch,
+        'events': events,
+
+        'for_arrival' : for_arrival,
+        'check_arrival' : check_arrival,
+        'reveal_arrival' : reveal_arrival
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
@@ -932,45 +1013,7 @@ def user_add_confirmed(request):
     }
     return render(request, 'profiles/user_add_confirmed.html', context)
 
-def load_locations(request):
 
-    search_query = request.GET.get('search_query')
-    width = request.GET.get('width')
-
-
-    if search_query == "":
-        geolocator = Nominatim(user_agent="Locator", timeout=None)
-    else:
-        geolocator = Nominatim(user_agent="Locator", format_string="%s, Philippines", timeout=None)
-
-    locations = geolocator.geocode(search_query, exactly_one=False)
-
-    print(locations)
-    print(width)
-
-    context = {
-        'locations' : locations,
-        'width': width
-    }
-
-    return render(request, 'deployment/location_data.html', context)
-
-def load_map(request):
-    lng = request.GET.get('lng')
-    lat = request.GET.get('lat')
-
-    width = request.GET.get('width')
-
-    print("TEST coordinates")
-    print(str(lat) + " , " + str(lng))
-
-    geoform = GeoForm(request.POST or None, lat=lat, lng=lng, width=width)
-
-    context = {
-        'geoform' : geoform
-    }
-
-    return render(request, 'deployment/map_data.html', context)
 
 class ScheduleView(APIView):
     def get(self, request, format=None):

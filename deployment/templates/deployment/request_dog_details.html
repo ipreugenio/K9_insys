@@ -113,22 +113,29 @@
         <th>Name</th>
         <th>Serial Number</th>
         <th>Capability</th>
-        <th>Handler</th>
-          <th>Status</th>
-         <th></th>
+        <th>Personnel</th>
+          <th>Position</th>
+          <!--<th></th>-->
       </tr>
   </thead>
   <tbody>
+        <tr>
+            <td>{{tl_dog.name}}</td>
+        <td>{{tl_dog.serial_number}}</td>
+        <td>{{tl_dog.capability}}</td>
+        <td>{{tl_dog.handler}}</td>
+        <td>Team Leader</td>
+        </tr>
        {% for dogs_deployed in dogs_deployed %}
       <tr>
         <td>{{dogs_deployed.k9.name}}</td>
         <td>{{dogs_deployed.k9.serial_number}}</td>
         <td>{{dogs_deployed.k9.capability}}</td>
         <td>{{dogs_deployed.k9.handler}}</td>
-          <td></td>
-          <td class="ui center aligned" style="width:15%;">
-           <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
-         </td>
+        <td>Handler</td>
+          <!--<td class="ui center aligned" style="width:15%;">-->
+           <!--<a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>-->
+         <!--</td>-->
       </tr>
         {% endfor %}
   </tbody>
@@ -263,14 +270,14 @@
         {% for idx, can_deploy in can_deploy_df.iterrows %}
         <tr class="ui center aligned">
             <td style="width:10%;">
-                <input type="checkbox" name="checks" value="{{can_deploy.id}}">
+                <input type="checkbox" name="checks" value={{can_deploy.K9.id}}>
               </td>
             <td>{{idx|add_one}}</td>
             <td>{{can_deploy.K9.name}}</td>
              <td>{{can_deploy.K9.serial_number}}</td>
             <td>{{can_deploy.K9.capability}}</td>
             <td>{{can_deploy.K9.handler}}</td>
-            <td>{{can_deploy.Location}}</td>
+            <td>{{can_deploy.Location.place}}</td>
             <td>{{can_deploy.Area}}</td>
             <td>{{can_deploy.Distance}} miles</td>
             <td>{{can_deploy.Maritime}}</td>
@@ -284,7 +291,7 @@
     </table>
 
     <div class="ui basic center aligned segment" style="padding: 0px;">
-        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Schedule K9s</button>
     </div>
   </form>
   {% elif data2.status == "Done" %}

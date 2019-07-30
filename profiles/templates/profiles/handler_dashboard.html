@@ -122,7 +122,7 @@
 
               <div class="seven wide column" style="padding: 0%;margin:0%;">
                 <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
-                    <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>                
+
                     <div class="ui buttons">
                       <button class="ui button"  id = "prev" >Previous Year</button>
                       <div class="or"></div>
@@ -135,111 +135,6 @@
         </div>
       </div>
 
-      <!--Pre Deployment Items Modal-->
-
-
-      <!--Event Modal-->
-      <div class="ui modal" id = 'modal1'>
-          <i class="close icon"></i>
-          <div class="header">Add Event</div>
-         
-          <div class="scrolling content">
-              <form class="ui form" method="POST">
-                  {% csrf_token %}
-                <div class="three fields">
-                    <div class="field">
-                        <label>Requester</label>
-                        {{form.requester}}
-                      </div>
-                      <div class="field">
-                        <label>Mobile Number</label>
-                        {{form.phone_number}}
-                      </div>
-                      <div class="field">
-                        <label>Email</label>
-                        {{form.email_address}}
-                      </div>
-                </div>
-                <div class="four fields">
-                    <div class="field">
-                        <label>Event Name</label>
-                        {{form.event_name}}
-                      </div>
-                      <div class="field">
-                        <label>Type</label>
-                        {{form.event_type}}
-                      </div>
-                      <div class="field">
-                        <label>Start Date</label>
-                        {{form.start_date}}
-                      </div>
-                      <div class="field">
-                          <label>End Date</label>
-                          {{form.end_date}}
-                        </div>
-                </div>
-                <div class="three fields">
-                    <div class="field">
-                        <label>NDD Needed</label>
-                        {{form.NDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>EDD Needed</label>
-                        {{form.EDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>SAR Needed</label>
-                        {{form.SAR_needed}}
-                      </div>
-                </div>
-                <div class="field">
-                    <label>Remarks</label>
-                    {{form.remarks}}
-                </div>
-                <div class="field">
-                    <label>Place</label>
-                    {{form.location}}
-                  </div>
-  
-                  <div class="ui two column grid">
-                    <div class="seven wide column">
-                        <center>
-                            <label>Search Location</label>
-                            <div class="ui fluid category search">
-                              <div class="ui icon input">
-                                {{geosearch.search}}
-                                <i class="search icon"></i>
-                              </div>
-                              <div class="results"></div>
-                            </div>
-                            <br>
-                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
-      
-                            <div  id ="id_location_cards"></div>
-                        </center>
-  
-                    </div>
-                    <div class="nine wide column">
-                        <label>Geotag Location</label>
-                        <div id = "id_geomap">
-                            {{geoform.point}}
-                        </div>
-                    </div>
-                  </div>
-                  <br>
-                    <center>
-                        <button class="ui green button" type="submit">Submit</button>
-                    </center>
-                </form>
-          </div>
-        
-        </div>
-        <!--End of Modal-->
-
-        <div class="ui mini modal" id = 'modal2'>
-          <i class="close icon"></i>
-          <div class="header">Event Added</div>
-        </div>
 
         {% if messages %}
         {% for message in messages %}
@@ -248,13 +143,8 @@
         {% endif %}
     </div>
 
-    <div class="ui modal event_modal">
-      <i class="close icon"></i>
-      <div class="header">Header</div>
-      <div class="scrolling content">Something</div>
-       
-    </div>
 
+   <!--Pre Deployment Items Modal-->
 
 <div class="ui mini modal" id = 'modal3'>
       <i class="close icon"></i>
@@ -282,6 +172,8 @@
 
     </div>
 </div>
+ <!--End Pre Deployment Items Modal-->
+
 
 <style>
 
@@ -298,6 +190,11 @@
   background-color:orangered;
   color: white;
   }
+
+  .fc-widget-header .fc-title{
+  background-color: black
+  }
+
 
   #calendar {
       max-width: 900px;
@@ -388,7 +285,7 @@ $(document).ready(function() {
 
           defaultView: 'month',
           weekNumbers: 'true',
-          editable: true,
+          editable: false,
           selectable: true,
           eventLimit: 3,
           showNonCurrentDates: true,
@@ -428,35 +325,7 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('nextYear');
         });
 
-        //Add event modal
-        $( "#add_event_btn" ).click(function() {
-          $('#modal1').modal('setting', 'closable', false)
-          .modal('show');
-        });
 
-         //GeoMap
-         $("#btn_search").click(function () {
-          var url = 'ajax_load_locations';  // get the url of the `load_locations` view
-          var search_query = $("#id_search").val();  // get the search query from the HTML input
-
-          $.ajax({                       // initialize an AJAX request
-            url: url,                    // set the url of the request
-            data: {
-              'search_query': search_query, // add the search query to the GET parameters
-              'width' : 480
-            },
-            success: function (data) {   // `data` is the return of the `load_locations` view function
-              $("#id_location_cards").html(data);  // replace the contents of the #id_location_cards input with the data that came from the server
-            },
-                error:
-            function(xhr){
-                alert("Error: " + xhr.statusText);
-                //alert(xhr.responseText) --> to get the full details of error
-                return false;
-                }
-          });
-
-        });
      
 });
 </script>

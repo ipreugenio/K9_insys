@@ -40,6 +40,8 @@ urlpatterns = [
 
     path('handler-dashboard/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
     path('handler-dashboard/ajax_load_map', views.load_map, name='ajax_load_map'),
+    path('team-leader-dashboard/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
+    path('team-leader-dashboard/ajax_load_map', views.load_map, name='ajax_load_map'),
 
     path('schedule/api', views.ScheduleView.as_view()),
 

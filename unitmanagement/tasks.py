@@ -405,56 +405,6 @@ def auto_subtract():
         Notification.objects.create(message='Milk is low. Its time to reorder!', notif_type='inventory_low')
 
 
-# 9AM
-@periodic_task(run_every=crontab(hour=6, minute=0))
-def deploy_dog():
-    # When Schedule is today, change training status to deployed
-    sched = K9_Schedule.objects.filter(date_start=date.today())
-
-    for sched in sched:
-        sched.k9.training_status = 'Deployed'
-        sched.k9.save()
-
-    # When request is done, change status and pull out all dogs
-    req = Dog_Request.objects.filter(status='Approved').filter(end_date=date.today())
-
-    for req in req:
-        req.status = 'Done'
-        req.save()
-        dog_deployed = Team_Dog_Deployed.objects.filter(team_requested=req)
-        for dog_deployed in dog_deployed:
-            k9 = K9.objects.get(id=dog_deployed.k9.id)
-            # code what to do with K9
-            try:
-                # last assignment
-                td = Team_Dog_Deployed.objects.filter(k9=k9).exclude(team_assignment=None).latest('date_pulled')
-                k9.assignment = str(td.team_assignment)
-                k9.training_status = 'Deployed'
-                k9.save()
-                # Create new Team dog deployed for team_assignment
-                Team_Dog_Deployed.objects.create(team_assignment=td.team_assignment, k9=k9, status='Deployed',
-                                                 date_added=date.today(), handler=str(k9.handler.fullname))
-
-                # update Team assignment
-                ta = Team_Assignment.objects.get(id=td.team_assignment.id)
-                if k9.capability == 'EDD':
-                    ta.EDD_deployed = ta.EDD_deployed - 1
-                elif k9.capability == 'NDD':
-                    ta.NDD_deployed = ta.NDD_deployed - 1
-                elif k9.capability == 'SAR':
-                    ta.SAR_deployed = ta.SAR_deployed - 1
-                ta.save()
-            except td.DoesNotExist:
-                # has no last assignment
-                k9.assignment = None
-                k9.training_status = 'For-Deployment'
-                k9.save()
-
-            # code for team dog deployed
-            dog_deployed.status = 'Done'
-            dog_deployed.date_pulled = date.today()
-            dog_deployed.save()
-
 
 # 8:50AM
 @periodic_task(run_every=crontab(hour=6, minute=0))
@@ -472,7 +422,6 @@ def due_retired_k9():
 # 12AM
 #DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
 @periodic_task(run_every=crontab(hour=23, minute=0))
-
 def delete():
     notif_delete = Notification.objects.filter(datetime=date.today - timedelta(days=60))
     notif_delete.delete()
