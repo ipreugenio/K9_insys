@@ -1227,6 +1227,7 @@ def trained_list(request):
         a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
         ts.append(a.date_end.date)
 
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -2782,15 +2783,18 @@ def load_k9_data(request):
     h_count = None
     health = None
     train = None
+
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
-        remarks = Training_Schedule.objects.filter(k9=k9)
+        remarks = Training_Schedule.objects.filter(k9=k9).exclude(stage = "Stage 0")
         h_count = Health.objects.filter(dog=k9).count()
         health = Health.objects.filter(dog=k9)
-        train = Training.objects.get(k9=k9)
-    except:
-        pass
+        train = Training.objects.filter(k9=k9).get(training=k9.capability)
+    except: pass
+
+    print("TRAIN")
+    print(train)
 
     context = {
         'k9': k9,

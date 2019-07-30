@@ -92,30 +92,30 @@
     </form>
 
 
-<div class="ui basic segment" style="border-style: none;">
-    <label><h3>No. of K9s Done with Training:</h3></label>
-           <table class="ui three column celled blue table">
-             <thead>
-               <tr>
-                 <th>EDD</th>
-                 <th>NDD</th>
-                 <th>SAR</th>
-               </tr>
-             </thead>
-             <tbody>
-               <tr>
-                 <td>{{edd_done}}</td>
-                 <td>{{ndd_done}}</td>
-                 <td>{{sar_done}}</td>
-               </tr>
-             </tbody>
-           </table>
-         </div>
+<!--<div class="ui basic segment" style="border-style: none;">-->
+    <!--<label><h3>No. of K9s Done with Training:</h3></label>-->
+           <!--<table class="ui three column celled blue table">-->
+             <!--<thead>-->
+               <!--<tr>-->
+                 <!--<th>EDD</th>-->
+                 <!--<th>NDD</th>-->
+                 <!--<th>SAR</th>-->
+               <!--</tr>-->
+             <!--</thead>-->
+             <!--<tbody>-->
+               <!--<tr>-->
+                 <!--<td>{{edd_done}}</td>-->
+                 <!--<td>{{ndd_done}}</td>-->
+                 <!--<td>{{sar_done}}</td>-->
+               <!--</tr>-->
+             <!--</tbody>-->
+           <!--</table>-->
+         <!--</div>-->
 
-<div class="ui top attached tabular menu">
-     <a class="item active" data-tab="first">Pending for Deployment</a>
-           <a class="item" data-tab="second">K9s on Training</a>
-</div>
+<!--<div class="ui top attached tabular menu">-->
+     <!--<a class="item active" data-tab="first">Pending for Deployment</a>-->
+           <!--<a class="item" data-tab="second">K9s on Training</a>-->
+<!--</div>-->
 
 <div class="ui tab segment active" data-tab="first">
 <div class = "ui segment">
@@ -126,7 +126,6 @@
                 <th>K9</th>
                 <th>Capability</th>
                 <th>Handler</th>
-                <th></th>
             </tr>
             </thead>
         <tbody>
@@ -135,7 +134,6 @@
       <td>{{item}}</td>
       <td>{{item.capability}} </td>
       <td>{{item.handler}}</td>
-      <td><center><button class = "ui blue button">Assign</button></center></td>
   </tr>
 {% endfor%}
         </tbody>
@@ -143,46 +141,46 @@
 </div>
 </div>
 
-<div class="ui tab segment" data-tab="second">
-<table id="tabledata3" class="ui celled table">
+<!--<div class="ui tab segment" data-tab="second">-->
+<!--<table id="tabledata3" class="ui celled table">-->
 
-    <thead>
-    <tr>
-        <th>K9</th>
-        <th>Capability</th>
-        <th>Training Stage</th>
-        <th>Average Training Time per Stage</th>
-        <th>Estimate Number of Days Before Training Ends</th>
-    </tr>
-    </thead>
+    <!--<thead>-->
+    <!--<tr>-->
+        <!--<th>K9</th>-->
+        <!--<th>Capability</th>-->
+        <!--<th>Training Stage</th>-->
+        <!--<th>Average Training Time per Stage</th>-->
+        <!--<th>Estimate Number of Days Before Training Ends</th>-->
+    <!--</tr>-->
+    <!--</thead>-->
 
-    <tbody>
-    {% for idx, train in train_df.iterrows %}
-    <tr>
-        <td> {{train.K9}} </td>
-        <td> {{train.K9.capability}} </td>
-        <td> {{train.K9.training_level}}</td>
-        <td> {{train.Duration}} days</td>
-        <td>{{train.End_Estimate}}  days</td>
-    </tr>
-    {% endfor %}
-    </tbody>
+    <!--<tbody>-->
+    <!--{% for idx, train in train_df.iterrows %}-->
+    <!--<tr>-->
+        <!--<td> {{train.K9}} </td>-->
+        <!--<td> {{train.K9.capability}} </td>-->
+        <!--<td> {{train.K9.training_level}}</td>-->
+        <!--<td> {{train.Duration}} days</td>-->
+        <!--<td>{{train.End_Estimate}}  days</td>-->
+    <!--</tr>-->
+    <!--{% endfor %}-->
+    <!--</tbody>-->
 
-</table>
-</div>
+<!--</table>-->
+<!--</div>-->
 
 
-{% else %}
-<div class="ui icon message">
-  <i class="exclamation icon"></i>
-  <div class="content">
-    <div class="header">
-      No units available
-    </div>
-    <p>There are no units available to be deployed right now based on current port requirements. Come back later!</p>
-  </div>
-</div>
-{% endif %}
+<!--{% else %}-->
+<!--<div class="ui icon message">-->
+  <!--<i class="exclamation icon"></i>-->
+  <!--<div class="content">-->
+    <!--<div class="header">-->
+      <!--No units available-->
+    <!--</div>-->
+    <!--<p>There are no units available to be deployed right now based on current port requirements. Come back later!</p>-->
+  <!--</div>-->
+<!--</div>-->
+<!--{% endif %}-->
 
 
 

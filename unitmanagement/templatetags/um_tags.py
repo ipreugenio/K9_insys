@@ -2,6 +2,7 @@ from django import template
 # from planningandacquiring.models import Budget_allocation, Budget_medicine, Budget_equipment, Budget_food, Budget_vaccine, Budget_vet_supply
 from inventory.models import Medicine, Miscellaneous, Food
 from unitmanagement.forms import SelectUnitsForm
+from datetime import date, datetime
 
 register = template.Library()
 
@@ -28,6 +29,11 @@ def render_k9_checkbox(k9, selected_list): #check_true as form parameter to set 
 
 @register.filter
 def list_item(List, i):
+
+    return List[i]
+
+@register.filter
+def list_item_date(List, i):
 
     return List[i]
 
