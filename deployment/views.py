@@ -29,15 +29,11 @@ from inventory.models import Medicine
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment,K9_Pre_Deployment_Items
 
+
+from training.models import Training_Schedule, Training
+
 from pyproj import Proj, transform
 
-
-
-#Plotly
-import plotly.offline as opy
-import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
-import plotly.figure_factory as ff
 
 #GeoDjango
 from math import sin, cos, radians, degrees, acos
@@ -60,7 +56,9 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
-#from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location
+from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates
+
+import random
 
 class MyDictionary(dict):
 
@@ -77,14 +75,14 @@ def notif(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
-    
+
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
-   
+
     return notif
 
 
@@ -116,7 +114,14 @@ def mass_populate():
     generate_incident() #generates 250 objects
     generate_maritime() # generates 500 objects
 
+    #>>advanced
+
+    generate_training() #Classify k9s
+    assign_commander_random() #Assign commanders to areas
+    fix_dog_duplicates() # fix duplicate names for dogs
+
     return None
+
 
 def add_area(request):
     # CAUTION : Only run this once
@@ -261,7 +266,7 @@ def assign_team_location(request):
             f.team_leader.assigned=True
             f.location.status='assigned'
             f.save()
-            
+
             #Location
             l=Location.objects.get(id=f.location.id)
             l.status = 'assigned'
@@ -337,7 +342,7 @@ def assigned_location_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'title' : 'DOGS AND HANDLERS ASSIGNED FOUs',
+        'title' : 'K9s and Handlers Assigned Field Officer Units',
         'data' : data,
         'notif_data':notif_data,
         'count':count,
@@ -357,8 +362,8 @@ def team_location_details(request, id):
 
     #filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data.location.city)
-    
-    user_deploy = [] 
+
+    user_deploy = []
     for h in handlers:
        user_deploy.append(h.UserID)
 
@@ -366,7 +371,7 @@ def team_location_details(request, id):
     can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
     dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
-  
+
 
     if request.method == 'POST':
         checks =  request.POST.getlist('checks') # get the id of all the dogs checked
@@ -501,7 +506,7 @@ def dog_request(request):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -523,7 +528,7 @@ def dog_request(request):
 
     }
     return render (request, 'deployment/request_form.html', context)
-    
+
 
 def request_dog_list(request):
     data = Dog_Request.objects.all()
@@ -772,7 +777,7 @@ def request_dog_details(request, id):
             #TODO automatic approve pag operations (+ admin na rin siguro pero wala naman dapat access admin dito lol)
 
             Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname)) #TODO Only save k9.assignment when system datetime is same as request
-            
+
             K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
 
             # TODO: if dog is equal capability increment
@@ -889,7 +894,7 @@ def deployment_area_details(request):
     data = Team_Assignment.objects.get(team_leader=user)
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    
+
     sar_inc = Incidents.objects.filter(location=data.location).filter(type='Search and Rescue Related').count()
     ndd_inc = Incidents.objects.filter(location=data.location).filter(type='Narcotics Related').count()
     edd_inc = Incidents.objects.filter(location=data.location).filter(type='Explosives Related').count()
@@ -901,7 +906,7 @@ def deployment_area_details(request):
         mn.append(pi.mobile_number)
 
     data_list = zip(tdd, mn)
-    
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -938,14 +943,14 @@ def add_incident(request):
     ta = Team_Assignment.objects.get(team_leader=current_user)
 
 
-    form.initial['date'] = date.today() 
+    form.initial['date'] = date.today()
     form.fields['location'].queryset = Location.objects.filter(id=ta.location.id)
-    
+
     if request.method == 'POST':
         if form.is_valid():
             f = form.save(commit=False)
             f.user = user
-            f.save() 
+            f.save()
 
             style = "ui green message"
             messages.success(request, 'Incident has been successfully added!')
@@ -982,7 +987,7 @@ def incident_list(request):
         'title': title,
         'notif_data':notif_data,
         'count':count,
-        'user':user,        
+        'user':user,
     }
 
     return render(request, 'deployment/incident_list.html', context)
@@ -996,7 +1001,7 @@ def fou_details(request):
     data = Team_Assignment.objects.get(team_leader=user)
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    
+
     a = []
     for td in tdd:
         a.append(td.handler)
@@ -1005,7 +1010,7 @@ def fou_details(request):
     pi = Personal_Info.objects.filter(UserID__in = a)
 
     data_list = zip(tdd,pi)
-   
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1024,7 +1029,7 @@ def daily_refresher_form(request):
     form = DailyRefresherForm(request.POST or None)
     style = "ui green message"
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.date.today())
-    
+
     dr = None
     if drf.exists():
         dr = 1
@@ -1056,7 +1061,7 @@ def daily_refresher_form(request):
             print(f.port_time)
             ######################
             f.save()
-            
+
             style = "ui green message"
             messages.success(request, 'Refresher Form has been Recorded!')
             return redirect('deployment:daily_refresher_form')
@@ -1121,6 +1126,8 @@ def deployment_report(request):
     }
     return render(request, 'deployment/deployment_report.html', context)
 
+def Average(lst):
+    return sum(lst) / len(lst)
 
 def choose_location(request):
 
@@ -1316,11 +1323,142 @@ def load_units_selected(request): #Note : Maybe we can use a db solution for thi
 
     return render(request, 'deployment/ajax_load_units_selected.html', context)
 
-#TODO Include K9 Backups
+
+
+def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: no changes made to dataframe here
+    end_assignment = 0
+    iteration = 0
+
+    # can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
+    #     assignment='None').exclude(pk__in=k9s_scheduled_list)
+
+    while end_assignment == 0:
+
+        # Solution 2: Loop through dataframe first
+        for item in location_dataframe.values:
+            incident_type_selected = 0
+            location = item[0]
+            incident_type_list = item[5]
+            team = item[6]  # check if only 1 unit is assigned (must be 2)
+
+            temp = TempDeployment.objects.all()  # add user field to avoid complications involving multiple users in the future
+            k9_id_list = []
+            for item in temp:
+                k9_id_list.append(item.k9.id)
+
+            # Get K9s ready for deployment #exclude already scheduled K9s
+            can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
+                assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) #Same code in main
+            # End Get K9s ready for deployment
+
+            # TODO can_deploy is empty for some reason
+
+            k9s_assigned = 0
+            finish_location_assignment = 0
+            for k9 in can_deploy:
+                if finish_location_assignment == 0:
+                    type = incident_type_list[iteration][
+                        0]  # TODO Dapat hanapin muna yung priority skill from list of k9s. If wala, go to next priority sa next iteration
+                    if type == k9.capability:
+
+                        sar_count = 0
+                        ndd_count = 0
+                        edd_count = 0
+                        for item in TempDeployment.objects.filter(
+                                location=location):  # this code also checks temporarily assigned k9s
+                            if item.k9.capability == "SAR":
+                                sar_count += 1
+                            elif item.k9.capability == "NDD":
+                                ndd_count += 1
+                            elif item.k9.capability == "EDD":
+                                edd_count += 1
+                            else:
+                                pass
+
+                        if type == "SAR":
+                            if team.SAR_deployed + sar_count < team.SAR_demand:
+                                TempDeployment.objects.create(k9=k9, location=location)
+                                k9s_assigned += 1
+
+                        elif type == "NDD":
+                            if team.NDD_deployed + ndd_count < team.NDD_demand:
+                                TempDeployment.objects.create(k9=k9, location=location)
+                                k9s_assigned += 1
+
+                        elif type == "EDD":
+                            if team.EDD_deployed + edd_count < team.EDD_demand:
+                                TempDeployment.objects.create(k9=k9, location=location)
+                                k9s_assigned += 1
+
+                        else:
+                            pass
+
+                    # dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status="Scheduled",
+                    #                                                         team_assignment = team).count()
+                    dogs_scheduled_count = K9_Schedule.objects.filter(status="Initial Deployment", team=team).count()
+                    if (
+                            team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2:  # There must be atleast 2 units per location #TODO Include schedule K9s
+                        print("Units per Location " + str(location))
+                        print(team.total_dogs_deployed + k9s_assigned)
+                        finish_location_assignment = 1
+
+        if iteration == 2:
+            end_assignment = 1
+        else:
+            iteration += 1
+
+    return None
+
+
 def schedule_units(request):
 
     removal = TempDeployment.objects.all() #TODO add user field then only delete objects from said user
     removal.delete()
+
+    #TODO Get number of k9s done with training (or include in list with blue highlight
+    #TODO Estimated time a K9 will finish training (red highlight)
+    #TODO ^ Or tab them both
+
+    #K9s estimated training duration
+    sar_done = K9.objects.filter(training_status = "Trained").filter(capability = "SAR").count()
+    ndd_done = K9.objects.filter(training_status = "Trained").filter(capability = "NDD").count()
+    edd_done = K9.objects.filter(training_status = "Trained").filter(capability = "EDD").count()
+
+
+    k9s_training = K9.objects.filter(training_status = "On-Training")
+
+    k9_training_list = []
+    duration_estimate_list = []
+    train_end_estimate_list = []
+    for k9 in k9s_training:
+        train_sched = Training_Schedule.objects.filter(k9=k9).exclude(date_start = None).exclude(date_end = None)
+
+        duration_list = []
+        if train_sched:
+            k9_training_list.append(k9)
+
+
+            for item in train_sched:
+                delta = item.date_end - item.date_start
+                duration_list.append(int(delta.days))
+
+            duration_average = Average(duration_list)
+            duration_estimate_list.append(duration_average)
+
+            days_estimate_before_end = duration_average * (9 - len(duration_list))
+            train_end_estimate_list.append(days_estimate_before_end)
+
+    df_training_data = {
+        'K9': k9_training_list,
+        'Duration': duration_estimate_list,
+        'End_Estimate': train_end_estimate_list,
+    }
+
+    training_dataframe = df(data=df_training_data)
+    training_dataframe = training_dataframe.sort_values(by=['End_Estimate'],
+                                                        ascending=[True])
+
+    #END K9s estimated training duration
 
     # Prioritize Locations
     locations = Location.objects.all()
@@ -1398,103 +1536,24 @@ def schedule_units(request):
         'Dogs_deployed': total_dogs_deployed_list
         }
     location_dataframe = df(data=df_data)
-    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[True, False, False])
-
+    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[True, False, False], inplace=True)
 
          #End Sort incidents
+    #End Prioritize Location
 
-    # End Prioritize Location
 
+    #TODO repeat temporary assignment with new dataframe (removed unassigned indexes)
     #Temporary assignment
-    end_assignment = 0
-    iteration = 0
-
     k9s_scheduled_list = []
-    #k9s_scheduled = Team_Dog_Deployed.objects.filter(status="Scheduled")
+    # k9s_scheduled = Team_Dog_Deployed.objects.filter(status="Scheduled")
     k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment")
 
     for item in k9s_scheduled:
         k9s_scheduled_list.append(item.k9.id)
 
-    # can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-    #     assignment='None').exclude(pk__in=k9s_scheduled_list)
-
-
-    while end_assignment == 0:
-
-        #Solution 2: Loop through dataframe first
-        for item in location_dataframe.values:
-            incident_type_selected = 0
-            location = item[0]
-            incident_type_list = item[5]
-            team = item[6]  #check if only 1 unit is assigned (must be 2)
-
-            temp = TempDeployment.objects.all()  # add user field to avoid complications involving multiple users in the future
-            k9_id_list = []
-            for item in temp:
-                k9_id_list.append(item.k9.id)
-
-            # Get K9s ready for deployment #TODO Include schedule K9s
-            can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-                assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
-            # End Get K9s ready for deployment
-
-            k9s_assigned = 0
-            finish_location_assignment = 0
-            for k9 in can_deploy:
-                if finish_location_assignment == 0:
-                    type = incident_type_list[iteration][0] #TODO Dapat hanapin muna yung priority skill from list of k9s. If wala, go to next priority sa next iteration
-                    if type == k9.capability:
-
-                        sar_count = 0
-                        ndd_count = 0
-                        edd_count = 0
-                        for item in TempDeployment.objects.filter(location = location):
-                            if item.k9.capability == "SAR":
-                                sar_count += 1
-                            elif item.k9.capability == "NDD":
-                                ndd_count += 1
-                            elif item.k9.capability == "EDD":
-                                edd_count += 1
-                            else: pass
-
-                        if type == "SAR":
-                            if team.SAR_deployed + sar_count < team.SAR_demand:
-                                TempDeployment.objects.create(k9=k9, location=location)
-                                k9s_assigned += 1
-
-                        elif type == "NDD":
-                            if team.NDD_deployed + ndd_count < team.NDD_demand:
-                                TempDeployment.objects.create(k9=k9, location=location)
-                                k9s_assigned += 1
-
-                        elif type == "EDD":
-                            if team.EDD_deployed + edd_count < team.EDD_demand:
-                                TempDeployment.objects.create(k9=k9, location=location)
-                                k9s_assigned += 1
-
-                        else:
-                            pass
-
-                    # dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status="Scheduled",
-                    #                                                         team_assignment = team).count()
-                    dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).count()
-                    if (team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2: #There must be atleast 2 units per location #TODO Include schedule K9s
-                        print("Units per Location " + str(location))
-                        print(team.total_dogs_deployed + k9s_assigned)
-                        finish_location_assignment = 1
-
-
-
-
-        if iteration == 2:
-            end_assignment = 1
-        else:
-            iteration += 1
-
+    assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list)
 
     temp = TempDeployment.objects.all()  # add user field to avoid complications involving multiple users in the future
-    locations = Location.objects.all()
     k9_id_list = []
 
     locations = list(location_dataframe['Location'])
@@ -1505,6 +1564,7 @@ def schedule_units(request):
             if item.location == location:
                 temp_count += 1
 
+        #TODO We are already deleting k9s pending for deployment right here
         if temp_count < 2:
             removal = TempDeployment.objects.filter(location=location) #TODO add user field then only delete objects from said user
             removal.delete()
@@ -1514,30 +1574,21 @@ def schedule_units(request):
     for item in temp:
         k9_id_list.append(item.k9.id)
 
+
     temp_list = []
     for location in locations:
         temp = TempDeployment.objects.filter(location = location)
         temp_list.append(temp)
 
-
-    # Get K9s ready for deployment
-    can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-        assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
-
     #End Temporary assignment
 
-    # TODO Add TempAssignments to dataframe, don't reinitialize
 
     location_dataframe['Temp_list'] = temp_list
-
-    # data = location_dataframe.set_index("Temp_list")
-    # data = data.drop(None, axis=0)
-
-
     temp_list = list(location_dataframe['Temp_list'])
 
     idx = 0
     delete_indexes = []
+
     for item in temp_list:
         if not item:
             delete_indexes.append(idx)
@@ -1546,12 +1597,36 @@ def schedule_units(request):
     print("DELETE INDEXES")
     print(delete_indexes)
 
+    #TODO Issue with current code where 2 k9s with varying skills are less likely be put in the same port together because of incident order list
     location_dataframe.drop(location_dataframe.index[delete_indexes], inplace=True) #Delete rows without any K9s assigned
     location_dataframe.reset_index(drop=True, inplace=True)
 
+    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'],
+                                   ascending=[True, False, False], inplace=True)
+
+
+    # NEW CODE
+    location_dataframe.drop(columns='Temp_list', inplace=True)
+    assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list)
+
     team_list = list(location_dataframe['Team'])
     locations = list(location_dataframe['Location'])
-    temp_list = list(location_dataframe['Temp_list'])
+
+    temp_list = []
+    k9_id_list = []
+    for location in locations:
+        temp = TempDeployment.objects.filter(location=location)
+        temp_list.append(temp)
+        for item in temp:
+            k9_id_list.append(item.k9.id)
+
+    location_dataframe['Temp_list'] = temp_list
+
+    #TODO exclude k9s pending for deployment if they are already assigned on 2nd evaluation
+    can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
+        assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
+
+    # END NEW CODE
 
     schedFormset = formset_factory(DeploymentDateForm, extra=len(locations))
     formset = schedFormset(request.POST or None)
@@ -1587,19 +1662,25 @@ def schedule_units(request):
                             for item in temp:
                                 print("Item")
                                 print(item)
+                                #TODO error when saving for some reason
                                 #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
                                 deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
+                                print(deploy)
                                 deploy.save()
                                 pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                                 pre_req_item.save()
                             style = "ui green message"
                             messages.success(request, 'Units have been successfully scheduled for deployment!')
                     except:
-                        pass
+                        style = "ui red message"
+                        messages.warning(request, 'Error!')
+                        print(form.errors)
 
     df_is_empty = False
     if location_dataframe.empty:
         df_is_empty = True
+
+    #TODO Issue for SAR units since they can't be deployed initially on ports because of "2 minimum" restriction
 
     context = {
         'df' : location_dataframe,
@@ -1608,6 +1689,10 @@ def schedule_units(request):
         'formset' :schedFormset,
         'style': style,
         'df_is_empty' : df_is_empty,
+        'sar_done': sar_done,
+        'ndd_done' : ndd_done,
+        'edd_done' : edd_done,
+        'train_df' : training_dataframe
     }
 
     return render(request, 'deployment/schedule_units.html', context)
@@ -1656,5 +1741,3 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
 
 
     return None
-
-

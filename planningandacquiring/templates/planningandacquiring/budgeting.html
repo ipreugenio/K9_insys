@@ -1,329 +1,342 @@
 {% extends "profiles/sidebar_pa.html" %}  
 {% load humanize %}
 {% block content %}
-<div class="ui center aligned inverted segment" style="padding:20px;">
-       
-        <h3 class="ui header">Budget Proposal as of {{today|date:"F Y"}} for the year {{next_year}}</h3>
-      
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{{style}}" > {{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
-{% if stat == True %}
 <div class="ui segment">
-        <table class="ui five column celled table">
+        <center>
+            <div class="ui inverted segment">
+                <h2>Generate a Budget Proposal for the Year {{next_year}}</h2>
+            </div>
+        </center>
+        <table class="ui three column celled table" style="width:50%;">
             <thead>
                 <tr>
-                    <!-- <th>Estimated K9 Born Next Year</th>
-                    <td>{{born_ny}}</td>
+                    <th colspan="2">Estimated K9 Born</th>
+                    <td colspan="1" class="right aligned" id='born_ny'>{{born_ny}}</td>
                 </tr>
                 <tr>
-                    <th>Estimated K9 Next Year</th>
-                    <td>{{k9_ny}}</td>
+                    <th colspan="2">Estimated Current K9 (Alive)</th>
+                    <td colspan="1" class="right aligned" id='k9_ny'>{{k9_ny}}</td>
                 </tr>
                 <tr>
-                    <th>K9 Count to be Procured</th>
-                    <td>{{need_procure_ny}}</td>
-                </tr> -->
-                <tr style="font-weight: bold;">
-                    <th colspan="4">Total K9</th>
-                    <td colspan="1">{{total_k9}}</td>
+                    <th colspan="2">Number of Procured k9</th>
+                    <td colspan="1" class="right aligned" id='p_count'>0</td>
+                </tr>
+                <tr style="font-weight: bold;" class="right aligned">
+                    <th colspan="2">Total K9</th>
+                    <td colspan="1" id='total_k9'>{{total_k9}}</td>
                 </tr>
             </thead>
             
         </table>
-     
-        {% if dog_food %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Dog Food & Milk</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in dog_food %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>{{data.0.inventory.unit}}</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{total_food|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
 
-        {% if vac_ny %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Prevention & Vaccination</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in vac_ny %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>pc</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{vac_total|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
+        <div class="ui two column grid">
+                <div class="two column row">
+                    <div class="six wide column">
+                        <table class="ui structured celled table right aligned">
+                            <thead>
+                                <tr>
+                                    <th>Breed</th>
+                                    <th>Diseased (count)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a,b in dead_list%}
+                                <tr>
+                                    <td>{{a}}</td>
+                                    <td>{{b}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ten wide column">
+                            <table class="ui structured celled table right aligned">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Current/Required</th>
+                                            <th>Recommended Breed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>    
+                                        <tr>
+                                            <td>NDD</td>
+                                            <td>{{NDD_count}}/{{NDD_demand}}</td>
+                                            <td>
+                                                {% for data in ndd %}
+                                                    {{data.breed}}<br>
+                                                {%endfor%}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>EDD</td>
+                                            <td>{{EDD_count}}/{{EDD_demand}}</td>
+                                            <td>
+                                                {% for data in edd %}
+                                                    {{data.breed}}<br>
+                                                {%endfor%}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>SAR</td>
+                                            <td>{{SAR_count}}/{{SAR_demand}}</td>
+                                            <td>
+                                                {% for data in sar %}
+                                                    {{data.breed}}<br>
+                                                {%endfor%}
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                    </div>
+                </div>
+             
+            </div>
 
-        {% if b_ny_med %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Medicine</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in b_ny_med %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>pc</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{total_medicine|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-        
-        {% if vet_total %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Veterinarian Supplies</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in vet_arr %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>{{data.0.uom}}</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{vet_total|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-
-        {% if ken_arr %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Kennel Supplies</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in ken_arr %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>{{data.0.uom}}</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{ken_total|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-
-        {% if oth_arr %}
-        <table class="ui five column celled table">
-            <thead>
-                <tr>
-                    <th colspan="5">Others</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in oth_arr %}
-                <tr>
-                    <td>{{data.0}}</td>
-                    <td>{{data.0.uom}}</td>
-                    <td>{{data.1|intcomma}}</td>
-                    <td>{{data.2|intcomma}}</td>
-                    <td>{{data.3|intcomma}}</td>
-                </tr>
-                {% endfor %}
-                <tr style="font-weight: bold;">
-                    <td colspan="4">Total Amount</td>
-                    <td colspan="1">{{oth_total|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-
-        {% if train_arr %}
-        <table class="ui four column celled table">
-            <thead>
-                <tr>
-                    <th colspan="4">Training</th>
-                </tr>
-                <tr>
-                    <th>Item</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                {% for data in train_arr %}
-                    <td>{{data|intcomma}}</td>
-                {% endfor %}
-                </tr>
-                <tr style="font-weight: bold;">
-                    <td colspan="3">Total Amount</td>
-                    <td colspan="1">{{train_total|intcomma}}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-
-        <table class="ui two column celled table">
-            <thead>
-                {% if total_food %}
-                <tr>
-                    <th class="twelve wide">Dog Food & Milk</th>
-                    <td>{{total_food|intcomma}}</td>
-                </tr>
-                {% endif %}
-
-                {% if vac_total %}
-                <tr>
-                    <th class="twelve wide">Vaccination & Prevention</th>
-                    <td>{{vac_total|intcomma}}</td>
-                </tr>
-                {% endif %}
-
-                {% if total_medicine %}
-                <tr>
-                    <th class="twelve wide">Medicines</th>
-                    <td>{{total_medicine|intcomma}}</td>
-                </tr>
-                {% endif %}
-                {% if vet_total %}
-                <tr>
-                    <th class="twelve wide">Veterinarian Supplies</th>
-                    <td>{{vet_total|intcomma}}</td>
-                </tr>
-                {% endif %}
-                {% if ken_total %}
-                <tr>
-                    <th class="twelve wide">Kennel Supplies</th>
-                    <td>{{ken_total|intcomma}}</td>
-                </tr>
-                {% endif %}
-                {% if oth_total %}
-                <tr>
-                    <th class="twelve wide">Others</th>
-                    <td>{{oth_total|intcomma}}</td>
-                </tr>
-                {% endif %}
-                {% if train_total %}
-                <tr>
-                    <th class="twelve wide">K9 Training</th>
-                    <td>{{train_total|intcomma}}</td>
-                </tr>
-                {% endif %}
-                <tr class="ui right aligned">
-                    <th class="twelve wide">Grand Total</th>
-                    <th>{{grand_total|intcomma}}</th>
-                </tr>
-            </thead>
-        </table>
-        <form action="" method="POST">
+            <table class="ui four column celled table right aligned">
+                <thead>
+                    <th class="four wide column">Last Year's Budget</th>
+                    <th class="four wide column" style="color: teal">
+                        {% if abb != None %}
+                            {{abb.grand_total|intcomma}}
+                        {%else%}
+                            No saved budget last year
+                        {%endif%}
+                    </th>
+                    <th class="four wide column">Budget Proposal</th>
+                    <th class="four wide column"id='bp_show' style="color: green;"></th>
+                </thead>
+            </table>
+            <br>
+        <form action="" method="POST" class="ui form" enctype="multipart/form-data" id="myForm">
             {% csrf_token %}
-            <center>
-                <button class="ui green button" type="submit">Save Budget Proposal</button>
-            </center>
+
+            <input type="hidden" id='id_need' name='id_need'>
+            <input type="hidden" id='id_need_total' name='id_need_total' step="0.01">
+            <div class="four fields">
+                    <div class="field">
+                       <label for="">Breed and Sex</label>
+                    </div>    
+                    <div class="field">
+                        <label for="">Value</label>
+                    </div>  
+                    <div class="field">
+                        <label for="">Quantity</label>
+                    </div>  
+                    <div class="field">
+                        <label for="">Amount</label>
+                    </div> 
+                </div>  
+            {% for form in formset %}
+            <div class="formset_class " id="{{ form.prefix }}-row">
+                <div class="four fields">
+                    <div class="field">
+                        {{form.item}}
+                    </div>    
+                    <div class="field">
+                        {{form.price}}
+                    </div>  
+                    <div class="field">
+                        {{form.quantity}}
+                    </div>  
+                    <div class="field">
+                        {{form.total}}
+                    </div> 
+                </div>  
+            </div>
+            {% endfor %}
+
+            <table class="ui three column celled table" style="width:50%;">
+                <thead>
+                    
+                    <tr style="font-weight: bold;">
+                        <th colspan="2">Procured K9 Total Amount</th>
+                        <td colspan="1" id='p_amount'>0</td>
+                    </tr>
+                </thead>
+                
+            </table>
+            <div id="id_data_all"></div>
+            {{formset.management_form}}
+       
         </form>
-        
 </div>
-{%else%}
-<div class="ui info message">
-    Dont have enought data on k9's and inventory.
-</div>
-{% endif %}
-<script type="text/javascript">
+
+
+<script>
+    $(document).ready(function() {
+        $('#btn').click(function(){
+            var url = 'ajax_load_budget';  
+            $.ajax({                      
+                url: url,    
+                data: {
+                'total_k9': parseInt($( "#total_k9" ).text()),      
+                'p_count':parseInt($( "#p_count" ).text()),
+                'k9_ny':parseInt($( "#k9_ny" ).text()),
+                'born_ny':parseInt($( "#born_ny" ).text()),
+                },
+                success: function (data) {  
+                    $("#id_data_all").html(data); 
+                    var gt = $( "#gt_show" ).text();
+
+                    $( "#bp_show" ).text(gt);
+                }
+            });             
+        });
+        $(function() {
+                $('#myForm .formset_class').formset({
+                    prefix: '{{ formset.prefix }}'
+                });            
+            });
             
-        $(document).ready(function() {
+        function addCommas(nStr)
+        {
+            nStr += '';
+            x = nStr.split('.');
+            x1 = x[0];
+            x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        }
+
+        $(".select_breed" ).bind('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            
+            var url = 'ajax_load_budget_data';  
+            $.ajax({                      
+                url: url,    
+                type : 'GET',           
+                dataType : 'json',     
+                data: {
+                'id': id,   
+                },
+                success: function (data) {
+                    var res = id_val.split("-"); 
+                    $('#id_form-'+res[1]+'-price').val(data.value);
+                    var quantity = $('#id_form-'+res[1]+'-quantity').val();   
+
+                    if (quantity == null){
+                        quantity = 0
+                    }
+
+                    var total = value * quantity
+
+                    $('#id_form-'+res[1]+'-total').val(total);
+
+                    var gt = $( "#gt_show" ).text();
+
+                    $( "#bp_show" ).text(gt);
+                }
+            });
+
+        });
+
+        $(".select_value" ).keyup('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            var res = id_val.split("-");
+
+            var value = $('#id_form-'+res[1]+'-price').val(); 
+            var quantity = $('#id_form-'+res[1]+'-quantity').val();            
+            
+            
+            if (quantity == null){
+                quantity = 0
+            }
+
+            var total = value * quantity
+
+            $('#id_form-'+res[1]+'-total').val(total);
+            formset_sum()
+
+            if($( "#p_amount" ).text() == '0'){
+           
+            }else{
+
+            }
+        });
+
+        $(".select_quantity" ).keyup('change', function(){    
+
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            var res = id_val.split("-");
+
+            var value = $('#id_form-'+res[1]+'-price').val(); 
+            var quantity = $('#id_form-'+res[1]+'-quantity').val();            
+            
+            if (quantity == null){
+                quantity = 0;
+            }
+
+            var total = value * quantity;          
+
+            $('#id_form-'+res[1]+'-total').val(total);
+
+            formset_sum()
+
+            $( "#p_amount" ).focus();
+
+            if($( "#p_amount" ).text() == '0'){
+           
+            }else{
+                var id_val = parseInt($( "#p_amount" ).text())
+                var url = 'ajax_load_budget';  
+                $.ajax({                      
+                    url: url,    
+                    data: {
+                    'id_val': id_val,      
+                    'p_count':parseInt($( "#p_count" ).text()),
+                    'k9_ny':parseInt($( "#k9_ny" ).text()),
+                    'born_ny':parseInt($( "#born_ny" ).text()),
+                    },
+                    success: function (data) {  
+                        $("#id_data_all").html(data); 
+                        var gt = $( "#gt_show" ).text();
+
+                        $( "#bp_show" ).text(gt);
+                    }
+                });
+            }
+        });
         
-        } );
-        
-    </script>
+        var t_k9 = '{{total_k9}}'
+        function formset_sum(){
+            a = $(".formset_class").length;
+
+            arr = []
+            arr_amount = []
+            for (i = 0; i < a; i++) { 
+                b = $('#id_form-'+i+'-quantity').val();
+                arr.push(b)  
+
+                c = $('#id_form-'+i+'-price').val();
+                arr_amount.push(b*c)
+            }
+            sum_q = 0;
+            $.each(arr,function(){sum_q+=parseFloat(this) || 0; });
+            $("#p_count").text(sum_q);
+
+            sum_a = 0;
+            $.each(arr_amount,function(){sum_a+=parseFloat(this) || 0; });
+            $("#p_amount").text(sum_a);
+            
+            d = parseInt(t_k9) + sum_q;
+            $("#total_k9").text(d);
+
+            $("#id_need").val(sum_q);
+            $("#id_need_total").val(sum_a);
+
+            var gt = $( "#gt_show" ).text();
+
+            $( "#bp_show" ).text(gt);
+        }
+      
+    });
+</script>
 {% endblock%}

@@ -31,7 +31,7 @@
                 <td>{{data.sex}}</td>
                 <td>{{data.capability}}</td>
                 <td class="ui center aligned">
-                    <a class = 'ui blue tiny basic button' href="{% url 'unitmanagement:choose_handler_list' data.id %}">Select</a>
+                    <a class = 'ui blue tiny basic button' href="{% url 'unitmanagement:reassign_assets' data.id %}">Select</a>
                 </td>
             </tr>
         {% endfor %}

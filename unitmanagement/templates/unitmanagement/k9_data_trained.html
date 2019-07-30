@@ -1,0 +1,105 @@
+
+{% load static %}
+{% block content %}
+{%if k9%}
+    <div class="header">{{k9}}</div>
+    <div class="image scrolling content">
+        <img class="image" src="{{k9.image.url}}" style="position:relative; width: 350px;height: 300px;" >
+        <div class="description">
+                <div class="ui tiny info message">
+                    <ul class="list">
+                        <li>Less Sickly K9 would be prefered For-Breeding</li>
+                        <li>Training Score 85 and above would be ideal for For-Deployment.</li>
+                        <li>Dont forget to check the remarks!</li>
+                    </ul>
+                </div>
+            <form action="" class="ui form">
+                <div class="four fields">
+                    <div class="field">
+                        <label>Name</label>
+                        <input type="text" value="{{k9.name}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Breed</label>
+                        <input type="text" value="{{k9.breed}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Sex</label>
+                        <input type="text" value="{{k9.sex}}" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Age</label>
+                        <input type="number" value="{{k9.age}}" readonly>
+                    </div>
+                </div>
+                <div class="four fields">
+                        <div class="field">
+                            <label>Capability</label>
+                            <input type="text" value="{{k9.capability}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Height</label>
+                            <input type="number" value="{{k9.height}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Weight</label>
+                            <input type="number" value="{{k9.weight}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Training Score</label>
+                            <input type="text" value="{{train.grade}}" readonly>
+                        </div>
+                    </div>
+                    <div class="field">
+                      <div class="ui large red label">
+                            <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
+                      </div>
+                    </div>
+                    <div id = 'sick' class="ui segment"> 
+                        <table class="ui small two celled table">
+                            <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Treatment</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in health %}
+                                    <tr>
+                                        <td>{{data.problem}}</td>
+                                        <td>{{data.treatment}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% for data in remarks%}
+                    <div class="field">
+                        <label>{{data.stage}}</label>
+                        <textarea name="" id="" rows="2">{{data.remarks}}</textarea>
+                    </div>
+                    {% endfor %}
+                </form>
+
+            
+        </div>
+    </div>
+    <div class="actions">
+        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
+        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>    
+    </div>
+
+
+    <script>   
+        $(document).ready(function() {
+            $("#sick").hide();
+
+            $("#btn2").click(function(){
+                $("#sick").slideToggle();
+            });
+
+        });
+    </script>
+{%endif%}
+{% endblock %}
+

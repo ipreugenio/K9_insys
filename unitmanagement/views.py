@@ -33,7 +33,7 @@ from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, Equipm
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
 
 from profiles.models import User, Account, Personal_Info
-from training.models import K9_Handler, Training_History
+from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
 from rest_framework.views import APIView
@@ -155,7 +155,14 @@ def yearly_vaccine_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
 
-    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(age__gte=1)
+    vr = VaccinceRecord.objects.filter(deworming_4=True,dhppil_cv_3=True,anti_rabies=True,bordetella_2=True,dhppil4_2=True)
+    
+    list_k9 = []
+
+    for v in vr:
+        list_k9.append(v.k9.id) 
+    
+    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
     
     k9_ar = []
     k9_dh = []
@@ -220,10 +227,16 @@ def yearly_vaccine_list(request):
             f.disease = request.POST.get('type')
             f.k9 = k9
 
-            f.save()
-
-            messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
-
+            #minus 
+            mi = Medicine_Inventory.objects.get(vaccine=f.vaccine)
+            mi.quantity = mi.quantity - 1
+         
+            if mi.quantity > 0 :
+                f.save()
+                mi.save()
+                messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
+            else:
+                messages.warning(request, 'Insufficient Quantity')
             return redirect('unitmanagement:yearly_vaccine_list')
 
     context = {
@@ -245,6 +258,7 @@ def yearly_vaccine_list(request):
 #TODO Initialize treatment
 #TODO fix missing form
 def health_form(request):
+    form = HealthForm(request.POST or None)
     medicine_formset = inlineformset_factory(Health, HealthMedicine, form=HealthMedicineForm, extra=1, can_delete=True)
     style=""
 
@@ -261,8 +275,7 @@ def health_form(request):
 
             dog = K9.objects.get(id=form_instance.dog.id)
             print('from query ', dog)
-            
-            print(request.session['problem'])
+           
             #Use Health form instance for Health Medicine
             formset = medicine_formset(request.POST, instance=form_instance)
             form_med = []
@@ -327,6 +340,16 @@ def health_form(request):
                     for form in formset:
                         form.save()
                     dog.status = 'Sick'
+                    dog.save()
+
+                    minus_list = zip(form_med,form_quantity)
+
+                    #subtract item
+                    for a,b in minus_list:
+                        mm = Medicine_Inventory.objects.get(id=a.id)
+                        mm.quantity = mm.quantity - b
+                        mm.save()
+
                     style = "ui green message"
                     messages.success(request, 'Health Form has been successfully recorded!')
 
@@ -1076,21 +1099,241 @@ def requests_form(request):
     }
     return render (request, 'unitmanagement/request_form.html', context)
 
-# def request_list(request):
-#     data = Requests.objects.all()
-#
-#     #NOTIF SHOW
-#     notif_data = notif(request)
-#     count = notif_data.filter(viewed=False).count()
-#     user = user_session(request)
-#     context = {
-#         'data': data,
-#         'title': 'Damaged Equipment List',
-#         'notif_data':notif_data,
-#         'count':count,
-#         'user':user,
-#     }
-#     return render (request, 'unitmanagement/request_list.html', context)
+def trained_list(request):
+    k9s_for_grading = []
+    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+
+    for item in train_sched:
+        if item.k9.training_level == item.stage:
+            k9s_for_grading.append(item.k9.id)
+
+    data = K9.objects.filter(id__in=k9s_for_grading)
+
+    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+
+    NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+    EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+    SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+    if not NDD_demand:
+        NDD_demand = 0
+    if not EDD_demand:
+        EDD_demand = 0
+    if not SAR_demand:
+        SAR_demand = 0
+
+    # breed = ['Belgian Malinois','Dutch Sheperd','German Sheperd','Golden Retriever','Jack Russel','Labrador Retriever']
+
+    # for breed in breed:
+
+    #Belgian Malinois
+    bm_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(sex='Male').count()
+    bm_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(sex='Female').count()
+    
+    bm_m_edd =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='EDD').filter(sex='Male').count()
+    bm_m_ndd =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='NDD').filter(sex='Male').count()
+    bm_m_sar =  K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='SAR').filter(sex='Male').count()
+
+    bm_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='EDD').filter(sex='Female').count()
+    bm_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='NDD').filter(sex='Female').count()
+    bm_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Belgian Malinois').filter(capability='SAR').filter(sex='Female').count()
+    
+    #Dutch Sheperd
+    ds_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(sex='Male').count()
+    ds_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(sex='Female').count()
+    
+    ds_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='EDD').filter(sex='Male').count()
+    ds_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='NDD').filter(sex='Male').count()
+    ds_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='SAR').filter(sex='Male').count()
+
+    ds_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='EDD').filter(sex='Female').count()
+    ds_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='NDD').filter(sex='Female').count()
+    ds_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Dutch Sheperd').filter(capability='SAR').filter(sex='Female').count()
+
+    #German Sheperd
+    gs_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(sex='Male').count()
+    gs_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(sex='Female').count()
+    
+    gs_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='EDD').filter(sex='Male').count()
+    gs_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='NDD').filter(sex='Male').count()
+    gs_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='SAR').filter(sex='Male').count()
+
+    gs_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='EDD').filter(sex='Female').count()
+    gs_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='NDD').filter(sex='Female').count()
+    gs_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='German Sheperd').filter(capability='SAR').filter(sex='Female').count()
+    
+    
+    gr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(sex='Male').count()
+    gr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(sex='Female').count()
+    
+    gr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='EDD').filter(sex='Male').count()
+    gr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='NDD').filter(sex='Male').count()
+    gr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='SAR').filter(sex='Male').count()
+
+    gr_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='EDD').filter(sex='Female').count()
+    gr_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='NDD').filter(sex='Female').count()
+    gr_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Golden Retriever').filter(capability='SAR').filter(sex='Female').count()
+    
+    jr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(sex='Male').count()
+    jr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(sex='Female').count()
+    
+    jr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='EDD').filter(sex='Male').count()
+    jr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='NDD').filter(sex='Male').count()
+    jr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='SAR').filter(sex='Male').count()
+
+    jr_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='EDD').filter(sex='Female').count()
+    jr_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='NDD').filter(sex='Female').count()
+    jr_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Jack Russel').filter(capability='SAR').filter(sex='Female').count()
+    
+    lr_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(sex='Male').count()
+    lr_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(sex='Female').count()
+    
+    lr_m_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='EDD').filter(sex='Male').count()
+    lr_m_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='NDD').filter(sex='Male').count()
+    lr_m_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='SAR').filter(sex='Male').count()
+
+    lr_f_edd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='EDD').filter(sex='Female').count()
+    lr_f_ndd = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='NDD').filter(sex='Female').count()
+    lr_f_sar = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed='Labrador Retriever').filter(capability='SAR').filter(sex='Female').count()
+
+    bm = bm_m+bm_f
+    ds = ds_m+ds_f
+    gs = gs_m+gs_f
+    gr = gr_m+gr_f
+    jr = jr_m+jr_f
+    lr = lr_m+lr_f
+    t_breed = bm+ds+gs+gr+jr+lr
+
+    edd_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='EDD').filter(sex='Female').count()
+    ndd_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='NDD').filter(sex='Female').count()
+    sar_f = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='SAR').filter(sex='Female').count()
+    
+    edd_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='EDD').filter(sex='Male').count()
+    ndd_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='NDD').filter(sex='Male').count()
+    sar_m = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(capability='SAR').filter(sex='Male').count()
+
+    ndd = ndd_f+ndd_m
+    edd = edd_f + edd_m
+    sar = sar_f + sar_m
+
+    #finished training data
+    ts =[]
+    for d in data:
+        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
+        ts.append(a.date_end.date)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'data': data,
+        'ts': ts,
+        'title': 'Trained K9 List',
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'EDD_count': EDD_count,
+        'NDD_count': NDD_count,
+        'SAR_count': SAR_count,
+        'NDD_demand': NDD_demand,
+        'EDD_demand': EDD_demand,
+        'SAR_demand': SAR_demand,
+
+        'ndd':ndd,
+        'edd':edd,
+        'sar':sar,
+
+        'ndd_f':ndd_f,
+        'edd_f':edd_f,
+        'sar_f':sar_f,
+
+        'ndd_m':ndd_m,
+        'edd_m':edd_m,
+        'sar_m':sar_m,
+
+        'bm_m':bm_m,
+        'bm_f':bm_f,
+        'bm_m_edd':bm_m_edd,
+        'bm_m_ndd':bm_m_ndd,
+        'bm_m_sar':bm_m_sar,
+        'bm_f_edd':bm_f_edd,
+        'bm_f_ndd':bm_f_ndd,
+        'bm_f_sar':bm_f_sar,
+
+
+        'ds_m':ds_m,
+        'ds_f':ds_f,
+        'ds_m_edd':ds_m_edd,
+        'ds_m_ndd':ds_m_ndd,
+        'ds_m_sar':ds_m_sar,
+        'ds_f_edd':ds_f_edd,
+        'ds_f_ndd':ds_f_ndd,
+        'ds_f_sar':ds_f_sar,
+
+        'gs_m':gs_m,
+        'gs_f':gs_f,
+        'gs_m_edd':gs_m_edd,
+        'gs_m_ndd':gs_m_ndd,
+        'gs_m_sar':gs_m_sar,
+        'gs_f_edd':gs_f_edd,
+        'gs_f_ndd':gs_f_ndd,
+        'gs_f_sar':gs_f_sar,
+
+        'gr_m':gr_m,
+        'gr_f':gr_f,
+        'gr_m_edd':gr_m_edd,
+        'gr_m_ndd':gr_m_ndd,
+        'gr_m_sar':gr_m_sar,
+        'gr_f_edd':gr_f_edd,
+        'gr_f_ndd':gr_f_ndd,
+        'gr_f_sar':gr_f_sar,
+
+        'jr_m':jr_m,
+        'jr_f':jr_f,
+        'jr_m_edd':jr_m_edd,
+        'jr_m_ndd':jr_m_ndd,
+        'jr_m_sar':jr_m_sar,
+        'jr_f_edd':jr_f_edd,
+        'jr_f_ndd':jr_f_ndd,
+        'jr_f_sar':jr_f_sar,
+
+        'lr_m':lr_m,
+        'lr_f':lr_f,
+        'lr_m_edd':lr_m_edd,
+        'lr_m_ndd':lr_m_ndd,
+        'lr_m_sar':lr_m_sar,
+        'lr_f_edd':lr_f_edd,
+        'lr_f_ndd':lr_f_ndd,
+        'lr_f_sar':lr_f_sar,
+
+        'bm':bm,
+        'ds':ds,
+        'gs':gs,
+        'gr':gr,
+        'jr':jr,
+        'lr':lr,
+        't_breed':t_breed,
+    }
+    return render (request, 'unitmanagement/trained_list.html', context)
+
+def classified_list(request):
+    data = K9.objects.filter(training_status="Classified").filter(status="Material Dog")
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'data': data,
+        'title': 'Classified K9 List',
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'unitmanagement/classified_list.html', context)
 #
 # def change_equipment(request, id):
 #     data = Requests.objects.get(id=id)
@@ -1475,52 +1718,63 @@ def on_leave_request(request):
     }
     return render (request, 'unitmanagement/on_leave_form.html', context)
 
-def reassign_assets(request):
-    style=''
-    form = ReassignAssetsForm(request.POST or None)
-    k9 = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
+def reassign_assets(request, id):
+    form = assign_handler_form(request.POST or None)
+    style = ""
+    k9 = K9.objects.get(id=id)  
 
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
-    numh = handler.count()
-    numk = k9.count()
+
+    g = []
+    for h in handler:
+
+        if k9.capability == 'NDD':
+            cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+        elif k9.capability == 'EDD':
+            cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+        else:
+            cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
+       
+        s=[cap]
+        g.append(s)
+
     if request.method == 'POST':
-        print('yes')
+        print(form.errors)
         if form.is_valid():
-            k9 = K9.objects.get(id=form.data['k9'])
-            handler = User.objects.get(id=form.data['handler'])
+            f = form.save(commit=False)
+            f.k9 = k9
+            f.save()
 
-            #save status
-            k9.handler = handler
-            k9.save()
+            #Handler Update
+            h = User.objects.get(id= f.handler.id)
+            h.partnered = True
+            h.save()
 
-            handler.partnered = True
-            handler.save()
+            #K9 Update
+            k = K9.objects.get(id=f.k9.id)
+            k.handler=h
+            k.save()
 
-            K9_Handler.objects.create(k9 = k9, handler = handler)
+            messages.success(request, str(k9) + ' has been assigned to ' + str(h))
+            return redirect('unitmanagement:k9_unpartnered_list')
 
-            form = ReassignAssetsForm()
-            style = "ui green message"
-            messages.success(request, 'Assets has been successfully Partnered!')
         else:
             style = "ui red message"
-            messages.warning(request, 'Make sure all input is complete!')
+            messages.warning(request, 'Invalid input data!')
         
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'title': "Reassign Assets",
-        'actiontype': "Submit",
-        'style': style,
+        'Title': "Available Handlers for " + k9.name,
         'form': form,
-        'handler': handler,
-        'k9':k9,
-        'numk': numk,
-        'numh': numh,
+        'style': style,
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'k9':k9,
+        'g':g,
     }
     return render (request, 'unitmanagement/reassign_assets.html', context)
 
@@ -1652,44 +1906,25 @@ def choose_handler_list(request, id):
     handler = User.objects.filter(status='Working').filter(position='Handler').filter(partnered=False)
     g = []
     for h in handler:
-        edd = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Trained').count()
-        edd_f = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Failed').count()
-        ndd = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Trained').count()
-        ndd_f = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Failed').count()
-        sar = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Trained').count()
-        sar_f = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Failed').count()
-        s = 0
-        n = 0
-        e = 0
-        f = 0
 
-        if sar != 0:
-            s = int((sar / (sar+sar_f)) * 100) 
-        if edd != 0:
-            e = int((edd / (edd+edd_f)) * 100)
-        if ndd != 0:
-            n = int((ndd / (ndd+ndd_f)) * 100)
+        if k9.capability == 'NDD':
+            cap = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Trained').count()
+            cap_f = Training_History.objects.filter(handler=h).filter(k9__capability='NDD').filter(k9__trained='Failed').count()
+        elif k9.capability == 'EDD':
+            cap = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Trained').count()
+            cap_f = Training_History.objects.filter(handler=h).filter(k9__capability='EDD').filter(k9__trained='Failed').count()
+        else:
+            cap = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Trained').count()
+            cap_f = Training_History.objects.filter(handler=h).filter(k9__capability='SAR').filter(k9__trained='Failed').count()
         
-        ctr = 0
-        if s !=0:
-            ctr = ctr+1
-        if e !=0:
-            ctr = ctr+1
-        if n !=0:
-            ctr = ctr+1
-        if ctr == 0:
-            ctr = 1
-
-        et = edd+edd_f
-        nt = ndd+ndd_f
-        st = sar+sar_f
-        f = int((e+n+s) / ctr )
-        fs = int(edd+ndd+sar)
-        ft = int(et+nt+st) 
-        s = [e, n, s, f, edd, et, ndd, nt, sar, st, fs, ft]
+        c = 0 
+        f = 0
+        ct = cap+cap_f
+        if cap != 0:
+            c = int((cap / ct) * 100) 
+     
+        s = [cap,ct,c]
         g.append(s)
-
-    print(g)
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
@@ -1719,7 +1954,7 @@ def choose_handler_list(request, id):
     user = user_session(request)
     
     context = {
-        'Title': "K9 Assignment for " + k9.name,
+        'Title': "Available Handlers for " + k9.name,
         'form': form,
         'style': style,
         'notif_data':notif_data,
@@ -2173,6 +2408,35 @@ class CommanderView(APIView):
         }
         return Response(data)
 
+class TrainerView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+
+
+        NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
+        EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
+        SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
+
+
+        current = [NDD_count,EDD_count,SAR_count]
+        demand = [NDD_demand,EDD_demand,SAR_demand]
+
+        ndd_train = K9.objects.filter(capability='NDD').filter(training_status='On-Training').count()
+        edd_train = K9.objects.filter(capability='EDD').filter(training_status='On-Training').count()
+        sar_train = K9.objects.filter(capability='SAR').filter(training_status='On-Training').count()
+        
+        pie_data = [ndd_train,edd_train,sar_train]
+        data = {
+            "current":current,
+            "demand":demand,
+            "pie_data":pie_data,
+        }
+        return Response(data)
+
 
 def load_handler(request):
 
@@ -2220,10 +2484,9 @@ def load_stamp(request):
 def load_k9(request):
 
     k9 = None
-
     try:
         handler_id = request.GET.get('handler')
-        k9 = K9.objects.get(handler__id=handler_id) 
+        k9 = K9.objects.get(handler__id=handler_id)
     except:
         pass
 
@@ -2340,6 +2603,34 @@ def load_physical(request):
     }
 
     return render(request, 'unitmanagement/physical_data.html', context)
+
+def load_k9_data(request):
+
+    k9 = None
+    remarks = None
+    h_count = None
+    health = None
+    train = None
+    try:
+        k9_id = request.GET.get('id')
+        k9 = K9.objects.get(id=k9_id)
+        remarks = Training_Schedule.objects.filter(k9=k9)
+        h_count = Health.objects.filter(dog=k9).count()
+        health = Health.objects.filter(dog=k9)
+        train = Training.objects.get(k9=k9)
+    except:
+        pass
+
+    context = {
+        'k9': k9,
+        'remarks': remarks,
+        'h_count': h_count,
+        'health': health,
+        'train': train,
+    }
+
+    return render(request, 'unitmanagement/k9_data_trained.html', context)
+
 def k9_checkup_pending(request):
     removal = TempCheckup.objects.all()
 
@@ -2366,6 +2657,7 @@ def k9_checkup_pending(request):
 
     context = {
         'k9_pending': pending_schedule,
+        'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
         'selected_list': []
     }

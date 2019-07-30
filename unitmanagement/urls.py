@@ -46,21 +46,28 @@ urlpatterns = [
     path('choose-handler-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
     path('health-history/ajax_load_stamp', views.load_stamp, name='ajax_load_stamp'),
     path('ajax_load_k9', views.load_k9, name='ajax_load_k9'),
+    
     path('k9-sick-details/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('k9-incident-list/ajax_load_incident', views.load_incident, name='ajax_load_incident'),
     path('k9-sick-details/ajax_load_image', views.load_image, name='ajax_load_image'),
     path('yearly-vaccine-list/ajax_load_yearly_vac', views.load_yearly_vac, name='ajax_load_yearly_vac'),
     path('unfit-list/ajax_load_physical', views.load_physical, name='ajax_load_physical'),
+    path('reassign-assets/ajax_load_handler', views.load_handler, name='load_handler'),
+    path('trained-list/ajax_load_k9_data', views.load_k9_data, name='ajax_load_k9_data'),
     
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
-    path('reassign-assets', views.reassign_assets, name='reassign_assets'),
-    #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    path('reassign-assets/<int:id>', views.reassign_assets, name='reassign_assets'),
     path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
+    path('trained-list', views.trained_list, name='trained_list'),
+    path('classified-list', views.classified_list, name='classified_list'),
+    #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
+    
     
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),
     path('vet/api', views.VetView.as_view()),
     path('commander/api', views.CommanderView.as_view()),
+    path('trainer/api', views.TrainerView.as_view()),
 
 
     path('k9-checkup-pending', views.k9_checkup_pending, name='k9_checkup_pending'),

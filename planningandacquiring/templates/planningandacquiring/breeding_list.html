@@ -22,6 +22,18 @@
         </tr>
         </thead>
         <tbody>
+            {% if d %}
+            <tr class="positive">
+                <td>{{ d.mother}}</td>
+                <td>{{ d.father}}</td>
+                <td class="center aligned">{{ d.date_mated}}</td>
+                <td class="center aligned">
+                    <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' d.id %}?decision=confirm" class="ui tiny blue button">Confirm</a>
+                    <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' d.id %}?decision=failed" class="ui tiny red button">Failed</a>
+                </td>
+            </tr>
+            {% endif %}
+
             {% for data in data1 %}
                 <tr>
                     <td>{{ data.mother}}</td>
@@ -65,8 +77,8 @@
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		$('#tabledata1').DataTable( {
-        "order": [[ 2, "desc" ]]
+		$('#tabledata1').DataTable({
+            "ordering": false
         });
 
         $('#tabledata2').DataTable( {

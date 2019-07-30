@@ -114,6 +114,10 @@
                           </tr>
                         </table>
                     </div>
+
+
+                <div id = "calendar" style="margin-top:0%;"></div>
+
             </div>
           </div>
         </div>
@@ -229,4 +233,61 @@
             
         });
         </script>
+
+
+<script>
+
+<style>
+.fc-header, .fc-button, #prev, #next{
+  background-color:orangered;
+  color: white;
+}
+
+ #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+ }
+</style>
+</script>
+
+
+<script>
+
+     $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+          nowIndicator: true,
+
+          eventTextColor: "white",
+
+
+          events: [
+                {% for i in events %}
+                {
+                     id: '{{ i.id }}',
+                    title: '{{i.k9}}',
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                },
+                {% endfor %}
+
+            ],
+
+
+          }); // end #calendar
+
+
+</script>
+
 {% endblock%}
