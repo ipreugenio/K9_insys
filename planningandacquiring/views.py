@@ -9,7 +9,7 @@ from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, a
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, K9_Supplier, K9_Litter
 from .models import K9_Mated
 from .forms import DateForm
-from deployment.models import Incidents
+from deployment.models import Incidents, Daily_Refresher, Team_Dog_Deployed
 from planningandacquiring.models import Proposal_Budget, Proposal_Milk_Food, Proposal_Vac_Prev, Proposal_Medicine, Proposal_Vet_Supply, Proposal_Kennel_Supply, Proposal_Others, Actual_Budget, Actual_Milk_Food, Actual_Vac_Prev, Actual_Medicine, Actual_Vet_Supply, Actual_Kennel_Supply, Actual_Others
 
 from django.db.models import Sum
@@ -27,13 +27,13 @@ from deployment.models import Dog_Request, Team_Assignment
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail, Food_Received_Trail, Medicine_Received_Trail, Miscellaneous_Received_Trail
 
-from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification, Handler_Incident
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
 
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
 import dateutil.parser
-from faker import Faker
+#from faker import Faker
 
 #statistical imports
 from math import *
@@ -47,31 +47,31 @@ from datetime import timedelta
 
 from datetime import date
 
-from faker import Faker
-
-#statistical imports
-from math import *
-from decimal import Decimal
-from sklearn.metrics import mean_squared_error
-import pandas as pd
-import numpy as np
-
-#graphing imports
-from igraph import *
-import plotly.offline as opy
-import plotly.graph_objs as go
-import plotly.graph_objs.layout as lout
-
-#forecasting imports
-from statsmodels.tsa.ar_model import AR
-from statsmodels.tsa.arima_model import ARMA
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from random import random, randint 
-from statsmodels.tsa.stattools import adfuller, kpss
-import statsmodels.api as sm
+# from faker import Faker
+#
+# #statistical imports
+# from math import *
+# from decimal import Decimal
+# from sklearn.metrics import mean_squared_error
+# import pandas as pd
+# import numpy as np
+#
+# #graphing imports
+# from igraph import *
+# import plotly.offline as opy
+# import plotly.graph_objs as go
+# import plotly.graph_objs.layout as lout
+#
+# #forecasting imports
+# from statsmodels.tsa.ar_model import AR
+# from statsmodels.tsa.arima_model import ARMA
+# from statsmodels.tsa.arima_model import ARIMA
+# from statsmodels.tsa.statespace.sarimax import SARIMAX
+# from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+# from statsmodels.tsa.holtwinters import ExponentialSmoothing
+# from random import random, randint
+# from statsmodels.tsa.stattools import adfuller, kpss
+# import statsmodels.api as sm
 
 import math
 # Create your views here.
@@ -2817,7 +2817,382 @@ def inventory_report(request):
     }
 
     return render(request, 'planningandacquiring/inventory_report.html', context)
-    
+
+def deployment_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('deployment_report/')
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/deployment_date.html', context)
+
+
+def deployment_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    locations = Incidents.objects.filter(date__range=[from_date, to_date])
+
+    incidents_data = []
+
+    incidents_distinct = locations.values('location').distinct()
+
+    for loc in incidents_distinct:
+        for key, value in loc.items():
+            print(value)
+            print(incidents_distinct)
+            explosives = locations.filter(location__id=value).filter(type="Explosives Related").count()
+            narcotics = locations.filter(location__id=value).filter(type="Narcotics Related").count()
+            sar = locations.filter(location__id=value).filter(type="Search and Rescue Related").count()
+            vac = locations.filter(location__id=value).latest('date')
+            arr = [vac.location, explosives, narcotics, sar]
+            incidents_data.append(arr)
+
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'incidents_data': incidents_data,
+
+    }
+
+    return render(request, 'planningandacquiring/deployment_report.html', context)
+
+def handler_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('handler_report/')
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/handler_date.html', context)
+
+
+def handler_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    handler = Handler_Incident.objects.filter(date__range=[from_date, to_date])
+
+    handler_data = []
+
+    handler_disinct = handler.values('handler').distinct()
+
+    for h in handler_disinct:
+        for key, value in h.items():
+            print(value)
+            positive = handler.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
+            negative = handler.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
+                incident="MIA") | Q(incident="Died")).count()
+            handler_name = handler.filter(handler=value).latest('date')
+            arr = [handler_name.handler, positive, negative]
+            handler_data.append(arr)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'handler_data': handler_data,
+
+    }
+
+    return render(request, 'planningandacquiring/handler_report.html', context)
+
+def k9_report(request):
+    # from_date = request.session["from_date"]
+    # to_date = request.session["to_date"]
+    user = user_session(request)
+
+    puppy = K9.objects.filter(training_status="Puppy").count()
+    unclassified = K9.objects.filter(training_status="Unclassified").count()
+    classified = K9.objects.filter(training_status="Classified").count()
+    on_training = K9.objects.filter(training_status="On-Training").count()
+    trained = K9.objects.filter(training_status="Trained").count()
+    for_breeding = K9.objects.filter(training_status="For-Breeding").count()
+    for_deployment = K9.objects.filter(training_status="For-Deployment").count()
+    breeding = K9.objects.filter(training_status="Breeding").count()
+    for_adoption = K9.objects.filter(training_status="For-Adoption").count()
+    adopted = K9.objects.filter(training_status="adopted").count()
+    deployed = K9.objects.filter(training_status="Deployed").count()
+    light_duty = K9.objects.filter(training_status="Light Duty").count()
+    retired = K9.objects.filter(training_status="Retired").count()
+    dead = K9.objects.filter(training_status="Dead").count()
+
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'user': user,
+        'puppy': puppy,
+        'unclassified': unclassified,
+        'classified': classified,
+        'on_training': on_training,
+        'trained':trained,
+        'for_breeding': for_breeding,
+        'for_deployment': for_deployment,
+        'breeding': breeding,
+        'for_adoption': for_adoption,
+        'adopted': adopted,
+        'deployed': deployed,
+        'light_duty': light_duty,
+        'retired': retired,
+        'dead': dead,
+    }
+
+    return render(request, 'planningandacquiring/k9_report.html', context)
+
+def k9_performance_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('k9_performance_report/')
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/k9_performance_date.html', context)
+
+
+def k9_performance_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    dog = Handler_Incident.objects.filter(date__range=[from_date, to_date])
+    dog_data = []
+    dog_disinct = dog.values('k9').distinct()
+
+    for d in dog_disinct:
+        for key, value in d.items():
+            print(value)
+            positive = dog.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
+            negative = dog.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
+                incident="MIA") | Q(incident="Died")).count()
+            dog_name = dog.filter(k9=value).latest('date')
+            arr = [dog_name.k9, positive, negative]
+            dog_data.append(arr)
+
+    refresher = Daily_Refresher.objects.filter(date__range=[from_date, to_date])
+    dog_data = []
+    dog_disinct = dog.values('k9').distinct()
+
+    for d in dog_disinct:
+        for key, value in d.items():
+            print(value)
+            positive = dog.filter(Q(incident="Made an Arrest") | Q(incident="Rescued People")).count()
+            negative = dog.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
+                incident="MIA") | Q(incident="Died")).count()
+            dog_name = dog.filter(k9=value).latest('date')
+            arr = [dog_name.k9, positive, negative]
+            dog_data.append(arr)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'dog_data': dog_data,
+
+    }
+
+    return render(request, 'planningandacquiring/k9_performance_report.html', context)
+
+def dog_request_date(request):
+    form = DateForm(request.POST or None)
+
+    if request.method == 'POST':
+        from_date = request.POST['from_date']
+        to_date = request.POST['to_date']
+        request.session["from_date"] = from_date
+        request.session["to_date"] = to_date
+        return HttpResponseRedirect('dog_request_report/')
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'form': form,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/dog_request_date.html', context)
+
+
+def dog_request_report(request):
+    from_date = request.session["from_date"]
+    to_date = request.session["to_date"]
+    user = user_session(request)
+
+    event = Dog_Request.objects.filter(start_date__range=[from_date, to_date])
+    event_data = []
+    event_distinct = event.values('requester').distinct()
+
+    deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
+    dog_distinct = deployed.values('k9').distinct()
+    dog_data = []
+
+    for d in dog_distinct:
+        for key, value2 in d.items():
+            print(value2)
+            print(dog_distinct)
+            SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
+            NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
+            EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
+            print(SAR)
+            print(NDD)
+            print(EDD)
+            print("HELLO")
+
+    for e in event_distinct:
+        for key, value in e.items():
+            print(value)
+            print(event_distinct)
+
+            event = event.filter(requester=value).latest('start_date')
+            arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
+            event_data.append(arr)
+
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'from_date': from_date,
+        'to_date': to_date,
+        'user': user,
+        'event_data': event_data,
+
+    }
+
+    return render(request, 'planningandacquiring/dog_request_report.html', context)
+
+def training_report(request):
+    # from_date = request.session["from_date"]
+    # to_date = request.session["to_date"]
+    user = user_session(request)
+
+    belgian_NDD = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="NDD").count()
+    belgian_EDD = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="EDD").count()
+    belgian_SAR = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="SAR").count()
+    total_belgian = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").count()
+
+    dutch_NDD = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="NDD").count()
+    dutch_EDD = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="EDD").count()
+    dutch_SAR = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="SAR").count()
+    total_dutch = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").count()
+
+    german_NDD = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="NDD").count()
+    german_EDD = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="EDD").count()
+    german_SAR = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="SAR").count()
+    total_german = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").count()
+
+    golden_NDD = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="NDD").count()
+    golden_EDD = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="EDD").count()
+    golden_SAR = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="SAR").count()
+    total_golden = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").count()
+
+    jack_NDD = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="NDD").count()
+    jack_EDD = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="EDD").count()
+    jack_SAR = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="SAR").count()
+    total_jack = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").count()
+
+    lab_NDD = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="NDD").count()
+    lab_EDD = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="EDD").count()
+    lab_SAR = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="SAR").count()
+    total_lab = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").count()
+
+
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'user': user,
+        'belgian_NDD': belgian_NDD,
+        'belgian_EDD': belgian_EDD,
+        'belgian_SAR': belgian_SAR,
+
+        'dutch_NDD': dutch_NDD,
+        'dutch_EDD': dutch_EDD,
+        'dutch_SAR': dutch_SAR,
+
+        'german_NDD': german_NDD,
+        'german_EDD': german_EDD,
+        'german_SAR': german_SAR,
+
+        'golden_NDD': golden_NDD,
+        'golden_EDD': golden_EDD,
+        'golden_SAR': golden_SAR,
+
+        'jack_NDD': jack_NDD,
+        'jack_EDD': jack_EDD,
+        'jack_SAR': jack_SAR,
+
+        'lab_NDD': lab_NDD,
+        'lab_EDD': lab_EDD,
+        'lab_SAR': lab_SAR,
+
+        'total_belgian': total_belgian,
+        'total_dutch': total_dutch,
+        'total_german': total_german,
+        'total_golden': total_golden,
+        'total_jack': total_jack,
+        'total_lab': total_lab,
+    }
+
+    return render(request, 'planningandacquiring/training_report.html', context)
 
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):

@@ -434,40 +434,38 @@ def login(request):
     if request.method == 'POST':
         serial = request.POST['serial_number']
         password = request.POST['password']
-        user_auth = authenticate(request, username=serial, password=password)
+        # user_auth = authenticate(request, username=serial, password=password)
         print(password)
-        if user_auth is not None:
-            auth_login(request, user_auth)
-            request.session["session_serial"] = serial
-            account = Account.objects.get(serial_number = serial)
-            user = User.objects.get(id = account.UserID.id) 
 
-            request.session["session_user_position"] = user.position
-            request.session["session_id"] = user.id
-            request.session["partnered"] = user.partnered
-            request.session["session_username"] = str(user)
+        # auth_login(request, user_auth)
+        request.session["session_serial"] = serial
+        account = Account.objects.get(serial_number = serial)
+        user = User.objects.get(id = account.UserID.id)
 
-            print(request.session["partnered"])
-            #TRAINOR, OPERATIONS
-            if user.position == 'Aministrator':
-                return HttpResponseRedirect('../dashboard')
-            elif user.position == 'Veterinarian':
-                return HttpResponseRedirect('../vet-dashboard')
-            elif user.position == 'Team Leader':
-                return HttpResponseRedirect('../team-leader-dashboard')
-            elif user.position == 'Handler':
-                return HttpResponseRedirect('../handler-dashboard')
-            elif user.position == 'Commander':
-                return HttpResponseRedirect('../commander-dashboard')
-            elif user.position == 'Operations':
-                return HttpResponseRedirect('../operations-dashboard')
-            elif user.position == 'Trainer':
-                return HttpResponseRedirect('../trainer-dashboard')
+        request.session["session_user_position"] = user.position
+        request.session["session_id"] = user.id
+        request.session["partnered"] = user.partnered
+        request.session["session_username"] = str(user)
 
-            else:
-                return HttpResponseRedirect('../dashboard')
+        print(request.session["partnered"])
+        #TRAINOR, OPERATIONS
+        if user.position == 'Aministrator':
+            return HttpResponseRedirect('../dashboard')
+        elif user.position == 'Veterinarian':
+            return HttpResponseRedirect('../vet-dashboard')
+        elif user.position == 'Team Leader':
+            return HttpResponseRedirect('../team-leader-dashboard')
+        elif user.position == 'Handler':
+            return HttpResponseRedirect('../handler-dashboard')
+        elif user.position == 'Commander':
+            return HttpResponseRedirect('../commander-dashboard')
+        elif user.position == 'Operations':
+            return HttpResponseRedirect('../operations-dashboard')
+        elif user.position == 'Trainer':
+            return HttpResponseRedirect('../trainer-dashboard')
+
         else:
-            messages.warning(request, 'username or password is invalid!')
+            return HttpResponseRedirect('../dashboard')
 
     return render (request, 'profiles/login.html')
 

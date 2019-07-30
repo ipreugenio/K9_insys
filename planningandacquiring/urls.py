@@ -56,6 +56,22 @@ urlpatterns = [
 
     path('inventory_date/', views.inventory_date, name='inventory_date'),
     path('inventory_date/inventory_report/', views.inventory_report, name='inventory_report'),
+
+    path('deployment_date/', views.deployment_date, name='deployment_date'),
+    path('deployment_date/deployment_report/', views.deployment_report, name='deployment_report'),
+
+    path('handler_date/', views.handler_date, name='handler_date'),
+    path('handler_date/handler_report/', views.handler_report, name='handler_report'),
+
+    path('k9_report/', views.k9_report, name='k9_report'),
+    path('training_report/', views.training_report, name='training_report'),
+
+    path('k9_performance_date/', views.k9_performance_date, name='k9_performance_date'),
+    path('k9_performance_date/k9_performance_report/', views.k9_performance_report, name='k9_performance_report'),
+
+    path('dog_request_date/', views.dog_request_date, name='dog_request_date'),
+    path('dog_request_date/dog_request_report/', views.dog_request_report, name='dog_request_report'),
+
     path('add_K9_parents_form/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('add_K9_offspring/ajax_load_form', views.load_form, name='ajax_load_form'),
 
