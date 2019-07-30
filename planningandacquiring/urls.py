@@ -22,6 +22,7 @@ urlpatterns = [
     path('report/', views.report, name='report'),
     path('index/', views.index, name='index'),
 
+    path('in_heat_change/', views.in_heat_change, name='in_heat_change'),
     
     path('budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/', views.budgeting_list, name='budget_list'),

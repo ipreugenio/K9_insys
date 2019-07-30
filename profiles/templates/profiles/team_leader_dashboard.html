@@ -15,7 +15,7 @@
                       {{ta.total_dogs_demand}}
                     </div>
                     <div class="label">
-                      K9 Demand in Area
+                      K9 Required
                     </div>
                   </div>  
                   <div class="blue statistic">
@@ -23,7 +23,7 @@
                       {{ta.total_dogs_deployed}}
                     </div>
                     <div class="label">
-                      K9 Assigned in Area
+                      K9 Assigned
                     </div>
                   </div>  
                 </div>
@@ -57,38 +57,89 @@
                           </div>
                         </div>  
                     </div>
-                    <canvas id="myChart3"></canvas>
+                    <div class="chart-container">
+                        <canvas id="myChart3"></canvas>
+                    </div>
+                   
                 </div>
               </div>
       </div>
     </div>
     </div>
     <div class="six wide column" style="padding: 0%;padding-right: 1%;">
+    
         <div class="ui basic segment" style="padding-left: 0%;">
-            
-                <div class="ui black floating message">
-                    <p>Reminder</p>
-                  </div>
-                <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
-
-                    <table class="ui basic table">
-                      <tr>
-                        <td>Someone is on leave: Will return on Date</td>
-                        <td class="center aligned three wide">
-                          <a href="#" class="ui tiny black button">Details</a>
-                        </td>
-                      </tr>
-                    </table>
+            <div class="ui raised segment">
+              <div class="horizontal divider"></div>
+              info
+            </div>
+            <div class="ui inverted segment">
+                <h4>Calendar</h4>
+              </div>
+                <div class="ui right aligned basic segment"
+                style="padding:0%;margin:0%;margin-bottom:5px">
+                    <div class="ui buttons">
+                        <button class="ui button"  id = "prev" >Previous Year</button>
+                        <div class="or"></div>
+                        <button class="ui button"  id = "next" >Next Year</button>
+                      </div>
+                
                 </div>
+        
+                <div id = "calendar" style="margin-top:0%;"></div>
         </div>
       </div>
     </div>
 </div>
 </div>
-
+<style>
+  #prev, #next{
+    background-color:orangered;
+    color: white;
+  }
+  </style>
 <script>
 
 $(document).ready(function() {
+  $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: 3,
+          nowIndicator: true,
+
+          eventTextColor: "white",
+
+
+          events: [
+                {% for i in events %}
+                {
+                    id: '{{ i.id }}',
+                    title: '{{i.event_name}}',
+                    start: '{{ i.start_date|date:"Y-m-d" }}',
+                    end: '{{ i.end_date|date:"Y-m-d" }}',
+                    allDay: 'true',
+                },
+                {% endfor %}
+            ],
+            dayClick: function(date) {
+                new_date = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+                var view = $('#calendar').fullCalendar('getView');
+
+                    $('#calendar').fullCalendar('gotoDate',date);
+                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+
+                },
+
+          });
+
     var endpoint = '../../unitmanagement/team-leader/api'
     var defaultData = [];
     var labels = [];
@@ -149,11 +200,11 @@ $(document).ready(function() {
             labels: ["EDD", "NDD", "SAR"],
             datasets: [
                 {
-                label: "Demand",
+                label: "Required",
                 backgroundColor: "#8e5ea2",
                 data: demand,
                 }, {
-                label: "Supply",
+                label: "Assigned",
                 backgroundColor: "#3e95cd",
                 data: supply,
                 }]
@@ -164,7 +215,7 @@ $(document).ready(function() {
             },
             title: {
                 display: true,
-                text: "K9's Demand and Assigned in Area"
+                text: "K9's Required and Assigned in Area"
             },
                 scales: {
                 xAxes: [{

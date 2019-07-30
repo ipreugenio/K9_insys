@@ -4,7 +4,7 @@ from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
-from deployment.models import K9_Schedule, Incidents, Location
+from deployment.models import K9_Schedule, Incidents, Location, Team_Assignment
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -165,6 +165,11 @@ class PhysicalExam(models.Model):
         return str(self.date) + ': ' + str(self.dog.name)
 
 class VaccinceRecord(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Done', 'Done'),
+    )
+
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     deworming_1 = models.BooleanField(default=False)     #2weeks
     deworming_2 = models.BooleanField(default=False)     #4weeks
@@ -199,13 +204,17 @@ class VaccinceRecord(models.Model):
     tick_flea_5 = models.BooleanField(default=False)     #24weeks
     tick_flea_6 = models.BooleanField(default=False)     #28weeks
     tick_flea_7 = models.BooleanField(default=False)     #32weeks
-
+    status = models.CharField('status', choices=STATUS, max_length=200, default='Pending')
     def __str__(self):
         return str(self.k9)
 
     def save(self, *args, **kwargs):
         if self.dhppil4_2 == True:
             self.k9.training_status = 'Unclassified'
+
+        if self.deworming_1 == True and self.deworming_2 == True and self.deworming_3 == True and self.deworming_4 == True and self.dhppil_cv_1 == True and self.dhppil_cv_2 == True and self.dhppil_cv_3 == True and self.heartworm_1 == True and self.heartworm_2 == True and self.heartworm_3 == True and self.heartworm_4 == True and self.heartworm_5 == True and self.heartworm_6 == True and self.heartworm_7 == True and self.heartworm_8 == True and self.anti_rabies == True and self.bordetella_1 == True and self.bordetella_2 == True and self.dhppil4_1 == True and self.dhppil4_2 == True and self.tick_flea_1 == True and self.tick_flea_2 == True and self.tick_flea_3 == True and self.tick_flea_4 == True and self.tick_flea_5 == True and self.tick_flea_6 == True and self.tick_flea_7 == True:
+            self.status = 'Done'
+        
         super(VaccinceRecord, self).save(*args, **kwargs)
 
 
@@ -295,13 +304,29 @@ class Handler_Incident(models.Model):
             self.k9.handler = None
         super(Handler_Incident, self).save(*args, **kwargs)
 
+class Request_Transfer(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Denied', 'Denied'),
+        ('Done', 'Done'),
+    )
 
-# class Request_Transfer(models.Model):
-#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     date_created =  models.DateField('date_created', auto_now_add=True)
-#     date_of_transfer = models.DateField('date_created', null=True, blank=True)
-#     location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
-#     location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date_created =  models.DateField('date_created', auto_now_add=True)
+    date_of_transfer = models.DateField('date_created', null=True, blank=True)
+    location_from = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name='location_from', null=True, blank=True)
+    location_to = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name='location_to', null=True, blank=True)
+    status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
+    remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
+
+class Call_Back_K9(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+    )
+    date_created =  models.DateField('date_created', auto_now_add=True)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
 
 class Notification(models.Model):
     POSITION = (
@@ -327,6 +352,7 @@ class Notification(models.Model):
         ('retired_k9', 'retired_k9'),
         ('medicine_done', 'medicine_done'),
         ('medicine_given', 'medicine_given'),
+        ('call_back', 'call_back'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

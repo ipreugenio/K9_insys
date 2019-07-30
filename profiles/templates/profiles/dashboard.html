@@ -1,45 +1,165 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
 {% block dashboard %}
-
-
-
 <div class="container fluid">
-  <h1>Dashboard</h1>
-  <div class="ui two column grid">
-    <div class="column">
+    <div class="ui two column grid">
+      <div class="streched row">
+        <div class="nine wide column"  style="padding-right: 0%;">
+          <div class="ui basic segment">
+            <div class="ui stackable grid">
+                <div class="sixteen wide column">
+                    <div class="ui equal width height grid">
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge user purple icon"></i>
+                                        <i class="huge paw purple icon">{{c_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="{% url 'unitmanagement:classified_list' %}">ASSIGN HANDLER TO K9</a>
+                                        </strong>
+                                    </div>
+                                </div>                                         
+                            </div>     
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge shopping basket olive icon">{{item_req_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                      <br>
+                                        <strong>
+                                            <a href="#">ITEM REQUESTS</a>
+                                            <!-- href="{% url 'unitmanagement:classified_list' %}" -->
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge question black icon"></i>
+                                        <i class="huge paw black icon">{{up_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <br>
+                                        <strong>
+                                            <a href="{% url 'unitmanagement:k9_unpartnered_list' %}">UNPARTNERED K9's</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge bus brown icon">{{tq_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <br>
+                                        <strong>
+                                            <a href="#">TRANSFER REQUESTS</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
 
-        <div class="ui right aligned basic segment" style="padding:0%;margin:0%;margin-bottom: 5px;" >
-            <div class="ui buttons">
-                <button class="ui button"  id = "prev" >Previous Year</button>
-                <div class="or"></div>
-                <button class="ui button"  id = "next" >Next Year</button>
-              </div>
-        
+                <div class="sixteen wide column">
+                    <div class="ui equal width height grid">
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge compass blue icon">{{dept_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <br>
+                                        <strong>
+                                            <a href="{% url 'deployment:schedule_units' %}">K9's
+                                            FOR INITIAL DEPLOYMENT</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge tasks orange icon">{{pq_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="#">UNCONFIRMED PRE-REQUIREMENT</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge exclamation circle red icon">{{ua_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <br>
+                                        <strong>
+                                            <a href="#">UNCONFIRMED ARRIVALS</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>       
+                </div>
+               
+                <div class="sixteen wide column">
+                    <div class="ui raised segment">
+                        <canvas id="myChart4"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-
-      <div id = "calendar" style="margin-top:0%;">
-
-    
-      </div></div>
-
-
-    <div class="column">
-    </div>
-  </div>
+        </div>
+        <div class="seven wide column" style="padding: 0%;padding-right: 1%;">
+            <div class="ui basic segment"> 
+              <div class="ui inverted segment">
+                <h4>Calendar</h4>
+              </div>
+                <div class="ui right aligned basic segment"
+                style="padding:0%;margin:0%;margin-bottom:5px">
+                    <div class="ui buttons">
+                        <button class="ui button"  id = "prev" >Previous Year</button>
+                        <div class="or"></div>
+                        <button class="ui button"  id = "next" >Next Year</button>
+                      </div>
+                
+                </div>
+        
+                <div id = "calendar" style="margin-top:0%;"></div>
+             </div> 
+          </div>
+        </div>
+    </div>    
 </div>
-
-<!-- <style>
-.fc-header, .fc-button, #prev, #next, .fc-button-group{
+<style>
+#prev, #next{
   background-color:orangered;
   color: white;
 }
-
- #calendar {
-    max-width: 900px;
-    margin: 40px auto;
- }
-</style> -->
+</style>
 
 <script>
   $(document).ready(function() {

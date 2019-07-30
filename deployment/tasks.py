@@ -95,11 +95,14 @@ def deployment_notifs():
 
 # @periodic_task(run_every=timedelta(seconds=10))
 # def test():
-#     print('Hello')
+#     today = date.today()
+#     k9_sced = K9_Schedule.objects.filter(date_start=today)
 
-@periodic_task(run_every=crontab(hour=8, minute=30))
-def check_predeployment_requirements():
+#     for sched in k9_sced:
+        
+
+# @periodic_task(run_every=crontab(hour=8, minute=30))
+# def check_predeployment_requirements():
 
 
-
-    return None
+#     return None

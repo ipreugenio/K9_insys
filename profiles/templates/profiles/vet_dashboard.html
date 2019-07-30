@@ -12,18 +12,99 @@
                     <div class="ui equal width grid">
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge syringe blue icon pop">{{vac_pending}}</i>
+                                <div class="ui two column grid">
+                                    <div class="four wide column">
+                                            <div class="card">
+                                                    <div class="content">
+                                                        <i class="huge syringe blue icon pop">{{vac_pending}}</i>
+                                                    </div>
+                                                    <div class="extra content">
+                                                        <strong>
+                                                            <a href="#">INITIAL VACCINATIONS</a>
+                                                        </strong>
+                                                    </div>
+                                                </div> 
                                     </div>
-                                    <div class="extra content">
-                                        <strong>
-                                            <a href="#">UNFINISHED VACCINATIONS</a>
-                                        </strong>
+                                    <div class="column left aligned">
+                                            <div class="ui grid">
+                                                <div class="column">asd</div>
+                                            </div>                        
                                     </div>
-                                </div>                                         
+                                </div>
+                                                        
                             </div>     
                         </div>
+                     
+                   
+                    </div>            
+                </div>
+                <div class="sixteen wide column">
+                        <div class="ui two column equal width grid">  
+                            <div class="ten wide column">
+                                <div class="ui raised center aligned segment">
+                                        <div class="ui two column grid">
+                                            <div class="four wide column">
+                                                    <div class="card">
+                                                            <div class="content">
+                                                                <i class="huge syringe purple icon pop">{{vac_pending}}</i>
+                                                            </div>
+                                                            <div class="extra content">
+                                                                <strong>
+                                                                    <a href="#">YEARLY VACCINATIONS</a>
+                                                                </strong>
+                                                            </div>
+                                                        </div> 
+                                            </div>
+                                            <div class="column left aligned">
+                                                    <div class="ui grid">
+                                                        <div class="column">asd</div>
+                                                    </div>                        
+                                            </div>
+                                        </div>
+                                </div>
+                            </div> 
+                            <div class="six wide column">
+                                <div class="ui raised center aligned segment">
+                                    <div style="margin-left: 25%;">
+                                            <span style="color: #016936;">Today </span> |
+                                            <span style="color: #0E6EB8;">Upcoming</span>
+                                    </div>
+                                        
+                                    <div class="card">
+                                                <div class="content">
+                                                    <i class="huge red heartbeat icon"></i>
+                                                    <i class="huge green icon">{{cv1}}</i>
+                                                    <i class="huge blue icon">{{cv1}}</i>
+                                                </div>
+                                                <div class="extra content right aligned">
+                                                  
+                                                    <strong>
+                                                        <a href="#">K9 PHYSICAL EXAM</a>
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                </div>
+                            </div>
+                        </div>   
+                </div>
+                <div class="sixteen wide column">
+                    <div class="ui equal width grid">
+                        <div class="column">
+                                <div class="ui raised center aligned segment">
+                                    <div class="card">
+                                        <div class="content">
+                                            <i class="huge calendar alternate orange icon">{{health_pending}}</i>
+                                        </div>
+                                        <div class="extra content">
+                                            <strong>
+                                                <a href="{% url
+                                                'unitmanagement:k9_sick_list'%}">PHEX
+                                                TO BE SCHEDULED</a>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="card">
@@ -32,31 +113,12 @@
                                     </div>
                                     <div class="extra content">
                                         <strong>
-                                            <a href="{% url 'unitmanagement:k9_sick_list'%}">PENDING HEALTH CONCERNS</a>
+                                            <a href="{% url 'unitmanagement:k9_sick_list'%}">HEALTH CONCERNS</a>
                                         </strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="column">
-                            <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge heartbeat red icon">{{cv1}}</i>
-                                    </div>
-                                    <div class="extra content">
-                                        <strong>
-                                            <a href="#">PENDING PHYSICAL EXAMS</a>
-                                        </strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>            
-                </div>
-
-                <div class="sixteen wide column">
-                    <div class="ui equal width grid">
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="card">
@@ -65,7 +127,7 @@
                                     </div>
                                     <div class="extra content">
                                         <strong>
-                                            <a href="#">PENDING K9 INCIDENTS</a>
+                                            <a href="#">K9 INCIDENTS</a>
                                         </strong>
                                     </div>
                                 </div>
@@ -85,41 +147,36 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>  
+                        </div> 
                     </div>       
                 </div>
-               
+              
                 <div class="sixteen wide column">
-                    <div class="ui raised segment">
+                    <!-- <div class="ui raised segment">
                         <canvas id="myChart4"></canvas>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
         </div>
         <div class="six wide column" style="padding: 0%;padding-right: 1%;">
-            <div class="ui basic segment" style="padding-left: 0%;">
-                
-                    <div class="ui black floating message">
-                        <p>Request</p>
-                      </div>
-                    <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
-    
-                        <table class="ui basic table">
-                          <tr>
-                            <td>You Have a Pending Request</td>
-                            <td class="center aligned three wide">
-                              <a href="#" class="ui tiny blue button">Go</a>
-                            </td>
-                          </tr>
-                        </table>
+                <div class="ui basic segment"> 
+                <div class="ui inverted segment">
+                    <h4>Calendar</h4>
+                </div>
+                    <div class="ui right aligned basic segment"
+                    style="padding:0%;margin:0%;margin-bottom:5px">
+                        <div class="ui buttons">
+                            <button class="ui button"  id = "prev" >Previous Year</button>
+                            <div class="or"></div>
+                            <button class="ui button"  id = "next" >Next Year</button>
+                        </div>
+                    
                     </div>
-
-
-                <div id = "calendar" style="margin-top:0%;"></div>
-
-            </div>
-          </div>
+            
+                    <div id = "calendar" style="margin-top:0%;"></div>
+                </div> 
+        </div>
         </div>
     </div>    
 </div>
@@ -159,7 +216,12 @@
         </tr>
     </table>
 </div>
-
+<style>
+#prev, #next{
+    background-color:orangered;
+    color: white;
+}
+</style>
     <script>
         $(document).ready(function() {
             $('.pop').popup({

@@ -1,5 +1,5 @@
 from django.db import models
-from planningandacquiring.models import K9
+# from planningandacquiring.models import K9
 # from unitmanagement.models import PhysicalExam
 # from inventory.models import Food, Medicine_Inventory
 from profiles.models import User
@@ -427,7 +427,7 @@ class Dog_Request(models.Model):
 class Team_Dog_Deployed(models.Model):
     team_assignment = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, blank=True, null=True)
     team_requested = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, blank=True, null=True) #Dog Rquest
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
     date_added = models.DateField('date_added', default=timezone.now, null=True, blank=True)
@@ -462,7 +462,7 @@ class K9_Schedule(models.Model):
         ('Request', 'Request'),
     )
 
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)
     dog_request = models.ForeignKey(Dog_Request, on_delete=models.CASCADE, null=True, blank=True)
     team = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Pending')
@@ -525,7 +525,7 @@ class Daily_Refresher(models.Model):
         ('MAREP', 'MAREP')
     )
 
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE)
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField('date', auto_now_add = True)
     rating = models.DecimalField('rating', max_length=200, blank=True, null=True, decimal_places=2, max_digits=10)
@@ -556,13 +556,13 @@ class Daily_Refresher(models.Model):
 
 class TempDeployment(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.k9) + ' - ' + str(self.location)
 
 class TempCheckup(models.Model):
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE)
     date = models.DateField('date', null=True, blank=True)
     deployment_date = models.DateField('deployment_date', null=True, blank=True)
 
@@ -577,7 +577,7 @@ class K9_Pre_Deployment_Items(models.Model):
         ('Done', 'Done'),
     )
 
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True, related_name='k9_pre_requirement')
+    k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True, related_name='k9_pre_requirement')
     initial_sched = models.ForeignKey(K9_Schedule, on_delete=models.CASCADE, null=True, blank=True, related_name='sched_pre_requirement')
     phex = models.ForeignKey('unitmanagement.PhysicalExam', on_delete=models.CASCADE, null=True, blank=True, related_name='phex_pre_requirement')
     food = models.ForeignKey('inventory.Food', on_delete=models.CASCADE, null=True, blank=True, related_name='food_pre_requirement')

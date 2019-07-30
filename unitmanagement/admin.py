@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unitmanagement.models import Health, HealthMedicine, PhysicalExam, VaccinceRecord, VaccineUsed, Transaction_Health
-from unitmanagement.models import K9_Incident, Handler_Incident, Notification, Equipment_Request, Handler_K9_History, Image, Handler_On_Leave
+from unitmanagement.models import K9_Incident, Handler_Incident, Notification, Equipment_Request, Handler_K9_History, Image, Handler_On_Leave, Request_Transfer, Call_Back_K9
 
 # Register your models here.
 admin.site.register(Health)
@@ -16,3 +16,5 @@ admin.site.register(Equipment_Request)
 admin.site.register(Handler_K9_History)
 admin.site.register(Image)
 admin.site.register(Transaction_Health)
+admin.site.register(Request_Transfer)
+admin.site.register(Call_Back_K9)

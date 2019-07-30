@@ -16,12 +16,12 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
 from planningandacquiring.models import K9
 from django.db.models import Sum
-from unitmanagement.models import Equipment_Request, Notification
+from unitmanagement.models import Equipment_Request, Notification, Request_Transfer
 from training.models import Training_Schedule, Training
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
@@ -34,6 +34,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from profiles.serializers import NotificationSerializer, UserSerializer
+from deployment.views import load_map, load_locations
 # Create your views here.
 
 def notif(request):
@@ -99,28 +100,6 @@ def dashboard(request):
     if not SAR_demand:
         SAR_demand = 0
 
-    # NDD_needed = list(Dog_Request.objects.aggregate(Sum('NDD_needed')).values())[0]
-    # EDD_needed = list(Dog_Request.objects.aggregate(Sum('EDD_needed')).values())[0]
-    # SAR_needed = list(Dog_Request.objects.aggregate(Sum('SAR_needed')).values())[0]
-    #
-    # if not NDD_needed:
-    #     NDD_needed = 0
-    # if not EDD_needed:
-    #     EDD_needed = 0
-    # if not SAR_needed:
-    #     SAR_needed = 0
-    #
-    # NDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('NDD_deployed')).values())[0]
-    # EDD_deployed_request = list(Dog_Request.objects.aggregate(Sum('EDD_deployed')).values())[0]
-    # SAR_deployed_request = list(Dog_Request.objects.aggregate(Sum('SAR_deployed')).values())[0]
-    #
-    # if not NDD_deployed_request:
-    #     NDD_deployed_request = 0
-    # if not EDD_deployed_request:
-    #     EDD_deployed_request = 0
-    # if not SAR_deployed_request:
-    #     SAR_deployed_request = 0
-
     k9_demand = NDD_demand + EDD_demand + SAR_demand
     k9_deployed = NDD_deployed + EDD_deployed + SAR_deployed
 
@@ -140,6 +119,14 @@ def dashboard(request):
 
     events = Dog_Request.objects.all()
 
+    #Counts
+    c_count = K9.objects.filter(training_status='Classified').count()
+    item_req_count = 3 #change this
+    up_count = K9.objects.filter(status='Working Dog').filter(handler=None).count()
+    tq_count = Request_Transfer.objects.filter(status='Pending').count()
+    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(handler=None).count()
+    pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
+    ua_count = 1 #change this
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -158,6 +145,14 @@ def dashboard(request):
         'for_breeding': for_breeding,
 
         'events': events,
+
+        'c_count': c_count,
+        'item_req_count': item_req_count,
+        'up_count': up_count,
+        'tq_count': tq_count,
+        'dept_count': dept_count,
+        'pq_count': pq_count,
+        'ua_count': ua_count,
 
         'notif_data':notif_data,
         'count':count,
@@ -315,7 +310,8 @@ def handler_dashboard(request):
 
 def vet_dashboard(request):
     user = user_session(request)
-    
+    today = datetime.today()
+
     cv1 = VaccinceRecord.objects.filter(dhppil_cv_1=False).count() #dhppil_cv_1
     cv2 = VaccinceRecord.objects.filter(dhppil_cv_2=False).count() #dhppil_cv_2
     cv3 = VaccinceRecord.objects.filter(dhppil_cv_3=False).count() #dhppil_cv_3
@@ -336,6 +332,14 @@ def vet_dashboard(request):
 
     # pending incidents
     incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()
+    
+    #Initial Vaccinations
+    i_vac =  VaccinceRecord.objects.filter(status='Pending')
+
+    # for i in i_vac:
+
+
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -373,6 +377,59 @@ def commander_dashboard(request):
 def operations_dashboard(request):
     user = user_session(request)
     
+    form = RequestForm(request.POST or None)
+
+    geoform = GeoForm(request.POST or None)
+    geosearch = GeoSearch(request.POST or None)
+    width = 100
+
+    if request.method == 'POST':
+        print(form.errors)
+        form.validate_date()
+        if form.is_valid():
+
+            cd = form.cleaned_data['phone_number']
+            regex = re.compile('[^0-9]')
+            form.phone_number = regex.sub('', cd)
+
+            location = form.save() #instance of form
+
+            checks = geoform['point'].value()
+            checked = ast.literal_eval(checks)
+            print(checked['coordinates'])
+            toList = list(checked['coordinates'])
+            print(toList)
+            lon = Decimal(toList[0])
+            lat = Decimal(toList[1])
+            print("LONGTITUDE")
+            print(lon)
+            print("LATITUDE")
+            print(lat)
+            location.longtitude = lon
+            location.latitude = lat
+
+            serial = request.session['session_serial']
+            account = Account.objects.get(serial_number=serial)
+            user_in_session = User.objects.get(id=account.UserID.id)
+
+
+            if location.sector_type != "Disaster": #TODO, wala pa process for disasters
+                if user_in_session.position == 'Operations' or  user_in_session.position == 'Administrator':
+                    location.sector_type = "Big Event"
+                    location.status = "Approved"
+                else:
+                    location.sector_type = "Small Event"
+
+
+            location.save()
+
+            style = "ui green message"
+            messages.success(request, 'Request has been successfully Added!')
+            return redirect('profiles:operations_dashboard')
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -380,6 +437,11 @@ def operations_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'form': form,
+        'geoform': geoform,
+        'geosearch': geosearch,
+        'width' :width,
     }
     return render (request, 'profiles/operations_dashboard.html', context)
 

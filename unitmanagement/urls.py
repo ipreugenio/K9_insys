@@ -31,6 +31,11 @@ urlpatterns = [
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),
     path('on-leave-decision/<int:id>', views.on_leave_decision, name='on_leave_decision'),
 
+    path('transfer-request-form', views.transfer_request_form, name='transfer_request_form'),
+    path('transfer-request-list', views.transfer_request_list, name='transfer_request_list'),
+    path('due-retired-list', views.due_retired_list, name='due_retired_list'),
+    path('due-retired-call/<int:id>', views.due_retired_call, name='due_retired_call'),
+
     path('unfit-list', views.unfit_list, name='unfit_list'),
     path('health-list', views.health_list_handler, name='health_list_handler'),
     path('k9-incident-list', views.k9_incident_list, name='k9_incident_list'),
@@ -41,7 +46,6 @@ urlpatterns = [
     #path('choose-date/<int:id>', views.choose_date, name='choose_date'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
-    # path('ajax/load-handler/', views.load_hander, name='ajax_load_handler'),
 
     path('choose-handler-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
     path('health-history/ajax_load_stamp', views.load_stamp, name='ajax_load_stamp'),
@@ -54,6 +58,7 @@ urlpatterns = [
     path('unfit-list/ajax_load_physical', views.load_physical, name='ajax_load_physical'),
     path('reassign-assets/ajax_load_handler', views.load_handler, name='load_handler'),
     path('trained-list/ajax_load_k9_data', views.load_k9_data, name='ajax_load_k9_data'),
+    path('transfer-request-list/ajax_load_transfer', views.load_transfer, name='load_transfer'),
     
     path('vaccination_form', views.vaccination_form, name='vaccination_form'),
     path('reassign-assets/<int:id>', views.reassign_assets, name='reassign_assets'),
@@ -61,7 +66,8 @@ urlpatterns = [
     path('trained-list', views.trained_list, name='trained_list'),
     path('classified-list', views.classified_list, name='classified_list'),
     #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
-    
+    path('transfer-request-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
+        
     
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),

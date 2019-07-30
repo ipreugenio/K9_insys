@@ -6,7 +6,8 @@ from datetime import date as d
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
-
+from deployment.models import Team_Assignment, Team_Dog_Deployed
+import calendar
 #from unitmanagement.models import Notification
 
 
@@ -268,11 +269,18 @@ class K9(models.Model):
             bday = 0
         return bday
 
-    def calculate_months_before(birthday):
+    def calculate_months_before():
         today = d.today()
         birthdate = birthday
         bday = 13 - birthdate.month
         return bday
+
+    def month_remainder(self):
+        if d.today().month >= self.birth_date.month:
+            month_remainder = d.today().month - self.birth_date.month
+        else:
+            month_remainder = 12 - self.birth_date.month + d.today().month
+        return month_remainder
 
     def save(self, *args, **kwargs):
         #litter
@@ -291,13 +299,19 @@ class K9(models.Model):
                 self.litter_no = 0
 
         
+        # try:
+        td = Team_Dog_Deployed.objects.filter(k9__id=self.id).filter(date_pulled=None)[0]
+        loc = Team_Assignment.objects.get(id=td.id)
+        self.assignment = str(loc)
+        # except:
+        #     self.assignment = None
+
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
-        self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
         self.training_id = self.id
-
+              
         #last_proestrus_date in heat
         #estrus_date start of session,10,12,14
         if self.sex == 'Female':
@@ -345,6 +359,8 @@ class K9(models.Model):
         # lead_zero = str(self.id).zfill(5)
         # serial_number = '#%s' % (lead_zero)
         # self.serial_number = str(serial_number)
+
+        self.age_month = (self.age * 12) + self.month_remainder()
         super(K9, self).save(*args, **kwargs)
 
 

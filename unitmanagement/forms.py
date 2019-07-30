@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed, Food_Request, Medicine_Request
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed, Food_Request, Medicine_Request, Request_Transfer
 from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
@@ -215,6 +215,23 @@ class VaccinationYearlyForm(forms.ModelForm):
         self.fields['image'].required = False
         self.fields['veterinary'].required = False
         self.fields['done'].required = False
+
+class RequestTransferForm(forms.ModelForm):
+    class Meta:
+        model = Request_Transfer
+        fields = ('handler', 'date_of_transfer', 'location_from', 'location_to')
+
+        widgets = {
+            'date_of_transfer': DateInput(),
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(RequestTransferForm, self).__init__(*args, **kwargs)
+        self.fields['handler'].widget.attrs['disabled'] = True
+        self.fields['location_from'].widget.attrs['disabled'] = True
+        self.fields['location_from'].required = False
+
 
 class RequestEquipment(forms.ModelForm):
     class Meta:

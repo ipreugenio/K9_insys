@@ -15,10 +15,10 @@ from dateutil.relativedelta import relativedelta
 from planningandacquiring.forms import k9_detail_form
 from planningandacquiring.models import K9
 
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History, Medicine_Request, Food_Request, Equipment_Request
+from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History, Medicine_Request, Food_Request, Equipment_Request, Request_Transfer,Call_Back_K9, Handler_Incident
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestEquipment, RequestFood, RequestMedicine
 
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm
+from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, RequestTransferForm
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, VaccineUsed, Notification
@@ -1799,6 +1799,123 @@ def on_leave_list(request):
     }
     return render (request, 'unitmanagement/on_leave_list.html', context)
 
+# TODO 
+# Due Retired
+def due_retired_list(request):
+    style='ui green message'
+    cb = Call_Back_K9.objects.all()
+
+    cb_list = []
+    for c in cb:
+        cb_list.append(c.k9.id)
+         
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(id__in=cb_list) 
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'title': "Due for Retirement List",
+        'data': data,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'unitmanagement/due_retired_list.html', context)
+
+def due_retired_call(request, id):
+    k9 = K9.objects.get(id=id)
+    cb = Call_Back_K9.objects.create(k9=k9)
+    Notification.objects.create(k9=k9,user=k9.handler,other_id=cb.id,notif_type='call_back', position='Handler', message=str(k9) + ' is due for retirement. Please return to PCGK9-Taguig Base.')
+    
+    messages.success(request, 'You have called ' + str(k9) + ' back to base.')
+    return redirect ('unitmanagement:due_retired_list')
+
+
+# TODO 
+# transfer request list
+def transfer_request_list(request):
+    style='ui green message'
+    rt =  Request_Transfer.objects.filter(status='Pending')
+
+    data = []
+
+    for d in rt:
+        count = Request_Transfer.objects.filter(status='Pending').filter(location_to=d.location_to).exclude(id=d.id).count()
+        a = [d, count]
+        data.append(a)
+
+    #Code here for approval of transfer
+    if request.method == 'POST':
+        date = request.POST.get('date_input')
+        match_id = request.POST.get('select')
+        requester_id = request.POST.get('requester')
+        
+        match = User.objects.get(id=match_id)
+        requester = User.objects.get(id=requester_id)
+
+        if 'approve' in request.POST:
+            print('yes',date, match, requester)
+        else:
+            print('no',date, match, requester)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context = {
+        'title': "Transfer Request List",
+        'data': data,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'unitmanagement/transfer_request.html', context)
+
+def transfer_request_form(request):
+    user = user_session(request)
+    form = RequestTransferForm(request.POST or None)
+    k9 = K9.objects.get(handler=user)
+    td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None)[0]
+    style='ui green message'
+
+    loc = Team_Assignment.objects.get(id=td.id)
+    form.initial['handler'] = User.objects.get(id=user.id)
+    form.initial['location_from'] = loc
+    form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
+    
+    if request.method == 'POST':
+        print(form.errors)
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.location_from = loc
+            f.handler = user
+            f.save()
+
+            style='ui green message'
+            messages.success(request,'You have submitted a transfer request!')
+            
+            return redirect('unitmanagement:transfer_request_form')
+        else:
+            style='ui red message'
+            messages.success(request,'Invalid Input!')
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'title': "Transfer Request Form",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'form':form,
+    }
+    return render (request, 'unitmanagement/transfer_request_form.html', context)
+
 #TODO
 # what to do if on-leave
 
@@ -2442,24 +2559,42 @@ def load_handler(request):
 
     handler = None
     pi = None
-
+    edd = None
+    ndd = None
+    sar = None
+    type_text = None
+    k9 = None
+    cc_ac = 0
+    cc_in = 0
+    requester = None
     try:
         handler_id = request.GET.get('handler')
+        type_text = request.GET.get('type_text')
+        requester = request.GET.get('requester')
         handler = User.objects.get(id=handler_id)
+        k9 = K9.objects.get(handler=handler)
+        
         pi = Personal_Info.objects.get(UserID=handler)
         edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
         ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
         sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
         
+        cc_ac = Handler_Incident.objects.filter(handler=handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
+        cc_in = Handler_Incident.objects.filter(handler=handler).filter(incident='Poor Performance').filter(incident='Violation').count()
     except:
         pass
 
     context = {
         'handler': handler,
+        'requester':requester,
         'pi':pi,
         'ndd':ndd,
         'edd':edd,
         'sar':sar,
+        'k9':k9,
+        'cc_ac':cc_ac,
+        'cc_in':cc_in,
+        'type_text':type_text,
     }
 
     return render(request, 'unitmanagement/handler_data.html', context)
@@ -2480,6 +2615,39 @@ def load_stamp(request):
     }
 
     return render(request, 'unitmanagement/stamp_data.html', context)
+
+def load_transfer(request):
+
+    transfer = None
+    k9 = None
+    matches = None
+    incident = None
+    c_ac = None
+    c_in = None
+    incident = None
+    try:
+        transfer_id = request.GET.get('id')
+        transfer = Request_Transfer.objects.get(id=transfer_id)
+        k9= K9.objects.get(handler=transfer.handler)
+
+        matches = Request_Transfer.objects.filter(location_to=transfer.location_from)
+        incident = Handler_Incident.objects.filter(handler=transfer.handler)
+        c_ac = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
+        c_in = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Poor Performance').filter(incident='Violation').count()
+        
+    except:
+        pass
+
+    context = {
+        'transfer': transfer,
+        'k9': k9,
+        'matches':matches,
+        'incident':incident,
+        'c_ac':c_ac,
+        'c_in':c_in,
+    }
+
+    return render(request, 'unitmanagement/transfer_data.html', context)
 
 def load_k9(request):
 
@@ -2761,54 +2929,54 @@ def current_team(K9):
 
     return team_assignment
 
-def transfer_request(request,location_id):
+# def transfer_request(request,location_id):
 
-    #TODO check if date of transfer has conflict
-    #TODO if unit is transferring,prompt commander/operations if he wants to replace units assigned to a request
+#     #TODO check if date of transfer has conflict
+#     #TODO if unit is transferring,prompt commander/operations if he wants to replace units assigned to a request
 
-    serial=request.session['session_serial']
-    account=Account.objects.get(serial_number=serial)
-    user_in_session=User.objects.get(id=account.UserID.id)
-    personal_info=Personal_Info.objects.get(id=user_in_session.id)
+#     serial=request.session['session_serial']
+#     account=Account.objects.get(serial_number=serial)
+#     user_in_session=User.objects.get(id=account.UserID.id)
+#     personal_info=Personal_Info.objects.get(id=user_in_session.id)
 
-    k9=K9.objects.get(handler=user_in_session)
+#     k9=K9.objects.get(handler=user_in_session)
 
-    team=current_team(k9)
+#     team=current_team(k9)
 
-    location=Location.objects.get(id=location_id)
-    team_to_transfer=Team_Assignment.objects.get(location=location)
+#     location=Location.objects.get(id=location_id)
+#     team_to_transfer=Team_Assignment.objects.get(location=location)
 
-    can_transfer=0
+#     can_transfer=0
 
-    try:
-        team_dog_deployed=Team_Dog_Deployed.objects.filter(k9=k9,status="Deployed").filter(team_assignment=team).latest('id')#checkcurrentteam_assignment
-        if(team_dog_deployed.date_pulled is None):
-            date_deployed=team_dog_deployed.date_added
-            delta=date.today()-date_deployed
-            duration=delta.days
+#     try:
+#         team_dog_deployed=Team_Dog_Deployed.objects.filter(k9=k9,status="Deployed").filter(team_assignment=team).latest('id')#checkcurrentteam_assignment
+#         if(team_dog_deployed.date_pulled is None):
+#             date_deployed=team_dog_deployed.date_added
+#             delta=date.today()-date_deployed
+#             duration=delta.days
 
-            if k9.capability=="SAR":
-                if team_to_transfer.SAR_deployed<team_to_transfer.SAR_demand:
-                    can_transfer=1
-            elif K9.capability=="NDD":
-                if team_to_transfer.NDD_deployed<team_to_transfer.NDD_demand:
-                    can_transfer=1
-            else:
-                if team_to_transfer.EDD_deployed<team_to_transfer.EDD_demand:
-                    can_transfer=1
+#             if k9.capability=="SAR":
+#                 if team_to_transfer.SAR_deployed<team_to_transfer.SAR_demand:
+#                     can_transfer=1
+#             elif K9.capability=="NDD":
+#                 if team_to_transfer.NDD_deployed<team_to_transfer.NDD_demand:
+#                     can_transfer=1
+#             else:
+#                 if team_to_transfer.EDD_deployed<team_to_transfer.EDD_demand:
+#                     can_transfer=1
 
-            if duration>=730 and (team.total_dogs_deployed-1)>=2 and can_transfer==0 and team_to_transfer.location.city!=personal_info.city:
-                can_transfer=1
+#             if duration>=730 and (team.total_dogs_deployed-1)>=2 and can_transfer==0 and team_to_transfer.location.city!=personal_info.city:
+#                 can_transfer=1
 
-            if can_transfer==1:
-                team_dog_deployed.date_pulled=date.today()
-                team_dog_deployed.save()
-                deploy=Team_Dog_Deployed.objects.create(k9=k9,team_assignment=team_to_transfer)
+#             if can_transfer==1:
+#                 team_dog_deployed.date_pulled=date.today()
+#                 team_dog_deployed.save()
+#                 deploy=Team_Dog_Deployed.objects.create(k9=k9,team_assignment=team_to_transfer)
 
-    except:
-            pass
+#     except:
+#             pass
 
 
-    context={}
+#     context={}
 
-    return render(request,'unitmanagement/transfer_request.html',context)
+#     return render(request,'unitmanagement/transfer_request.html',context)

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.dateparse import parse_date
 
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed, K9_Supplier, K9_Litter, K9_Mated
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm,DateK9Form
@@ -474,10 +475,10 @@ def confirm_failed_pregnancy(request, id):
 
 def add_K9_parents(request):
     style = "ui teal message"
-    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(reproductive_stage = "Estrus")
+    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
     
     father = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
-    mother_all  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
+    mother_all  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).exclude(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
     
     mom = []
     sick = []
@@ -731,6 +732,18 @@ def add_K9_parents(request):
     }
 
     return render(request, 'planningandacquiring/add_K9_parents.html', context)
+
+def in_heat_change(request):
+    if request.method == 'POST':
+        id = request.POST.get('id_k9')
+        date = parse_date(request.POST.get('date_change'))
+        
+        k9 = K9.objects.get(id=id)
+        k9.last_proestrus_date = date
+        k9.save()
+        
+        return redirect('planningandacquiring:add_K9_parents_form')
+
 
 def confirm_K9_parents(request):
     form = date_mated_form(request.POST or None)
@@ -1740,26 +1753,34 @@ def load_k9_reco(request):
     try:
         id = request.GET.get('id')
         k9 = K9.objects.get(id=id)
-        kp = K9_Parent.objects.filter(mother=k9)
+       
+        try:
+            kp = K9_Parent.objects.filter(mother=k9)
+            k9_o = K9_Parent.objects.get(offspring=k9)
+
+            kp_id=[]
+            for k in kp:
+                kp_id.append(k.offspring.id)
+            
+            k9_m = K9_Parent.objects.filter(mother=k9_o.mother)
+            k9_f = K9_Parent.objects.filter(father=k9_o.father)
+            
+            for m in k9_m:
+                kp_id.append(m.offspring.id)
+
+            for f in k9_f:
+                kp_id.append(f.offspring.id)
+        except ObjectDoesNotExist:
+            kp_id = None
+
+        print(kp_id)
+
+        if kp_id != None:
+            k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte= 1).exclude(id__in=kp_id).order_by('-litter_no')
+        else:
+            k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte= 1).order_by('-litter_no')
         
-        k9_o = K9_Parent.objects.get(offspring=k9)
-
-        kp_id=[]
-        for k in kp:
-            kp_id.append(k.offspring.id)
-        
-        k9_m = K9_Parent.objects.filter(mother=k9_o.mother)
-        k9_f = K9_Parent.objects.filter(father=k9_o.father)
-        
-        for m in k9_m:
-            kp_id.append(m.offspring.id)
-
-        for f in k9_f:
-            kp_id.append(f.offspring.id)
-
-
-        k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte = 1).exclude(id__in=kp_id).order_by('-litter_no')
-
+        print(k9_data)
         for k in k9_data:
             h_count = Health.objects.filter(dog=k).count()
             h_count_arr.append(h_count)   
@@ -1777,6 +1798,7 @@ def load_k9_reco(request):
 
     except:
         pass
+
     flist = zip(k9_arr,h_count_arr, b_arr)
 
     context = {
