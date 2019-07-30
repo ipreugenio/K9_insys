@@ -14,9 +14,11 @@ from planningandacquiring.models import K9
 from django.contrib.auth.models import User as AuthUser
 
 # Create your models here.
+
+
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     date = models.DateField('date', auto_now_add=True)
 
     def __str__(self):
@@ -28,6 +30,7 @@ class K9_Incident(models.Model):
         ('Lost', 'Lost'),
         ('Accident', 'Accident'),
         ('Sick', 'Sick'),
+        ('Missing', 'Missing')
     )
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
@@ -65,11 +68,11 @@ class Health(models.Model):
 
     def expire(self):
         expired = self.date_done + timedelta(days=7)
-        e = expired - date.today() 
+        e = expired - date.today()
         return e.days
 
     def expire_date(self):
-        expired = self.date_done + timedelta(days=7) 
+        expired = self.date_done + timedelta(days=7)
         return expired
 
     def save(self, *args, **kwargs):
@@ -107,7 +110,7 @@ class Transaction_Health(models.Model):
     incident = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='initial')
     follow_up = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='follow_up')
     status = models.CharField('status', max_length=200, default="Pending")
-    
+
 class PhysicalExam(models.Model):
     EXAMSTATUS = (
         ('Normal', 'Normal'),
@@ -175,11 +178,11 @@ class VaccinceRecord(models.Model):
     deworming_2 = models.BooleanField(default=False)     #4weeks
     deworming_3 = models.BooleanField(default=False)     #6weeks
     deworming_4 = models.BooleanField(default=False)     #9weeks
-   
+
     dhppil_cv_1 = models.BooleanField(default=False)     #6weeks *
     dhppil_cv_2 = models.BooleanField(default=False)     #9weeks *
     dhppil_cv_3 = models.BooleanField(default=False)     #12weeks *
-    
+
     heartworm_1 = models.BooleanField(default=False)     #6weeks
     heartworm_2 = models.BooleanField(default=False)     #10weeks
     heartworm_3 = models.BooleanField(default=False)     #14weeks
@@ -188,7 +191,7 @@ class VaccinceRecord(models.Model):
     heartworm_6 = models.BooleanField(default=False)     #26weeks
     heartworm_7 = models.BooleanField(default=False)     #30weeks
     heartworm_8 = models.BooleanField(default=False)     #34weeks
-   
+
     anti_rabies = models.BooleanField(default=False)     #12weeks *
 
     bordetella_1 = models.BooleanField(default=False)    #8weeks *
@@ -230,7 +233,7 @@ class VaccineUsed(models.Model):
     image = models.FileField(upload_to='health_image', blank=True, null=True)
     done = models.BooleanField(default=False)
     date = models.DateField('date', auto_now_add=True)
-    
+
     def __str__(self):
         return str(self.k9) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
 
@@ -343,7 +346,7 @@ class Notification(models.Model):
         ('heat_cycle', 'heat_cycle'),
         ('location_incident', 'location_incident'),
         ('equipment_request', 'equipment_request'), #VERIFY
-        ('k9_died', 'k9_died'), 
+        ('k9_died', 'k9_died'),
         ('k9_sick', 'k9_sick'),
         ('k9_stolen', 'k9_stolen'),
         ('k9_accident', 'k9_accident'),
@@ -428,14 +431,14 @@ def create_k9_vaccines(sender, instance, **kwargs):
 
 #######################################################################################################################
 
-#TODO EDIT 
+#TODO EDIT
 @receiver(post_save, sender=PhysicalExam)
 def phex_next_date(sender, instance, **kwargs):
     if kwargs.get('created', False):
         instance.date_next_exam = instance.date + relativedelta(year=+1)
         instance.save()
 
-#TODO EDIT    
+#TODO EDIT
 # HANDLER INCIDENT repored
 @receiver(post_save, sender=Handler_Incident)
 def create_handler_incident_notif(sender, instance, **kwargs):
@@ -452,7 +455,7 @@ def create_handler_incident_notif(sender, instance, **kwargs):
                             other_id = instance.id,
                             notif_type = 'handler_on_leave',
                             message= 'On-Leave Request! ' + str(instance.handler))
-#TODO HEALTH TEST                            
+#TODO HEALTH TEST
 @receiver(post_save, sender=Health)
 def create_handler_health_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -462,7 +465,7 @@ def create_handler_health_notif(sender, instance, **kwargs):
                             notif_type = 'medicine_given',
                             message= 'Health Concern has been reviewed. See Details.')
 
-#TODO K9 INCIDENT Add died and accident 
+#TODO K9 INCIDENT Add died and accident
 @receiver(post_save, sender=K9_Incident)
 def create_k9_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -472,13 +475,13 @@ def create_k9_incident_notif(sender, instance, **kwargs):
                             other_id = instance.id,
                             notif_type = 'k9_sick',
                             message= str(instance.k9.name) + ' has a health concern! ')
-        elif instance.incident == 'Lost': 
+        elif instance.incident == 'Lost':
             Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
                             other_id = instance.id,
                             notif_type = 'k9_lost',
                             message= str(instance.k9.name) + ' is reported Lost! ')
-        elif instance.incident == 'Stolen': 
+        elif instance.incident == 'Stolen':
             Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
                             other_id = instance.id,
@@ -512,7 +515,7 @@ def location_incident(sender, instance, **kwargs):
                                 position = 'Administrator',
                                 other_id=instance.id,
                                 notif_type = 'location_incident',
-                                message= str(instance.user) + ' has reported an incident at ' + 
+                                message= str(instance.user) + ' has reported an incident at ' +
                                 str(instance.location) + '.')
         else:
             Notification.objects.create(user = instance.user,
@@ -534,6 +537,3 @@ def account_create(sender, instance, **kwargs):
             instance.first_name = instance.username
             instance.last_name = 'Superuser'
             instance.save()
-        
-
-

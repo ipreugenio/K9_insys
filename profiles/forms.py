@@ -60,3 +60,27 @@ class add_user_account(UserCreationForm):
 class DateForm(forms.Form):
     from_date = forms.DateField(widget=DateInput())
     to_date = forms.DateField(widget=DateInput())
+
+
+class CheckArrivalForm(forms.Form):
+    team_member_list = []
+
+    team_member = forms.MultipleChoiceField(choices=team_member_list,
+                                    widget=forms.CheckboxSelectMultiple())
+
+    def __init__(self, *args, **kwargs):
+
+        try:
+            for_arrival = kwargs.pop("for_arrival", None)
+        except:
+            pass
+
+        super(CheckArrivalForm, self).__init__(*args, **kwargs)
+        if for_arrival:
+            for_arrival_list = []
+            for item in for_arrival:
+                for_arrival_list.append((item.handler.id , str(item.handler)))
+
+            print(for_arrival_list)
+
+            self.fields['team_member'].choices = for_arrival_list

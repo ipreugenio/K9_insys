@@ -18,11 +18,14 @@ from geopy.extra.rate_limiter import RateLimiter
 from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
-from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account
+from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
 from planningandacquiring.models import K9
 from django.db.models import Sum
-from unitmanagement.models import Equipment_Request, Notification, Request_Transfer
+from unitmanagement.models import Equipment_Request, Notification, Request_Transfer, PhysicalExam
+
 from training.models import Training_Schedule, Training
+from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
+from django.db.models import Sum
 
 from unitmanagement.models import PhysicalExam, VaccinceRecord, K9_Incident
 from datetime import datetime, date
@@ -161,26 +164,95 @@ def dashboard(request):
 
     return render (request, 'profiles/dashboard.html', context)
 
+
+#TODO all Team dogs deployed under the team of TL with "Pending status)
 def team_leader_dashboard(request):
     user = user_session(request)
     ta = None
     incident_count = 0
     tdd = None
     tdd_count= 0
+
+    form = RequestForm(request.POST or None)
+    geoform = GeoForm(request.POST or None)
+    geosearch = GeoSearch(request.POST or None)
+
+
+    k9 = None
+    for_arrival = None
+    check_arrival = None
+    reveal_arrival = False
+
     try:
-        ta = Team_Assignment.objects.get(team_leader=user)
+        k9 = K9.objects.get(handler = user)
+    except:pass
 
-        incident_count = Incidents.objects.filter(location = ta.location).count()
+    ta = Team_Assignment.objects.get(team_leader=user)
 
-        tdd_count = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').count()
-        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
-    except:
-        pass
+    incident_count = Incidents.objects.filter(location = ta.location).count()
+
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_pulled = None) #only currently deployed k9s
+    tdd_count = tdd.count()
+
+    # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
+    for_arrival = tdd.filter(status = "Pending")
+
+    if for_arrival:
+        reveal_arrival = True
+
+    print("For arrival")
+    print(for_arrival)
+
+    check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
+
+    events = Dog_Request.objects.all()
 
     year = datetime.now().year
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
+
+    if request.method == 'POST':
+        if form.is_valid():
+            checks = geoform['point'].value()
+            checked = ast.literal_eval(checks)
+
+            toList = list(checked['coordinates'])
+
+            lon = Decimal(toList[0])
+            lat = Decimal(toList[1])
+
+            f = form.save(commit=False)
+            f.longtitude = lon
+            f.latitude = lat
+            f.save()
+
+            messages.success(request, 'Event succesfully saved!')
+            return redirect("profiles:team_leader_dashboard")
+
+
+        if check_arrival.is_valid():
+
+            handlers_arrived_id = check_arrival['team_member'].value()
+            print("Handlers Arrived")
+            print(handlers_arrived_id)
+
+            handlers_arrived = User.objects.filter(pk__in = handlers_arrived_id)
+
+            for handler in handlers_arrived:
+                try:
+                    deploy = Team_Dog_Deployed.objects.get(handler = handler)
+                    deploy.status = "Deployed"
+                    deploy.save()
+                except: pass
+
+            #Team Leader
+
+            messages.success(request, 'Arrival succesfully confirmed')
+            return redirect("profiles:team_leader_dashboard")
+        else:
+            print(check_arrival.errors)
+
 
     context = {
         'incident_count':incident_count,
@@ -192,34 +264,211 @@ def team_leader_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'k9' : k9,
+        'form': form,
+        'geoform': geoform,
+        'geosearch': geosearch,
+        'events': events,
+
+        'for_arrival' : for_arrival,
+        'check_arrival' : check_arrival,
+        'reveal_arrival' : reveal_arrival
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
-def handler_dashboard(request):
-    user = user_session(request)
 
+# Step 1
+# Access this view/function when TL opens dashboard
+def check_pre_deployment_items(user):
+    all_clear = False
+    items_list = [False]
+
+    all_clear = True
+    k9 = K9.objects.get(handler = user)
+
+
+    items_list = []
+
+    collar = False
+    vest = False
+    leash = False
+    shipping_crate = False
+    food = False
+    vitamins = False
+    grooming_kit = False
+    first_aid_kit = False
+    oral_dextrose = False
+    ball = False
+    phex = False
+
+    items_list.append(all_clear)
+
+    try:
+        checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
+        if checkup.cleared == True:
+            phex = True
+    except: phex = False
+    items_list.append((phex, "Physical Exam"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains = "Collar").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        collar = True
+    items_list.append((collar , "Collar"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains = "Vest").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if  agg >= 1:
+        vest = True
+    items_list.append((vest , "Vest"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        leash = True
+    items_list.append((leash , "Leash"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        shipping_crate = True
+    items_list.append((shipping_crate , "Shipping Crate"))
+
+    agg = Food.objects.filter(foodtype = "Adult Dog Food").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        food = True
+    items_list.append((food , "Dog Food"))
+
+    medicines = Medicine.objects.filter(med_type = "Vitamins")
+    agg = Medicine_Inventory.objects.filter(medicine__in = medicines).aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        vitamins = True
+    items_list.append((vitamins , "Vitamins"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        grooming_kit = True
+    items_list.append((grooming_kit , "Grooming Kit"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        first_aid_kit = True
+    items_list.append((first_aid_kit , "First Aid Kit"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        oral_dextrose = True
+    items_list.append((oral_dextrose , "Oral Dextrose"))
+
+    agg = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(Sum('quantity'))
+    agg = agg['quantity__sum']
+    if agg is None:
+        agg = 0
+    if agg >= 1:
+        ball = True
+    items_list.append((ball , "Ball"))
+
+    #Check if items are complete
+
+    check_list = [collar, vest, leash, shipping_crate, food, vitamins, grooming_kit, first_aid_kit, oral_dextrose, ball, phex]
+
+    for item in check_list:
+        if item == False:
+            all_clear = False
+
+    items_list[0] = all_clear
+
+    return items_list
+
+
+#Step 2
+#Handler confirms items and will be part of the team officially deployed
+def confirm_pre_deployment_items(request, k9):
+
+    pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+    pre_deployment_items.status = "Confirmed"
+    pre_deployment_items.save()
+
+    return False
+
+def handler_dashboard(request):
+
+    user = user_session(request)
     form = RequestForm(request.POST or None)
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
+
     
     dr = 0
     k9 = None
     training_sched = None
+    training = None
+
+    pre_deployment_items = False
+    all_clear = False
+    reveal_items = False
+
+
+    k9 = K9.objects.get(handler=user)
+    today = datetime.today()
+
+    items_list = []
+    if k9.training_status == "For-Deployment":
+
+        items_list = check_pre_deployment_items(user)
+        all_clear = items_list[0]
+
+        del items_list[0]
+
+        print("Items List")
+        print(items_list)
+
+        pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+        initial_sched = pre_deployment_items.initial_sched
+
+        delta = initial_sched.date_start - today.date()
+        if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
+            reveal_items = True
+
+
+    # TODO try except for when handler does not yet have a k9
+    # TODO try except for when k9s still don't have a skill
+    # TODO try except when k9 has finished training
 
     try:
-        k9 = K9.objects.get(handler=user)
-
-        training = None
-        training_sched = None
-        today = datetime.today()
-
-        # TODO try except for when handler does not yet have a k9
-        # TODO try except for when k9s still don't have a skill
-        # TODO try except when k9 has finished training
         training = Training.objects.get(k9=k9, training=k9.capability)
         training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
-    except:
-        pass
+    except: pass
+
+
+    print("ALL CLEAR")
+    print(all_clear)
+    print("REVEAL ITEMS")
+    print(reveal_items)
 
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
 
@@ -234,6 +483,11 @@ def handler_dashboard(request):
     if request.method == 'POST':
         start_training = request.POST.get('start_training')
         end_training = request.POST.get('end_training')
+
+        confirm_deployment = request.POST.get('confirm_deployment')
+        if confirm_deployment:
+            confirm_pre_deployment_items(request, k9)
+            return redirect("profiles:handler_dashboard")
 
         if start_training:
             print("START TRAINING VALUE")
@@ -304,7 +558,12 @@ def handler_dashboard(request):
 
         'show_start': show_start,
         'show_end': show_end,
-        'training_sched' : training_sched
+        'training_sched' : training_sched,
+
+        'pre_deployment_item' : pre_deployment_items,
+        'reveal_items' : reveal_items,
+        'all_clear' : all_clear,
+        'items_list' : items_list
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -567,40 +826,38 @@ def login(request):
     if request.method == 'POST':
         serial = request.POST['serial_number']
         password = request.POST['password']
-        user_auth = authenticate(request, username=serial, password=password)
+        # user_auth = authenticate(request, username=serial, password=password)
         print(password)
-        if user_auth is not None:
-            auth_login(request, user_auth)
-            request.session["session_serial"] = serial
-            account = Account.objects.get(serial_number = serial)
-            user = User.objects.get(id = account.UserID.id) 
 
-            request.session["session_user_position"] = user.position
-            request.session["session_id"] = user.id
-            request.session["partnered"] = user.partnered
-            request.session["session_username"] = str(user)
+        # auth_login(request, user_auth)
+        request.session["session_serial"] = serial
+        account = Account.objects.get(serial_number = serial)
+        user = User.objects.get(id = account.UserID.id)
 
-            print(request.session["partnered"])
-            #TRAINOR, OPERATIONS
-            if user.position == 'Aministrator':
-                return HttpResponseRedirect('../dashboard')
-            elif user.position == 'Veterinarian':
-                return HttpResponseRedirect('../vet-dashboard')
-            elif user.position == 'Team Leader':
-                return HttpResponseRedirect('../team-leader-dashboard')
-            elif user.position == 'Handler':
-                return HttpResponseRedirect('../handler-dashboard')
-            elif user.position == 'Commander':
-                return HttpResponseRedirect('../commander-dashboard')
-            elif user.position == 'Operations':
-                return HttpResponseRedirect('../operations-dashboard')
-            elif user.position == 'Trainer':
-                return HttpResponseRedirect('../trainer-dashboard')
+        request.session["session_user_position"] = user.position
+        request.session["session_id"] = user.id
+        request.session["partnered"] = user.partnered
+        request.session["session_username"] = str(user)
 
-            else:
-                return HttpResponseRedirect('../dashboard')
+        print(request.session["partnered"])
+        #TRAINOR, OPERATIONS
+        if user.position == 'Aministrator':
+            return HttpResponseRedirect('../dashboard')
+        elif user.position == 'Veterinarian':
+            return HttpResponseRedirect('../vet-dashboard')
+        elif user.position == 'Team Leader':
+            return HttpResponseRedirect('../team-leader-dashboard')
+        elif user.position == 'Handler':
+            return HttpResponseRedirect('../handler-dashboard')
+        elif user.position == 'Commander':
+            return HttpResponseRedirect('../commander-dashboard')
+        elif user.position == 'Operations':
+            return HttpResponseRedirect('../operations-dashboard')
+        elif user.position == 'Trainer':
+            return HttpResponseRedirect('../trainer-dashboard')
+
         else:
-            messages.warning(request, 'username or password is invalid!')
+            return HttpResponseRedirect('../dashboard')
 
     return render (request, 'profiles/login.html')
 
@@ -828,45 +1085,7 @@ def user_add_confirmed(request):
     }
     return render(request, 'profiles/user_add_confirmed.html', context)
 
-def load_locations(request):
 
-    search_query = request.GET.get('search_query')
-    width = request.GET.get('width')
-
-
-    if search_query == "":
-        geolocator = Nominatim(user_agent="Locator", timeout=None)
-    else:
-        geolocator = Nominatim(user_agent="Locator", format_string="%s, Philippines", timeout=None)
-
-    locations = geolocator.geocode(search_query, exactly_one=False)
-
-    print(locations)
-    print(width)
-
-    context = {
-        'locations' : locations,
-        'width': width
-    }
-
-    return render(request, 'deployment/location_data.html', context)
-
-def load_map(request):
-    lng = request.GET.get('lng')
-    lat = request.GET.get('lat')
-
-    width = request.GET.get('width')
-
-    print("TEST coordinates")
-    print(str(lat) + " , " + str(lng))
-
-    geoform = GeoForm(request.POST or None, lat=lat, lng=lng, width=width)
-
-    context = {
-        'geoform' : geoform
-    }
-
-    return render(request, 'deployment/map_data.html', context)
 
 class ScheduleView(APIView):
     def get(self, request, format=None):

@@ -11,9 +11,9 @@ from dateutil.relativedelta import relativedelta
 from unitmanagement.models import Notification
 from planningandacquiring.models import K9
 
-@periodic_task(run_every=crontab(hour=9, minute=0))
-def test():
-   Notification.objects.create(message='meassage sent') 
+# @periodic_task(run_every=crontab(hour=9, minute=0))
+# def test():
+#    Notification.objects.create(message='meassage sent')
        
 # 8:50AM
 @periodic_task(run_every=crontab(hour=8, minute=50))

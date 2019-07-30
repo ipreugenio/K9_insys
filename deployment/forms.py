@@ -49,7 +49,7 @@ class SelectLocationForm(forms.Form):
     location_list = []
 
     location = forms.ChoiceField(choices=location_list,
-                             widget=forms.RadioSelect)
+                                 widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
 

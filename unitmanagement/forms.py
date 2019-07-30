@@ -74,13 +74,14 @@ class PhysicalExamForm(forms.ModelForm):
     eyes = forms.CharField(label = 'eyes', widget = forms.Select(choices=EXAMSTATUS))
     ears = forms.CharField(label = 'ears', widget = forms.Select(choices=EXAMSTATUS))
     remarks = forms.CharField(label = 'remarks', widget = forms.Textarea(attrs={'rows':'4'}))
+    cleared = forms.BooleanField(label = 'cleared', widget=forms.CheckboxInput)
 
     class Meta:
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
         'musculo_skeletal', 'respiratory', 'genito_urinary', 'nervous', 'circulatory', 'digestive',
         'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam',
-        'heart_rate','respiratory_rate','temperature','weight')
+        'heart_rate','respiratory_rate','temperature','weight', 'cleared')
 
     def __init__(self, *args, **kwargs):
         super(PhysicalExamForm, self).__init__(*args, **kwargs)

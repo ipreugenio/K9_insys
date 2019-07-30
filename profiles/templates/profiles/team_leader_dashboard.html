@@ -1,6 +1,10 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
 
+{% load um_tags %}
+{% load widget_tweaks %}
+
 {% block dashboard %}
+<head> {{geoform.media}}</head>
 <div class="container fluid">
 <div class="ui two column grid">
   <div class="streched row">
@@ -15,17 +19,17 @@
                       {{ta.total_dogs_demand}}
                     </div>
                     <div class="label">
-                      K9 Required
+                      K9 Demand in Area
                     </div>
-                  </div>  
+                  </div>
                   <div class="blue statistic">
                     <div class="value">
                       {{ta.total_dogs_deployed}}
                     </div>
                     <div class="label">
-                      K9 Assigned
+                      K9 Assigned in Area
                     </div>
-                  </div>  
+                  </div>
                 </div>
                   <canvas id="myChart2"></canvas>
               </div>
@@ -40,11 +44,12 @@
                         <div class="label">
                           Total Incidents
                         </div>
-                      </div>  
+                      </div>
                   </div>
                   <canvas id="myChart"></canvas>
               </div>
             </div>
+
             <div class="sixteen wide column">
                 <div class="ui raised segment">
                     <div class="ui horizontal statistics">
@@ -55,53 +60,266 @@
                           <div class="label">
                             Field Officer Units
                           </div>
-                        </div>  
+                        </div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="myChart3"></canvas>
-                    </div>
-                   
+                    <canvas id="myChart3"></canvas>
                 </div>
               </div>
       </div>
     </div>
     </div>
-    <div class="six wide column" style="padding: 0%;padding-right: 1%;">
-    
-        <div class="ui basic segment" style="padding-left: 0%;">
-            <div class="ui raised segment">
-              <div class="horizontal divider"></div>
-              info
-            </div>
-            <div class="ui inverted segment">
-                <h4>Calendar</h4>
-              </div>
-                <div class="ui right aligned basic segment"
-                style="padding:0%;margin:0%;margin-bottom:5px">
-                    <div class="ui buttons">
-                        <button class="ui button"  id = "prev" >Previous Year</button>
-                        <div class="or"></div>
-                        <button class="ui button"  id = "next" >Next Year</button>
-                      </div>
-                
+
+
+
+            <div class = "ui segment">
+
+                 {% if k9 %}
+                    <h4>K9 Details</h4>
+                    <table class="ui very basic four column table">
+                    <thead>
+
+                    <tr>
+                    <th>Status: {{k9.training_status}}</th>
+                    <th>Type: {{k9.status}}</th>
+                    <th>Capability: {{k9.capability}}</th>
+                    </tr>
+                    </thead>
+
+                    </table>
+
+                    {% if reveal_arrival == True %}
+                    <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
+                    {% endif %}
+
+                {% else %}
+                <div class = "ui segment">
+                    You currently don't have a K9.
                 </div>
-        
-                <div id = "calendar" style="margin-top:0%;"></div>
+                {% endif %}
+
+
+
+
+    <div class="six wide column" style="padding: 0%;padding-right: 1%;">
+
+        <div class="ui basic segment" style="padding-left: 0%;">
+            
+                <div class="ui black floating message">
+                    <p>Reminder</p>
+                  </div>
+                <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
+
+                    <table class="ui basic table">
+                      <tr>
+                        <td>Someone is on leave: Will return on Date</td>
+                        <td class="center aligned three wide">
+                          <a href="#" class="ui tiny black button">Details</a>
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+
+        </div>
         </div>
       </div>
+      </div>
+
+
+      <div class="seven wide column" style="padding: 0%;margin:0%;">
+                <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
+                    <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
+                    <div class="ui buttons">
+                      <button class="ui button"  id = "prev" >Previous Year</button>
+                      <div class="or"></div>
+                      <button class="ui button"  id = "next" >Next Year</button>
+                    </div>
+
+                    <div id = "calendar" style="margin-top:0%;"></div>
+                </div>
+              </div>
+
+
     </div>
 </div>
-</div>
-<style>
-  #prev, #next{
-    background-color:orangered;
-    color: white;
-  }
-  </style>
-<script>
 
+
+
+
+    <!--Event Modal-->
+      <div class="ui modal" id = 'modal1'>
+          <i class="close icon"></i>
+          <div class="header">Add Event</div>
+
+          <div class="scrolling content">
+              <form class="ui form" method="POST">
+                  {% csrf_token %}
+                <div class="three fields">
+                    <div class="field">
+                        <label>Requester</label>
+                        {{form.requester}}
+                      </div>
+                      <div class="field">
+                        <label>Mobile Number</label>
+                        {{form.phone_number}}
+                      </div>
+                      <div class="field">
+                        <label>Email</label>
+                        {{form.email_address}}
+                      </div>
+                </div>
+                <div class="four fields">
+                    <div class="field">
+                        <label>Event Name</label>
+                        {{form.event_name}}
+                      </div>
+                      <div class="field">
+                        <label>Type</label>
+                        {{form.event_type}}
+                      </div>
+                      <div class="field">
+                        <label>Start Date</label>
+                        {{form.start_date}}
+                      </div>
+                      <div class="field">
+                          <label>End Date</label>
+                          {{form.end_date}}
+                        </div>
+                </div>
+                <div class="three fields">
+                    <div class="field">
+                        <label>NDD Needed</label>
+                        {{form.NDD_needed}}
+                      </div>
+                      <div class="field">
+                        <label>EDD Needed</label>
+                        {{form.EDD_needed}}
+                      </div>
+                      <div class="field">
+                        <label>SAR Needed</label>
+                        {{form.SAR_needed}}
+                      </div>
+                </div>
+                <div class="field">
+                    <label>Remarks</label>
+                    {{form.remarks}}
+                </div>
+                <div class="field">
+                    <label>Place</label>
+                    {{form.location}}
+                  </div>
+
+                  <div class="ui two column grid">
+                    <div class="seven wide column">
+                        <center>
+                            <label>Search Location</label>
+                            <div class="ui fluid category search">
+                              <div class="ui icon input">
+                                {{geosearch.search}}
+                                <i class="search icon"></i>
+                              </div>
+                              <div class="results"></div>
+                            </div>
+                            <br>
+                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
+
+                            <div  id ="id_location_cards"></div>
+                        </center>
+
+                    </div>
+                    <div class="nine wide column">
+                        <label>Geotag Location</label>
+                        <div id = "id_geomap">
+                            {{geoform.point}}
+                        </div>
+                    </div>
+                  </div>
+                  <br>
+                    <center>
+                        <button class="ui green button" type="submit">Submit</button>
+                    </center>
+                </form>
+          </div>
+
+        </div>
+        <!--End of Modal-->
+
+    <div class="ui mini modal" id = 'modal2'>
+          <i class="close icon"></i>
+          <div class="header">Event Added</div>
+        </div>
+
+
+
+   <!--Pre Deployment Items Modal-->
+
+<div class="ui mini modal" id = 'modal3'>
+      <i class="close icon"></i>
+    <div class="header"><h2>Confirm Unit Arrival</h2></div>
+    <div class="scrolling content">
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+
+            {% for field in check_arrival %}
+            {{ field }}
+            {% endfor %}
+
+            <button class="ui green button" type="submit" name = "confirm_arrival" value="Confirm Arrival"><i class="ship icon"></i>Confirm Arrival</button>
+        </form>
+
+    </div>
+</div>
+ <!--End Pre Deployment Items Modal-->
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <input class="msg" type='hidden' value="{{message}}">
+        {% endfor %}
+        {% endif %}
+
+
+    <style>
+
+    ul
+{
+    list-style-type: none;
+}
+
+
+  #calendar .fc-dayGridMonth-view .fc-scroller {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  }
+
+  .fc-center>h2 {
+     font-size:  18px !important;
+     }
+
+  .fc-header, .fc-button, #prev, #next{
+  background-color:orangered;
+  color: white;
+  }
+
+  .fc-widget-header .fc-title{
+  background-color: black
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+  }
+</style>
+
+
+
+    <script>
 $(document).ready(function() {
-  $('#calendar').fullCalendar({
+
+ //Calendar
+
+      $('#calendar').fullCalendar({
           header: {
               left: 'prev,next today',
               center: 'title',
@@ -113,10 +331,10 @@ $(document).ready(function() {
           editable: true,
           selectable: true,
           eventLimit: 3,
-          nowIndicator: true,
+          showNonCurrentDates: true,
 
           eventTextColor: "white",
-
+          nowIndicator: true,
 
           events: [
                 {% for i in events %}
@@ -128,18 +346,65 @@ $(document).ready(function() {
                     allDay: 'true',
                 },
                 {% endfor %}
+
             ],
-            dayClick: function(date) {
-                new_date = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-                var view = $('#calendar').fullCalendar('getView');
 
-                    $('#calendar').fullCalendar('gotoDate',date);
-                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+          eventClick : function(event, element){
+            $('.content').text(event.title);
+            $('.event_modal').modal('show');
 
-                },
+          },
 
+          }); // end #calendar
+
+
+
+        $('#prev').click(function() {
+        $('#calendar').fullCalendar('prevYear');
+        });
+
+        $('#next').click(function() {
+        $('#calendar').fullCalendar('nextYear');
+        });
+
+
+         //Add event modal
+        $( "#add_event_btn" ).click(function() {
+          $('#modal1').modal('show');
+        });
+
+         //GeoMap
+         $("#btn_search").click(function () {
+          var url = 'ajax_load_locations';  // get the url of the `load_locations` view
+          var search_query = $("#id_search").val();  // get the search query from the HTML input
+
+          $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request
+            data: {
+              'search_query': search_query, // add the search query to the GET parameters
+              'width' : 480
+            },
+            success: function (data) {   // `data` is the return of the `load_locations` view function
+              $("#id_location_cards").html(data);  // replace the contents of the #id_location_cards input with the data that came from the server
+            },
+                error:
+            function(xhr){
+                alert("Error: " + xhr.responseText);
+                //alert(xhr.responseText) --> to get the full details of error
+                return false;
+                }
           });
 
+        });// end add event modal
+
+
+});
+    </script>
+
+
+<script>
+
+$(document).ready(function() {
     var endpoint = '../../unitmanagement/team-leader/api'
     var defaultData = [];
     var labels = [];
@@ -200,11 +465,11 @@ $(document).ready(function() {
             labels: ["EDD", "NDD", "SAR"],
             datasets: [
                 {
-                label: "Required",
+                label: "Demand",
                 backgroundColor: "#8e5ea2",
                 data: demand,
                 }, {
-                label: "Assigned",
+                label: "Supply",
                 backgroundColor: "#3e95cd",
                 data: supply,
                 }]
@@ -215,7 +480,7 @@ $(document).ready(function() {
             },
             title: {
                 display: true,
-                text: "K9's Required and Assigned in Area"
+                text: "K9's Demand and Assigned in Area"
             },
                 scales: {
                 xAxes: [{
@@ -296,4 +561,15 @@ $(document).ready(function() {
 });
       
 </script>
+
+
+<script>
+
+    $( "#reveal_confirm_arrival" ).click(function() {
+  $('#modal3').modal('show');
+});
+
+</script>
+
+
 {% endblock%}

@@ -8,14 +8,29 @@
             <div class="three wide column">
                     <div class="ui pointing vertical menu">
                         <a class="item"> <b>Reports Menu</b></a>
-                        <a href="{% url 'planningandacquiring:accomplishment_date'%}" class="item">
-                            <i class="money bill alternate outline icon"></i>Accomplishment Report
-                        </a>
                         <a href="{% url 'planningandacquiring:vet_date'%}" class="item">
                                 <i class="money bill alternate outline icon"></i>Veterinarian Report
                         </a>
-                                <a href="{% url 'planningandacquiring:inventory_date'%}" class="item">
-                                <i class="money bill alternate outline icon"></i>Inventory Report
+                                <a href="{% url 'planningandacquiring:accomplishment_date'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>Accomplishment Report
+                        </a>
+                                <a href="{% url 'planningandacquiring:deployment_date'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>Deployment Port Report
+                        </a>
+                                 <a href="{% url 'planningandacquiring:handler_date'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>Handler Incident Report
+                        </a>
+                                <a href="{% url 'planningandacquiring:k9_report'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>K9 Generalized Report
+                        </a>
+                        <a href="{% url 'planningandacquiring:k9_performance_date'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>K9 Performance Report
+                        </a>
+                        <a href="{% url 'planningandacquiring:dog_request_date'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>K9 Request Report
+                        </a>
+                        <a href="{% url 'planningandacquiring:training_report'%}" class="item">
+                                <i class="money bill alternate outline icon"></i>Training Report
                         </a>
                     </div>
             </div>

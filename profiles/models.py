@@ -84,9 +84,9 @@ class User(models.Model):
 
     # Larger number = Higher Ranking
     RANK_SORTED = (
-        (1, "ASN"),
-        (2, "SN2"),
-        (3, "SN1"),
+        (1, "ASN/ASW"),
+        (2, "SN2/SW2"),
+        (3, "SN1/SW1"),
         (4, "PO3"),
         (5, 'PO2'),
         (6, 'PO1'),

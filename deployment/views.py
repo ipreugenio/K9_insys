@@ -56,9 +56,12 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
-from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates
+from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
+    generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed
 
 import random
+
+from deployment.tasks import assign_TL
 
 class MyDictionary(dict):
 
@@ -116,6 +119,7 @@ def mass_populate():
 
     #>>advanced
 
+    generate_dogbreed()
     generate_training() #Classify k9s
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
@@ -556,37 +560,41 @@ def request_dog_list(request):
 def request_dog_details(request, id):
     data2 = Dog_Request.objects.get(id=id)
     '''data = Team_Assignment.objects.get(id=id)'''
-    k9 = Team_Dog_Deployed.objects.filter(team_requested=data2)
+    #k9 = Team_Dog_Deployed.objects.filter(team_requested=data2)
     style = ""
     # filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=data2.city)
 
     handler_can_deploy = []  # append the id of the handlers
     for h in handlers:
-        handler_can_deploy.append(h.id)
+        handler_can_deploy.append(h.UserID.id)
     # print(handler_can_deploy)
 
     # get instance of user using personal_info.id
     # id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy)
-    # print(user)
+    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader")
 
     user_deploy = []  # append the user itself
     for u in user:
         user_deploy.append(u.id)
 
+    print("Viable User Ids")
     print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
-    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='For-Deployment').filter(
-        assignment='None')
-    # print(can_deploy)
+    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed')
+        # .filter(assignment='None')
+
+    print("can_deploy_by_handler")
+    print(can_deploy)
 
     # dogs deployed to Dog Request
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_requested=data2).filter(Q(status='Deployed') | Q(status='Scheduled'))
+    dogs_deployed = K9_Schedule.objects.filter(dog_request=data2) #.filter(status='Request') (unnecessary filter)
 
     sar_deployed = 0
     ndd_deployed = 0
     edd_deployed = 0
+
+    TL_candidates = []
 
     for item in dogs_deployed:
         if item.k9.capability == "SAR":
@@ -596,6 +604,15 @@ def request_dog_details(request, id):
         else:
             edd_deployed += 1
 
+        TL_candidates.append(item.k9.handler)
+
+
+    TL = assign_TL(None, handler_list_arg=TL_candidates)
+    data2.team_leader = TL
+    data2.save()
+    tl_dog = K9.objects.get(handler = TL)
+    dogs_deployed = dogs_deployed.exclude(k9 = tl_dog)
+
     #>>>> start of new Code for saving schedules instead of direct deployment
     # TODO Filter can deploy to with teams without date conflicts
     can_deploy_filtered = []
@@ -603,8 +620,7 @@ def request_dog_details(request, id):
         #1 = true, 0 = false
         deployable = 1
         schedules = K9_Schedule.objects.filter(k9=k9).filter(status ="Request")
-        print("can_deploy")
-        print(k9)
+
         #TODO obtain schedule of request then compare to start and end date of schedules (loop)
         for sched in schedules:
             if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
@@ -618,6 +634,8 @@ def request_dog_details(request, id):
     #>>Also, dog deployment means scheduling first
 
     can_deploy = can_deploy2
+    print("can_deploy_no_conflict")
+    print(can_deploy)
 
     #K9s that are within AOR of request
     k9s_within_AOR = []
@@ -629,7 +647,6 @@ def request_dog_details(request, id):
                 if location.area == AOR:
                     k9s_within_AOR.append(k9.id)
 
-
     #TODO Combine df of within AOR and ouside AOR if event is small
 
     can_deploy_list = []
@@ -639,6 +656,7 @@ def request_dog_details(request, id):
     location_list =[]
     area_list = []
 
+    #Note that can_deploy is same as usual if event is Big
     if data2.sector_type == "Small Event":
         can_deploy_inside_AOR = can_deploy.filter(pk__in = k9s_within_AOR)
         can_deploy_outside_AOR = can_deploy.exclude(pk__in = k9s_within_AOR)
@@ -746,12 +764,12 @@ def request_dog_details(request, id):
             "Incident": incident_count_list,
         }
 
-        # TODO Find a way to somehow put all within AOR on top first for Small Events, otherwise create a seperate dataframe
+
         can_deploy_outside_AOR_dataframe = df(data=df_data)
         can_deploy_outside_AOR_dataframe.sort_values(by=["Distance", "Maritime", "Incident"],
                                          ascending=[True, True, True])
 
-        can_deploy_dataframe = pd.concat([can_deploy_dataframe, can_deploy_outside_AOR_dataframe])
+        can_deploy_dataframe = pd.concat([can_deploy_dataframe, can_deploy_outside_AOR_dataframe])  #Puts within AOR on top first
         can_deploy_dataframe.reset_index(drop=True, inplace=True)
 
     if request.method == 'POST':
@@ -767,31 +785,33 @@ def request_dog_details(request, id):
             return redirect('deployment:request_dog_details', id=id)
 
         checks = request.POST.getlist('checks')  # get the id of all the dogs checked
-        # print(checks)
+        print("Checked Dogs")
+        print(checks)
 
         # get the k9 instance of checked dogs
         checked_dogs = K9.objects.filter(id__in=checks)
         # print(checked_dogs)
 
         for checked_dogs in checked_dogs:
-            #TODO automatic approve pag operations (+ admin na rin siguro pero wala naman dapat access admin dito lol)
-
-            Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname)) #TODO Only save k9.assignment when system datetime is same as request
+            # TODO Only save k9.assignment when system datetime is same as request
+            # TODO Don't create Team_Dog_Deployed if hindi pa officially "Deployed"
+            # Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname))
 
             K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
 
-            # TODO: if dog is equal capability increment
-            if checked_dogs.capability == 'EDD':
-                data2.EDD_deployed = data2.EDD_deployed + 1
-            elif checked_dogs.capability == 'NDD':
-                data2.NDD_deployed = data2.NDD_deployed + 1
-            else:
-                data2.SAR_deployed = data2.SAR_deployed + 1
+            #
+            # if checked_dogs.capability == 'EDD':
+            #     data2.EDD_deployed = data2.EDD_deployed + 1
+            # elif checked_dogs.capability == 'NDD':
+            #     data2.NDD_deployed = data2.NDD_deployed + 1
+            # else:
+            #     data2.SAR_deployed = data2.SAR_deployed + 1
 
+            data2.k9s_deployed =  data2.k9s_deployed + 1
             data2.save()
-            dog = K9.objects.get(id=checked_dogs.id)
-            #dog.assignment = str(data2) #TODO remove assignement for dog requests, only do this if schedule is already hit
-            #dog.save()
+            # dog = K9.objects.get(id=checked_dogs.id)
+            # dog.assignment = str(data2) #TODO only save assignments for ports
+            # dog.save()
 
         style = "ui green message"
         messages.success(request, 'Dogs has been successfully Deployed!')
@@ -813,7 +833,9 @@ def request_dog_details(request, id):
 
         'sar_deployed' : sar_deployed,
         'ndd_deployed' : ndd_deployed,
-        'edd_deployed' : edd_deployed
+        'edd_deployed' : edd_deployed,
+
+        'tl_dog' : tl_dog
     }
 
     return render(request, 'deployment/request_dog_details.html', context)
@@ -1698,15 +1720,24 @@ def schedule_units(request):
     return render(request, 'deployment/schedule_units.html', context)
 
 
+
+# Step 3
+#Input from TL if team has arrived(a checklist of team members)
+def confirm_arrival(request):
+
+    #if request == "POST": #TL confirms arrival through a post submit
+
+    return None
+
 def transfer_request(request, k9_id, team_assignment_id, location_id):
 
     #TODO check if date of transfer has conflict
     #TODO if unit is transferring, prompt commander/operations if he wants to replace units assigned to a request
 
     k9 = K9.objects.get(id = k9_id)
-    team = Team_Assignment.objects.get(id = team_assignment_id)
-    location = Location.objects.get(id = location_id)
-    team_to_transfer = Team_Assignment.objects.get(location = location)
+    team = Team_Assignment.objects.get(id = team_assignment_id) #Current Team
+    location = Location.objects.get(id = location_id)  #Location to transfer to (user input)
+    team_to_transfer = Team_Assignment.objects.get(location = location) #Team to transfer to
 
     can_transfer = 0
 
