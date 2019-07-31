@@ -196,7 +196,8 @@ class K9(models.Model):
     in_heat_months = models.IntegerField('in_heat_months', default = 6)
     last_proestrus_date = models.DateField(blank=True, null=True)
     next_proestrus_date = models.DateField(blank=True, null=True)
-    estrus_date = models.DateField(blank=True, null=True)
+    last_estrus_date = models.DateField(blank=True, null=True)
+    next_estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
@@ -318,10 +319,11 @@ class K9(models.Model):
             if self.last_proestrus_date == None:
                 self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
             
-            self.estrus_date = self.last_proestrus_date + relativedelta(days=10)
+            self.last_estrus_date = self.last_proestrus_date + relativedelta(days=10)
             self.metestrus_date = self.estrus_date + relativedelta(month=2)
             self.anestrus_date = self.metestrus_date + relativedelta(months=4)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
+            self.next_estrus_date = self.next_proestrus_date + relativedelta(days=10)
 
             if d.today() == self.last_proestrus_date:
                 self.reproductive_stage = 'Proestrus'

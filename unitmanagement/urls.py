@@ -35,6 +35,8 @@ urlpatterns = [
     path('due-retired-list', views.due_retired_list, name='due_retired_list'),
     path('due-retired-call/<int:id>', views.due_retired_call, name='due_retired_call'),
 
+    path('called-back-list', views.confirm_base_arrival, name='confirm_base_arrival'),
+    path('confirm_arrive/<int:id>', views.confirm_arrive, name='confirm_arrive'),
     path('unfit-list', views.unfit_list, name='unfit_list'),
     path('health-list', views.health_list_handler, name='health_list_handler'),
     path('k9-incident-list', views.k9_incident_list, name='k9_incident_list'),

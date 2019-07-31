@@ -20,21 +20,21 @@ from django.db.models import Sum
 @periodic_task(run_every=crontab(hour=6, minute=0))
 def auto_subtract():
     # TODO Vitamins consumption
-    vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
-    v = K9.objects.filter(status='Working Dog').count()
-    
-    for vitamins in vitamins:
-        if v > 0:
-            if v > vitamins.quantity:
-                Medicine_Subtracted_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
-                v = v-vitamins.quantity
-                vitamins.quantity = 0 
-                vitamins.save()
-            else: 
-                Medicine_Subtracted_Trail.objects.create(inventory=vitamins, quantity=v)
-                vitamins.quantity = vitamins.quantity-v
-                v=0
-                vitamins.save()
+    # vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
+    # v = K9.objects.filter(status='Working Dog').count()
+
+    # for vitamins in vitamins:
+    #     if v > 0:
+    #         if v > vitamins.quantity:
+    #             Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
+    #             v = v-vitamins.quantity
+    #             vitamins.quantity = 0
+    #             vitamins.save()
+    #         else:
+    #             Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
+    #             vitamins.quantity = vitamins.quantity-v
+    #             v=0
+    #             vitamins.save()
 
     # FOOD CONSUMPTION EVERYDAY
     k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
@@ -42,26 +42,26 @@ def auto_subtract():
     k9_others = K9.objects.filter(age__gte=1).exclude(breed='Labrador Retriever').exclude(breed='Jack Russel').exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
     food = Food.objects.filter(foodtype='Adult Dog Food').exclude(quantity=0).order_by('quantity')
 
-    # dog_count * food_per_day 
+    # dog_count * food_per_day
     lab = k9_labrador * 0.5
     jack = k9_jack_russel * 0.3
     oth = k9_others * 0.8
     total = lab+jack+oth
     t = Decimal(total)
-    
+
     for food in food:
         if t > 0:
             if t > food.quantity:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=food.quantity)
                 t = t-food.quantity
-                food.quantity = 0 
+                food.quantity = 0
                 food.save()
-            else: 
+            else:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=t)
                 food.quantity = food.quantity-t
                 t=0
                 food.save()
-    
+
     # PUPPY FOOD CONSUMPTION
     # get puppy count by age
     third_fourth = K9.objects.filter(age_days__range=(21,28)).count() # 3rd-4th week : milk only
@@ -98,7 +98,7 @@ def auto_subtract():
 
     milk = tf_milk + fs_milk + se_milk + nt_milk + et_milk
     food = fs_food + se_food + nt_food + et_food + four_food + five_food + six_food + seven_food + eight_food + nine_twelve_food
-    
+
     query_milk = Food.objects.filter(foodtype='Milk').exclude(quantity=0).order_by('quantity')
     query_food = Food.objects.filter(foodtype='Puppy Dog Food').exclude(quantity=0).order_by('quantity')
 
@@ -111,9 +111,9 @@ def auto_subtract():
             if t_milk > query_milk.quantity:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=query_milk.quantity)
                 t_milk = t_milk-query_milk.quantity
-                query_milk.quantity = 0 
+                query_milk.quantity = 0
                 query_milk.save()
-            else: 
+            else:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=t_milk)
                 query_milk.quantity = query_milk.quantity-t_milk
                 t_milk=0
@@ -125,14 +125,14 @@ def auto_subtract():
             if t_food > query_food.quantity:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=query_food.quantity)
                 t_food = t_food-query_food.quantity
-                query_food.quantity = 0 
+                query_food.quantity = 0
                 query_food.save()
-            else: 
+            else:
                 Food_Subtracted_Trail.objects.create(inventory=food, quantity=t_food)
                 query_food.quantity = query_food.quantity-t_food
                 t_food=0
                 query_food.save()
-    
+
 
     # EXPIRATION OF MEDICINE
     med_receive = Medicine_Received_Trail.objects.filter(expiration_date=date.today())
@@ -145,7 +145,7 @@ def auto_subtract():
 
     # TODO Get Delivery Days
     # INVENTORY LOW NOTIFICATION
-    delivery_days = 4 
+    delivery_days = 4
     day_adult = Decimal(total) * delivery_days
     day_puppy = Decimal(food) * delivery_days
     day_milk = Decimal(milk) * delivery_days
@@ -157,7 +157,7 @@ def auto_subtract():
         stock.milk = milk
         stock.save()
     except (stock.DoesNotExist):
-        pass 
+        pass
 
     adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
     puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
@@ -169,4 +169,3 @@ def auto_subtract():
         Notification.objects.create(message= 'Puppy Dog Food is low. Its time to reorder!', notif_type='inventory_low')
     if milk_q <= day_milk:
         Notification.objects.create(message= 'Milk is low. Its time to reorder!', notif_type='inventory_low')
-        

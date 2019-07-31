@@ -25,3 +25,26 @@ def due_retired_k9():
             Notification.objects.create(message=str(k9) + ' is due for retirement next year!', 
             notif_type = 'retired_k9',
             position="Administrator")
+
+@periodic_task(run_every=crontab(hour=8, minute=50))
+def in_heat_notifs():
+     # HEAT CYCLE
+    # when it is time for the next heat, the last_heat = next_heat thus updating the dates
+    for p in p:
+        p.last_proestrus_date = p.next_proestrus_date
+        p.save()
+
+    k9_breed = K9.objects.all(training_status='For-Breeding')
+    for k9_breed in k9_breed:
+        if k9_breed.estrus_date == date.today() and k9_breed.age >= 1:
+            Notification.objects.create(k9=k9_breed, message=str(
+                k9_breed) + ' is recommended to mate this week as she is most fertile!', notif_type='heat_cycle',
+                                        position='Veterinarian')
+
+        if k9_breed.last_proestrus_date == date.today():
+            Notification.objects.create(k9=k9_breed, message=str(k9_breed) + ' is in heat!', notif_type='heat_cycle')
+
+        if k9_breed.metestrus_date == date.today():
+            Notification.objects.create(k9=k9_breed, message='If you mated ' + str(
+                k9_breed) + ', she is about to show signs of pregnancy!', notif_type='heat_cycle',
+                                        position='Veterinarian')
