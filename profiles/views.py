@@ -197,6 +197,10 @@ def team_leader_dashboard(request):
     # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
     for_arrival = tdd.filter(status = "Pending")
 
+    #TODO check arrival of units at request and from request to port
+    for_arrival_request = None
+    for_arrival_r_to_p = None
+
     if for_arrival:
         reveal_arrival = True
 

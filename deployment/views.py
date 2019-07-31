@@ -117,7 +117,7 @@ def mass_populate():
     generate_incident() #generates 250 objects
     generate_maritime() # generates 500 objects
 
-    #>>advanced
+    # >>advanced
 
     generate_dogbreed()
     generate_training() #Classify k9s
@@ -1354,7 +1354,15 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
     # can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
     #     assignment='None').exclude(pk__in=k9s_scheduled_list)
 
-    while end_assignment == 0:
+    temp = TempDeployment.objects.all()  # add user field to avoid complications involving multiple users in the future
+    k9_id_list = []
+    for item in temp:
+        k9_id_list.append(item.k9.id)
+        print("TEMP K9")
+        print(item.k9)
+
+    while end_assignment == 0 and K9.objects.filter(training_status='For-Deployment').filter(
+                assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) is not None:
 
         # Solution 2: Loop through dataframe first
         for item in location_dataframe.values:
@@ -1367,20 +1375,28 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
             k9_id_list = []
             for item in temp:
                 k9_id_list.append(item.k9.id)
+                print("TEMP K9")
+                print(item.k9)
+
 
             # Get K9s ready for deployment #exclude already scheduled K9s
             can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-                assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) #Same code in main
+                assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) #Same code in main
             # End Get K9s ready for deployment
 
-            # TODO can_deploy is empty for some reason
+            print("CAN DEPLOY QUERYSET")
+            print(can_deploy)
+
+            # if can_deploy is None:
+            #     sys.exit()
 
             k9s_assigned = 0
             finish_location_assignment = 0
             for k9 in can_deploy:
+                print("CAN DEPLOY K9")
+                print(k9)
                 if finish_location_assignment == 0:
-                    type = incident_type_list[iteration][
-                        0]  # TODO Dapat hanapin muna yung priority skill from list of k9s. If wala, go to next priority sa next iteration
+                    type = incident_type_list[iteration][0]
                     if type == k9.capability:
 
                         sar_count = 0
@@ -1418,12 +1434,13 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
                     # dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status="Scheduled",
                     #                                                         team_assignment = team).count()
                     dogs_scheduled_count = K9_Schedule.objects.filter(status="Initial Deployment", team=team).count()
-                    if (
-                            team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2:  # There must be atleast 2 units per location #TODO Include schedule K9s
+                    if (team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2:  # There must be atleast 2 units per location #TODO Include schedule K9s
                         print("Units per Location " + str(location))
                         print(team.total_dogs_deployed + k9s_assigned)
                         finish_location_assignment = 1
 
+
+        #Code does not reach this part
         if iteration == 2:
             end_assignment = 1
         else:
@@ -1437,50 +1454,47 @@ def schedule_units(request):
     removal = TempDeployment.objects.all() #TODO add user field then only delete objects from said user
     removal.delete()
 
-    #TODO Get number of k9s done with training (or include in list with blue highlight
-    #TODO Estimated time a K9 will finish training (red highlight)
-    #TODO ^ Or tab them both
 
-    #K9s estimated training duration
-    sar_done = K9.objects.filter(training_status = "Trained").filter(capability = "SAR").count()
-    ndd_done = K9.objects.filter(training_status = "Trained").filter(capability = "NDD").count()
-    edd_done = K9.objects.filter(training_status = "Trained").filter(capability = "EDD").count()
+    # #K9s estimated training duration
+    # sar_done = K9.objects.filter(training_status = "Trained").filter(capability = "SAR").count()
+    # ndd_done = K9.objects.filter(training_status = "Trained").filter(capability = "NDD").count()
+    # edd_done = K9.objects.filter(training_status = "Trained").filter(capability = "EDD").count()
+    # k9s_training = K9.objects.filter(training_status = "On-Training")
+    #
+    # k9_training_list = []
+    # duration_estimate_list = []
+    # train_end_estimate_list = []
+    # for k9 in k9s_training:
+    #     train_sched = Training_Schedule.objects.filter(k9=k9).exclude(date_start = None).exclude(date_end = None)
+    #
+    #     duration_list = []
+    #     if train_sched:
+    #         k9_training_list.append(k9)
+    #
+    #
+    #         for item in train_sched:
+    #             delta = item.date_end - item.date_start
+    #             duration_list.append(int(delta.days))
+    #
+    #         duration_average = Average(duration_list)
+    #         duration_estimate_list.append(duration_average)
+    #
+    #         days_estimate_before_end = duration_average * (9 - len(duration_list))
+    #         train_end_estimate_list.append(days_estimate_before_end)
+    #
+    # df_training_data = {
+    #     'K9': k9_training_list,
+    #     'Duration': duration_estimate_list,
+    #     'End_Estimate': train_end_estimate_list,
+    # }
+    #
+    # training_dataframe = df(data=df_training_data)
+    # training_dataframe = training_dataframe.sort_values(by=['End_Estimate'],
+    #                                                     ascending=[True])
+    #
+    # #END K9s estimated training duration
 
 
-    k9s_training = K9.objects.filter(training_status = "On-Training")
-
-    k9_training_list = []
-    duration_estimate_list = []
-    train_end_estimate_list = []
-    for k9 in k9s_training:
-        train_sched = Training_Schedule.objects.filter(k9=k9).exclude(date_start = None).exclude(date_end = None)
-
-        duration_list = []
-        if train_sched:
-            k9_training_list.append(k9)
-
-
-            for item in train_sched:
-                delta = item.date_end - item.date_start
-                duration_list.append(int(delta.days))
-
-            duration_average = Average(duration_list)
-            duration_estimate_list.append(duration_average)
-
-            days_estimate_before_end = duration_average * (9 - len(duration_list))
-            train_end_estimate_list.append(days_estimate_before_end)
-
-    df_training_data = {
-        'K9': k9_training_list,
-        'Duration': duration_estimate_list,
-        'End_Estimate': train_end_estimate_list,
-    }
-
-    training_dataframe = df(data=df_training_data)
-    training_dataframe = training_dataframe.sort_values(by=['End_Estimate'],
-                                                        ascending=[True])
-
-    #END K9s estimated training duration
 
     # Prioritize Locations
     locations = Location.objects.all()
@@ -1596,7 +1610,6 @@ def schedule_units(request):
     for item in temp:
         k9_id_list.append(item.k9.id)
 
-
     temp_list = []
     for location in locations:
         temp = TempDeployment.objects.filter(location = location)
@@ -1646,7 +1659,7 @@ def schedule_units(request):
 
     #TODO exclude k9s pending for deployment if they are already assigned on 2nd evaluation
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-        assignment='None').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
+        assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list)
 
     # END NEW CODE
 
@@ -1658,11 +1671,28 @@ def schedule_units(request):
     print(location_dataframe)
 
     if request.method == 'POST':
+        invalid = False
         if  formset.is_valid:
+            for form in formset:
+                if form.is_valid:
+                    try:
+                        deployment_date = form['deployment_date'].value()
+                        deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
+                        print("Deployment Date")
+                        print(deployment_date)
+
+                        delta = deployment_date - datetime.date.today()
+                        print("Delta")
+                        print(delta.days)
+                        if delta.days < 7:
+                            style = "ui red message"
+                            messages.warning(request, 'Dates should have atleast 1 week allowance')
+                            invalid = True
+                    except:pass
 
             idx = 0
             for form in  formset:
-                if form.is_valid:
+                if form.is_valid and invalid == False:
                     try:
                         deployment_date = form['deployment_date'].value()
                         deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
@@ -1711,23 +1741,15 @@ def schedule_units(request):
         'formset' :schedFormset,
         'style': style,
         'df_is_empty' : df_is_empty,
-        'sar_done': sar_done,
-        'ndd_done' : ndd_done,
-        'edd_done' : edd_done,
-        'train_df' : training_dataframe
+        # 'sar_done': sar_done,
+        # 'ndd_done' : ndd_done,
+        # 'edd_done' : edd_done,
+        # 'train_df' : training_dataframe
     }
 
     return render(request, 'deployment/schedule_units.html', context)
 
 
-
-# Step 3
-#Input from TL if team has arrived(a checklist of team members)
-def confirm_arrival(request):
-
-    #if request == "POST": #TL confirms arrival through a post submit
-
-    return None
 
 def transfer_request(request, k9_id, team_assignment_id, location_id):
 

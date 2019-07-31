@@ -1101,14 +1101,16 @@ def requests_form(request):
     return render (request, 'unitmanagement/request_form.html', context)
 
 def trained_list(request):
-    k9s_for_grading = []
-    train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+    # k9s_for_grading = []
+    # train_sched = Training_Schedule.objects.exclude(date_start=None).exclude(date_end=None)
+    #
+    # for item in train_sched:
+    #     if item.k9.training_level == item.stage:
+    #         k9s_for_grading.append(item.k9.id)
 
-    for item in train_sched:
-        if item.k9.training_level == item.stage:
-            k9s_for_grading.append(item.k9.id)
+    # data = K9.objects.filter(id__in=k9s_for_grading)
 
-    data = K9.objects.filter(id__in=k9s_for_grading)
+    data = K9.objects.filter(training_status = "Trained")
 
     NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
     EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
@@ -1224,6 +1226,7 @@ def trained_list(request):
     for d in data:
         a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
         ts.append(a.date_end.date)
+
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2780,15 +2783,18 @@ def load_k9_data(request):
     h_count = None
     health = None
     train = None
+
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
-        remarks = Training_Schedule.objects.filter(k9=k9)
+        remarks = Training_Schedule.objects.filter(k9=k9).exclude(stage = "Stage 0")
         h_count = Health.objects.filter(dog=k9).count()
         health = Health.objects.filter(dog=k9)
-        train = Training.objects.get(k9=k9)
-    except:
-        pass
+        train = Training.objects.filter(k9=k9).get(training=k9.capability)
+    except: pass
+
+    print("TRAIN")
+    print(train)
 
     context = {
         'k9': k9,

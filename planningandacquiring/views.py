@@ -54,8 +54,8 @@ from datetime import date
 # from math import *
 # from decimal import Decimal
 # from sklearn.metrics import mean_squared_error
-# import pandas as pd
-# import numpy as np
+import pandas as pd
+import numpy as np
 #
 # #graphing imports
 # from igraph import *
