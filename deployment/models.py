@@ -1,6 +1,5 @@
 from django.db import models
 # from planningandacquiring.models import K9
-# from unitmanagement.models import PhysicalExam
 # from inventory.models import Food, Medicine_Inventory
 from profiles.models import User
 from datetime import timedelta, date, datetime
@@ -621,3 +620,4 @@ class K9_Pre_Deployment_Items(models.Model):
         self.remove_old_instance()
 
         super(K9_Pre_Deployment_Items, self).save(*args, **kwargs)
+        

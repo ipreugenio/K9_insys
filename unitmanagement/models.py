@@ -2,9 +2,9 @@ from django.db import models
 
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
+from deployment.models import Incidents 
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
-from deployment.models import K9_Schedule, Incidents, Location, Team_Assignment
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -317,8 +317,8 @@ class Request_Transfer(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date_created =  models.DateField('date_created', auto_now_add=True)
     date_of_transfer = models.DateField('date_created', null=True, blank=True)
-    location_from = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name='location_from', null=True, blank=True)
-    location_to = models.ForeignKey(Team_Assignment, on_delete=models.CASCADE, related_name='location_to', null=True, blank=True)
+    location_from = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_from', null=True, blank=True)
+    location_to = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_to', null=True, blank=True)
     status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
     remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
 
@@ -383,7 +383,9 @@ def create_medicine_inventory(sender, instance, **kwargs):
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Training.objects.create(k9=instance, training=instance.capability)
+        Training.objects.create(k9=instance, training="EDD")
+        Training.objects.create(k9=instance, training="NDD")
+        Training.objects.create(k9=instance, training="SAR")
         Training_Schedule.objects.create(k9 = instance)
 
 #create vaccine record, and vaccine used
@@ -498,6 +500,20 @@ def create_damaged_equipment_notif(sender, instance, **kwargs):
                             notif_type = 'equipment_request',
                             message='Equipment Concern!')
 
+
+@receiver(post_save, sender=AuthUser)
+def account_create(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        try:
+            UserID = User.objects.last()
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+        except:
+            UserID = User.objects.create(position='Administrator',rank='PO1',firstname=instance.username, lastname='Superuser', middlename='Su',birthdate=date.today())
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+            instance.first_name = instance.username
+            instance.last_name = 'Superuser'
+            instance.save()
+
 #LOCATION INCIDENT reported
 @receiver(post_save, sender=Incidents)
 def location_incident(sender, instance, **kwargs):
@@ -524,16 +540,3 @@ def location_incident(sender, instance, **kwargs):
                                 notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
-
-@receiver(post_save, sender=AuthUser)
-def account_create(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        try:
-            UserID = User.objects.last()
-            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
-        except:
-            UserID = User.objects.create(position='Administrator',rank='PO1',firstname=instance.username, lastname='Superuser', middlename='Su',birthdate=date.today())
-            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
-            instance.first_name = instance.username
-            instance.last_name = 'Superuser'
-            instance.save()
