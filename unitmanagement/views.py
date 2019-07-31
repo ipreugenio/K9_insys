@@ -1807,7 +1807,7 @@ def on_leave_list(request):
 # Due Retired
 def due_retired_list(request):
     style='ui green message'
-    cb = Call_Back_K9.objects.all()
+    cb = Call_Back_K9.objects.filter(status='Pending')
 
     cb_list = []
     for c in cb:
@@ -1836,6 +1836,31 @@ def due_retired_call(request, id):
     messages.success(request, 'You have called ' + str(k9) + ' back to base.')
     return redirect ('unitmanagement:due_retired_list')
 
+def confirm_base_arrival(request):
+    dd = Call_Back_K9.objects.filter(status='Pending')
+
+    data = []
+    for d in dd:
+        handler = User.objects.get(id=d.k9.handler.id)
+        a = [d,handler]
+        data.append(a)
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'title': "Called Back to Base List - Confirm Arrival",
+        'data': data,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'unitmanagement/confirm_base_arrival.html', context)
+
+def confirm_arrive(request,id):
+    Call_Back_K9.objects.get(id=id).delete()
+    return redirect ('unitmanagement:confirm_base_arrival')
 
 # TODO 
 # transfer request list
