@@ -15,21 +15,21 @@ from dateutil.relativedelta import relativedelta
 @periodic_task(run_every=crontab(hour=6, minute=0))
 def auto_subtract():
     # TODO Vitamins consumption
-    vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
-    v = K9.objects.filter(status='Working Dog').count()
+    # vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')
+    # v = K9.objects.filter(status='Working Dog').count()
     
-    for vitamins in vitamins:
-        if v > 0:
-            if v > vitamins.quantity:
-                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
-                v = v-vitamins.quantity
-                vitamins.quantity = 0 
-                vitamins.save()
-            else: 
-                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
-                vitamins.quantity = vitamins.quantity-v
-                v=0
-                vitamins.save()
+    # for vitamins in vitamins:
+    #     if v > 0:
+    #         if v > vitamins.quantity:
+    #             Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
+    #             v = v-vitamins.quantity
+    #             vitamins.quantity = 0 
+    #             vitamins.save()
+    #         else: 
+    #             Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
+    #             vitamins.quantity = vitamins.quantity-v
+    #             v=0
+    #             vitamins.save()
 
     # FOOD CONSUMPTION EVERYDAY
     k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
