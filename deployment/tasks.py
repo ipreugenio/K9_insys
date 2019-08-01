@@ -237,11 +237,11 @@ def check_initial_deployment_dates():
         team = item.team
         team_list.append(team.id)
 
-        if delta.days >= 0: #TAKE NOTE OF THIS #TODO Add code here na cancelled deployment if magisa lang siya nagconfirm
+        if delta.days >= 0: #TAKE NOTE OF THIS #TODO notification
             for pre_dep in pre_deps:
                 print("PRE DEP STATUS")
                 print(pre_dep.status)
-                if pre_dep.status == "Confirmed":
+                if pre_dep.status == "Confirmed" and pre_deps.count() >= 2: #Dapat atleast 2 sila nidedeploy
                     pre_dep.status = "Done"
                     pre_dep.save()
                     k9 = pre_dep.k9
@@ -256,8 +256,7 @@ def check_initial_deployment_dates():
 
                     #TODO dito pa lang ibabawas yung items
 
-
-                elif pre_dep.status == "Pending":
+                elif pre_dep.status == "Pending" or pre_deps.count() < 2:
                     pre_dep.status = "Cancelled"
                     pre_dep.save()
 
@@ -331,6 +330,7 @@ def update_request_info(dog_request):
 #2.) Every K9 in Team_Dog_Deployed have their training_statuses temporarily set to #Deployed
 #3.) Update dog_request info (k9s deployed)
 
+#TODO remove creation of duplicates
 # @periodic_task(run_every=crontab(hour=8, minute=30))
 @periodic_task(run_every=timedelta(seconds=30))
 def deploy_dog_request():
@@ -341,15 +341,18 @@ def deploy_dog_request():
         # sched.k9.training_status = 'Deployed'
         # sched.k9.save()
 
-        deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
+        # temporarily pull out from port
+        recent_port_deploy = Team_Dog_Deployed.objects.filter(team_requested=sched.dog_request).filter(date_pulled=None).latest('date_added')
+        recent_port_deploy.date_pulled = datetime.today().date()
+        recent_port_deploy.save()
+
+        if Team_Dog_Deployed.objects.filter(k9 = sched.k9, team_requested = sched.dog_request, status="Pending").count() == 0:
+            deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
         handler = sched.k9.handler
         handler.position = "Handler"
         handler.save()
         update_request_info(sched.dog_request)
 
-        #temporarily pull out from port
-        recent_port_deploy = Team_Dog_Deployed.objects.filter(team_requested = sched.dog_request).exclude(date_pulled = None).latest('date_pulled')
-        recent_port_deploy.date_pulled = datetime.today().date()
 
         tl = sched.dog_request.team_leader
 
@@ -361,6 +364,7 @@ def deploy_dog_request():
 
 
     return None
+
 
 #Pull out dogs where request end date is now
 # @periodic_task(run_every=crontab(hour=8, minute=30))
@@ -381,7 +385,9 @@ def pull_dog_request():
 
             #TODO Create Team_Dog_Deployed for last port assignment
             recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).latest('date_pulled')
-            new_deploy = Team_Dog_Deployed.objects.create(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending")
+
+            if Team_Dog_Deployed.objects.filter(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending").count() == 0:
+                new_deploy = Team_Dog_Deployed.objects.create(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending")
         except: pass
     return None
 
@@ -397,6 +403,7 @@ def check_arrival_to_request(dog_request):
             k9 = item.k9
             k9.training_status = "MIA"
             k9.save()
+        # creation of TDD is through deploy_dog_request()
 
     return None
 
@@ -414,6 +421,7 @@ def check_arrival_to_ports_via_request(team_assignment):
             k9 = item.k9
             k9.training_status = "MIA"
             k9.save()
+        #creation of TDD is through pull_dog_request()
 
     return None
 
@@ -424,7 +432,6 @@ def check_arrivals():
 
     team_assignments = Team_Assignment.objects.all()
     dog_requests = Dog_Request.objects.all() #TODO filter for currently ongoing dog requests
-
 
     team_list = []
     for team_assignment in team_assignments:

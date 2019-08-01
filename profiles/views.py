@@ -203,7 +203,7 @@ def team_leader_dashboard(request):
 
     incident_count = Incidents.objects.filter(location = ta.location).count()
 
-    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_pulled = None) #only currently deployed k9s
+    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_pulled = None) #only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
     tdd_count = tdd.count()
 
     # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
@@ -216,20 +216,29 @@ def team_leader_dashboard(request):
     #Dog_Request TLs are assigned as soon as deployment date hits
     #After dog request ends, everyone reverts back to "Handler" position. Note that Team_Assignment TLs cannot be deployed to Requests, making life easier
 
-    try:
-        dr = Dog_Request.objects.filter(team_leader=user)
-    except: pass
+    reveal_for_arrival_request = False
+    td_dr = None
+    dr = None
+    try: #NOTE: TL won't see this anyway unless he's not a TL within date range of Dog_Request
+        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).earliest()
+        td_dr = Team_Dog_Deployed.objects.exclude(team_requested = None).filter(team_requested = dr).filter(status = "Pending")
 
-    for_arrival_request = None
-    for_arrival_r_to_p = None
+        #TODO add filter to td_dr for requests that start today. Celery na bahala sa pag pull out if hindi na confirm
+        #TODO if td_dr is today, reveal for_arrival_request
+        #TODO change Team_Dog_Deployed.status to "Deployed" if nag confirm si TL
+    except: pass
 
     if for_arrival:
         reveal_arrival = True
+
+    if td_dr:
+        reveal_for_arrival_request = True
 
     print("For arrival")
     print(for_arrival)
 
     check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
+    check_arrival_dr = CheckArrivalForm(request.POST or None, for_arrival=td_dr)
 
     events = Dog_Request.objects.all()
 
@@ -299,7 +308,11 @@ def team_leader_dashboard(request):
 
         'for_arrival' : for_arrival,
         'check_arrival' : check_arrival,
-        'reveal_arrival' : reveal_arrival
+        'reveal_arrival' : reveal_arrival,
+        'reveal_for_arrival_request' : reveal_for_arrival_request,
+        'check_arrival_dr' : check_arrival_dr,
+
+        'upcoming_request' : dr
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 

@@ -1874,6 +1874,10 @@ def confirm_arrive(request,id):
 # TODO 
 # transfer request list
 def transfer_request_list(request):
+    # for sched in schedules:
+    #     if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
+    #         deployable = 0
+
     style='ui green message'
     rt =  Request_Transfer.objects.filter(status='Pending')
 
@@ -1916,26 +1920,47 @@ def transfer_request_form(request):
     user = user_session(request)
     form = RequestTransferForm(request.POST or None)
     k9 = K9.objects.get(handler=user)
-    td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None)[0]
+    schedules = K9_Schedule.objects.filter(k9 = k9)
+
+    td = None
+    loc = None
+    try:
+        td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).exclude(team_requested = None).latest('date_added')
+
+        loc = Team_Assignment.objects.get(id=td.team_requested.id)
+        form.initial['handler'] = User.objects.get(id=user.id)
+        form.initial['location_from'] = loc
+        form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
+    except: pass
     style='ui green message'
 
-    loc = Team_Assignment.objects.get(id=td.id)
-    form.initial['handler'] = User.objects.get(id=user.id)
-    form.initial['location_from'] = loc
-    form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
-    
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
             f = form.save(commit=False)
             f.location_from = loc
             f.handler = user
-            f.save()
+            f.save(commit = False)
 
-            style='ui green message'
-            messages.success(request,'You have submitted a transfer request!')
+            date_of_transfer = f.date_of_transfer
+            today = datetime.today().date()
+            deploy = True
+            for sched in schedules:
+                if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
+                    deploy = False
+
+                delta = date_of_transfer - td.date_added
+                if delta.days >= 730:
+                    deploy = False
+
+            if deploy == True:
+                style='ui green message'
+                messages.success(request,'You have submitted a transfer request!')
             
-            return redirect('unitmanagement:transfer_request_form')
+                return redirect('unitmanagement:transfer_request_form')
+            else:
+                style = 'ui red message'
+                messages.success(request, 'Date input has conflict with a request scheduled!')
         else:
             style='ui red message'
             messages.success(request,'Invalid Input!')
@@ -1951,17 +1976,19 @@ def transfer_request_form(request):
         'count':count,
         'user':user,
         'form':form,
+        'events' : schedules
     }
     return render (request, 'unitmanagement/transfer_request_form.html', context)
 
 #TODO
 # what to do if on-leave
-
 def on_leave_decision(request, id):
 
     user = user_session(request)
     data = Handler_On_Leave.objects.get(id=id)
     leave = request.GET.get('leave')
+
+
 
     if leave == 'approve':
         data.status = 'Approved'
@@ -2656,10 +2683,10 @@ def load_stamp(request):
 
 def load_transfer(request):
 
+    #TODO 3 day gap between two handlers
     transfer = None
     k9 = None
     matches = None
-    incident = None
     c_ac = None
     c_in = None
     incident = None
@@ -2667,8 +2694,18 @@ def load_transfer(request):
         transfer_id = request.GET.get('id')
         transfer = Request_Transfer.objects.get(id=transfer_id)
         k9= K9.objects.get(handler=transfer.handler)
+        personal = Personal_Info.objects.get(UserID = transfer.handler)
 
         matches = Request_Transfer.objects.filter(location_to=transfer.location_from)
+        matches_within_three = []
+        for match in matches:
+            match_date_of_transfer = match.date_of_transfer
+            delta = match_date_of_transfer - transfer.date_of_transfer
+            if abs(delta.days) <= 3:
+               matches_within_three.append(match.id)
+
+        matches = matches.exclude(id__in = matches_within_three)
+
         incident = Handler_Incident.objects.filter(handler=transfer.handler)
         c_ac = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
         c_in = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Poor Performance').filter(incident='Violation').count()
@@ -2683,6 +2720,7 @@ def load_transfer(request):
         'incident':incident,
         'c_ac':c_ac,
         'c_in':c_in,
+        'personal' : personal
     }
 
     return render(request, 'unitmanagement/transfer_data.html', context)
@@ -3033,3 +3071,13 @@ def k9_checkup_list_today(request):
     }
 
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)
+
+def k9_mia_list(request):
+
+    k9_mia = K9.objects.filter(training_status = "MIA")
+
+    context = {
+        'k9_mia' : k9_mia
+    }
+
+    return render(request, 'unitmanagement/k9_mia_list.html', context)

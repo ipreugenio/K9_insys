@@ -330,26 +330,26 @@ class ReproductiveForm(forms.ModelForm):
         self.fields['last_proestrus_date'].required = False
 
 
-class RequestEquipment(forms.ModelForm):
-    class Meta:
-        model = Equipment_Request
-        fields = ('equipment', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestEquipment, self).__init__(*args, **kwargs)
-
-class RequestMedicine(forms.ModelForm):
-    class Meta:
-        model = Medicine_Request
-        fields = ('medicine', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestMedicine, self).__init__(*args, **kwargs)
-
-class RequestFood(forms.ModelForm):
-    class Meta:
-        model = Food_Request
-        fields = ('food', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestFood, self).__init__(*args, **kwargs)
+# class RequestEquipment(forms.ModelForm):
+#     class Meta:
+#         model = Equipment_Request
+#         fields = ('equipment', 'quantity')
+#
+#     def __init__(self, *args, **kwargs):
+#         super(RequestEquipment, self).__init__(*args, **kwargs)
+#
+# class RequestMedicine(forms.ModelForm):
+#     class Meta:
+#         model = Medicine_Request
+#         fields = ('medicine', 'quantity')
+#
+#     def __init__(self, *args, **kwargs):
+#         super(RequestMedicine, self).__init__(*args, **kwargs)
+#
+# class RequestFood(forms.ModelForm):
+#     class Meta:
+#         model = Food_Request
+#         fields = ('food', 'quantity')
+#
+#     def __init__(self, *args, **kwargs):
+#         super(RequestFood, self).__init__(*args, **kwargs)
