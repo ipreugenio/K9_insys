@@ -11,6 +11,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
+from django.core.exceptions import MultipleObjectsReturned
 
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
@@ -240,7 +241,7 @@ def team_leader_dashboard(request):
     check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
     check_arrival_dr = CheckArrivalForm(request.POST or None, for_arrival=td_dr)
 
-    events = Dog_Request.objects.all()
+    events = Dog_Request.objects.filter(team_leader = user)
 
     year = datetime.now().year
     #NOTIF SHOW
@@ -472,8 +473,12 @@ def handler_dashboard(request):
     all_clear = False
     reveal_items = False
 
+    k9 = None
+    try:
+        k9 = K9.objects.get(handler=user)
+    except MultipleObjectsReturned:
+        k9 = K9.objects.filter(handler=user).first()
 
-    k9 = K9.objects.get(handler=user)
     today = datetime.today()
 
     items_list = []
@@ -563,6 +568,8 @@ def handler_dashboard(request):
             messages.success(request, 'event')
             return redirect("profiles:handler_dashboard")
 
+
+    k9_schedules = K9_Schedule.objects.filter(k9 = k9)
     events = Dog_Request.objects.all()
 
     try:
@@ -603,7 +610,9 @@ def handler_dashboard(request):
         'pre_deployment_item' : pre_deployment_items,
         'reveal_items' : reveal_items,
         'all_clear' : all_clear,
-        'items_list' : items_list
+        'items_list' : items_list,
+
+        'k9_schedules' : k9_schedules,
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -637,7 +646,7 @@ def vet_dashboard(request):
 
     # for i in i_vac:
 
-
+    events = K9_Schedule.objects.filter(status = "Checkup")
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -657,12 +666,21 @@ def vet_dashboard(request):
         'dh1':dh1,
         'dh2':dh2,
         'incident':incident,
+
+        'events' : events
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
 def commander_dashboard(request):
     user = user_session(request)
-    
+
+    area_list = []
+    areas = Area.objects.filter(commander = user)
+    for area in areas:
+        area_list.append(area)
+    events = Dog_Request.objects.filter(area__in = area_list)
+
+    events = Dog_Request
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -670,6 +688,7 @@ def commander_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'events' : events
     }
     return render (request, 'profiles/commander_dashboard.html', context)
 
@@ -681,6 +700,8 @@ def operations_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
     width = 100
+
+    events = Dog_Request.objects.filter(sector_type = "Big Event")
 
     if request.method == 'POST':
         print(form.errors)
@@ -741,6 +762,8 @@ def operations_dashboard(request):
         'geoform': geoform,
         'geosearch': geosearch,
         'width' :width,
+
+        'events' : events
     }
     return render (request, 'profiles/operations_dashboard.html', context)
 

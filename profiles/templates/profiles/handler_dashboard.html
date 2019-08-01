@@ -100,7 +100,7 @@
                                       <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                                 </div>
                             </div>
-                        {% elif all_clear == True and reveal_items == True%}
+                        {% elif all_clear == True and reveal_items == True %}
                          <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
                         <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                         {% else %}
@@ -286,16 +286,31 @@ $(document).ready(function() {
           nowIndicator: true,
 
           events: [
-                {% for i in events %}
-                {
-                    id: '{{ i.id }}',
-                    title: '{{i.event_name}}',
-                    start: '{{ i.start_date|date:"Y-m-d" }}',
-                    end: '{{ i.end_date|date:"Y-m-d" }}',
-                    allDay: 'true',
-                },
-                {% endfor %}
+                <!--{% for i in events %}-->
+                <!--{-->
+                    <!--id: '{{ i.id }}',-->
+                    <!--title: '{{i.event_name}}',-->
+                    <!--start: '{{ i.start_date|date:"Y-m-d" }}',-->
+                    <!--end: '{{ i.end_date|date:"Y-m-d" }}',-->
+                    <!--allDay: 'true',-->
+                <!--},-->
+                <!--{% endfor %}-->
 
+                    {% for i in k9_schedules %}
+                    {
+                    id: '{{ i.id }}',
+
+                    {% if i.status == 'Request' %}
+                    title: 'Request : {{i.dog_request}}',
+                    {% else %}
+                    title: 'Port : {{i.dog_request}}',
+                    {% endif %}
+
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                    },
+                    {% endfor %}
             ],
 
           eventClick : function(event, element){
