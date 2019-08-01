@@ -314,12 +314,18 @@ def classify_k9_list(request):
     if not SAR_demand:
         SAR_demand = 0
 
+    type_text = request.GET.get('type')
+
+    if type_text == None:
+        type_text = 'unclassified'
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
         'title': 'K9 Classification',
+        'type_text': type_text,
         'data_unclassified': data_unclassified,
         'data_classified': data_classified,
         'data_ontraining': data_ontraining,
@@ -336,39 +342,29 @@ def classify_k9_list(request):
     }
     return render (request, 'training/classify_k9_list.html', context)
 
-def assign_k9_duty(request, id):
-    data = K9.objects.get(id=id) # get k9
-    duty = request.GET.get('duty')
-    print(duty)
+def assign_k9_duty(request, id=None):
     active4 = ' active'
+    if request.method == 'POST':
+        data = K9.objects.get(id=id) # get k9
+        height = request.POST.get('height')
+        weight = request.POST.get('weight')
 
-    if duty == 'deployment':
-        data.training_status = 'For-Deployment'
-    elif duty == 'breeding':
-        data.training_status = 'For-Breeding'
-    
-    data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
-    data.status = 'Working Dog'
-    data.save()
+        if 'deploy' in request.POST:
+            data.training_status = 'For-Deployment'
 
-    style = "ui green message"
-    messages.success(request, data.name + ' has been assigned ' + data.training_status)
-    messages.info(request, 'Trained')
+        else:
+            data.training_status = 'For-Breeding'
 
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    
-    context = {
-        'active4':active4,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-        'style':style,
-        'title': 'K9 Classification',
-    }
-    return redirect('unitmanagement:trained_list')
+        data.height =height
+        data.weight = weight
+        data.serial_number ='SN-' + str(data.id) +'-'+str(datetime.datetime.now().year)
+        data.status = 'Working Dog'
+        data.save()
+
+        style = "ui green message"
+        messages.success(request, data.name + ' has been assigned ' + data.training_status)
+        messages.info(request, 'Trained')
+        return redirect('unitmanagement:trained_list')
 
 def view_graphs(request, id):
     k9_id = request.session['k9_id']
@@ -747,8 +743,7 @@ def classify_k9_select(request, id):
 
         style = "ui green message"
         messages.success(request, 'K9 has been successfully Classified!')
-        messages.info(request, 'Unclassified')
-        return redirect('training:classify_k9_list')
+        return HttpResponseRedirect('../list-classify-k9?type=unclassified')
 
     try:
         parent = K9_Parent.objects.get(offspring=data)
@@ -924,6 +919,7 @@ def assign_k9_select(request, id):
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -934,6 +930,7 @@ def assign_k9_select(request, id):
         'form': form,
         'style': style,
         'notif_data':notif_data,
+        'type_text':type_text,
         'count':count,
         'user':user,
         'k9':k9,
@@ -1028,8 +1025,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = (Decimal(average) + Decimal(stage1_1))
                     stage = "Stage 1.1"
@@ -1045,8 +1041,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9 = data, stage = stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 1.1":
                 stage1_2 = request.POST.get('stage1_2')
                 print("STAGE 1")
@@ -1057,8 +1052,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = (Decimal(average) + Decimal(stage1_2))
                     stage = "Stage 1.2"
@@ -1073,8 +1067,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 1.2":
                 stage1_3 = request.POST.get('stage1_3')
                 if stage1_3 == '0':
@@ -1083,8 +1076,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = (Decimal(average) + Decimal(stage1_3))
                     stage = "Stage 1.3"
@@ -1099,8 +1091,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 1.3":
                 stage2_1 = request.POST.get('stage2_1')
                 if stage2_1 == '0':
@@ -1109,8 +1100,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage2_1)
                     stage = "Stage 2.1"
@@ -1123,8 +1113,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 2.1":
                 stage2_2 = request.POST.get('stage2_2')
                 if stage2_2 == '0':
@@ -1133,8 +1122,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage2_2)
                     stage = "Stage 2.2"
@@ -1147,8 +1135,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 2.2":
                 stage2_3 = request.POST.get('stage2_3')
                 if stage2_3 == '0':
@@ -1157,8 +1144,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage2_3)
                     stage = "Stage 2.3"
@@ -1169,7 +1155,7 @@ def training_update_form(request, id):
                     training.save()
 
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 2.3":
                 stage3_1 = request.POST.get('stage3_1')
                 if stage3_1 == '0':
@@ -1178,8 +1164,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage3_1)
                     stage = "Stage 3.1"
@@ -1192,8 +1177,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 3.1":
                 stage3_2 = request.POST.get('stage3_2')
                 if stage3_2 == 0:
@@ -1202,8 +1186,7 @@ def training_update_form(request, id):
 
                     style = "ui blue message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage3_2)
                     stage = "Stage 3.2"
@@ -1216,8 +1199,7 @@ def training_update_form(request, id):
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
                     messages.success(request, str(data) + " has been graded!")
-                    messages.info(request, 'On-Training')
-                    return redirect('training:classify_k9_list')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 3.2":
                 stage3_3 = request.POST.get('stage3_3')
                 if stage3_3 == 0:
@@ -1256,7 +1238,7 @@ def training_update_form(request, id):
 
             # messages.success(request, 'Training Progress has been successfully Updated!')
             messages.info(request, 'On-Training')
-            return redirect('training:classify_k9_list')
+            return HttpResponseRedirect('../list-classify-k9?type=grading')
 
     # NOTIF SHOW
     notif_data = notif(request)
@@ -1282,6 +1264,7 @@ def training_update_form(request, id):
 
 def fail_dog(request, id):
     data = K9.objects.get(id=id) # get k9
+    print(data.handler.id)
     k9_handler = User.objects.get(id=data.handler.id)
     k9_handler.partnered = False
     k9_handler.save()
@@ -1296,7 +1279,7 @@ def fail_dog(request, id):
     for training in training:
         training.grade = '75.0'
         training.save()
-    return redirect('training:classify_k9_list')
+    return HttpResponseRedirect('../training/list-classify-k9?type=grading')
 
 def training_details(request, id):
     data = K9.objects.get(id=id) # get k9
@@ -1887,11 +1870,8 @@ def daily_record_mult(request):
 
     date = request.session["session_date"]
     try:
-# <<<<<<< HEAD
-#         record = Record_Training.objects.filter(k9 = k9).get(date_today = date)
-# =======
         record = Daily_Refresher.objects.filter(k9 = k9).get(date_today = date)
-# >>>>>>> 67603ec727f20d95ed779807086d18316555466a
+
     except:
         record = None
 

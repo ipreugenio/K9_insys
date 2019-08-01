@@ -21,16 +21,17 @@
     <table id="tabledata1" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
-                <th>K9</th>
-                <th>Date Due</th>
-                <th></th>
+                <th>Name</th>
+                <th>Vaccination</th>
+                <th>Age</th>
             </tr>
         </thead>
         <tbody>
             {% for data in k9_dw %}
             <tr>
-                <td>{{data.0}}</td>
-                <td class="center aligned">{{data.1}}</td>
+                <td>{{data.0.name}}</td>
+                <td class="center aligned">{{data.1.disease}}</td>
+                <td class="center aligned">{{data.0.age}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
@@ -69,7 +70,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for data in k9_aw %}
+            {% for data in k9_ar %}
             <tr>
                 <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1}}</td>
@@ -107,7 +108,7 @@
 
 $(document).ready(function() {
     $( ".btn_modal" ).bind( "click", function() {
-        var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
+        var url = 'vaccination-list/ajax_load_yearly_vac';  
         id = $(this).attr('id');
         type = $(this).data('type');
        

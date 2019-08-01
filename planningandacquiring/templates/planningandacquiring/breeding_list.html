@@ -8,10 +8,30 @@
     {% endif %}
 </div>
 <div class="ui top attached tabular menu">
-    <a class="active item" data-tab="first">Confirm Pregnancy</a>
-    <a class="item" data-tab="second">Pregnant</a>
+{%if type_text%}
+    {% if type_text == 'pregnant' %}
+   
+        <a class="item" data-tab="first">Confirm Pregnancy</a>
+        <a class="active item" data-tab="second">Pregnant</a>
+   
+    {% else%}
+        <a class="active item" data-tab="first">Confirm Pregnancy</a>
+        <a class="item" data-tab="second">Pregnant</a>
+    {% endif %}
+{%else%}
+<a class="active item" data-tab="first">Confirm Pregnancy</a>
+<a class="item" data-tab="second">Pregnant</a>
+{%endif%}
 </div>
+
+
+{% if type_text == 'pregnant' %}
+<div class="ui bottom attached tab segment" data-tab="first">
+{% else%}
 <div class="ui bottom attached active tab segment" data-tab="first">
+{% endif %}
+
+
     <table id="tabledata1" class="ui four column celled table">
         <thead class="center aligned">
         <tr>
@@ -48,7 +68,13 @@
         </tbody>
     </table>
 </div>
+
+
+{% if type_text == 'pregnant' %}
+<div class="ui bottom attached tab active segment" data-tab="second">
+{% else%}
 <div class="ui bottom attached tab segment" data-tab="second">
+{% endif %}
 	<table id="tabledata2" class="ui four column celled table">
         <thead class="center aligned">
         <tr>

@@ -14,7 +14,7 @@ urlpatterns = [
     path('health-details/<int:id>', views.health_details, name='health_details'),
     path('physical-exam-details/<int:id>', views.physical_exam_details, name='physical_exam_details'),
     path('approve-medicine/<int:id>', views.medicine_approve, name='medicine_approve'),
-    path('request-form', views.requests_form, name='request_form'),
+    # path('request-form', views.requests_form, name='request_form'),
     #path('request-list', views.request_list, name='request_list'),
     path('k9-incident', views.k9_incident, name='k9_incident'),
     path('handler-incident-form', views.handler_incident_form, name='handler_incident_form'),
@@ -37,6 +37,8 @@ urlpatterns = [
 
     path('called-back-list', views.confirm_base_arrival, name='confirm_base_arrival'),
     path('confirm_arrive/<int:id>', views.confirm_arrive, name='confirm_arrive'),
+    path('confirm_going_back/<int:id>', views.confirm_going_back, name='confirm_going_back'),
+
     path('unfit-list', views.unfit_list, name='unfit_list'),
     path('health-list', views.health_list_handler, name='health_list_handler'),
     path('k9-incident-list', views.k9_incident_list, name='k9_incident_list'),
@@ -44,6 +46,8 @@ urlpatterns = [
     path('follow-up/<int:id>', views.follow_up, name='follow_up'),
 
     path('yearly-vaccine-list', views.yearly_vaccine_list, name='yearly_vaccine_list'),
+    path('vaccination-list', views.vaccination_list, name='vaccination_list'),
+    path('vaccine_submit', views.vaccine_submit, name='vaccine_submit'),
     #path('choose-date/<int:id>', views.choose_date, name='choose_date'),
 
     path('redirect-notif/<int:id>', views.redirect_notif, name='redirect_notif'),
@@ -56,19 +60,25 @@ urlpatterns = [
     path('k9-incident-list/ajax_load_incident', views.load_incident, name='ajax_load_incident'),
     path('k9-sick-details/ajax_load_image', views.load_image, name='ajax_load_image'),
     path('yearly-vaccine-list/ajax_load_yearly_vac', views.load_yearly_vac, name='ajax_load_yearly_vac'),
+    path('vaccination-list/ajax_load_yearly_vac', views.load_yearly_vac, name='ajax_load_yearly_vac'),
     path('unfit-list/ajax_load_physical', views.load_physical, name='ajax_load_physical'),
     path('reassign-assets/ajax_load_handler', views.load_handler, name='load_handler'),
     path('trained-list/ajax_load_k9_data', views.load_k9_data, name='ajax_load_k9_data'),
     path('transfer-request-list/ajax_load_transfer', views.load_transfer, name='load_transfer'),
     
-    path('vaccination_form', views.vaccination_form, name='vaccination_form'),
     path('reassign-assets/<int:id>', views.reassign_assets, name='reassign_assets'),
     path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
     path('trained-list', views.trained_list, name='trained_list'),
     path('classified-list', views.classified_list, name='classified_list'),
     #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     path('transfer-request-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
-        
+    
+    path('replenishment_form', views.replenishment_form, name='replenishment_form'),
+    path('replenishment_form/ajax_load_item_food', views.load_item_food, name='load_item_food'),
+    path('replenishment_form/ajax_load_item_med', views.load_item_med, name='load_item_med'),
+    path('replenishment_form/ajax_load_item_misc', views.load_item_misc, name='load_item_misc'),
+    
+    path('replenishment_confirm', views.replenishment_confirm, name='replenishment_confirm'),
     
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),

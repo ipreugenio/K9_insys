@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate
@@ -20,9 +21,9 @@ from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
-from planningandacquiring.models import K9
+from planningandacquiring.models import K9, K9_Mated
 from django.db.models import Sum
-from unitmanagement.models import Equipment_Request, Notification, Request_Transfer, PhysicalExam
+from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9
 
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
@@ -588,6 +589,11 @@ def handler_dashboard(request):
     except:
         pass
 
+    cb = None
+    try:
+        cb = Call_Back_K9.objects.get(k9__handler=user)        
+    except ObjectDoesNotExist:
+        pass
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -597,6 +603,7 @@ def handler_dashboard(request):
         'count':count,
         'user':user,
         'k9':k9,
+        'cb':cb,
         'dr':dr,
         'form': form,
         'geoform': geoform,
@@ -641,8 +648,17 @@ def vet_dashboard(request):
     # pending incidents
     incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()
     
+    # Mated K9's
+    mated_count = K9_Mated.objects.filter(status='Breeding').count()
+    # pregnant K9's
+    pregnant_count = K9_Mated.objects.filter(status='Pregnant').count()
+
+    
     #Initial Vaccinations
     i_vac =  VaccinceRecord.objects.filter(status='Pending')
+
+    #For Adoption
+    for_adopt_count =  K9.objects.filter(training_status='For-Adoption').count()
 
     # for i in i_vac:
 
@@ -655,6 +671,9 @@ def vet_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'for_adopt_count':for_adopt_count,
+        'mated_count':mated_count,
+        'pregnant_count':pregnant_count,
         'vac_pending':vac_pending,
         'health_pending':health_pending,
         'cv1':cv1,
@@ -787,7 +806,6 @@ def trainer_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
-
         'grade':grade,
         'unclassified':unclassified,
     }

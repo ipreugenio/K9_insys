@@ -27,12 +27,17 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td  class="two wide">{{data.0.date_created}}</td>
-k9              <td  class="three wide">{{data.0.k9}}</td>
+                <td  class="two wide">{{data.0.date_created | date:"Y-m-d"}}</td>
+                <td  class="three wide">{{data.0.k9}}</td>
                 <td  class="three wide">{{data.1}}</td>
                 <td>{{data.0.k9.assignment}}</td>
-                <td style="text-align:center;" class="two wide">
-                  <a href="{% url 'unitmanagement:confirm_arrive' data.0.id %}" class="ui tiny blue button">Confirm</a>
+                <td class="two wide center aligned">
+                    {% if data.0.status == 'Confirmed' %}
+                    <a href="{% url 'unitmanagement:confirm_arrive' data.0.id %}" class="ui tiny blue button">Confirm</a>
+                    {% else %}
+                    <i class="hourglass half orange icon"></i>
+                    Pending 
+                    {% endif%}
                 </td>
             </tr>
             {% endfor %}
