@@ -8,6 +8,12 @@
     <div class="sub header">Schedule k9 for checkup pre-requirement before initial deployment.</div>
     </h1>
 
+     {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
 </div>
 
 <div class="ui info message">

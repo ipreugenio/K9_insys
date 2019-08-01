@@ -7,6 +7,19 @@
         <div class="sub header">Input data of Transfer Here</div>
     </h2>
 </div>
+
+<div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+    Transfer Requests
+  </div>
+  <ul class="list">
+    <li>You can request a port transfer if you have atleast 2 years of duty on your current port by the time of your requested date.</li>
+    <li>The approval of your request is subjected to the discretion of the administrator and the date of your transfer may be changed.</li>
+  </ul>
+</div>
+
+<div><button class = "ui blue button" id = "view_calendar">View Calendar</button></div>
 <div class="ui two column centered grid">
     <div class="fourteen wide column">
             <div class="ui inverted segment">
@@ -48,13 +61,65 @@
     </div>
 </div>
 
+<div class="ui longer modal" id ="calendar_modal">
+  <div class="header">Current Appointments</div>
+  <div class="content">
+                       <div id = "calendar"></div>
+  </div>
+</div>
+
 <script type="text/javascript">
         
     $(document).ready(function() {
         $('#tabledata').DataTable();
-        
-     
     });
     
 </script>
+
+<script>
+
+$( "#view_calendar" ).click(function() {
+   $('#calendar_modal').modal('show');
+   $('.fc-today-button.fc-button ').click();
+});
+
+
+
+     $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+
+          eventTextColor: "white",
+
+
+          events: [
+                {% for i in events %}
+                {
+                     id: '{{ i.id }}',
+                    title: '{{i.k9}}',
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                },
+                {% endfor %}
+
+            ],
+
+
+          }); // end #calendar
+
+
+</script>
+
+
  {% endblock %}

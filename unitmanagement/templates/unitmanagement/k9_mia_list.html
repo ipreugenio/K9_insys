@@ -1,0 +1,57 @@
+{% extends "profiles/sidebar_um.html" %}
+{% load um_tags %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="ui segment" style="padding:20px;">
+    <h1 class="ui header">MIA List
+    <div class="sub header">List of Units that did not arrive on duty. Select a unit to confirm status.</div>
+    </h1>
+
+     {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+
+
+</div>
+<div class="ui segment">
+    <table id="tabledata1" class="ui celled table">
+        <thead>
+            <tr>
+                <th>Handler</th>
+                <th>K9</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in k9_mia %}
+            <tr>
+                <th>{{data.handler}}</th>
+                <td>{{data}}</td>
+                <td style="text-align:center;" class="two wide">
+                    <a href="{% url 'unitmanagement:handler_incident_form'%}" class="ui tiny basic blue button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable(
+             "order": [[ 4, "desc" ]]
+        );
+        $('.menu .item').tab();
+
+    });
+
+</script>
+
+{% endblock %}

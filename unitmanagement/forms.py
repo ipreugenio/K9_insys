@@ -356,21 +356,4 @@ class ReplenishmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReplenishmentForm, self).__init__(*args, **kwargs)
 
-# class ItemReplenishmentForm(forms.Form):
-
-#     TYPE = (
-#         ('Medicine', 'Medicine'),
-#         ('Equipment/Miscellaneous', 'Equipment/Miscellaneous'),
-#         ('Dog Food', 'Dog Food'),
-#     )
-
-#     item_type = forms.ChoiceField(choices=TYPE)
-#     quantity = forms.IntegerField()
-
-#     def __init__(self, *args, **kwargs):
-#         super(ItemReplenishmentForm, self).__init__(*args, **kwargs)
-#         if self.fields['item_type'].
-
-
-
     

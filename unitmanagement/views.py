@@ -737,8 +737,11 @@ def physical_exam_form(request, id=None):
             k9.save()
 
             style = "ui green message"
-            messages.success(request, 'Physical Exam has been successfully recorded!')
+            messages.success(request, 'Physical Exam for ' + str(k9) + ' has been successfully recorded!')
             form = PhysicalExamForm()
+
+            if id:
+                return redirect('unitmanagement:k9_checkup_list_today')
 
         else:
             style = "ui red message"
@@ -1005,12 +1008,19 @@ def health_history_handler(request):
     user_s = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user_s.UserID.id)
 
-    data = K9.objects.get(handler=current_user)
+    data = None
+    try:
+        data = K9.objects.get(handler=current_user)
+    except: pass
     health_data = Health.objects.filter(dog = data).order_by('-date')
     phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
-    vr = VaccinceRecord.objects.get(k9=data)
-    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    vr = None
+    vu = None
+    try:
+        vr = VaccinceRecord.objects.get(k9=data)
+        vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    except: pass
     style = 'ui green message'
 
     VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
@@ -1140,6 +1150,11 @@ def health_history_handler(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+
+    age = None
+    try:
+        age = data.age_days
+    except: pass
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -1148,7 +1163,7 @@ def health_history_handler(request):
         'phyexam_data':phyexam_data,
         'formset':formset,
         'data':data,
-        'age': data.age_days,
+        'age': age,
         'vu':vu,
         'style':style,
         'active_1':active_1,
@@ -2085,6 +2100,10 @@ def confirm_going_back(request,id):
 # TODO 
 # transfer request list
 def transfer_request_list(request):
+    # for sched in schedules:
+    #     if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
+    #         deployable = 0
+
     style='ui green message'
     rt =  Request_Transfer.objects.filter(status='Pending')
 
@@ -2127,26 +2146,47 @@ def transfer_request_form(request):
     user = user_session(request)
     form = RequestTransferForm(request.POST or None)
     k9 = K9.objects.get(handler=user)
-    td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None)[0]
+    schedules = K9_Schedule.objects.filter(k9 = k9)
+
+    td = None
+    loc = None
+    try:
+        td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).exclude(team_requested = None).latest('date_added')
+
+        loc = Team_Assignment.objects.get(id=td.team_requested.id)
+        form.initial['handler'] = User.objects.get(id=user.id)
+        form.initial['location_from'] = loc
+        form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
+    except: pass
     style='ui green message'
 
-    loc = Team_Assignment.objects.get(id=td.id)
-    form.initial['handler'] = User.objects.get(id=user.id)
-    form.initial['location_from'] = loc
-    form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
-    
     if request.method == 'POST':
         print(form.errors)
         if form.is_valid():
             f = form.save(commit=False)
             f.location_from = loc
             f.handler = user
-            f.save()
+            f.save(commit = False)
 
-            style='ui green message'
-            messages.success(request,'You have submitted a transfer request!')
+            date_of_transfer = f.date_of_transfer
+            today = datetime.today().date()
+            deploy = True
+            for sched in schedules:
+                if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
+                    deploy = False
+
+                delta = date_of_transfer - td.date_added
+                if delta.days >= 730:
+                    deploy = False
+
+            if deploy == True:
+                style='ui green message'
+                messages.success(request,'You have submitted a transfer request!')
             
-            return redirect('unitmanagement:transfer_request_form')
+                return redirect('unitmanagement:transfer_request_form')
+            else:
+                style = 'ui red message'
+                messages.success(request, 'Date input has conflict with a request scheduled!')
         else:
             style='ui red message'
             messages.success(request,'Invalid Input!')
@@ -2162,6 +2202,7 @@ def transfer_request_form(request):
         'count':count,
         'user':user,
         'form':form,
+        'events' : schedules
     }
     return render (request, 'unitmanagement/transfer_request_form.html', context)
 
@@ -2268,12 +2309,13 @@ def replenishment_confirm(request):
 
 #TODO
 # what to do if on-leave
-
 def on_leave_decision(request, id):
 
     user = user_session(request)
     data = Handler_On_Leave.objects.get(id=id)
     leave = request.GET.get('leave')
+
+
 
     if leave == 'approve':
         data.status = 'Approved'
@@ -2968,10 +3010,10 @@ def load_stamp(request):
 
 def load_transfer(request):
 
+    #TODO 3 day gap between two handlers
     transfer = None
     k9 = None
     matches = None
-    incident = None
     c_ac = None
     c_in = None
     incident = None
@@ -2979,8 +3021,18 @@ def load_transfer(request):
         transfer_id = request.GET.get('id')
         transfer = Request_Transfer.objects.get(id=transfer_id)
         k9= K9.objects.get(handler=transfer.handler)
+        personal = Personal_Info.objects.get(UserID = transfer.handler)
 
         matches = Request_Transfer.objects.filter(location_to=transfer.location_from)
+        matches_within_three = []
+        for match in matches:
+            match_date_of_transfer = match.date_of_transfer
+            delta = match_date_of_transfer - transfer.date_of_transfer
+            if abs(delta.days) <= 3:
+               matches_within_three.append(match.id)
+
+        matches = matches.exclude(id__in = matches_within_three)
+
         incident = Handler_Incident.objects.filter(handler=transfer.handler)
         c_ac = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
         c_in = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Poor Performance').filter(incident='Violation').count()
@@ -2995,6 +3047,7 @@ def load_transfer(request):
         'incident':incident,
         'c_ac':c_ac,
         'c_in':c_in,
+        'personal' : personal
     }
 
     return render(request, 'unitmanagement/transfer_data.html', context)
@@ -3173,27 +3226,29 @@ def load_k9_data(request):
 def k9_checkup_pending(request):
     removal = TempCheckup.objects.all()
 
+    style = ""
     #TODO Save schedule before deletion
     if request.method == "POST":
         for item in removal:
             sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
             sched.save()
+            style = "ui green message"
+            messages.success(request, 'You have scheduled ' + str(item.k9) + ' for checkup on ' + str(item.date) + "!")
 
     removal.delete()
 
-    # TODO remove all checkups missed
-    #TODO remove checkups pag valid ba yung latest checkup
+    # TODO remove all checkups missed ./
+    # TODO remove checkups pag valid ba yung latest checkup
     # TODO remove if missed na yung deployment date
 
-    current_appointments = K9_Schedule.objects.filter(status = "Checkup")
+    current_appointments = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
 
     k9s_exclude = []
 
     for item in current_appointments:
             k9s_exclude.append(item.k9)
 
-
-    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude)
+    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude).exclude(date_start__lt=datetime.today().date())
     date_form = DateForm()
 
     k9s_exclude2 = []
@@ -3203,16 +3258,16 @@ def k9_checkup_pending(request):
         print(item.k9)
         print(str(datetime.today().date()) + " - " + str(item.date_start) + " = " + str(delta.days))
 
-        # phex = False
-        # try:
-        #     checkup = PhysicalExam.objects.filter(dog=item.k9).latest('id')
-        #     delta2 = datetime.today().date() - checkup.date
-        #     if checkup.cleared == True and delta2.days <= 90:  # also checks if last checkup is within 3 months
-        #         phex = True #Pag true, wag na isama sa checkup list kasi valid pa
-        # except:
-        #     pass
+        phex = False
+        try:
+            checkup = PhysicalExam.objects.filter(dog=item.k9).latest('id')
+            delta2 = datetime.today().date() - checkup.date
+            if checkup.cleared == True and delta2.days <= 90:  # also checks if last checkup is within 3 months
+                phex = True #Pag true, wag na isama sa checkup list kasi valid pa
+        except:
+            pass
 
-        if delta.days > 0:  # Nalagapasan na checkup date
+        if delta.days > 0 and phex == False:  # Nalagapasan na checkup date
             k9s_exclude2.append(item.k9)
 
     pending_schedule = pending_schedule.exclude(k9__in = k9s_exclude2)
@@ -3221,7 +3276,8 @@ def k9_checkup_pending(request):
         'k9_pending': pending_schedule,
         'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
-        'selected_list': []
+        'selected_list': [],
+        'style' : style
     }
 
     return render(request, 'unitmanagement/k9_checkup_pending.html', context)
@@ -3369,7 +3425,7 @@ def current_team(K9):
 def k9_checkup_list_today(request):
 
     #TODO Highlight rows if today
-    checkups = K9_Schedule.objects.filter(status = "Checkup")
+    checkups = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
 
     k9_list = []
     for sched in checkups:
@@ -3390,8 +3446,25 @@ def k9_checkup_list_today(request):
 
     checkups = checkups.exclude(k9__in = k9_exclude_list)
 
+    checkup_list = []
+    for checkup in checkups:
+        if checkup.date_start == datetime.today().date():
+            checkup_list.append((checkup, True))
+        else:
+            checkup_list.append((checkup, False))
+
     context = {
-        'checkups' : checkups
+        'checkups' : checkup_list
     }
 
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)
+
+def k9_mia_list(request):
+
+    k9_mia = K9.objects.filter(training_status = "MIA")
+
+    context = {
+        'k9_mia' : k9_mia
+    }
+
+    return render(request, 'unitmanagement/k9_mia_list.html', context)

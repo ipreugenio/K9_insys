@@ -20,7 +20,7 @@ import re
 import sys
 from datetime import date
 
-from unitmanagement.models import Notification
+from unitmanagement.models import Notification, Request_Transfer
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
@@ -622,11 +622,17 @@ def request_dog_details(request, id):
         #1 = true, 0 = false
         deployable = 1
         schedules = K9_Schedule.objects.filter(k9=k9).filter(status ="Request")
+        transfer_requests = Request_Transfer.objects.filter(k9 = k9)
 
         #TODO obtain schedule of request then compare to start and end date of schedules (loop)
         for sched in schedules:
             if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
                 deployable = 0
+
+            for transfer in transfer_requests: #Checks if may conflict with transfer requests
+                date_of_transfer = transfer.date_of_transfer
+                if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
+                    deployable = 0
 
         if deployable == 1 and deployment_template_tags.current_location(k9, data2.id) != "PCGK9 Taguig Base": #checks if K9's current location is at a port
             can_deploy_filtered.append(k9.id)
@@ -1496,7 +1502,11 @@ def schedule_units(request):
     #
     # #END K9s estimated training duration
 
+    pre_dep = K9_Pre_Deployment_Items.objects.filter(status="Cancelled")
 
+    k9s_tobe_redeployed = []
+    for item in pre_dep:
+        k9s_tobe_redeployed.append(item.k9)
 
     # Prioritize Locations
     locations = Location.objects.all()
@@ -1523,7 +1533,7 @@ def schedule_units(request):
         team_list.append(team)
 
         #dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status = "Scheduled", team_assignment = team).count()
-        dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).count()
+        dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).exclude(k9__in = k9s_tobe_redeployed).count()
 
         total_dogs_deployed_list.append(team.total_dogs_deployed + dogs_scheduled_count) #TODO Include scheduled K9s
 
@@ -1579,12 +1589,11 @@ def schedule_units(request):
          #End Sort incidents
     #End Prioritize Location
 
-
-    #TODO repeat temporary assignment with new dataframe (removed unassigned indexes)
+    #TODO For those whose deploymetns are cancelled, pwede sila isama
     #Temporary assignment
     k9s_scheduled_list = []
     # k9s_scheduled = Team_Dog_Deployed.objects.filter(status="Scheduled")
-    k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment")
+    k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in = k9s_tobe_redeployed)
 
     for item in k9s_scheduled:
         k9s_scheduled_list.append(item.k9.id)

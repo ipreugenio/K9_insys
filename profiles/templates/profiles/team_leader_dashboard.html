@@ -91,6 +91,9 @@
                     <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
                     {% endif %}
 
+                    {% if reveal_arrival_dr == True %}
+                    <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
+                    {% endif %}
                 {% else %}
                 <div class = "ui segment">
                     You currently don't have a K9.
@@ -250,8 +253,7 @@
 
 
 
-   <!--Pre Deployment Items Modal-->
-
+   <!--Port Arrival Items Modal-->
 <div class="ui mini modal" id = 'modal3'>
       <i class="close icon"></i>
     <div class="header"><h2>Confirm Unit Arrival</h2></div>
@@ -270,7 +272,28 @@
 
     </div>
 </div>
- <!--End Pre Deployment Items Modal-->
+ <!--End Port Arrival Items Modal-->
+
+<!-- Request Arrival Modal -->
+<div class="ui mini modal" id = 'modal4'>
+      <i class="close icon"></i>
+    <div class="header"><h2>Confirm Unit Arrival</h2></div>
+    <div class="scrolling content">
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+
+            {% for field in check_arrival_dr %}
+            {{ field }}
+            {% endfor %}
+
+            <button class="ui green button" type="submit" name = "confirm_arrival" value="Confirm Arrival"><i class="ship icon"></i>Confirm Arrival</button>
+        </form>
+
+    </div>
+</div>
+<!--End Request Arrival Modal-->
 
 
     {% if messages %}
@@ -569,6 +592,10 @@ $(document).ready(function() {
   $('#modal3').modal('show');
 });
 
+
+  $( "#reveal_confirm_arrival_dr" ).click(function() {
+  $('#modal4').modal('show');
+});
 </script>
 
 
