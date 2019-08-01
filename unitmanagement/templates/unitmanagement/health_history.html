@@ -1,14 +1,24 @@
 {% extends "profiles/sidebar_um.html" %}
 {% block content %}
 {% load static %}
+
+
 <div class="ui inverted segment" style="padding:20px;">
+    {% if data %}
     <h3 class="ui header">{{ title }}{{ name }}</h3>
+    {% else %}
+    <h3 class="ui header">K9 Health Record</h3>
+    {% endif %}
     {% if messages %}
         {% for message in messages %}
             <div class="{{style}}" > {{ message }}</div>
         {% endfor %}
     {% endif %}
 </div>
+
+
+{% if data %}
+
 <div class="ui top attached tabular menu">
     <a class="item{{active_1}}" data-tab="first">Preventive Health Program</a>
     <a class="item{{active_2}}" data-tab="second">Physical Exam</a>
@@ -158,6 +168,19 @@
         </div>
       
 </div>
+
+{% else %}
+<div class="ui icon message">
+  <i class="hand paper outline icon"></i>
+  <div class="content">
+    <div class="header">
+      You don't have a K9
+    </div>
+    <p>You cannot access this view because you don't have a k9.</p>
+  </div>
+</div>
+{% endif %}
+
 <input type="hidden" value="{{age}}" id = 'age'>
 <input type="hidden" value="{{user.position}}" id = 'handler'>
 <script src="{% static 'js/health_history.js' %}"></script>

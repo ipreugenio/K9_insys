@@ -677,12 +677,19 @@ def health_history_handler(request):
     user_s = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user_s.UserID.id)
 
-    data = K9.objects.get(handler=current_user)
+    data = None
+    try:
+        data = K9.objects.get(handler=current_user)
+    except: pass
     health_data = Health.objects.filter(dog = data).order_by('-date')
     phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
-    vr = VaccinceRecord.objects.get(k9=data)
-    vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    vr = None
+    vu = None
+    try:
+        vr = VaccinceRecord.objects.get(k9=data)
+        vu = VaccineUsed.objects.filter(vaccine_record=vr)
+    except: pass
     style = 'ui green message'
 
     VaccinationUsedFormset= inlineformset_factory(VaccinceRecord, VaccineUsed, form=VaccinationUsedForm, extra=0)
@@ -812,6 +819,11 @@ def health_history_handler(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+
+    age = None
+    try:
+        age = data.age_days
+    except: pass
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -820,7 +832,7 @@ def health_history_handler(request):
         'phyexam_data':phyexam_data,
         'formset':formset,
         'data':data,
-        'age': data.age_days,
+        'age': age,
         'vu':vu,
         'style':style,
         'active_1':active_1,
