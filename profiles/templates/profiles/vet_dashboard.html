@@ -123,6 +123,68 @@
                             <div class="ui raised center aligned segment">
                                 <div class="card">
                                     <div class="content">
+                                        <i class="huge exclamation venus mars teal icon">{{mated_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="{% url 'planningandacquiring:breeding_list'%}?type=mated">MATED K9's</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge heart red icon">{{pregnant_count}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="{% url 'planningandacquiring:breeding_list'%}?type=pregnant">PREGNANT K9's</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>       
+                </div>
+                <div class="sixteen wide column">
+                    <div class="ui equal width grid">
+                        <div class="column">
+                                <div class="ui raised center aligned segment">
+                                    <div class="card">
+                                        <div class="content">
+                                            <i class="huge paw alternate olive icon">{{health_pending}}</i>
+                                        </div>
+                                        <div class="extra content">
+                                            <strong  style="font-size: 11px;">
+                                                <a href="#">K9
+                                                ACQUISITION COUNTDOWN</a>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
+                                        <i class="huge first aid green icon">{{health_pending}}</i>
+                                    </div>
+                                    <div class="extra content">
+                                        <strong>
+                                            <a href="{% url 'unitmanagement:k9_sick_list'%}">HEALTH CONCERNS</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="card">
+                                    <div class="content">
                                         <i class="huge exclamation black icon">{{incident}}</i>
                                     </div>
                                     <div class="extra content">
@@ -138,11 +200,11 @@
                             <div class="ui raised center aligned segment">
                                 <div class="card">
                                     <div class="content">
-                                        <i class="huge paw brown icon">{{cv1}}</i>
+                                        <i class="huge handshake brown icon">{{for_adopt_count}}</i>
                                     </div>
                                     <div class="extra content">
                                         <strong>
-                                            <a href="#">K9 FOR-ADOPTION</a>
+                                            <a href="{% url 'training:adoption_list'%}">K9 FOR-ADOPTION</a>
                                         </strong>
                                     </div>
                                 </div>

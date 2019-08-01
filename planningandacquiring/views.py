@@ -442,6 +442,7 @@ def donation_confirmed(request):
         return render(request, 'planningandacquiring/add_donated_K9.html', context)
 
 def breeding_list(request, id=None):
+    
     data1 = K9_Mated.objects.filter(status='Breeding').order_by('-id', '-date_mated')
     data2 = K9_Mated.objects.filter(status='Pregnant').order_by('-id', '-date_mated')
     notif_data = notif(request)
@@ -454,11 +455,19 @@ def breeding_list(request, id=None):
         d = K9_Mated.objects.get(id=id)
         data1 = K9_Mated.objects.filter(status='Breeding').exclude(id=id).order_by('-id', '-date_mated')
       
+   
+    type_text = request.GET.get('type')
+    if type_text == None:
+        type_text = 'mated'
+
+    print('type_text',type_text)
+
     context = {
         'Title': "Breeding List",
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'type_text':type_text,
         'data1':data1,
         'data2':data2,
         'data_id':data_id,
@@ -476,14 +485,14 @@ def confirm_failed_pregnancy(request, id):
         data.status = 'Pregnant'
         mom.training_status = 'Breeding'
 
-        messages.success(request, 'You have confirmed that ' + str(data.mother) + ' is pregnant.')
+        # messages.success(request, 'You have confirmed that ' + str(data.mother) + ' is pregnant.')
 
     elif decision == 'failed':
         data.status = 'Failed'
         mom.training_status = 'For-Breeding'
         K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=0)
         
-        messages.success(request, 'You have confirmed that ' + str(data.mother) + ' is not pregnant.')
+        # messages.success(request, 'You have confirmed that ' + str(data.mother) + ' is not pregnant.')
 
     data.save()
     mom.save()
@@ -492,11 +501,42 @@ def confirm_failed_pregnancy(request, id):
 
 def add_K9_parents(request):
     style = "ui teal message"
-    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
+
+    #all in-heat today
+    heat = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(last_estrus_date=dt.today())
+
+
+    #heat today
+    momh = []
+    sickh = []
+    b_arrh = []
+
+    heat_list = []
+    for heat in heat:
+        heat_list.append(heat.id)
+
+        h = Health.objects.filter(dog=heat).count()
+        momh.append(heat)
+        sickh.append(h)
+
+        birth = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_no'))['sum']
+        death = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_died'))['sum']
+
+        if birth != None or death != None:
+            total = (birth / (birth+death)) * 100
+        else:
+            total=100
+        
+        b_arrh.append(int(total))
+
+    hlist = zip(momh,sickh,b_arrh)
+
+    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus")).exclude(id__in=heat_list)
     
     father = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
     mother_all  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).exclude(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
     
+    #table 1
     mom = []
     sick = []
     b_arr = []
@@ -664,6 +704,7 @@ def add_K9_parents(request):
     context = {
         'Title': "K9_Breeding",
         'today': dt.today(),
+        'hlist': hlist,
         'style': style,
         'mlist' : mlist,
         'flist' : flist,
@@ -757,6 +798,7 @@ def in_heat_change(request):
         
         k9 = K9.objects.get(id=id)
         k9.last_proestrus_date = date
+        k9.reproductive_stage = 'Proestrus'
         k9.save()
         
         return redirect('planningandacquiring:add_K9_parents_form')
@@ -785,7 +827,8 @@ def confirm_K9_parents(request):
             mother.save()
             request.session['date_mated'] = mated.id
 
-        return redirect('planningandacquiring:breeding_list', id=mated.id)
+        # return redirect('planningandacquiring:breeding_list', id=mated.id)
+        return redirect('profiles:vet_dashboard')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -894,7 +937,7 @@ def add_K9_offspring(request, id):
 
             data.save()
             messages.success(request, 'You have added k9 offspring!')
-            return redirect('planningandacquiring:breeding_list')
+            return HttpResponseRedirect('../breeding_list/?type=pregnant')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')

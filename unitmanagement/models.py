@@ -2,7 +2,7 @@ from django.db import models
 
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
-from deployment.models import Incidents 
+from deployment.models import Incidents, Team_Assignment, Team_Dog_Deployed
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
 from django.db.models.signals import post_save
@@ -237,31 +237,38 @@ class VaccineUsed(models.Model):
     def __str__(self):
         return str(self.k9) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
 
+class Replenishment_Request(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Received', 'Received'),
+    )
 
-#TODO
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='tl_request')
+    status = models.CharField('status', max_length=200, default="Pending", choices=STATUS)
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='admin_give')
+    date_approved = models.DateField('date_vaccinated', null=True, blank=True)
+    date_received = models.DateField('date_vaccinated', null=True, blank=True)
+    date_requested = models.DateField('date', auto_now_add=True)
 # Request Equipment Connect to K9_Pre_Deployment Equipments
-class Equipment_Request(models.Model):
-    equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
+class Miscellaneous_Request(models.Model):
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
+    miscellaneous = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Medicine_Request(models.Model):
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
+    medicine = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Food_Request(models.Model):
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
-
-
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
+    
 class Handler_On_Leave(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='handler_leave')
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
@@ -497,16 +504,27 @@ def create_k9_incident_notif(sender, instance, **kwargs):
                             notif_type = 'k9_stolen',
                             message= str(instance.k9.name) + ' is reported Stolen! ')
 
-#TODO EQUIPMENT Verify
-@receiver(post_save, sender=Equipment_Request)
-def create_damaged_equipment_notif(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        Notification.objects.create(user = instance.handler,
-                            position = 'Administrator',
-                            other_id=instance.id,
-                            notif_type = 'equipment_request',
-                            message='Equipment Concern!')
+# #TODO EQUIPMENT Verify
+# @receiver(post_save, sender=Equipment_Request)
+# def create_damaged_equipment_notif(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Notification.objects.create(user = instance.handler,
+#                             position = 'Administrator',
+#                             other_id=instance.id,
+#                             notif_type = 'equipment_request',
+#                             message='Equipment Concern!')
 
+#TODO EQUIPMENT Verify
+@receiver(post_save, sender=Call_Back_K9)
+def back_to_base(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        td = Team_Dog_Deployed.objects.filter(k9=instance.k9).filter(date_pulled=None)[0]
+        ta = Team_Assignment.objects.filter(id=td.team_assignment.id)[0]
+        Notification.objects.create(user =  ta.team_leader,
+                                position = 'Handler',
+                                other_id=instance.k9.id,
+                                notif_type = 'back_to_base',
+                                message= str(instance.k9.handler) + ' and '+str(instance.k9)+ ' has been called back to base.')
 
 @receiver(post_save, sender=AuthUser)
 def account_create(sender, instance, **kwargs):

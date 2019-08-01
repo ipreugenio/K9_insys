@@ -1,0 +1,86 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui inverted segment" style="margin-bottom:0px;">
+    <h2 class="ui header">
+        {{title}}
+    </h2>
+</div>
+
+<div class="ui top attached tabular menu">
+        <a class="item active" data-tab="first">Item Replenishment Request</a>
+        <a class="item" data-tab="second">Pending Confirmation</a>
+    </div>
+    <div class="ui tab segment active" data-tab="first">
+        <table id="tabledata1" class="ui  column celled table">
+            <thead>
+                <tr>
+                    <th class="ui two wide">Date Requested</th>
+                    <th class="ui three wide">Team Leader</th>
+                    <th>Port</th>
+                    <th class="ui two wide"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in data1 %}
+                <tr>
+                    <td>{{data.0.date_requested | date:'Y-m-d'}}</td>
+                    <td>{{data.0.handler}}</td>
+                    <td>{{data.1}}</td>
+                    <td class="center aligned">
+                        <button class="ui basic blue button">Select</button>
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="ui tab segment" data-tab="second">
+        <table id="tabledata1" class="ui four column celled table">
+            <thead>
+                <tr>
+                    <th>Date Approved</th>
+                    <th>Team Leader</th>
+                    <th>Port</th>
+                    <th>Approved by</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in data2 %}
+                <tr>
+                    <td>{{data.0.date_approved | date:'Y-m-d'}}</td>
+                    <td>{{data.0.handler}}</td>
+                    <td>{{data.1}}</td>
+                    <td>{{data.0.approved_by}}</td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ui modal">
+            <div class="header"></div>
+            <div class="content">
+                <h1></h1>
+            </div>
+    </div>
+
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata1').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
+
+        $('#tabledata2').DataTable({
+            "order": [[ 0, "desc" ]]
+        });
+
+        $('.menu .item').tab();
+
+    });
+    
+</script>
+ {% endblock %}

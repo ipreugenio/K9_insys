@@ -46,39 +46,30 @@
 {% endif %}
 
 <div class="ui top attached tabular menu">
-        {% if messages %}
-            {% for message in messages %}
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-                {% if message.message == 'On-Training' %}
-                <a class="item" data-tab="first">Unclassified</a>
-                    <a class="item active" data-tab="third">On-Training</a>
-                    {% else %}
-                <a class="item active" data-tab="first">Unclassified</a>
-                    <a class="item" data-tab="third">On-Training</a>
-                {% endif %}
-            {% endif %}
-            {% endfor %}
-        {%else%}
+    {%if type_text%}
+        {%if type_text == 'grading'%}
+            <a class="item" data-tab="first">Unclassified</a>
+            <a class="item active" data-tab="third">On-Training</a>
+            {% else %}
+            <a class="item active" data-tab="first">Unclassified</a>
+            <a class="item" data-tab="third">On-Training</a>
+        {% endif %}
+    {%else%}
         <a class="item active" data-tab="first">Unclassified</a>
         <a class="item" data-tab="third">On-Training</a>
-        {% endif %}
+    {% endif %}
 </div>
 
-{% if messages %}
-    {% for message in messages %}
-        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-            {% if message.message == 'Unclassified' %}
-            <div class="ui tab segment active" data-tab="first">
-            {% else %}
-            <div class="ui tab segment" data-tab="first">
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-
-{%else%}
+{%if type_text%}
+    {%if type_text == 'grading'%}
+    <div class="ui tab segment" data-tab="first">
+    {%else%}
     <div class="ui tab segment active" data-tab="first">
-{%endif%}           
-  
+    {%endif%} 
+{%else%}
+<div class="ui tab segment active" data-tab="first">
+{%endif%}  
+
     <table id="tabledata1" class="ui seven column celled table">
         <thead>
             <tr>
@@ -107,20 +98,16 @@
     </table>
 </div>
 
-{% if messages %}
-    {% for message in messages %}
-        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-            {% if message.message == 'On-Training' %}
-            <div class="ui tab segment active" data-tab="third">
-            {% else %}
-            <div class="ui tab segment" data-tab="third">
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-
+{%if type_text%}
+    {%if type_text == 'grading'%}
+    <div class="ui tab segment active" data-tab="third">
+    {%else%}
+    <div class="ui tab segment" data-tab="third">
+    {%endif%} 
 {%else%}
 <div class="ui tab segment" data-tab="third">
-{%endif%}   
+{%endif%}  
+
 
 <table id="tabledata3" class="ui celled table">
     <thead>

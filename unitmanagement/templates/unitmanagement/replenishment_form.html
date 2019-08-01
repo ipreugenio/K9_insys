@@ -1,0 +1,181 @@
+{% extends "profiles/sidebar_um.html" %}  
+
+{% block content %}
+<div class="ui basic segment" style="margin-bottom:0px;">
+    <h2 class="ui header">
+        {{title}}
+        <div class="sub header">Input items Here</div>
+    </h2>
+</div>
+
+<form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" >
+    {% csrf_token %}    
+    <div class="three fields">
+            <div class="field">
+                <label>Requester</label>
+                {{form.handler}}
+            </div>
+        <div class="field"></div>
+        <div class="field"></div>
+    </div>
+   <div class="ui equal width grid">
+        <div class="column">
+            <div class="ui horizontal divider">Dog Food</div>
+            <div class="ui inverted segment">
+                {% for form in food_formset %}
+                <div class="formset_class1" id="{{ form.prefix }}-row">
+                    <div class="three fields">
+                        <div class="field">
+                            <label>Dog Food</label>
+                            {{form.food}}
+                        </div>
+                        <div class="field">
+                            <label>Unit</label>
+                            {{form.unit}}
+                        </div>
+                        <div class="field">
+                            <label>Quantity</label>
+                            {{form.quantity}}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {{food_formset.management_form}}
+            </div>
+           
+        </div> 
+        <div class="column">
+            <div class="ui horizontal divider">Medicine</div>
+            <div class="ui inverted segment">
+            {% for form in med_formset %}
+            <div class="formset_class2" id="{{ form.prefix }}-row">
+                <div class="three fields">
+                    <div class="field">
+                        <label>Medicine</label>
+                        {{form.medicine}}
+                    </div>
+                    <div class="field">
+                        <label>Unit</label>
+                        {{form.unit}}
+                    </div>
+                    <div class="field">
+                        <label>Quantity</label>
+                        {{form.quantity}}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {{med_formset.management_form}}
+            </div>
+        </div>
+        <div class="column">
+            <div class="ui horizontal divider">Miscellaneous</div>
+            <div class="ui inverted segment">
+            {% for form in misc_formset %}
+            <div class="formset_class3" id="{{ form.prefix }}-row">
+                <div class="three fields">
+                    <div class="field">
+                        <label>Miscellaneous</label>
+                        {{form.miscellaneous}}
+                    </div>
+                    <div class="field">
+                        <label>Unit</label>
+                        {{form.unit}}
+                    </div>
+                    <div class="field">
+                        <label>Quantity</label>
+                        {{form.quantity}}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {{misc_formset.management_form}}
+            </div>
+        </div>
+   </div>
+
+   <div class="ui basic center aligned segment">
+        <button class="ui green button" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
+   </div>
+</form>
+
+<script type="text/javascript">
+        
+    $(document).ready(function() {
+        $('#tabledata').DataTable();
+        
+        $(function() {
+            $('#myForm .formset_class1').formset({
+                prefix: '{{ formset.prefix }}'
+            });            
+        })
+        $(function() {
+            $('#myForm .formset_class2').formset({
+                prefix: '{{ formset.prefix }}'
+            });            
+        })
+        $(function() {
+            $('#myForm .formset_class3').formset({
+                prefix: '{{ formset.prefix }}'
+            });            
+        })
+
+
+        $(".food_item" ).bind('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            var url = 'replenishment_form/ajax_load_item_food';  
+            $.ajax({                      
+                url: url,    
+                type : 'GET',           
+                dataType : 'json',     
+                data: {
+                'id': id,   
+                },
+                success: function (data) {
+                    var res = id_val.split("-"); 
+                    $('#id_food_request_set-'+res[1]+'-unit').val(data.unit); 
+                }
+            });
+
+        });
+
+        $(".medicine_item" ).bind('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            var url = 'replenishment_form/ajax_load_item_med';  
+            $.ajax({                      
+                url: url,    
+                type : 'GET',           
+                dataType : 'json',     
+                data: {
+                'id': id,   
+                },
+                success: function (data) {
+                    var res = id_val.split("-"); 
+                    $('#id_medicine_request_set-'+res[1]+'-unit').val(data.unit); 
+                }
+            });
+        });
+        $(".miscellaneous_item" ).bind('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+            var url = 'replenishment_form/ajax_load_item_misc';  
+            $.ajax({                      
+                url: url,    
+                type : 'GET',           
+                dataType : 'json',     
+                data: {
+                'id': id,   
+                },
+                success: function (data) {
+                    var res = id_val.split("-"); 
+                    $('#id_miscellaneous_request_set-'+res[1]+'-unit').val(data.unit); 
+                }
+            });
+        });
+
+    });
+    
+</script>
+ {% endblock %}

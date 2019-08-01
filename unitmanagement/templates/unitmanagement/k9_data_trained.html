@@ -1,10 +1,14 @@
 {% load static %}
 {% block content %}
 {%if k9%}
+
     <div class="header">{{k9}}</div>
     <div class="image scrolling content">
+        
         <img class="image" src="{{k9.image.url}}" style="position:relative; width: 350px;height: 300px;" >
         <div class="description">
+                <form action="{% url 'training:assign_k9_duty' k9.id %}" class="ui form" method="POST">
+                {% csrf_token %}
                 <div class="ui tiny info message">
                     <ul class="list">
                         <li>Less Sickly K9 would be prefered For-Breeding</li>
@@ -12,7 +16,6 @@
                         <li>Dont forget to check the remarks!</li>
                     </ul>
                 </div>
-            <form action="" class="ui form">
                 <div class="four fields">
                     <div class="field">
                         <label>Name</label>
@@ -37,22 +40,38 @@
                             <input type="text" value="{{k9.capability}}" readonly>
                         </div>
                         <div class="field">
-                            <label>Height</label>
-                            <input type="number" value="{{k9.height}}" readonly>
+                            <label>Height (cm)</label>
+                            <input type="number" value="{{k9.height}}" name="height">
+                            <div class="ui pointing blue basic label">
+                                Update Height
+                            </div>
                         </div>
                         <div class="field">
-                            <label>Weight</label>
-                            <input type="number" value="{{k9.weight}}" readonly>
+                            <label>Weight (kg)</label>
+                            <input type="number" value="{{k9.weight}}" name="weight">
+                            <div class="ui pointing blue basic label">
+                                Update Weight
+                            </div>
                         </div>
                         <div class="field">
                             <label>Training Score</label>
                             <input type="text" value="{{train.grade}}" readonly>
                         </div>
                     </div>
-                    <div class="field">
-                      <div class="ui large red label">
-                            <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
+                    <div class="three fields">
+                      <div class="field">
+                            <div class="ui large red label">
+                                <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
+                            </div>
                       </div>
+                      <div class="field">
+                        <label for="">Dam (Female) </label>
+                        <input type="text" value="{{female}}" readonly>
+                      </div>
+                      <div class="field">
+                            <label for="">Sire (Male)</label>
+                            <input type="text" value="{{male}}" readonly>
+                        </div>
                     </div>
                     <div id = 'sick' class="ui segment"> 
                         <table class="ui small two celled table">
@@ -75,18 +94,19 @@
                     {% for data in remarks%}
                     <div class="field">
                         <label>{{data.stage}}</label>
-                        <textarea name="" id="" rows="2">{{data.remarks}}</textarea>
+                        <textarea name="" id="" rows="2" readonly>{{data.remarks}}</textarea>
                     </div>
                     {% endfor %}
-                </form>
-
             
+                    <div class="ui basic center aligned segment">
+                        <button type="submit" class="tiny ui blue button" name="deploy">For-Deployment</button>
+                        <button type="submit" class="tiny ui green button" name="breed">For-Breeding</button>    
+                    </div>
+                </form>
         </div>
     </div>
-    <div class="actions">
-        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=deployment" class = "tiny ui blue button">For-Deployment</a>
-        <a href="{% url 'training:assign_k9_duty' k9.id %}?duty=breeding" class = "tiny ui green button">For-Breeding</a>    
-    </div>
+   
+
 
 
     <script>   
@@ -96,8 +116,23 @@
             $("#btn2").click(function(){
                 $("#sick").slideToggle();
             });
-
+           
         });
+        // $(".weight").change(function(){
+        //     w = $(this).val();
+        //     h = $(".height").val();
+        //     $(".deploy").attr("href", "{% url 'training:assign_k9_duty' k9.id %}?duty=deployment weight=" +w+" height="+h);
+        //     $(".breed").attr("href", "{% url 'training:assign_k9_duty' k9.id %}?duty=breeding weight=" +w+" height="+h);
+        //     alert($(".deploy").attr('href'), $(".breed").attr('href'))
+        // });
+
+        // $(".height").change(function(){
+        //     h = $(this).val();
+        //     w = $(".weight").val();
+        //     $(".deploy").attr("href", "{% url 'training:assign_k9_duty' k9.id %}?duty=deployment weight=" +w+" height="+h);
+        //     $(".breed").attr("href", "{% url 'training:assign_k9_duty' k9.id %}?duty=breeding weight=" +w+" height="+h);
+        //     alert($(".deploy").attr('href'), $(".breed").attr('href'))
+        // });
     </script>
 {%endif%}
 {% endblock %}

@@ -204,8 +204,8 @@ class K9(models.Model):
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
     trained = models.CharField('trained', choices=TRAINED, max_length=100, blank=True, null=True)
-    height = models.DecimalField('height',max_digits=50, decimal_places=2,blank=True, null=True)
-    weight = models.DecimalField('weight',max_digits=50, decimal_places=2,blank=True, null=True)
+    height = models.DecimalField('height',max_digits=50, decimal_places=2,default=0)
+    weight = models.DecimalField('weight',max_digits=50, decimal_places=2,default=0)
     fit = models.BooleanField(default=True)
     date_created = models.DateField('date_created', default=now, blank=True, null=True)
     #partnered = models.BooleanField(default=False)
@@ -307,6 +307,10 @@ class K9(models.Model):
         except:
             self.assignment = None
 
+        if self.handler != None:
+            self.handler.partnered = True
+            self.handler.save()
+
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
         self.age_days = days.days
@@ -319,15 +323,15 @@ class K9(models.Model):
             if self.last_proestrus_date == None:
                 self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
             
-            self.last_estrus_date = self.last_proestrus_date + relativedelta(days=10)
-            self.metestrus_date = self.estrus_date + relativedelta(month=2)
+            self.last_estrus_date = self.last_proestrus_date + relativedelta(days=9)
+            self.metestrus_date = self.last_estrus_date + relativedelta(month=2)
             self.anestrus_date = self.metestrus_date + relativedelta(months=4)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
-            self.next_estrus_date = self.next_proestrus_date + relativedelta(days=10)
+            self.next_estrus_date = self.next_proestrus_date + relativedelta(days=9)
 
             if d.today() == self.last_proestrus_date:
                 self.reproductive_stage = 'Proestrus'
-            elif d.today() == self.estrus_date:
+            elif d.today() == self.last_estrus_date:
                 self.reproductive_stage = 'Estrus'
             elif d.today() == self.metestrus_date:
                 self.reproductive_stage = 'Metestrus'
@@ -336,12 +340,10 @@ class K9(models.Model):
             else:
                 pass
 
+        #TODO TRANSFER TO CELERY
         if self.age == 9:
-            self.training_status = 'Due-For-Retirement'
-            self.status = 'Working Dog'
-            #TODO notif 1 year
-            from unitmanagement.models import Notification
-            Notification.objects.create(message= str(self.name) +' is due to retire next year.')
+            self.status = 'Due-For-Retirement'
+            
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))
@@ -353,7 +355,8 @@ class K9(models.Model):
             self.in_heat_months = 0
             self.last_proestrus_date = None
             self.next_proestrus_date = None
-            self.estrus_date = None
+            self.last_estrus_date = None
+            self.next_estrus_date = None
             self.metestrus_date = None
             self.anestrus_date = None
 

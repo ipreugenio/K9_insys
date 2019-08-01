@@ -5,10 +5,10 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed, Food_Request, Medicine_Request, Request_Transfer
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Miscellaneous_Request, VaccineUsed, Food_Request, Medicine_Request, Request_Transfer, Replenishment_Request
 from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
 from planningandacquiring.models import K9
-from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
+from inventory.models import Medicine, Miscellaneous, Medicine_Inventory, Food
 from profiles.models import Account, User
 from django.db.models import Q
 
@@ -234,31 +234,6 @@ class RequestTransferForm(forms.ModelForm):
         self.fields['handler'].widget.attrs['disabled'] = True
         self.fields['location_from'].widget.attrs['disabled'] = True
         self.fields['location_from'].required = False
-
-
-class RequestEquipment(forms.ModelForm):
-    class Meta:
-        model = Equipment_Request
-        fields = ('equipment', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestEquipment, self).__init__(*args, **kwargs)
-
-class RequestMedicine(forms.ModelForm):
-    class Meta:
-        model = Medicine_Request
-        fields = ('medicine', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestMedicine, self).__init__(*args, **kwargs)
-
-class RequestFood(forms.ModelForm):
-    class Meta:
-        model = Food_Request
-        fields = ('food', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestFood, self).__init__(*args, **kwargs)
         
 class K9IncidentForm(forms.ModelForm):
     CONCERN = (
@@ -330,26 +305,72 @@ class ReproductiveForm(forms.ModelForm):
         self.fields['last_proestrus_date'].required = False
 
 
-class RequestEquipment(forms.ModelForm):
+class RequestMiscellaneous(forms.ModelForm):
+    miscellaneous = forms.ModelChoiceField(queryset = Miscellaneous.objects.all())
     class Meta:
-        model = Equipment_Request
-        fields = ('equipment', 'quantity')
+        model = Miscellaneous_Request
+        fields = ('miscellaneous', 'quantity', 'unit')
 
     def __init__(self, *args, **kwargs):
-        super(RequestEquipment, self).__init__(*args, **kwargs)
+        super(RequestMiscellaneous, self).__init__(*args, **kwargs)
+        self.fields['miscellaneous'].widget.attrs['class'] = 'miscellaneous_item'
+        self.fields['unit'].widget.attrs['class'] = 'miscellaneous_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['miscellaneous'].required = False
+        # self.fields['quantity'].required = False
 
 class RequestMedicine(forms.ModelForm):
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine'))
     class Meta:
         model = Medicine_Request
-        fields = ('medicine', 'quantity')
+        fields = ('medicine', 'quantity','unit')
 
     def __init__(self, *args, **kwargs):
         super(RequestMedicine, self).__init__(*args, **kwargs)
+        self.fields['medicine'].widget.attrs['class'] = 'medicine_item'
+        self.fields['unit'].widget.attrs['class'] = 'medicine_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['medicine'].required = False
+        # self.fields['quantity'].required = False
 
 class RequestFood(forms.ModelForm):
+    food = forms.ModelChoiceField(queryset = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='Sack - 20kg'))
     class Meta:
         model = Food_Request
-        fields = ('food', 'quantity')
+        fields = ('food', 'quantity','unit')
 
     def __init__(self, *args, **kwargs):
         super(RequestFood, self).__init__(*args, **kwargs)
+        self.fields['food'].widget.attrs['class'] = 'food_item'
+        self.fields['unit'].widget.attrs['class'] = 'food_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['food'].required = False
+        # self.fields['quantity'].required = False
+
+class ReplenishmentForm(forms.ModelForm):
+    handler = forms.ModelChoiceField(queryset = User.objects.all(), empty_label=None)
+    class Meta:
+        model= Replenishment_Request
+        fields = ('handler',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ReplenishmentForm, self).__init__(*args, **kwargs)
+
+# class ItemReplenishmentForm(forms.Form):
+
+#     TYPE = (
+#         ('Medicine', 'Medicine'),
+#         ('Equipment/Miscellaneous', 'Equipment/Miscellaneous'),
+#         ('Dog Food', 'Dog Food'),
+#     )
+
+#     item_type = forms.ChoiceField(choices=TYPE)
+#     quantity = forms.IntegerField()
+
+#     def __init__(self, *args, **kwargs):
+#         super(ItemReplenishmentForm, self).__init__(*args, **kwargs)
+#         if self.fields['item_type'].
+
+
+
+    

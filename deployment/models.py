@@ -440,6 +440,7 @@ class Team_Dog_Deployed(models.Model):
         if self.status == 'Deployed':
             # k9 = K9.objects.get(id=self.k9.id)
             self.k9.training_status = 'Deployed'
+            self.k9.assignment = str(self.team_assignment)
             self.k9.save()
             try:
                 ta = Team_Assignment.objects.get(id=self.team_assignment)
