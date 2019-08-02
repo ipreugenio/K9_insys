@@ -487,7 +487,7 @@ def handler_dashboard(request):
     try:
         k9 = K9.objects.get(handler=user)
     except MultipleObjectsReturned:
-        k9 = K9.objects.filter(handler=user).first()
+        k9 = K9.objects.filter(handler=user).last()
 
     today = datetime.today()
 

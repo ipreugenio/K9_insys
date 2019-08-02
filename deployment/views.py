@@ -28,7 +28,7 @@ from inventory.models import Medicine
 
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment,K9_Pre_Deployment_Items
-
+from django.core.exceptions import MultipleObjectsReturned
 
 from training.models import Training_Schedule, Training
 
@@ -1055,7 +1055,11 @@ def fou_details(request):
 
 def daily_refresher_form(request):
     user = user_session(request)
-    k9 = K9.objects.get(handler=user)
+    k9 = None
+    try:
+        k9 = K9.objects.get(handler=user)
+    except MultipleObjectsReturned:
+        k9 = K9.objects.filter(handler=user).last()
     form = DailyRefresherForm(request.POST or None)
     style = "ui green message"
     drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.date.today())
@@ -1535,7 +1539,7 @@ def schedule_units(request):
         #dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status = "Scheduled", team_assignment = team).count()
         dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).exclude(k9__in = k9s_tobe_redeployed).count()
 
-        total_dogs_deployed_list.append(team.total_dogs_deployed + dogs_scheduled_count) #TODO Include scheduled K9s
+        total_dogs_deployed_list.append(team.total_dogs_deployed + dogs_scheduled_count) #TODO Included scheduled K9s
 
         #Sort incidents
         incident_type_list = []

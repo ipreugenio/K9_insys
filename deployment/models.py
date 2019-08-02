@@ -579,6 +579,7 @@ class K9_Pre_Deployment_Items(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
+        ('Cancelled', 'Cancelled'),
         ('Done', 'Done')
     )
 

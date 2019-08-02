@@ -31,7 +31,7 @@ from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, Vaccinatio
 
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup
+from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
@@ -44,6 +44,7 @@ from rest_framework import status
 from unitmanagement.serializers import K9Serializer
 from django.db.models import Q
 from dateutil.parser import parse
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 # Create your views here.
 
 import json
@@ -822,7 +823,11 @@ def health_record(request):
 
         number = Account.objects.get(serial_number=serial)
         handler = User.objects.get(id=number.UserID.id)
-        data = K9.objects.get(handler=handler)
+        data = None
+        try:
+            data = K9.objects.get(handler=handler)
+        except MultipleObjectsReturned:
+            data = K9.objects.filter(handler=handler).last()
 
     else:
         data = K9.objects.all()
@@ -1011,7 +1016,8 @@ def health_history_handler(request):
     data = None
     try:
         data = K9.objects.get(handler=current_user)
-    except: pass
+    except (MultipleObjectsReturned, ObjectDoesNotExist):
+        data = K9.objects.filter(handler=current_user).last()
     health_data = Health.objects.filter(dog = data).order_by('-date')
     phyexam_data = PhysicalExam.objects.filter(dog = data).order_by('-date')
 
@@ -3247,6 +3253,10 @@ def k9_checkup_pending(request):
 
     for item in current_appointments:
             k9s_exclude.append(item.k9)
+
+    cancelled_init_dep = K9_Pre_Deployment_Items.objects.filter(status = "Cancelled")
+    for item in cancelled_init_dep:
+        k9s_exclude.append(item.k9)
 
     pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude).exclude(date_start__lt=datetime.today().date())
     date_form = DateForm()
