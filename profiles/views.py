@@ -152,9 +152,12 @@ def dashboard(request):
     for item in pre_dep_items:
         exclude_k9_list.append(item.k9.id)
 
-    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(pk__in = exclude_k9_list).exclude(handler=None).exclude(pk__in = k9s_scheduled_list).count() #initial deployment k9s
+    dept_count = K9.objects.filter(training_status='For-Deployment').exclude(pk__in = exclude_k9_list).exclude(handler=None).count() #initial deployment k9s
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
-    ua_count = 1 #change this
+    ua_count = K9.objects.filter(training_status = "MIA").count()
+
+    print("Dept Count")
+    print(dept_count)
 
     ab = None
     try:
@@ -1697,6 +1700,15 @@ def load_event_handler(request):
     }
 
     return render(request, 'profiles/load_event_handler.html', context)
+
+
+def unconfirmed_pre_req(request):
+
+    pre_dep = K9_Pre_Deployment_Items.objects.filter(status = None)
+
+    
+
+    return None
 
 class ScheduleView(APIView):
     def get(self, request, format=None):

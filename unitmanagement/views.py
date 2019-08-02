@@ -3032,9 +3032,9 @@ class TrainerView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
 
-        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
 
 
         NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
@@ -3363,6 +3363,10 @@ def load_k9_data(request):
     h_count = None
     health = None
     train = None
+    male = None
+    female = None
+    breeder_count_by_breed = None
+    total_breeders = None
 
     try:
         k9_id = request.GET.get('id')
@@ -3375,6 +3379,10 @@ def load_k9_data(request):
         female = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed=k9.breed).filter(capability=k9.capability).filter(sex='Female').count()
 
         male = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed=k9.breed).filter(capability=k9.capability).filter(sex='Male').count()
+
+        breeder_count_by_breed = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).filter(breed=k9.breed).count()
+        total_breeders = K9.objects.filter(Q(training_status='For-Breeding')|Q(training_status='Breeding')).count()
+
     except: pass
 
     print("TRAIN")
@@ -3388,6 +3396,9 @@ def load_k9_data(request):
         'train': train,
         'female': female,
         'male': male,
+        'breeder_count_by_breed' : breeder_count_by_breed,
+        'total_breeders' : total_breeders
+
     }
 
     return render(request, 'unitmanagement/k9_data_trained.html', context)
@@ -3665,3 +3676,4 @@ def k9_mia_list(request):
     }
 
     return render(request, 'unitmanagement/k9_mia_list.html', context)
+
