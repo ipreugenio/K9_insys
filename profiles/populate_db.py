@@ -534,6 +534,7 @@ def generate_training():
         k9.training_status = 'Trained'
         k9.training_level = "Finished Training"
         k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+        k9.trained = "Trained"
         k9.save()
 
         print(str(k9))
