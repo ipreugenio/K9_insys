@@ -35,7 +35,12 @@
                             <a href="{% url 'unitmanagement:due_retired_list'%}" class="item">
                                     <i class="clipboard list icon"></i>Due for
                                     Retirement List
-                                </a> 
+                                </a>
+                            <a href="{% url 'unitmanagement:k9_mia_list'%}" class="item">
+                                    <i class="clipboard list icon"></i>Unconfirmed Arrivals
+                                </a>
+
+
                             {% elif request.session.session_user_position == "Veterinarian" %}
                             <!-- <a href="{% url 'profiles:add_User_form'%}" class="item">
                                 <i class="user plus icon"></i>Add User Form

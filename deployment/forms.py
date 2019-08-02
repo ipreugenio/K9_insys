@@ -109,6 +109,8 @@ class EditTeamForm(forms.ModelForm):
         fields = ('team', 'EDD_demand', 'NDD_demand', 'SAR_demand')
 
 class RequestForm(forms.ModelForm):
+    remarks = forms.CharField(widget=forms.Textarea)
+
     class Meta:
         model = Dog_Request
         fields = ('requester', 'event_name', 'location', 'email_address', 'phone_number', 'area', 'city', 'k9s_needed', 'start_date', 'end_date', 'remarks')

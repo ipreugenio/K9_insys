@@ -262,10 +262,19 @@ def team_leader_dashboard(request):
             f = form.save(commit=False)
             f.longtitude = lon
             f.latitude = lat
+            f.sector_type = "Small Event"
             f.save()
 
-            messages.success(request, 'Event succesfully saved!')
-            return redirect("profiles:team_leader_dashboard")
+            # location =
+            #
+            # if user.position == 'Operations' or user.position == 'Administrator':
+            #     location.sector_type = "Big Event"
+            #     location.status = "Approved"
+            # else:
+            #     location.sector_type = "Small Event"
+            #
+            # messages.success(request, 'Event succesfully saved!')
+            # return redirect("profiles:team_leader_dashboard")
 
 
         if check_arrival.is_valid():
@@ -573,6 +582,7 @@ def handler_dashboard(request):
     k9_schedules = K9_Schedule.objects.filter(k9 = k9)
     events = Dog_Request.objects.all()
 
+
     try:
         if training_sched.date_start is None and training_sched.date_end is None:
             show_start = True
@@ -752,7 +762,7 @@ def operations_dashboard(request):
             user_in_session = User.objects.get(id=account.UserID.id)
 
 
-            if location.sector_type != "Disaster": #TODO, wala pa process for disasters
+            if location.sector_type != "Disaster":
                 if user_in_session.position == 'Operations' or  user_in_session.position == 'Administrator':
                     location.sector_type = "Big Event"
                     location.status = "Approved"

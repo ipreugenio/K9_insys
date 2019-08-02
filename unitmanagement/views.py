@@ -2080,7 +2080,7 @@ def confirm_arrive(request,id):
     k9.handler = None
 
     #handler
-    handler = Handler.objects.get(id=k9.handler.id)
+    handler = User.objects.get(id=k9.handler.id)
     handler.partnered = False
     handler.assigned = False
 

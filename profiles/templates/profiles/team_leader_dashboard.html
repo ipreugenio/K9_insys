@@ -154,93 +154,102 @@
           <div class="header">Add Event</div>
 
           <div class="scrolling content">
-              <form class="ui form" method="POST">
-                  {% csrf_token %}
-                <div class="three fields">
-                    <div class="field">
-                        <label>Requester</label>
-                        {{form.requester}}
-                      </div>
-                      <div class="field">
-                        <label>Mobile Number</label>
-                        {{form.phone_number}}
-                      </div>
-                      <div class="field">
-                        <label>Email</label>
-                        {{form.email_address}}
-                      </div>
-                </div>
-                <div class="four fields">
-                    <div class="field">
-                        <label>Event Name</label>
-                        {{form.event_name}}
-                      </div>
-                      <div class="field">
-                        <label>Type</label>
-                        {{form.event_type}}
-                      </div>
-                      <div class="field">
-                        <label>Start Date</label>
-                        {{form.start_date}}
-                      </div>
-                      <div class="field">
-                          <label>End Date</label>
-                          {{form.end_date}}
-                        </div>
-                </div>
-                <div class="three fields">
-                    <div class="field">
-                        <label>NDD Needed</label>
-                        {{form.NDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>EDD Needed</label>
-                        {{form.EDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>SAR Needed</label>
-                        {{form.SAR_needed}}
-                      </div>
-                </div>
-                <div class="field">
-                    <label>Remarks</label>
-                    {{form.remarks}}
-                </div>
-                <div class="field">
-                    <label>Place</label>
-                    {{form.location}}
-                  </div>
+               <form class="ui equal width small form" id="request_form" action="" method="POST">
+                                    {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="{{ style }}">{{message}}</div>
+                                    {% endfor %}
+                                    {% endif %}
 
-                  <div class="ui two column grid">
-                    <div class="seven wide column">
-                        <center>
-                            <label>Search Location</label>
-                            <div class="ui fluid category search">
-                              <div class="ui icon input">
-                                {{geosearch.search}}
-                                <i class="search icon"></i>
-                              </div>
-                              <div class="results"></div>
-                            </div>
-                            <br>
-                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
+                                    {% csrf_token %}
+                                    <div class="fields">
+                                        <div class="field">
+                                            <label>Requester</label>
+                                            {{form.requester}}
+                                        </div>
 
-                            <div  id ="id_location_cards"></div>
-                        </center>
+                                        <div class="field">
+                                            <label>Event Name</label>
+                                            {{form.event_name}}
+                                        </div>
 
-                    </div>
-                    <div class="nine wide column">
-                        <label>Geotag Location</label>
-                        <div id = "id_geomap">
-                            {{geoform.point}}
-                        </div>
-                    </div>
-                  </div>
-                  <br>
-                    <center>
-                        <button class="ui green button" type="submit">Submit</button>
-                    </center>
-                </form>
+                                        <div class="field">
+                                            <label>Phone Number</label>
+                                            {{form.phone_number}}
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field">
+                                            <label>Area</label>
+                                            {{form.area}}
+                                        </div>
+                                        <div class="field">
+                                            <label>City</label>
+                                            {{form.city}}
+                                        </div>
+                                        <div class="field">
+                                            <label>Email Address</label>
+                                            {{form.email_address}}
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Number of K9s needed</label>
+                                            {{form.k9s_needed}}
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="field">
+                                            <label>Start of Event</label>
+                                            {{form.start_date}}
+                                        </div>
+                                        <div class="field">
+                                            <label>End of Event</label>
+                                            {{form.end_date}}
+                                        </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="ten wide field">
+                                                <label>Address</label>
+                                                {{form.location}}
+                                            </div>
+                                    </div>
+                                    <div class="ui right aligned segment" style="padding: 0px;">
+                                        <button class = "ui button green" type="submit" >Submit</button>
+                                    </div>
+                                    <div class="ui placeholder segment">
+                                        <div class="ui two column stackable center aligned grid">
+                                            <!-- <div class="ui vertical divider"></div> -->
+                                          <div class="top aligned row">
+                                            <div class="four wide column">
+
+                                                <label>Search Location</label>
+                                                <div class="ui fluid category search">
+                                                  <div class="ui icon input">
+                                                    {{geosearch.search}}
+                                                    <i class="search icon"></i>
+                                                  </div>
+                                                  <div class="results"></div>
+                                                </div>
+                                                <br>
+                                                <button id = "btn_search" class="ui blue button" type="button">Search</button>
+
+                                                <div  id ="id_location_cards"></div>
+
+
+                                            </div>
+                                            <div class="column">
+
+                                                <label>Geotag Location</label>
+                                              <div id = "id_geomap">
+                                                  {{geoform.point}}
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                </form>
           </div>
 
         </div>

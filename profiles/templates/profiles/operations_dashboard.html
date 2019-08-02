@@ -32,6 +32,11 @@
                                             <label>Event Name</label>
                                             {{form.event_name}}
                                         </div>
+
+                                        <div class="field">
+                                            <label>Phone Number</label>
+                                            {{form.phone_number}}
+                                        </div>
                                     </div>
                                     <div class="fields">
                                         <div class="field">
@@ -39,8 +44,8 @@
                                             {{form.area}}
                                         </div>
                                         <div class="field">
-                                            <label>Phone Number</label>
-                                            {{form.phone_number}}
+                                            <label>City</label>
+                                            {{form.city}}
                                         </div>
                                         <div class="field">
                                             <label>Email Address</label>
@@ -63,10 +68,6 @@
                                         </div>
                                     </div>
                                     <div class="fields">
-                                        <div class="six wide field">
-                                            <label>Area</label>
-                                            {{form.area}}
-                                        </div>
                                         <div class="ten wide field">
                                                 <label>Address</label>
                                                 {{form.location}}
@@ -260,7 +261,6 @@ $(document).ready(function() {
         data: {
           'search_query': search_query, // add the search query to the GET parameters
            'width' : {{width}},
-           'height' : 300
         },
         success: function (data) {   // `data` is the return of the `load_locations` view function
           $("#id_location_cards").html(data);  // replace the contents of the #id_location_cards input with the data that came from the server

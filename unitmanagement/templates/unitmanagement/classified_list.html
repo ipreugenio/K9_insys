@@ -18,9 +18,9 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Breed</th>
-                <th>Color</th>
-                <th>Sex</th>
+                <!--<th>Breed</th>-->
+                <!--<th>Color</th>-->
+                <!--<th>Sex</th>-->
                 <th>Age</th>
                 <th></th>
             </tr>
@@ -29,10 +29,10 @@
             {% for data in data %}
             <tr>
                 <td>{{data.name}}</td>
-                <td >{{data.breed}}</td>
-                <td>{{data.color}}</td>
-                <td >{{data.sex}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} mons</td>
+                <!--<td >{{data.breed}}</td>-->
+                <!--<td>{{data.color}}</td>-->
+                <!--<td >{{data.sex}}</td>-->
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
                 <td style="text-align:center;" class="two wide">
                     <a href="{% url 'unitmanagement:choose_handler_list' data.id %}" class="ui tiny basic blue button">Select</a>
                 </td>
@@ -46,11 +46,8 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable(
-             "order": [[ 4, "desc" ]]
-        );
+        $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
         $('.menu .item').tab();
-
     });
 
 </script>

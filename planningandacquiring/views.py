@@ -1706,7 +1706,7 @@ def vet_report(request):
             arr = [medi.medicine, k9_count]
             med_data.append(arr)
 
-    print(k9_count)
+    # print(k9_count)
     print(med_distinct)
 
     # SICKNESS
@@ -2072,7 +2072,6 @@ def dog_request_report(request):
             event = event.filter(requester=value).latest('start_date')
             arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
             event_data.append(arr)
-
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
