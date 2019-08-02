@@ -367,6 +367,7 @@ class Notification(models.Model):
         ('breeding', 'breeding'),
         ('initial_deployment', 'initial_deployment'),
         ('checkup', 'checkup'),
+        ('k9_given', 'k9_given'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

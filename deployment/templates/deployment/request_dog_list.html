@@ -12,6 +12,39 @@
     </h2>
 </div>
 
+{%if user.position == 'Operations'%}
+<table class="ui small celled table" id="tabledata1">
+        <thead>
+            <th class="two wide">Start date</th>
+            <th class="two wide">End date</th>
+            <th>Duration</th>
+            <th>Requester</th>
+            <th>Event Name</th>
+            <th>Place</th>
+            <th class="one wide">K9s Requested</th>
+            <th class="one wide">K9s Scheduled</th>
+            <th></th>
+        </thead>
+        <tbody>
+            {% for Data in data2 %}
+            <tr >
+                <td>{{Data.start_date | date:'Y-m-d'}}</td>
+                <td>{{Data.end_date| date:'Y-m-d'}}</td>
+                    <td>{{Data.duration}} days</td>
+                <td>{{Data.requester}}</td>
+                <td>{{Data.event_name}}</td>
+                <td>{{Data.location}}</td>
+                <td>{{Data.k9s_needed}}</td>
+                <td>{{Data.k9s_deployed}}</td>
+                <td style="text-align:center;">
+                    <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{%else%}
+
 <div class="ui top attached tabular menu">
     <a class="item active" data-tab="first">Pending</a>
     <a class="item" data-tab="second">Approved</a>
@@ -62,7 +95,7 @@
             <th></th>
         </thead>
         <tbody>
-            {% for Data in data2 %}
+        {% for Data in data2 %}
             <tr >
                 <td>{{Data.start_date | date:'Y-m-d'}}</td>
                 <td>{{Data.end_date| date:'Y-m-d'}}</td>
@@ -95,7 +128,7 @@
         </tbody>
     </table>
 </div>
-
+{%endif%}
 <script type="text/javascript">
 
 	$(document).ready(function() {

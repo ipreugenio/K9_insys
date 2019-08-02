@@ -10,33 +10,6 @@
   <div class="streched row">
     <div class="ten wide column"  style="padding-right: 0%;">
       <div class="ui basic segment">
-          {%if cb %}
-          {%if cb.status == 'Pending' %}
-          <div class="ui info message">
-             
-              <div class="header">
-                <i></i>
-                  YOU HAVE BEEN CALLED BACK TO BASE! 
-                  <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
-              </div>
-              <ul class="list">
-                <li>Please confirm that
-                    you have received the message and will return at your most earliest
-                    convenient time. </li>
-              </ul>
-            </div>
-            {% else %}
-            <div class="ui info icon message">
-                <i class="exclamation icon"></i>
-                <div class="content">
-                  <div class="header">
-                      Admin is awaiting your arrival back to base.
-                  </div>
-                </div> 
-            </div>
-            {% endif %}
-            {% endif %}
-
         <div class="ui stackable grid">
          <div class="sixteen wide column">
           <div class="ui three column equal width grid">
@@ -101,20 +74,20 @@
             <div class="eight wide column">
               <div class="ui raised segment">
                 <div class="ui two statistics">
-                  <div class="purple statistic">
-                    <div class="value">
-                      {{ta.total_dogs_demand}}
-                    </div>
-                    <div class="label">
-                      K9 Demand in Area
-                    </div>
-                  </div>
                   <div class="blue statistic">
                     <div class="value">
                       {{ta.total_dogs_deployed}}
                     </div>
                     <div class="label">
                       K9 Assigned in Area
+                    </div>
+                  </div>
+                  <div class="purple statistic">
+                    <div class="value">
+                      {{ta.total_dogs_demand}}
+                    </div>
+                    <div class="label">
+                      K9 Required in Area
                     </div>
                   </div>
                 </div>
@@ -160,34 +133,7 @@
     <div class="six wide column" style="padding: 0%;padding-right: 1%;">
 
         <div class="ui basic segment" style="padding-left: 0%;">
-            {% if k9 %}
-            <h4>Port</h4>
-            <p>{{ta.location}}</p>
-           <strong>K9 : {{k9}}</strong> 
-            <table class="ui very basic four column table">
-            <thead>
-
-            <tr>
-            <th>Status: {{k9.training_status}}</th>
-            <th>Type: {{k9.status}}</th>
-            <th>Capability: {{k9.capability}}</th>
-            </tr>
-            </thead>
-
-            </table>
-
-            {% if reveal_arrival == True %}
-            <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
-            {% endif %}
-
-            {% if reveal_arrival_dr == True %}
-            <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
-            {% endif %}
-        {% else %}
-        <div class = "ui segment">
-            You currently don't have a K9.
-        </div>
-        {% endif %}
+          
 
                 <div class="ui black floating message">
                     <p>Calendar</p>
@@ -203,6 +149,62 @@
   
                       <div id = "calendar" style="margin-top:0%;"></div>
                   </div>
+
+                  {%if cb %}
+                  {%if cb.status == 'Pending' %}
+                  <div class="ui info message">
+                     
+                      <div class="header">
+                        <i></i>
+                          YOU HAVE BEEN CALLED BACK TO BASE! 
+                          <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
+                      </div>
+                      <ul class="list">
+                        <li>Please confirm that
+                            you have received the message and will return at your most earliest
+                            convenient time. </li>
+                      </ul>
+                    </div>
+                    {% else %}
+                    <div class="ui info icon message">
+                        <i class="exclamation icon"></i>
+                        <div class="content">
+                          <div class="header">
+                              Admin is awaiting your arrival back to base.
+                          </div>
+                        </div> 
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    
+                  {% if k9 %}
+                  <h4>Port</h4>
+                  <p>{{ta.location}}</p>
+                 <strong>K9 : {{k9}}</strong> 
+                  <table class="ui very basic four column table">
+                  <thead>
+      
+                  <tr>
+                  <th>Status: {{k9.training_status}}</th>
+                  <th>Type: {{k9.status}}</th>
+                  <th>Capability: {{k9.capability}}</th>
+                  </tr>
+                  </thead>
+      
+                  </table>
+      
+                  {% if reveal_arrival == True %}
+                  <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
+                  {% endif %}
+      
+                  {% if reveal_arrival_dr == True %}
+                  <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
+                  {% endif %}
+              {% else %}
+              <div class = "ui segment">
+                  You currently don't have a K9.
+              </div>
+              {% endif %}
         </div>
         </div>
       </div>
@@ -571,13 +573,13 @@ $(document).ready(function() {
             labels: ["EDD", "NDD", "SAR"],
             datasets: [
                 {
-                label: "Demand",
+                label: "Assigned",
                 backgroundColor: "#8e5ea2",
-                data: demand,
-                }, {
-                label: "Supply",
-                backgroundColor: "#3e95cd",
                 data: supply,
+                }, {
+                label: "Required",
+                backgroundColor: "#3e95cd",
+                data: demand,
                 }]
             },
             options: {
@@ -586,7 +588,7 @@ $(document).ready(function() {
             },
             title: {
                 display: true,
-                text: "K9's Demand and Assigned in Area"
+                text: "K9's Assigned and Required in Area"
             },
                 scales: {
                 xAxes: [{

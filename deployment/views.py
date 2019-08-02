@@ -5,13 +5,12 @@ from django.forms import formset_factory, inlineformset_factory
 from django.db.models import aggregates
 from django.contrib import messages
 
-from django.db.models import Count
-from django.db.models import Q, F
+from django.db.models import Count, Sum, Q, F
 from django.views import generic
 from django.utils.safestring import mark_safe
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
-
+from dateutil.relativedelta import relativedelta
 from pandas import DataFrame as df
 import pandas as pd
 
@@ -24,7 +23,7 @@ from unitmanagement.models import Notification, Request_Transfer
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
-from inventory.models import Medicine
+from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory, Medicine_Received_Trail, Miscellaneous_Received_Trail, Food_Received_Trail
 
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
 from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, K9_Schedule, Incidents, Daily_Refresher, Maritime, TempDeployment,K9_Pre_Deployment_Items
@@ -100,12 +99,153 @@ def index(request):
     d = Daily_Refresher.objects.get(id=4)
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
-    mass_populate()
     context = {
       'title':'Deployment',
       'd':d,
     }
     return render (request, 'deployment/index.html', context)
+
+def pre_req_unconfirmed(request):
+    user = user_session(request)
+    #K9 schedule
+    #pre-req items
+    #K9_Schedule
+    kdi = K9_Pre_Deployment_Items.objects.filter(status='Pending').exclude(initial_sched__date_end__lt=datetime.date.today())
+   
+    count = 0 
+    for kp in kdi:
+        date = kp.initial_sched.date_start - relativedelta(days=5)
+        print(date)
+        if datetime.date.today() >= date:
+            count = count+1
+
+    collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").aggregate(sum=Sum('quantity'))['sum'] - count
+    vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").aggregate(sum=Sum('quantity'))['sum'] - count
+    leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(sum=Sum('quantity'))['sum'] - count
+    shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(sum=Sum('quantity'))['sum'] - count
+    food = Food.objects.filter(foodtype="Adult Dog Food").aggregate(sum=Sum('quantity'))['sum']
+    medicines = Medicine_Inventory.objects.filter(medicine__med_type="Vitamins").aggregate(sum=Sum('quantity'))['sum'] - count
+    grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(sum=Sum('quantity'))['sum'] - count
+    first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(sum=Sum('quantity'))['sum'] - count
+    oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(sum=Sum('quantity'))['sum'] - count
+    ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(sum=Sum('quantity'))['sum'] - count
+
+    item_list = []
+    if collar < 0:
+        a = abs(collar)
+        b = ['Collar',a]
+        item_list.append(b)
+    if vest < 0:
+        a = abs(vest)
+        b = ['Vest',a]
+        item_list.append(b)
+    if leash < 0:
+        a = abs(leash)
+        b = ['Leash',a]
+        item_list.append(b)
+    if shipping_crate < 0:
+        a = abs(shipping_crate)
+        b = ['Shipping Crate',a]
+        item_list.append(b)
+    if food < 0:
+        a = abs(food)
+        b = ['Food',a]
+        item_list.append(b)
+    if medicines < 0:
+        a = abs(medicines)
+        b = ['Vitamins',a]
+        item_list.append(b)
+    if grooming_kit < 0:
+        a = abs(grooming_kit)
+        b = ['Grooming Kit',a]
+        item_list.append(b)
+    if first_aid_kit < 0:
+        a = abs(first_aid_kit)
+        b = ['First Aid Kit',a]
+        item_list.append(b)
+    if oral_dextrose < 0:
+        a = abs(oral_dextrose)
+        b = ['Oral Dextrose',a]
+        item_list.append(b)
+    if ball < 0:
+        a = abs(ball)
+        b = ['Ball',a]
+        item_list.append(b)
+
+    if request.method == 'POST':
+        item_type = request.POST.get('item_type')
+        select = request.POST.get('select')
+        quantity = int(request.POST.get('quantity'))
+        date = request.POST.get('date')
+
+        if item_type == 'Vitamins':
+            mi = Medicine_Inventory.objects.get(id=select)
+            mi.quantity = mi.quantity + quantity
+            mi.save()
+            Medicine_Received_Trail.objects.create(inventory=mi, user=user, expiration_date=date, quantity = quantity)
+            messages.success(request, 'You have added '+ str(quantity) + ' to ' + str(mi) + '.')
+        elif item_type == 'Adult Dog Food':
+            fi = Food.objects.get(id=select)
+            fi.quantity = fi.quantity + quantity
+            fi.save()
+            Food_Received_Trail.objects.create(inventory=fi, user=user, quantity = quantity)
+            messages.success(request, 'You have added '+ str(quantity) + ' to ' + str(fi) + '.')
+        else:
+            misc = Miscellaneous.objects.get(id=select)
+            misc.quantity = misc.quantity + quantity
+            misc.save()
+            Miscellaneous_Received_Trail.objects.create(inventory=misc, user=user, quantity = quantity)
+            messages.success(request, 'You have added '+ str(quantity) + ' to ' + str(misc) + '.')
+
+        return redirect('deployment:pre_req_unconfirmed')
+
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    
+    context = {
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'item_list':item_list,
+    }
+    return render (request, 'deployment/pre_req_unconfirmed.html', context)
+
+def load_pre_req(request):
+
+    item_type = None
+
+    try:
+        item_type = request.GET.get('item_type')
+        if item_type == 'Collar':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Collar")
+        elif item_type == 'Vest':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Vest")
+        elif item_type == 'Leash':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Leash")
+        elif item_type == 'Shipping Crate':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate")
+        elif item_type == 'Adult Dog Food':
+            data = Food.objects.filter(foodtype="Adult Dog Food")
+        elif item_type == 'Vitamins':
+            data = Medicine_Inventory.objects.filter(medicine__med_type="Vitamins")
+        elif item_type == 'Grooming Kit':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit")
+        elif item_type == 'First Aid Kit':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit")
+        elif item_type == 'Oral Dextrose':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose")
+        elif item_type == 'Ball':
+            data =  Miscellaneous.objects.filter(miscellaneous__contains="Ball")
+    except:
+        pass
+
+    context = {
+        'item_type': item_type,
+        'data': data,
+    }
+
+    return render(request, 'deployment/pre_req_data.html', context)
 
 
 def mass_populate():

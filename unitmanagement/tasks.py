@@ -26,8 +26,7 @@ from django.db.models import Avg, Count, Min, Sum
 
 # TODO UNITMANAGEMENT NOTIFS
 #8AM
-@periodic_task(run_every=crontab(hour=8, minute=0))
-
+# @periodic_task(run_every=crontab(hour=8, minute=0))
 def unitmanagement_notifs():
     k9 = K9.objects.all()
     phex = PhysicalExam.objects.all()
@@ -204,7 +203,7 @@ def unitmanagement_notifs():
             # TODO DEPLOYMENT NOTIFS
 
 # 8:30AM
-@periodic_task(run_every=crontab(hour=6, minute=0))
+# @periodic_task(run_every=crontab(hour=6, minute=0))
 def deployment_notifs():
     request = Dog_Request.objects.all()
 
@@ -233,7 +232,7 @@ def deployment_notifs():
 
 # 12AM
 #DELETE FUNCTION WHERE 2MONTHS OF NOTIFICATION IS DELETED
-@periodic_task(run_every=crontab(hour=23, minute=0))
+# @periodic_task(run_every=crontab(hour=23, minute=0))
 def delete():
     notif_delete = Notification.objects.filter(datetime=date.today - timedelta(days=60))
     notif_delete.delete()

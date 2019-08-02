@@ -13,9 +13,11 @@
                           <div class="value">
                             <i class="tags icon"></i> {{unclassified}}
                           </div><br>
-                          <a href="{% url 'training:classify_k9_list'%}?type=unclassified">
-                            UNCLASSIFIED K9's
-                          </a>
+                          <div class="label">
+                              <a href="{% url 'training:classify_k9_list'%}?type=unclassified">
+                                  UNCLASSIFIED K9's
+                                </a>
+                          </div>
                         </div>
                   </div>
                 </div>
@@ -25,9 +27,11 @@
                             <div class="value">
                               <i class="pencil alternate icon"></i> {{grade}}
                             </div><br>
-                            <a href="{% url 'training:classify_k9_list'%}?type=grading">
-                              FOR-GRADING
-                            </a>
+                            <div class="label">
+                                <a href="{% url 'training:classify_k9_list'%}?type=grading">
+                                    FOR-GRADING
+                                  </a>
+                            </div>
                           </div>
                     </div>
                 </div>

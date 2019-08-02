@@ -93,7 +93,7 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'heat_cycle':
         notif.viewed = True
         notif.save()
-        return redirect('unitmanagement:reproductive_edit', id = notif.k9.id)
+        return redirect('planningandacquiring:add_K9_parents_form')
     elif notif.notif_type == 'k9_sick' :
         notif.viewed = True
         notif.save()
@@ -130,12 +130,16 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'pregnancy':
         notif.viewed = True
         notif.save()
-        return redirect('planningandacquiring:breeding_list', id = notif.other_id)
+        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=pregnant')
     elif notif.notif_type == 'breeding':
         notif.viewed = True
         notif.save()
-        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=pregnant')
+        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=breeding')
     elif notif.notif_type == 'initial_deployment' or notif.notif_type == 'checkup':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'k9_given':
         notif.viewed = True
         notif.save()
         return redirect('profiles:handler_dashboard')
@@ -145,8 +149,13 @@ def index(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    
-   
+    d = dt.date.today() + relativedelta(days=63) 
+
+    a = dt.date.today() + relativedelta(days=22) 
+
+    print(d)
+    print(a)
+
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -1985,6 +1994,8 @@ def reassign_assets(request, id):
             k.handler=h
             k.save()
 
+            Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
+
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:k9_unpartnered_list')
 
@@ -2418,10 +2429,10 @@ def on_leave_decision(request, id):
 # Reproductive Cycle
 def reproductive_list(request):
     style=''
-    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female')
-    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female')
-    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female')
-    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female')
+    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2535,6 +2546,9 @@ def choose_handler_list(request, id):
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
             h.save()
+
+            
+            Notification.objects.create(position='Handler', user=h, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:classified_list')
