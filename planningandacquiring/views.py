@@ -2439,7 +2439,7 @@ def budgeting(request):
            
         need_procure_ny =  int(request.POST.get('id_need'))
         total_p =  Decimal(request.POST.get('id_need_total'))
-        
+
         #get dog food based on dog count
         # k9 = all_k9 - dead + born + Forecasted added_procured
         # monthly 
@@ -3064,7 +3064,7 @@ def budgeting(request):
                     
             
             return redirect('planningandacquiring:budget_list')
-        except:
+        except ObjectDoesNotExist:
             pb = Proposal_Budget.objects.create(k9_current=k9_ny, k9_needed=need_procure_ny, k9_breeded=born_ny, food_milk_total=total_food, vac_prev_total=vac_total, medicine_total=total_medicine, vet_supply_total=vet_total, kennel_total=ken_total, others_total=oth_total, training_total=train_total, grand_total=grand_total, date_created=dt.today(),k9_current_train = k9_current_train,k9_total=total_p)
 
             #item, price, quantity, total
