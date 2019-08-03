@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="ui segment" style="padding:20px;">
-    <h1 class="ui header">MIA List
+    <h1 class="ui header">Unconfirmed Arrival List
     <div class="sub header">List of Units that did not arrive on duty. Select a unit to confirm status.</div>
     </h1>
 
@@ -16,8 +16,6 @@
 
 </div>
 
-
-</div>
 <div class="ui segment">
     <table id="tabledata1" class="ui celled table">
         <thead>
@@ -45,9 +43,9 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable(
-             "order": [[ 4, "desc" ]]
-        );
+        $('#tabledata1').DataTable({
+             "order": [[ 0, "desc" ]]
+        });
         $('.menu .item').tab();
 
     });

@@ -460,7 +460,6 @@ class K9_Schedule(models.Model):
         ('Initial Deployment', 'Initial Deployment'),
         ('Checkup', 'Checkup'),
         ('Request', 'Request'),
-        ('Transfer Deployment', 'Transfer Deployment')
     )
 
     k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)
@@ -580,6 +579,7 @@ class K9_Pre_Deployment_Items(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
+        ('Cancelled', 'Cancelled'),
         ('Done', 'Done')
     )
 

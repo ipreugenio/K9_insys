@@ -75,6 +75,8 @@ def update_port_deployed_count(team):
 # Get all handlers from team
 def assign_TL(team, handler_list_arg = None):
 
+    team_leader = None
+
     #Higher number = higher rank
     RANK_SORTED = (
         (1, "ASN/ASW"),

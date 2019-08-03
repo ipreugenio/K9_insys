@@ -119,6 +119,7 @@
       </tr>
   </thead>
   <tbody>
+        {% if tl_dog %}}
         <tr>
             <td>{{tl_dog.name}}</td>
         <td>{{tl_dog.serial_number}}</td>
@@ -126,6 +127,7 @@
         <td>{{tl_dog.handler}}</td>
         <td>Team Leader</td>
         </tr>
+        {% endif %}
        {% for dogs_deployed in dogs_deployed %}
       <tr>
         <td>{{dogs_deployed.k9.name}}</td>

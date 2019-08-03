@@ -534,6 +534,7 @@ def generate_training():
         k9.training_status = 'Trained'
         k9.training_level = "Finished Training"
         k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+        k9.trained = "Trained"
         k9.save()
 
         print(str(k9))
@@ -917,7 +918,7 @@ def generate_incident():
 
         remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
 
-        date = fake.date_between(start_date="-30y", end_date="-20y")
+        date = fake.date_between(start_date="-10y", end_date="-5y")
 
         incident = Incidents.objects.create(user = user, date = date, incident = incident_txt, location = location, type = type, remarks = remarks)
         incident.save()
@@ -954,7 +955,7 @@ def generate_maritime():
         boat_type = BOAT_TYPE[randomizer][0]
         print("Boat type : " + boat_type)
 
-        date = fake.date_between(start_date="-30y", end_date="-20y")
+        date = fake.date_between(start_date="-10y", end_date="-5y")
 
         passenger_count = random.randint(20, 100)
 

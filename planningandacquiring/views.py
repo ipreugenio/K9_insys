@@ -1710,7 +1710,7 @@ def vet_report(request):
             arr = [medi.medicine, k9_count]
             med_data.append(arr)
 
-    print(k9_count)
+    # print(k9_count)
     print(med_distinct)
 
     # SICKNESS
@@ -2048,34 +2048,51 @@ def dog_request_report(request):
     to_date = request.session["to_date"]
     user = user_session(request)
 
-    event = Dog_Request.objects.filter(start_date__range=[from_date, to_date])
+    events = Dog_Request.objects.filter(start_date__range=[from_date, to_date])
     event_data = []
-    event_distinct = event.values('requester').distinct()
+    # event_distinct = event.values('requester').distinct()
 
-    deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
-    dog_distinct = deployed.values('k9').distinct()
-    dog_data = []
+    # deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
+    # dog_distinct = deployed.values('k9').distinct()
+    # dog_data = []
+    #
+    # for d in dog_distinct:
+    #     for key, value2 in d.items():
+    #         print(value2)
+    #         print(dog_distinct)
+    #         SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
+    #         NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
+    #         EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
+    #         print(SAR)
+    #         print(NDD)
+    #         print(EDD)
+    #         print("HELLO")
+    #
+    # for e in event_distinct:
+    #     for key, value in e.items():
+    #         # print(value)
+    #         # print(event_distinct)
+    #         print(event)
+    #         print("^^EVENT^^")
+    #
+    #         event = event.filter(requester=value).latest('start_date')
+    #         arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
+    #         event_data.append(arr)
 
-    for d in dog_distinct:
-        for key, value2 in d.items():
-            print(value2)
-            print(dog_distinct)
-            SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
-            NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
-            EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
-            print(SAR)
-            print(NDD)
-            print(EDD)
-            print("HELLO")
-
-    for e in event_distinct:
-        for key, value in e.items():
-            print(value)
-            print(event_distinct)
-
-            event = event.filter(requester=value).latest('start_date')
-            arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
-            event_data.append(arr)
+    for event in events:
+        SAR = 0
+        NDD = 0
+        EDD = 0
+        tdd = Team_Dog_Deployed.objects.filter(team_requested = event)
+        for item in tdd:
+            if item.k9.capability == "SAR":
+                SAR += 1
+            elif item.k9.capability == "NDD":
+                NDD += 1
+            else:
+                EDD += 1
+        arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
+        event_data.append(arr)
 
 
     notif_data = notif(request)

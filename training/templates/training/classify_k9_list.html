@@ -88,7 +88,7 @@
                 <td >{{data_unclassified.breed}}</td>
                 <td>{{data_unclassified.color}}</td>
                 <td >{{data_unclassified.sex}}</td>
-                <td>{{data_unclassified.age}}</td>
+                <td>{{data_unclassified.age}} years and {{data_unclassified.month_remainder}} months</td>
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -127,7 +127,7 @@
             <td>{{data_ontraining}}</td>
             <td>{{data_ontraining.handler}}</td>
             <td >{{data_ontraining.breed}}</td>
-            <td>{{data_ontraining.age}}</td>
+            <td>{{data_ontraining.age}} years and {{data_ontraining.month_remainder}} months</td>
             <td>{{data_ontraining.capability}}</td>
             <td>{{data_ontraining.training_level}}</td>
             <td style="width:25%;" class="ui center aligned">
@@ -149,8 +149,8 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata3').DataTable();
+        $('#tabledata1').DataTable({ "order": [[ 4, "desc" ]]  });
+        $('#tabledata3').DataTable({ "order": [[ 3, "desc" ]]  });
         $('.menu .item').tab();
 
     });
