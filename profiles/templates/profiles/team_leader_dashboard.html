@@ -39,8 +39,9 @@
                               {%if rro.status == 'Confirmed'%}
                               <h5 style='color:orangered;'> YOUR ITEMS ARE ON THE WAY. PLEASE CONFIRM ARRIVAL.</h5>
                               {%elif rro.status == 'Pending' %}
-                              <h5 style='color:teal;'>YOU HAVE A PENDING ITEM
+                              <h5 style='color:teal; padding: 10px;'>YOU HAVE A PENDING ITEM
                               REPLENISHMENT REQUEST. PLEASE AWAIT CONFIRMATION</h5>
+                              
                               {%endif%}
                             {%else%}
                             <h5 style='color:grey;'>YOU HAVE NO CURRENT REPLENISHMENT REQUEST TRANSACTION.</h5>

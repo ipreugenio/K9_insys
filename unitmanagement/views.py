@@ -2241,17 +2241,34 @@ def replenishment_form(request):
     style = 'ui green message'
     form = ReplenishmentForm(request.POST or None)
 
-    form2 = formset_factory(ItemReplenishmentForm, can_delete=True)
+    form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
     formset = form2()
     if request.method == 'POST':
         if form.is_valid:
-            f1 = form.save(commit=False)    
-            formset = form2(request.POST,)
+            f1 = form.save()    
+            formset = form2(request.POST)
 
             if formset.is_valid:
                 for forms in formset:
                    #TODO SAVE FORMS
-                    print('type',forms['item_type'].value())
+                    if forms['item_type'].value() != '------------':
+                        uom = forms['uom'].value()
+                        quantity = forms['quantity'].value()
+
+                        if forms['item_type'].value() == 'Dog Food':
+                            item_id = forms['item'].value()
+                            item = Food.objects.get(id=item_id)
+                            Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Medicine':
+                            item_id = forms['item'].value()
+                            item = Medicine_Inventory.objects.get(id=item_id)
+                            Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Miscellaneous':
+                            item_id = forms['item'].value()
+                            item = Miscellaneous.objects.get(id=item_id)
+                            Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
+
+                return redirect('profiles:team_leader_dashboard')
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -3556,7 +3573,7 @@ def load_item(request):
     item_type = request.GET.get('type')
     
     if item_type == 'Dog Food':
-        item = Food.objects.all()
+        item = Food.objects.filter(foodtype='Adult Dog Food')
     elif item_type == 'Medicine':
         item = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
     elif item_type == 'Medicine':

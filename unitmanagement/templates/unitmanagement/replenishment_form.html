@@ -7,6 +7,14 @@
         <div class="sub header">Input items Here</div>
     </h2>
 </div>
+<div class="ui info message">
+    <div class="header">
+        Fileds can be blank. Only input the items you need.
+    </div>
+    <ul class="list">
+      <li>A total of 10 items or less can be requested at a time.</li>
+    </ul>
+  </div>
 
 <form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" data-teams-url="{% url 'unitmanagement:load_item' %}">
     {% csrf_token %}    
@@ -54,11 +62,11 @@
 
     $(document).ready(function() {
     
-    $(function() {
-        $('#myForm .formset_class').formset({
-            prefix: '{{ formset.prefix }}'
-        });            
-    })
+    // $(function() {
+    //     $('#myForm .formset_class').formset({
+    //         prefix: '{{ formset.prefix }}'
+    //     });            
+    // })
         $(".type" ).bind('change', function() {
         var url = $("#myForm").attr("data-teams-url");
         var type = $(this).val();  
