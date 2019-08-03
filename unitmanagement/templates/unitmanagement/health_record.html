@@ -9,15 +9,15 @@
         {% endfor %}
     {% endif %}
 </div>
-<table id="tabledata" class="ui five column celled table">
+<table id="tabledata" class="ui six column celled table">
     <thead>
         <tr>
-            <th>Dog Name</th>
+            <th>Name</th>
             <th>Serial Number</th>
             <th>Breed</th>
             <th>Sex</th>
             <th>Age</th>
-
+            <th>Source</th>
         </tr>
     </thead>
     <tbody>
@@ -33,6 +33,7 @@
             <td>{{ data.breed }}</td>
             <td>{{ data.sex }}</td>
             <td>{{ data.age }}</td>
+            <td>{{ data.source }}</td>
 
         </tr>
         {% endif %}
@@ -50,7 +51,7 @@
             <td>{{ data.breed }}</td>
             <td>{{ data.sex }}</td>
             <td>{{ data.age }}</td>
-
+            <td>{{ data.source }}</td>
         </tr>
         {% endfor %}
         {% endif %}

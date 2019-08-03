@@ -174,44 +174,47 @@ def yearly_vaccine_list(request):
         try:
             ar = VaccineUsed.objects.filter(disease__contains='Anti-Rabies').filter(k9=k9).latest('date_vaccinated')
             nxt_ar = ar.date_vaccinated + relativedelta(years=+1)
-        except:
-            dar = k9.date_created + relativedelta(months=+6)
-            nxt_ar = dar
+        except ObjectDoesNotExist:
+            nxt_ar = None
 
         try:
             br = VaccineUsed.objects.filter(disease__contains='Bordetella').filter(k9=k9).latest('date_vaccinated')
             nxt_br = br.date_vaccinated + relativedelta(years=+1)
-        except:
-            dbr = k9.date_created + relativedelta(months=+6)
-            nxt_br = dbr
+        except ObjectDoesNotExist:
+            nxt_br = None
 
         try:
             dh = VaccineUsed.objects.filter(disease__contains='DHPPiL4').filter(k9=k9).latest('date_vaccinated')
             nxt_dh = dh.date_vaccinated + relativedelta(years=+1)
-        except:
-            ddh = k9.date_created + relativedelta(months=+6)
-            nxt_dh = ddh
+        except ObjectDoesNotExist:
+           nxt_dh = None
 
         try:
             dw = VaccineUsed.objects.filter(disease__contains='Deworming').filter(k9=k9).latest('date_vaccinated')
-            nxt_dw = dw.date_vaccinated + relativedelta(months=+1)
-        except:
-            ddw = k9.date_created + relativedelta(months=+6)
-            nxt_dw = ddw
+            nxt_dw = dw.date_vaccinated + relativedelta(months=+3)
+        except ObjectDoesNotExist:
+            nxt_dw = None
 
-        if nxt_ar <= dt.date.today():
-            ard = [k9,nxt_ar]
-            k9_ar.append(ard)
-        if nxt_br <= dt.date.today():
-            brd = [k9,nxt_br]
-            k9_br.append(brd)
-        if nxt_dh <= dt.date.today():
-            dhd = [k9,nxt_dh]
-            k9_dh.append(dhd)
-        if nxt_dw <= dt.date.today():
-            dwd = [k9,nxt_dw]
-            k9_dw.append(dwd)
+        if nxt_ar != None:
+            if nxt_ar <= dt.date.today():
+                ard = [k9,nxt_ar]
+                k9_ar.append(ard)
 
+        if nxt_br != None:
+            if nxt_br <= dt.date.today():
+                brd = [k9,nxt_br]
+                k9_br.append(brd)
+
+        if nxt_dh != None:
+            if nxt_dh <= dt.date.today():
+                dhd = [k9,nxt_dh]
+                k9_dh.append(dhd)
+                
+        if nxt_dw != None:
+            if nxt_dw <= dt.date.today():
+                dwd = [k9,nxt_dw]
+                k9_dw.append(dwd)
+            print(nxt_dw)
     form = VaccinationUsedForm(request.POST or None)
 
     if request.method == "POST":
@@ -241,6 +244,7 @@ def yearly_vaccine_list(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'today':dt.date.today(),
         'form':form,
         'k9_ar':k9_ar,
         'k9_dh':k9_dh,
@@ -2219,36 +2223,42 @@ def replenishment_form(request):
 
     form.fields['handler'].queryset = User.objects.filter(id=user.id)
 
-    formset1 = food_formset(request.POST or None, prefix='food')
-    formset2 = med_formset(request.POST or None, prefix='med')
-    formset3 = misc_formset(request.POST or None, prefix='misc')
+    formset1 = food_formset(request.POST or None)
+    formset2 = med_formset(request.POST or None)
+    formset3 = misc_formset(request.POST or None)
 
     # form
     if request.method == 'POST':
         print(form.errors)
+
         if form.is_valid():
-            f=form.save()
+            f=form.save(commit=False)
+
+            formset1 = food_formset(request.POST or None, prefix='food', instance=f)
+            formset2 = med_formset(request.POST or None, prefix='med', instance=f)
+            formset3 = misc_formset(request.POST or None, prefix='misc', instance=f)
 
             if formset1.is_valid() and formset2.is_valid() and formset3.is_valid():
-                for form in formset1:   
-                    form = form.save(commit=False)
-                    form.request = f
+               
+                for form1 in formset1:   
+                    form1 = form1.save(commit=False)
+                    form1.request = f
                     # form.save()
-                    print(form)
+                    print(form1)
 
           
-                for form in formset2:
-                    form = form.save(commit=False)
-                    form.request = f
+                for form2 in formset2:
+                    form2 = form2.save(commit=False)
+                    form2.request = f
                     # form.save()
-                    print(form)
+                    print(form2)
 
            
-                for form in formset3:
-                    form = form.save(commit=False)
-                    form.request = f
+                for form3 in formse31:
+                    form3 = form3.save(commit=False)
+                    form3.request = f
                     # form.save()
-                    print(form)
+                    print(form3)
             else:
                 message.warning(request, 'Invalid Input')
          
