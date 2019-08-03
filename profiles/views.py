@@ -21,7 +21,7 @@ from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
-from planningandacquiring.models import K9, K9_Mated
+from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from django.db.models import Sum
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9
 
@@ -145,6 +145,19 @@ def dashboard(request):
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
     ua_count = 1 #change this
 
+    try:
+        ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
+
+        aq = K9.objects.filter(date_created__year=datetime.today().year).count()
+        
+        ab_k9 = (ab.k9_needed + ab.k9_breeded) - aq
+
+        if ab_k9 < 0:
+            ab_k9 = 0
+
+    except ObjectDoesNotExist:
+        ab_k9 = 0
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -162,6 +175,8 @@ def dashboard(request):
         'for_breeding': for_breeding,
 
         'events': events,
+        'ab': ab,
+        'ab_k9': ab_k9,
 
         'c_count': c_count,
         'item_req_count': item_req_count,

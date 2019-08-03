@@ -85,6 +85,7 @@ urlpatterns = [
     path('vet/api', views.VetView.as_view()),
     path('commander/api', views.CommanderView.as_view()),
     path('trainer/api', views.TrainerView.as_view()),
+    path('admin/api', views.AdminView.as_view()),
 
 
     path('k9-checkup-pending', views.k9_checkup_pending, name='k9_checkup_pending'),

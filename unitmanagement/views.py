@@ -12,39 +12,32 @@ from django.db.models import Sum, Avg, Max, Q
 from django.core.exceptions import ObjectDoesNotExist
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
+from unitmanagement.serializers import K9Serializer
+from django.db.models import Q
+from dateutil.parser import parse
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+import calendar
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from planningandacquiring.forms import k9_detail_form
-from planningandacquiring.models import K9
+from planningandacquiring.models import K9, Actual_Budget
 
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History, Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine
+from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous_Received_Trail, Food_Received_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, RequestTransferForm, ReplenishmentForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
-from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, VaccineUsed, Notification
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm
 
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
 
-from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 
-from unitmanagement.serializers import K9Serializer
-from django.db.models import Q
-from dateutil.parser import parse
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 # Create your views here.
 
 import json
@@ -2959,6 +2952,71 @@ class TrainerView(APIView):
             "current":current,
             "demand":demand,
             "pie_data":pie_data,
+        }
+        return Response(data)
+
+class AdminView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        month = datetime.today().month
+        print(month)
+
+        ctr = 1
+        temp_total = 0
+
+        list_month = []
+        list_month_name = []
+        while ctr <= month:
+            mr = Medicine_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
+            # .aggregate(sum=Sum('quantity'))['sum'] 
+
+            mrt = 0
+            for mr in mr:
+                mi = Medicine_Inventory.objects.get(id=mr.inventory.id)
+                t = mr.quantity * mi.medicine.price
+                mrt = mrt + t
+            
+            fr = Food_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
+
+            frt = 0
+            for fr in fr:
+                mi = Food.objects.get(id=fr.id)
+                t = fr.quantity * mi.price
+                frt = frt + t
+
+            mir = Miscellaneous_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr) 
+            
+            mirt = 0
+            for mir in mir:
+                mi = Food.objects.get(id=mir.id)
+                t = mir.quantity * mi.price
+                mirt = mirt + t
+
+
+            if mr == None:
+                mr = 0
+            if fr == None:
+                fr = 0
+            if mir == None:
+                mir =0
+
+            temp_total = temp_total+mrt+frt+mirt
+
+            mon = calendar.month_name[ctr]
+            list_month_name.append(mon)
+            list_month.append(temp_total)
+            ctr = ctr+1
+
+        try:
+            ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
+            ab = ab.grand_total
+        except ObjectDoesNotExist:
+            ab = None
+        data = {
+         'list_month':list_month,
+         'list_month_name':list_month_name,
+         'ab':ab,
         }
         return Response(data)
 

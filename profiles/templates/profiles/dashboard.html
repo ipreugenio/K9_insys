@@ -1,5 +1,5 @@
 {% extends "profiles/global-base-ui/sidebar_menu.html" %} 
-
+{% load humanize %}
 {% block dashboard %}
 <div class="container fluid">
     <div class="ui two column grid">
@@ -88,7 +88,6 @@
                                         <i class="huge compass blue icon">{{dept_count}}</i>
                                     </div>
                                     <div class="extra content">
-                                        <br>
                                         <strong>
                                             <a href="{% url 'deployment:schedule_units' %}">K9's
                                             FOR INITIAL DEPLOYMENT</a>
@@ -126,12 +125,30 @@
                                 </div>
                             </div>
                         </div> 
+                        <div class="column">
+                                <div class="ui raised center aligned segment">
+                                    <div class="card">
+                                        <div class="content">
+                                            <i class="huge exclamation paw teal icon">{{ab_k9}}</i>
+                                        </div>
+                                        <div class="extra content">
+                                            <br>
+                                            <strong>
+                                                <a href="#">K9 TO BE ACQUIRED</a>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
                     </div>       
                 </div>
                
                 <div class="sixteen wide column">
                     <div class="ui raised segment">
-                        <canvas id="myChart4"></canvas>
+                        <div class="chart-container" style="position: relative; height:40vh;">
+                            <canvas id="myChart4"></canvas>
+                        </div>
+                       
                     </div>
                 </div>
             </div>
@@ -215,6 +232,77 @@
       $('#next').click(function() {
       $('#calendar').fullCalendar('nextYear');
       });
+
+      //Charts
+      var endpoint = '../../unitmanagement/admin/api'
+      var list_month = []
+      var list_month_name = []
+    
+      $.ajax({
+          method: "GET",
+          url: endpoint,
+          success: function(data){
+            list_month = data.list_month
+            list_month_name = data.list_month_name
+          
+            setChart()         
+          },
+          error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+          }
+      })
+
+      function setChart(){
+        var ctx = document.getElementById('myChart4');
+        //Chart1
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: list_month_name,
+              datasets: [{
+                    label: "{{ab.grand_total|intcomma}}",
+                    data: list_month,
+                    backgroundColor: ['rgba(75, 192, 192, 0.5)'],
+                    borderColor: ['rgba(75, 192, 192, 1)'],
+                    borderWidth: 1
+                }],
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                animateScale: true,
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        // var label = list_month_name[tooltipItem.datasetIndex] || '';
+                        var label = ''
+                        // if (label) {
+                        //     label += ': ';
+                        // }
+                        label += Math.round(tooltipItem.yLabel * 100) / 100;
+                        return label.toLocaleString();
+                    }
+                }
+            },
+            scales: {
+                xAxes: [{
+                ticks: {
+                   
+                }
+                }],
+                yAxes: [{
+                ticks: {
+                    step:1,
+                 
+                }
+                }]
+            },
+          }
+        });
+      }
     
   });
 </script>
