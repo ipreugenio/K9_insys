@@ -51,19 +51,12 @@ def in_heat_notifs():
             
         if (k9_breed.last_estrus_date + relativedelta(days=4)) == date.today():
             Notification.objects.create(k9=k9_breed, message=str(k9_breed) + ' is 3rd session of mating is today!', notif_type='heat_cycle')
-
             
-        # if k9_breed.estrus_date == date.today() and k9_breed.age >= 1:
-        #     Notification.objects.create(k9=k9_breed, message=str(
-        #         k9_breed) + ' is recommended to mate this week as she is most fertile!', notif_type='heat_cycle',
-        #                                 position='Veterinarian')
+        #TODO
+        # k9 might be pregnant
+        # k9 might give birth 
 
-
-        # if k9_breed.metestrus_date == date.today():
-        #     Notification.objects.create(k9=k9_breed, message='If you mated ' + str(
-        #         k9_breed) + ', she is about to show signs of pregnancy!', notif_type='heat_cycle',
-        #                                 position='Veterinarian')
-        
-        # for p in p:
-        #     p.last_proestrus_date = p.last_proestrus_date
-        #     p.save()
+@periodic_task(run_every=timedelta(seconds=30)) 
+    def k9_sched():
+        # k9_schedule
+        #Check-up

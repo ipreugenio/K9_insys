@@ -321,7 +321,7 @@ class K9(models.Model):
         #estrus_date start of session,10,12,14
         if self.sex == 'Female':
             if self.last_proestrus_date == None:
-                self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
+                self.last_proestrus_date = d.today() + relativedelta(months=+self.in_heat_months)
             
             self.last_estrus_date = self.last_proestrus_date + relativedelta(days=9)
             self.metestrus_date = self.last_estrus_date + relativedelta(month=2)
@@ -329,10 +329,15 @@ class K9(models.Model):
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
             self.next_estrus_date = self.next_proestrus_date + relativedelta(days=9)
 
-            if d.today() == self.last_proestrus_date:
+            m = d.today() - relativedelta(days=9)
+            p = d.today() + relativedelta(days=9)
+
+            if self.last_proestrus_date <= d.today() and self.last_proestrus_date >= m:
                 self.reproductive_stage = 'Proestrus'
             elif d.today() == self.last_estrus_date:
                 self.reproductive_stage = 'Estrus'
+            elif self.last_proestrus_date >=  d.today() and self.last_proestrus_date <= p:
+                self.reproductive_stage = 'Proestrus'
             elif d.today() == self.metestrus_date:
                 self.reproductive_stage = 'Metestrus'
             elif d.today() == self.anestrus_date:

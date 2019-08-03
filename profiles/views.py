@@ -1060,9 +1060,23 @@ def commander_dashboard(request):
 
     area_list = []
     areas = Area.objects.get(commander = user)
-    
+    location = Location.objects.filter(area=areas)
+
+    c_list = []
+    for l in location:
+        c_list.append(l.city)
+
+    loc_u = np.unique(c_list)
+
     events = Dog_Request.objects.filter(area= areas)
 
+
+    data = Dog_Request.objects.all()
+    data = data.filter(area=areas)
+
+    pending_sched = data.filter(status='Pending').count()
+    
+    print(pending_sched)   
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1072,6 +1086,7 @@ def commander_dashboard(request):
         'user':user,
         'events' : events,
         'areas' : areas,
+        'pending_sched' : pending_sched,
     }
     return render (request, 'profiles/commander_dashboard.html', context)
 

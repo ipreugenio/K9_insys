@@ -3020,8 +3020,8 @@ class VetView(APIView):
 class CommanderView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
-        area = Area.objects.filter(commander=user)
-        location = Location.objects.filter(area__in = area)
+        area = Area.objects.get(commander=user)
+        location = Location.objects.filter(area = area)
 
         c_list = []
         for l in location:

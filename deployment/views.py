@@ -581,9 +581,12 @@ def request_dog_list(request):
     print(user)
     print(user.position)
 
-    if user.position == "Commander":
-        areas = Area.objects.filter(commander = user)
-        data = data.filter(area__in=areas)
+    if user.position == "Administrator":
+        areas = Area.objects.get(commander = user)
+        data = data.filter(area=areas)
+
+    data1 = data.filter(status='Pending')
+    data2 = data.filter(status='Approved')
 
 
     # latest_date = Dog_Request.objects.latest('end_date')
@@ -600,6 +603,8 @@ def request_dog_list(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'data1':data1,
+        'data2':data2,
     }
     return render (request, 'deployment/request_dog_list.html', context)
 
