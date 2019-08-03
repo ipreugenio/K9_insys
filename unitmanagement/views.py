@@ -177,7 +177,7 @@ def yearly_vaccine_list(request):
     for v in vr:
         list_k9.append(v.k9.id)
 
-    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
+    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").filter(id__in=list_k9)
 
     k9_ar = []
     k9_dh = []
@@ -1347,9 +1347,9 @@ def trained_list(request):
 
     data = K9.objects.filter(training_status = "Trained")
 
-    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
+    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
+    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
 
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
@@ -2050,7 +2050,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
          
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(assignment=None).exclude(id__in=cb_list) 
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list) 
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -3049,9 +3049,9 @@ class TrainerView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
 
-        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
-        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
-        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
 
 
         NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
@@ -3685,12 +3685,49 @@ def k9_checkup_list_today(request):
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)
 
 def k9_mia_list(request):
-
+    style = "ui green message"
     k9_mia = K9.objects.filter(training_status = "MIA")
 
+    k9_list = []
+    
+    for km in k9_mia:
+        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).exclude(date_pulled=None).latest('date_pulled')
+
+        loc = None
+        if tdd.team_assignment != None:
+            loc = tdd.team_assignment
+        else:
+            loc = tdd.team_requested
+        
+        a = [km,loc,tdd]
+        k9_list.append(a)
+
+    print(k9_mia)
+    print(k9_list)
+    
     context = {
-        'k9_mia' : k9_mia
+        'k9_list' : k9_list,
+        'style' : style,
     }
 
     return render(request, 'unitmanagement/k9_mia_list.html', context)
+
+
+def k9_mia_change(request,id):
+    status =  request.GET.get('status')
+    
+    k9 = K9.objects.get(id=id)
+    if status == 'missing':
+        k9.status = 'Missing'
+        k9.training_status = 'Missing'
+        k9.save()
+
+    elif status == 'late':
+        k9.status = 'Working Dog'
+        k9.training_status = 'Deployed'
+        k9.save()
+
+    style = "ui green message"
+    messages.success(request, 'You have updated K9 unit status.')    
+    return redirect('unitmanagement:k9_mia_list')
 

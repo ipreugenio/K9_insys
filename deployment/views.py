@@ -115,7 +115,6 @@ def pre_req_unconfirmed(request):
     count = 0 
     for kp in kdi:
         date = kp.initial_sched.date_start - relativedelta(days=5)
-        print(date)
         if datetime.date.today() >= date:
             count = count+1
 
@@ -281,8 +280,8 @@ def check_handlers_with_multiple_k9s():
         if k9_count > 1:
             mult_k9.append((user, k9_count))
 
-    for item in mult_k9:
-        print(item)
+    # for item in mult_k9:
+    #     print(item)
 
     return None
 
@@ -332,7 +331,7 @@ def add_location(request):
     style = ""
 
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         if form.is_valid() and geoform.is_valid():
             location = form.save()
 
@@ -341,15 +340,15 @@ def add_location(request):
 
             checks = geoform['point'].value()
             checked = ast.literal_eval(checks)
-            print(checked['coordinates'])
+            # print(checked['coordinates'])
             toList = list(checked['coordinates'])
-            print(toList)
+            # print(toList)
             lon = Decimal(toList[0])
             lat = Decimal(toList[1])
-            print("LONGTITUDE")
-            print(lon)
-            print("LATITUDE")
-            print(lat)
+            # print("LONGTITUDE")
+            # print(lon)
+            # print("LATITUDE")
+            # print(lat)
             location.longtitude = lon
             location.latitude = lat
             location.save()
@@ -396,7 +395,7 @@ def load_locations(request):
 
     locations = geolocator.geocode(search_query, exactly_one=False)
 
-    print(locations)
+    # print(locations)
 
     context = {
         'locations' : locations,
@@ -411,8 +410,8 @@ def load_map(request):
 
     width = request.GET.get('width')
 
-    print("TEST coordinates")
-    print(str(lat) + " , " + str(lng))
+    # print("TEST coordinates")
+    # print(str(lat) + " , " + str(lng))
 
     geoform = GeoForm(request.POST or None, lat=lat, lng=lng, width=width)
 
@@ -506,8 +505,8 @@ def assigned_location_list(request):
     user = user_session(request)
     date_now = datetime.date.today()
 
-    print(user)
-    print(user.position)
+    # print(user)
+    # print(user.position)
 
     if user.position == "Commander":
         areas = Area.objects.filter(commander=user)
@@ -531,7 +530,7 @@ def assigned_location_list(request):
 #NOTE You cannot deploy k9s in this view anymore
 def team_location_details(request, id):
     data = Team_Assignment.objects.get(id=id)
-    print(data.id)
+    # print(data.id)
     incidents = Incidents.objects.filter(location = data.location)
     edd_inc = Incidents.objects.filter(location = data.location).filter(type = "Explosives Related").count()
     ndd_inc = Incidents.objects.filter(location=data.location).filter(type="Narcotics Related").count()
@@ -647,7 +646,7 @@ def dog_request(request):
     style = ""
 
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         form.validate_date()
         if form.is_valid():
 
@@ -659,15 +658,15 @@ def dog_request(request):
 
             checks = geoform['point'].value()
             checked = ast.literal_eval(checks)
-            print(checked['coordinates'])
+            # print(checked['coordinates'])
             toList = list(checked['coordinates'])
-            print(toList)
+            # print(toList)
             lon = Decimal(toList[0])
             lat = Decimal(toList[1])
-            print("LONGTITUDE")
-            print(lon)
-            print("LATITUDE")
-            print(lat)
+            # print("LONGTITUDE")
+            # print(lon)
+            # print("LATITUDE")
+            # print(lat)
             location.longtitude = lon
             location.latitude = lat
 
@@ -721,8 +720,8 @@ def request_dog_list(request):
     user = user_session(request)
     date_now = datetime.date.today()
 
-    print(user)
-    print(user.position)
+    # print(user)
+    # print(user.position)
 
     if user.position == "Commander":
         areas = Area.objects.get(commander = user)
@@ -775,14 +774,14 @@ def request_dog_details(request, id):
     for u in user:
         user_deploy.append(u.id)
 
-    print("Viable User Ids")
-    print(user_deploy)
+    # print("Viable User Ids")
+    # print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
     can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed')
         # .filter(assignment='None')
 
-    print("can_deploy_by_handler")
-    print(can_deploy)
+    # print("can_deploy_by_handler")
+    # print(can_deploy)
 
     # dogs deployed to Dog Request
     # Don't need to filter data2.status == "Approved" since wala rin naman k9_schedule if naka pending pa yung request
@@ -806,8 +805,8 @@ def request_dog_details(request, id):
 
     #TODO
 
-    print("TL Candidates")
-    print(TL_candidates)
+    # print("TL Candidates")
+    # print(TL_candidates)
     TL = None
     if len(TL_candidates) >= 1:
         TL = assign_TL(None, handler_list_arg=TL_candidates)
@@ -854,8 +853,8 @@ def request_dog_details(request, id):
     #>>Also, dog deployment means scheduling first
 
     can_deploy = can_deploy2
-    print("can_deploy_no_conflict")
-    print(can_deploy)
+    # print("can_deploy_no_conflict")
+    # print(can_deploy)
 
     #K9s that are within AOR of request
     k9s_within_AOR = []
@@ -1005,8 +1004,8 @@ def request_dog_details(request, id):
             return redirect('deployment:request_dog_details', id=id)
 
         checks = request.POST.getlist('checks')  # get the id of all the dogs checked
-        print("Checked Dogs")
-        print(checks)
+        # print("Checked Dogs")
+        # print(checks)
 
         # get the k9 instance of checked dogs
         checked_dogs = K9.objects.filter(id__in=checks)
@@ -1176,8 +1175,8 @@ def add_incident(request):
 
     user_serial = request.session['session_serial']
 
-    print("USER SERIAL")
-    print(user_serial)
+    # print("USER SERIAL")
+    # print(user_serial)
 
     user = Account.objects.get(serial_number=user_serial)
     current_user = User.objects.get(id=user.UserID.id)
@@ -1283,7 +1282,7 @@ def daily_refresher_form(request):
         dr = 0
 
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         if form.is_valid():
             f = form.save(commit=False)
             f.k9 = k9
@@ -1304,7 +1303,7 @@ def daily_refresher_form(request):
 
             #TIME
             #time = (f.port_time + f.building_time + f.vehicle_time + f.baggage_time + f.others_time)
-            print(f.port_time)
+            # print(f.port_time)
             ######################
             f.save()
 
@@ -1442,14 +1441,14 @@ def load_units(request):
         fullstring = request.GET.get('fullstring')
         fullstring = json.loads(fullstring)
 
-        print("FullString")
-        print(fullstring)
+        # print("FullString")
+        # print(fullstring)
 
         for item in fullstring.values(): # item == checked checkboxes
             selected_list.append(item)
 
-        print("SELECTED LIST")
-        print(selected_list)
+        # print("SELECTED LIST")
+        # print(selected_list)
 
         # START TEST
 
@@ -1457,8 +1456,8 @@ def load_units(request):
         temp = TempDeployment.objects.filter(location=location)
         k9s = K9.objects.filter(pk__in = selected_list)
 
-        print("TEMP OBJECTS")
-        print(temp)
+        # print("TEMP OBJECTS")
+        # print(temp)
 
         for item in temp:
             if item.k9.capability == "SAR":
@@ -1475,12 +1474,12 @@ def load_units(request):
         if (team.SAR_deployed + sar_count_select) >= team.SAR_demand:
             capability_blacklist.append("SAR")
 
-        print("CAPABILITY BLACKLIST")
-        print(capability_blacklist)
+        # print("CAPABILITY BLACKLIST")
+        # print(capability_blacklist)
 
-        print(sar_count_select)
-        print(ndd_count_select)
-        print(edd_count_select)
+        # print(sar_count_select)
+        # print(ndd_count_select)
+        # print(edd_count_select)
 
         # END TEST
 
@@ -1582,8 +1581,8 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
     k9_id_list = []
     for item in temp:
         k9_id_list.append(item.k9.id)
-        print("TEMP K9")
-        print(item.k9)
+        # print("TEMP K9")
+        # print(item.k9)
 
     while end_assignment == 0 and K9.objects.filter(training_status='For-Deployment').filter(
                 assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) is not None:
@@ -1599,8 +1598,8 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
             k9_id_list = []
             for item in temp:
                 k9_id_list.append(item.k9.id)
-                print("TEMP K9")
-                print(item.k9)
+                # print("TEMP K9")
+                # print(item.k9)
 
             handlers = Personal_Info.objects.filter(city=location.city)
 
@@ -1618,8 +1617,8 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
                 assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list).exclude(handler__in = user_exclude) #Same code in main
             # End Get K9s ready for deployment
 
-            print("CAN DEPLOY QUERYSET")
-            print(can_deploy)
+            # print("CAN DEPLOY QUERYSET")
+            # print(can_deploy)
 
             # if can_deploy is None:
             #     sys.exit()
@@ -1627,8 +1626,8 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
             k9s_assigned = 0
             finish_location_assignment = 0
             for k9 in can_deploy:
-                print("CAN DEPLOY K9")
-                print(k9)
+                # print("CAN DEPLOY K9")
+                # print(k9)
                 if finish_location_assignment == 0:
                     type = incident_type_list[iteration][0]
                     if type == k9.capability:
@@ -1669,8 +1668,8 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
                     #                                                         team_assignment = team).count()
                     dogs_scheduled_count = K9_Schedule.objects.filter(status="Initial Deployment", team=team).count()
                     if (team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2:  # There must be atleast 2 units per location #TODO Include schedule K9s
-                        print("Units per Location " + str(location))
-                        print(team.total_dogs_deployed + k9s_assigned)
+                        # print("Units per Location " + str(location))
+                        # print(team.total_dogs_deployed + k9s_assigned)
                         finish_location_assignment = 1
 
 
@@ -1866,8 +1865,8 @@ def schedule_units(request):
             delete_indexes.append(idx)
         idx += 1
 
-    print("DELETE INDEXES")
-    print(delete_indexes)
+    # print("DELETE INDEXES")
+    # print(delete_indexes)
 
     #TODO Issue with current code where 2 k9s with varying skills are less likely be put in the same port together because of incident order list
     location_dataframe.drop(location_dataframe.index[delete_indexes], inplace=True) #Delete rows without any K9s assigned
@@ -1905,7 +1904,7 @@ def schedule_units(request):
 
     style = ""
 
-    print(location_dataframe)
+    # print(location_dataframe)
 
     if request.method == 'POST':
         invalid = False
@@ -1917,12 +1916,12 @@ def schedule_units(request):
                     try:
                         deployment_date = form['deployment_date'].value()
                         deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
-                        print("Deployment Date")
-                        print(deployment_date)
+                        # print("Deployment Date")
+                        # print(deployment_date)
 
                         delta = deployment_date - datetime.date.today()
-                        print("Delta")
-                        print(delta.days)
+                        # print("Delta")
+                        # print(delta.days)
 
                     except:pass
 
@@ -1941,12 +1940,12 @@ def schedule_units(request):
                     # try:
                     deployment_date = form['deployment_date'].value()
                     deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
-                    print("Deployment Date")
-                    print(deployment_date)
+                    # print("Deployment Date")
+                    # print(deployment_date)
 
                     delta = deployment_date - datetime.date.today()
-                    print("Delta")
-                    print(delta.days)
+                    # print("Delta")
+                    # print(delta.days)
                     if delta.days < 7:
                         style = "ui red message"
                         messages.warning(request, 'Dates should have atleast 1 week allowance')
@@ -1954,17 +1953,17 @@ def schedule_units(request):
                         team = team_list[idx]
                         temp = temp_list[idx]
 
-                        print("Temp")
-                        print(temp)
+                        # print("Temp")
+                        # print(temp)
 
                         for item in temp:
-                            print("Item")
-                            print(item)
+                            # print("Item")
+                            # print(item)
 
                             #TODO Issue when saving team_assingment (everyone is scheduled under one team)
                             #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
                             deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
-                            print(deploy)
+                            # print(deploy)
                             deploy.save()
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()
