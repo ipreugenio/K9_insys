@@ -79,7 +79,10 @@ urlpatterns = [
     path('replenishment_form/ajax_load_item_misc', views.load_item_misc, name='load_item_misc'),
     
     path('replenishment_confirm', views.replenishment_confirm, name='replenishment_confirm'),
-    
+    path('replenishment_approval/<int:id>', views.replenishment_approval, name='replenishment_approval'),
+
+    path('confirm_item_request/<int:id>', views.confirm_item_request, name='confirm_item_request'),
+
     path('team-leader/api', views.TeamLeaderView.as_view()),
     path('handler/api', views.HandlerView.as_view()),
     path('vet/api', views.VetView.as_view()),

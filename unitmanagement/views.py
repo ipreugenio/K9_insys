@@ -133,9 +133,11 @@ def index(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
+    food = Medicine.objects.all()
 
-    #form = VaccinationYearlyForm
-
+    for food in food:
+        print(food)
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -2100,6 +2102,11 @@ def confirm_going_back(request,id):
     cb.save()
     return redirect ('profiles:handler_dashboard')
 
+def confirm_item_request(request,id):
+    rr = Replenishment_Request.objects.get(id=id)
+    rr.delete()
+    return redirect ('profiles:team_leader_dashboard')
+
 # TODO 
 # transfer request list
 def transfer_request_list(request):
@@ -2315,6 +2322,106 @@ def replenishment_confirm(request):
         'data2':data2,
     }
     return render (request, 'unitmanagement/replenishment_request_confirm.html', context)
+
+def replenishment_approval(request, id):
+    user = user_session(request)
+    style = 'ui green message'
+
+    rr = Replenishment_Request.objects.get(id=id)
+    ta = Team_Assignment.objects.get(team_leader=rr.handler)
+    misc = Miscellaneous_Request.objects.filter(request=rr)
+    med = Medicine_Request.objects.filter(request=rr)
+    food = Food_Request.objects.filter(request=rr)
+
+    if request.method == 'POST':
+        msg = 'Inssufficient quantity for item '
+        items = []
+        for f in food:
+            ff = Food.objects.get(id=f.food.id)
+            if f.quantity > ff.quantity:
+                items.append(str(ff))
+
+        for md in med:
+            mdd = Medicine_Inventory.objects.get(id=md.medicine.id)
+            if md.quantity > mdd.quantity:
+                items.append(str(mdd))
+
+        for msc in misc:
+            mscc = Miscellaneous.objects.get(id=msc.miscellaneous.id)
+            if msc.quantity > mscc.quantity:
+                items.append(str(mscc))
+
+        if len(items) != 0:
+            i = 0
+            msg2 = ''
+            print(len(items))
+
+            while  i < len(items):
+                if i == (len(items) - 1):
+                    msg2 = msg2 + items[i] + '.'
+                else:    
+                    msg2 = msg2 + items[i] + ' ,'
+            
+                i = i+1
+
+            style = 'ui red message'
+            messages.warning(request, msg+msg2)
+
+        else:
+            for f in food:
+                ff = Food.objects.get(id=f.food.id)
+                if ff.quantity <= 0:
+                    ff.quantity = 0
+                if f.quantity <= ff.quantity:
+                    Food_Subtracted_Trail.objects.create(inventory=ff, user=user,quantity=f.quantity)
+                    ff.quantity = ff.quantity - f.quantity
+                    ff.save()
+
+            for md in med:
+                mdd = Medicine_Inventory.objects.get(id=md.medicine.id)
+                if md.quantity <= 0:
+                    md.quantity = 0
+                if md.quantity <= mdd.quantity:
+                    Medicine_Subtracted_Trail.objects.create(inventory=mdd, user=user,quantity=md.quantity)
+                    mdd.quantity = mdd.quantity - md.quantity
+                    mdd.save()
+
+            for msc in misc:
+                mscc = Miscellaneous.objects.get(id=msc.miscellaneous.id)
+                if msc.quantity <= 0:
+                    msc.quantity = 0
+                if msc.quantity <= mscc.quantity:
+                    Miscellaneous_Subtracted_Trail.objects.create(inventory=mscc, user=user,quantity=msc.quantity)
+                    mscc.quantity = mscc.quantity - msc.quantity
+                    mscc.save()
+
+
+            rr.status = 'Confirmed'
+            rr.approved_by = user
+            rr.date_approved = date.today()
+            rr.save()
+
+            style = 'ui green message'
+            messages.success(request, 'Replenishment Request Approved')
+            return redirect('unitmanagement:replenishment_confirm')
+
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
+    context = {
+        'title': "Item Replenishment Request Details",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'ta':ta,
+        'rr':rr,
+        'misc':misc,
+        'med':med,
+        'food':food,
+    }
+    return render (request, 'unitmanagement/replenishment_approve.html', context)
 
 #TODO
 # what to do if on-leave
@@ -3006,15 +3113,9 @@ class AdminView(APIView):
             list_month.append(temp_total)
             ctr = ctr+1
 
-        try:
-            ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
-            ab = ab.others_total + ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash   
-        except ObjectDoesNotExist:
-            ab = None
         data = {
          'list_month':list_month,
          'list_month_name':list_month_name,
-         'ab':ab,
         }
         return Response(data)
 

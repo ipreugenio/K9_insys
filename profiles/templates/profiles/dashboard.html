@@ -68,7 +68,6 @@
                                         <i class="huge bus brown icon">{{tq_count}}</i>
                                     </div>
                                     <div class="extra content">
-                                        <br>
                                         <strong>
                                             <a href="#">TRANSFER REQUESTS</a>
                                         </strong>
@@ -117,7 +116,6 @@
                                         <i class="huge exclamation circle red icon">{{ua_count}}</i>
                                     </div>
                                     <div class="extra content">
-                                        <br>
                                         <strong>
                                             <a href="{% url 'unitmanagement:k9_mia_list'%}">UNCONFIRMED ARRIVALS</a>
                                         </strong>
@@ -132,7 +130,6 @@
                                             <i class="huge exclamation paw teal icon">{{ab_k9}}</i>
                                         </div>
                                         <div class="extra content">
-                                            <br>
                                             <strong>
                                                 <a href="#">K9 TO BE ACQUIRED</a>
                                             </strong>
@@ -261,11 +258,13 @@
             data: {
               labels: list_month_name,
               datasets: [{
-                    label: "{{ab.grand_total|intcomma}}",
+                    label: "{{ab_total|intcomma}}",
                     data: list_month,
                     backgroundColor: ['rgba(75, 192, 192, 0.5)'],
                     borderColor: ['rgba(75, 192, 192, 1)'],
-                    borderWidth: 1
+                    borderWidth: 1,
+                    lineTension:0.1,
+                    borderJointStyle:'miter',
                 }],
             },
             options: {

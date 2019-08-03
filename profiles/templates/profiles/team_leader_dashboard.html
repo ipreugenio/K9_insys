@@ -10,7 +10,93 @@
   <div class="streched row">
     <div class="ten wide column"  style="padding-right: 0%;">
       <div class="ui basic segment">
+          {%if cb %}
+          {%if cb.status == 'Pending' %}
+          <div class="ui info message">
+             
+              <div class="header">
+                <i></i>
+                  YOU HAVE BEEN CALLED BACK TO BASE! 
+                  <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
+              </div>
+              <ul class="list">
+                <li>Please confirm that
+                    you have received the message and will return at your most earliest
+                    convenient time. </li>
+              </ul>
+            </div>
+            {% else %}
+            <div class="ui info icon message">
+                <i class="exclamation icon"></i>
+                <div class="content">
+                  <div class="header">
+                      Admin is awaiting your arrival back to base.
+                  </div>
+                </div> 
+            </div>
+            {% endif %}
+            {% endif %}
+
         <div class="ui stackable grid">
+         <div class="sixteen wide column">
+          <div class="ui three column equal width grid">
+            <div class="column">
+              <div class="ui raised segment center aligned">
+                  <div class="card">
+                      <div class="content">
+                          {%if dr == 1%}
+                          <i class="huge green check icon"></i>
+                          {%else%}
+                          <i class="huge red close icon"></i>
+                          {%endif%}
+                      </div>
+                      <div class="extra content">
+                          <strong>
+                              <a href="{% url 'deployment:daily_refresher_form'%}">DAILY REFRESHER</a>
+                          </strong>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="column">
+                <div class="ui raised segment">
+                    <div class="card">
+                        <div class="content">
+                            {%if rro%}
+                              {%if rro.status == 'Confirmed'%}
+                              <h5 style='color:orangered;'> YOUR ITEMS ARE ON THE WAY. PLEASE CONFIRM ARRIVAL.</h5>
+                              {%elif rro.status == 'Pending' %}
+                              <h5 style='color:teal;'>YOU HAVE A PENDING ITEM
+                              REPLENISHMENT REQUEST. PLEASE AWAIT CONFIRMATION</h5>
+                              {%endif%}
+                            {%else%}
+                            <h5 style='color:grey;'>YOU HAVE NO CURRENT REPLENISHMENT REQUEST TRANSACTION.</h5>
+                            {%endif%}
+                        </div>
+                        <div class="extra content center aligned">
+                          <center>
+                              <strong>
+                                  {% if rro %}
+                                    {%if rro.status == 'Confirmed'%}
+                                    <a href="{% url 'unitmanagement:confirm_item_request' rro.id%}" class="ui green button">CONFIRM</a>
+                                    {% endif %}
+                                  {% else %}
+                                  <a href="{% url 'unitmanagement:replenishment_form'%}">ITEM REPLENISHMENT REQUEST</a>
+                                  {% endif %}
+                                </strong>
+                          </center>
+                         
+                        </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="column">
+                  <div class="ui raised segment">
+
+                    </div>
+                </div>
+          </div>
+         </div>
             <div class="eight wide column">
               <div class="ui raised segment">
                 <div class="ui two statistics">

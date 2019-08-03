@@ -37,7 +37,7 @@ from deployment.models import Location, Team_Assignment, Dog_Request, Incidents,
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
-from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, K9_Incident, VaccineUsed
+from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, K9_Incident, VaccineUsed, Replenishment_Request
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -156,8 +156,12 @@ def dashboard(request):
         if ab_k9 < 0:
             ab_k9 = 0
 
+        ab_total = ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash
+
+
     except ObjectDoesNotExist:
         ab_k9 = 0
+        ab_total = None
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -178,6 +182,7 @@ def dashboard(request):
         'events': events,
         'ab': ab,
         'ab_k9': ab_k9,
+        'ab_total':ab_total,
 
         'c_count': c_count,
         'item_req_count': item_req_count,
@@ -315,7 +320,26 @@ def team_leader_dashboard(request):
         else:
             print(check_arrival.errors)
 
+    cb = None
+    try:
+        cb = Call_Back_K9.objects.get(k9__handler=user)        
+    except ObjectDoesNotExist:
+        pass
 
+    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+
+    if drf.exists():
+        dr = 1
+    else:
+        dr = 0
+
+
+    try:
+        rro = Replenishment_Request.objects.filter(handler=user).latest('id')
+    except ObjectDoesNotExist:
+        rro = None
+
+    print('rr',rro)
     context = {
         'incident_count':incident_count,
         'ta':ta,
@@ -332,6 +356,9 @@ def team_leader_dashboard(request):
         'geoform': geoform,
         'geosearch': geosearch,
         'events': events,
+        'cb':cb,
+        'dr':dr,
+        'rro':rro,
 
         'for_arrival' : for_arrival,
         'check_arrival' : check_arrival,
@@ -635,7 +662,7 @@ def handler_dashboard(request):
         'geoform': geoform,
         'geosearch': geosearch,
         'events': events,
-
+        'today': date.today(),
         'show_start': show_start,
         'show_end': show_end,
         'training_sched' : training_sched,

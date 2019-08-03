@@ -40,17 +40,22 @@
             
                   <div class="ui three column grid">
                     <div class="column">
-                        <div class="ui raised segment">
+                        <div class="ui raised segment center aligned">
                             <div class="card">
                                 <div class="content">
+                                    {%if dr == 1%}
                                     <i class="huge green check icon"></i>
+                                    {%else%}
+                                    <i class="huge red close icon"></i>
+                                    {%endif%}
                                 </div>
                                 <div class="extra content">
                                     <strong>
-                                        <a href="">DAILY REFRESHER</a>
+                                        <a href="{% url 'deployment:daily_refresher_form'%}">DAILY REFRESHER</a>
                                     </strong>
                                 </div>
                             </div>
+                          
                           
                         </div>
                     </div>

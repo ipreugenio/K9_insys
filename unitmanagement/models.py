@@ -247,24 +247,24 @@ class Replenishment_Request(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='tl_request')
     status = models.CharField('status', max_length=200, default="Pending", choices=STATUS)
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='admin_give')
-    date_approved = models.DateField('date_vaccinated', null=True, blank=True)
-    date_received = models.DateField('date_vaccinated', null=True, blank=True)
-    date_requested = models.DateField('date', auto_now_add=True)
+    date_approved = models.DateField('date_approved', null=True, blank=True)
+    date_received = models.DateField('date_received', null=True, blank=True)
+    date_requested = models.DateField('date_requested', auto_now_add=True)
 # Request Equipment Connect to K9_Pre_Deployment Equipments
 class Miscellaneous_Request(models.Model):
-    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True,related_name='misc_replenishment')
     miscellaneous = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
     unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Medicine_Request(models.Model):
-    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True, related_name='med_replenishment')
     medicine = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
     unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Food_Request(models.Model):
-    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True)
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True,related_name='food_replenishment')
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
     unit = models.CharField('unit', max_length=200, null=True, blank=True)
