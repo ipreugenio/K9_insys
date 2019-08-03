@@ -44,12 +44,12 @@
                         {% if proestrus.last_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ proestrus.last_proestrus_date }}</td>
+                        <td>{{ proestrus.last_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                         {% if proestrus.next_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ proestrus.next_proestrus_date }}</td>
+                        <td>{{ proestrus.next_proestrus_date | date:"Y-m-d" }}</td>
                         {% endif %}
                 </tr>
             {% endfor %}
@@ -76,12 +76,12 @@
                         {% if estrus.last_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ estrus.last_proestrus_date }}</td>
+                        <td>{{ estrus.last_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                         {% if estrus.next_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ estrus.next_proestrus_date }}</td>
+                        <td>{{ estrus.next_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                 </tr>
             {% endfor %}
@@ -108,12 +108,12 @@
                         {% if metestrus.last_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ metestrus.last_proestrus_date }}</td>
+                        <td>{{ metestrus.last_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                         {% if metestrus.next_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ metestrus.next_proestrus_date }}</td>
+                        <td>{{ metestrus.next_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                 </tr>
             {% endfor %}
@@ -140,12 +140,12 @@
                         {% if anestrus.last_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ anestrus.last_proestrus_date }}</td>
+                        <td>{{ anestrus.last_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                         {% if anestrus.next_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}
-                        <td>{{ anestrus.next_proestrus_date }}</td>
+                        <td>{{ anestrus.next_proestrus_date | date:"Y-m-d"}}</td>
                         {% endif %}
                 </tr>
             {% endfor %}
@@ -157,10 +157,18 @@
 <script type="text/javascript">
         
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
+        $('#tabledata1').DataTable({
+            "order": [[ 3, "asc" ]]
+        });
+        $('#tabledata2').DataTable({
+            "order": [[ 3, "asc" ]]
+        });
+        $('#tabledata3').DataTable({
+            "order": [[ 3, "asc" ]]
+        });
+        $('#tabledata4').DataTable({
+            "order": [[ 3, "asc" ]]
+        });
         $('.menu .item').tab();
     });
     

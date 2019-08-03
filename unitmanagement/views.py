@@ -41,7 +41,7 @@ from training.forms import assign_handler_form
 # Create your views here.
 
 import json
-
+import numpy as np
 from pandas import DataFrame as df
 
 def notif(request):
@@ -2481,6 +2481,7 @@ def reproductive_edit(request, id):
             form.save()
             style = "ui green message"
             messages.success(request, 'Reproductive Details has been successfully Updated!')
+            return redirect('unitmanagement:reproductive_list')
         else:
             style = "ui red message"
             messages.warning(request, 'Make sure all input is complete!')
@@ -3022,13 +3023,26 @@ class CommanderView(APIView):
         area = Area.objects.filter(commander=user)
         location = Location.objects.filter(area__in = area)
 
-        team = Team_Assignment.objects.filter(location__in =location)
-        team_items = []
-        for t in team:
-            pass
+        c_list = []
+        for l in location:
+            c_list.append(l.city)
 
+        loc_u = np.unique(c_list)
+
+        list_city = []
+        list_count = []
+        for loc in loc_u:
+            count = Dog_Request.objects.filter(city=loc).count() 
+            list_city.append(loc)
+            list_count.append(count)
+        
+        # print(list_city)
+
+        # team_items = []
+      
         data = {
-            "team_items":team_items,
+            "list_city":list_city,
+            "list_count":list_count,
         }
         return Response(data)
 

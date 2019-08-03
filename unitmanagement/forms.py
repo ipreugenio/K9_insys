@@ -303,6 +303,8 @@ class ReproductiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReproductiveForm, self).__init__(*args, **kwargs)
         self.fields['last_proestrus_date'].required = False
+        self.fields['reproductive_stage'].required = False
+        self.fields['reproductive_stage'].widget.attrs['disabled'] = True
 
 
 class RequestMiscellaneous(forms.ModelForm):

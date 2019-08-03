@@ -87,8 +87,8 @@
                                     <div class="card">
                                                 <div class="content">
                                                     <i class="huge red heartbeat icon"></i>
-                                                    <i class="huge green icon">2</i>
-                                                    <i class="huge blue icon">5</i>
+                                                    <i class="huge green icon">{{checkup_now}}</i>
+                                                    <i class="huge blue icon">{{checkup_upcoming}}</i>
                                                 </div>
                                                 <div class="extra content right aligned">
                                                   
@@ -170,12 +170,11 @@
                                 <div class="ui raised center aligned segment">
                                     <div class="card">
                                         <div class="content">
-                                            <i class="huge paw alternate olive icon">{{health_pending}}</i>
+                                            <i class="huge paw alternate olive icon">{{ab_k9}}</i>
                                         </div>
                                         <div class="extra content">
                                             <strong  style="font-size: 11px;">
-                                                <a href="#">K9
-                                                ACQUISITION COUNTDOWN</a>
+                                                <a href="{% url 'planningandacquiring:add_procured_k9'%}">K9 ACQUISITION COUNTDOWN</a>
                                             </strong>
                                         </div>
                                     </div>
@@ -223,6 +222,12 @@
         </div>
         <div class="six wide column" style="padding: 0%;padding-right: 1%;">
                 <div class="ui basic segment"> 
+                <div class="ui info message">
+                    <div class="header">
+                        Dont forget to keep the K9 Reproductive Date updated!
+                        <a href="{% url 'unitmanagement:reproductive_list'%}">Go</a>
+                    </div>
+                </div>
                 <div class="ui inverted segment">
                     <h4>Calendar</h4>
                 </div>

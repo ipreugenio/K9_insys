@@ -698,26 +698,31 @@ def vet_dashboard(request):
 
     #TODO show k9 if there are no valid checkups
 
-    k9_exclude_list = [] #Does not need to be checkuped
+    k9_exclude_list = [] #Does not need to be 
     for k9 in k9_list:
         try:
             checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
             delta = datetime.today().date() - checkup.date
             if checkup.cleared == True and delta.days <= 90: #3 months
                 k9_exclude_list.append(k9)
-                print(checkup.cleared)
-                print(delta.days)
-        except: pass
+                # print(checkup.cleared)
+                # print(delta.days)
+        except ObjectDoesNotExist:
+            pass
 
+    #k9 schedule = checkups, checkup list
     checkups = checkups.exclude(k9__in = k9_exclude_list)
 
     checkup_list = []
+    k9_list = []
     for checkup in checkups:
         if checkup.date_start == datetime.today().date():
             checkup_list.append(checkup)
+            k9_list.append(checkup.k9)
     
+ 
     checkup_now = len(checkup_list)
-    checkup_upcoming = checkups.exclude(k9__in = checkup_list).count()
+    checkup_upcoming = checkups.exclude(k9__in = k9_list).count()
     print('checkup', checkup_now,checkup_upcoming)
 
     #k9 to be scheduled for checkup
@@ -1008,6 +1013,24 @@ def vet_dashboard(request):
     vac_list = zip(vac_values,vac_counts)
     vac_count = sum(vac_counts)
 
+    ab = None
+    try:
+        ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
+
+        aq = K9.objects.filter(date_created__year=datetime.today().year).count()
+        
+        ab_k9 = (ab.k9_needed + ab.k9_breeded) - aq
+
+        if ab_k9 < 0:
+            ab_k9 = 0
+
+        ab_total = ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash
+
+
+    except ObjectDoesNotExist:
+        ab_k9 = 0
+        ab_total = None
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1026,6 +1049,9 @@ def vet_dashboard(request):
         'yearly_count':yearly_count,
         'vac_list':vac_list,
         'vac_count':vac_count,
+        'ab_k9':ab_k9,
+        'checkup_now':checkup_now,
+        'checkup_upcoming':checkup_upcoming,
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
@@ -1033,10 +1059,9 @@ def commander_dashboard(request):
     user = user_session(request)
 
     area_list = []
-    areas = Area.objects.filter(commander = user)
-    for area in areas:
-        area_list.append(area)
-    events = Dog_Request.objects.filter(area__in = area_list)
+    areas = Area.objects.get(commander = user)
+    
+    events = Dog_Request.objects.filter(area= areas)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1045,7 +1070,8 @@ def commander_dashboard(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
-        'events' : events
+        'events' : events,
+        'areas' : areas,
     }
     return render (request, 'profiles/commander_dashboard.html', context)
 

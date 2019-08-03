@@ -10,25 +10,35 @@
           <div class="ui basic segment">
             <div class="ui stackable grid">
                 <div class="sixteen wide column">
-                    <div class="ui equal width height grid">
+                    <div class="ui equal width height two column grid center aligned">
                         <div class="column">
-                          <div class="ui raised segment">
-                              <div class="card">
-                                  <div class="content">
-                                      <i class="huge syringe blue icon pop">{{vac_pending}}</i>
+                            <div class="ui raised segment">
+                                <div class="ui blue statistic">
+                                    <div class="value">
+                                        <i class="calendar check blue icon"></i>
+                                        {n}
+                                    </div>
+                                    <div class="label">
+                                        <a href="#">Pending Event Request</a>
+                                    </div>
                                   </div>
-                                  <div class="extra content">
-                                      <strong>
-                                          <a href="#">Pending Event Request</a>
-                                      </strong>
-                                  </div>
-                              </div> 
+                            </div>
                           </div>
-                           
-                        </div>
+                          <div class="column">
+                              <div class="ui raised segment" style='padding:19px;'>
+                                  <h2>AOR</h2>
+                                  <strong style="color: orangered;font-size: 20px;">{{areas}}</strong>
+                              </div>
+                            </div>
                       </div>
                 </div>
-
+                <div class="sixteen wide column">
+                  <div class="ui raised segment">
+                      <div class="chart-container" style="position: relative;">
+                          <canvas id="myChart" height="150" ></canvas>
+                      </div>
+                  </div>
+                </div>
            
             </div>
         </div>
@@ -110,13 +120,17 @@ $(document).ready(function() {
       $('#next').click(function() {
       $('#calendar').fullCalendar('nextYear');
       });
+
     var endpoint = '../../unitmanagement/commander/api'
-    var performance = []
+    var city = []
+    var count = []
     $.ajax({
         method: "GET",
         url: endpoint,
         success: function(data){
-          team = data.team_items
+          city = data.list_city
+          count = data.list_count
+          defaultData = data.default
           setChart()         
         },
         error: function(error_data){
@@ -129,14 +143,13 @@ $(document).ready(function() {
         var ctx = document.getElementById('myChart');
         //Chart1
         var myChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
-              labels: ['Something'],
+              labels: city,
               datasets: [{
-                    label: "AOR",
-                    data: team_items,
-                    backgroundColor: ['rgba(75, 192, 192, 0.5)'],
-                    borderColor: ['rgba(75, 192, 192, 1)'],
+                    label: 'Event Request ',
+                    data: count,
+                    backgroundColor:  ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)', 'rgba(75, 192, 192, 0.5)', 'rgba(153, 102, 255, 0.5)', 'rgba(255, 159, 64, 0.5)', 'rgba(255, 162, 192, 0.5)', 'rgba(54, 162, 99, 0.5)', 'rgba(153, 162, 235, 0.5)', 'rgba(54, 64, 86, 0.5)'],
                     borderWidth: 1
                 }]
             },
@@ -146,7 +159,7 @@ $(document).ready(function() {
             },
             title: {
                 display: true,
-                text: "AOR"
+                text: "Area of Responsibility"
             },
             scales: {
                 xAxes: [{
@@ -158,7 +171,6 @@ $(document).ready(function() {
                 ticks: {
                     beginAtZero: true,
                     step:1,
-                    suggestedMax:100,
                 }
                 }]
             },
