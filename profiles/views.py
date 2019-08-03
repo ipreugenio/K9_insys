@@ -37,7 +37,7 @@ from deployment.models import Location, Team_Assignment, Dog_Request, Incidents,
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
-from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, K9_Incident, VaccineUsed, Replenishment_Request
+from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -718,8 +718,9 @@ def vet_dashboard(request):
 
 
     #health pending
-    health_pending = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
-
+    h_c = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
+    th_c = Transaction_Health.objects.filter(status='Pending').count()
+    health_pending = h_c +th_c
     # pending incidents
     incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()
     

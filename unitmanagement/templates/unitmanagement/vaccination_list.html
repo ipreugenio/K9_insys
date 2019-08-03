@@ -26,7 +26,7 @@
 
 <div class="ui bottom attached active tab segment" data-tab="first">
     <h4>Deworming</h4>
-    <table id="tabledata1" class="ui column celled table">
+    <table id="tabledata1" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
@@ -133,7 +133,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for data in k9_br %}
+            {% for data in k9_dh %}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.0.age_days}}</td>
@@ -158,7 +158,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for data in k9_br %}
+                {% for data in k9_hw %}
                 <tr>
                     <td>{{data.0}}</td>
                     <td>{{data.0.age_days}}</td>
@@ -183,7 +183,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for data in k9_br %}
+                    {% for data in k9_tf %}
                     <tr>
                         <td>{{data.0}}</td>
                         <td>{{data.0.age_days}}</td>
@@ -200,7 +200,32 @@
 <script>
 
     $(document).ready(function() {
-        $( ".btn_modal" ).bind( "click", function() {
+    
+        $('#tabledata1').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata2').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata3').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata4').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata5').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata6').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('#tabledata7').DataTable({
+            "order": [[ 1, "desc" ]]
+        });
+        $('.menu .item').tab();
+    
+    });
+    $( ".btn_modal" ).bind( "click", function() {
             var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
             id = $(this).attr('id');
             type = $(this).data('type');
@@ -221,17 +246,6 @@
             });
             $('#id_modal_data').modal('show');
         });
-    
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
-        $('#tabledata5').DataTable();
-        $('#tabledata6').DataTable();
-        $('#tabledata7').DataTable();
-        $('.menu .item').tab();
-    
-    });
     
 </script>
 
