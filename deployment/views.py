@@ -1985,6 +1985,10 @@ def schedule_units(request):
 
     #TODO Issue for SAR units since they can't be deployed initially on ports because of "2 minimum" restriction
 
+    user = user_session(request)
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'df' : location_dataframe,
         'can_deploy': can_deploy,
@@ -1992,6 +1996,9 @@ def schedule_units(request):
         'formset' :schedFormset,
         'style': style,
         'df_is_empty' : df_is_empty,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
         # 'sar_done': sar_done,
         # 'ndd_done' : ndd_done,
         # 'edd_done' : edd_done,

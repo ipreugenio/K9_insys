@@ -153,6 +153,7 @@ def dashboard(request):
         exclude_k9_list.append(item.k9.id)
 
     dept_count = K9.objects.filter(training_status='For-Deployment').exclude(pk__in = exclude_k9_list).exclude(handler=None).count() #initial deployment k9s
+    
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
     ua_count = K9.objects.filter(training_status = "MIA").count()
 
