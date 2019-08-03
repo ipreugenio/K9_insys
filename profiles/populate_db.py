@@ -656,10 +656,7 @@ def generate_k9_deployment():
             team.EDD_deployed += 1
         team.save()
 
-        tl = assign_TL(team)
-        team.team_leader = tl
-        team.save()
-
+        assign_TL(team)
         print("K9 : " + str(k9))
         print("Team Assignment : " + str(team))
 

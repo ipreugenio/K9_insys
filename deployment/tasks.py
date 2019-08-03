@@ -95,48 +95,47 @@ def assign_TL(team, handler_list_arg = None):
 
     handler_list = []
 
-    try:
-        if handler_list_arg:
-            handler_list = handler_list_arg
-        else:
-            for item in deployment:
-                handler_list.append(item.handler)
-
-        rank_list = []
-        for handler in handler_list:
-            is_ranked = 0
-            for rank in RANK_SORTED:
-                if handler.rank == rank[1]:
-                    rank_list.append(rank[0])
-                    is_ranked = 1
-
-            if is_ranked == 0:
-                rank_list.append(0)
-
-        df_data = {
-            'Rank': rank_list,
-            'Handler': handler_list,
-
-        }
-        handler_rank_dataframe = df(data=df_data)
-        handler_rank_dataframe.sort_values(by=['Rank'],
-                                       ascending=[False], inplace=True) #TODO add another field for User model for "date of duty" then add another sorting process
-
-        team_leader =  handler_rank_dataframe.iloc[0]['Handler']
-
-        if not handler_list_arg:
-            team.team_leader = team_leader
-            team.save()
-
+    if handler_list_arg:
+        handler_list = handler_list_arg
+    else:
         for item in deployment:
-            if item.handler != team_leader:
-                handler = item.handler.position = "Handler"
-                handler.save()
+            handler_list.append(item.handler)
 
-        team_leader.position = "Team Leader"
-        team_leader.save()
+    rank_list = []
+    for handler in handler_list:
+        is_ranked = 0
+        for rank in RANK_SORTED:
+            if handler.rank == rank[1]:
+                rank_list.append(rank[0])
+                is_ranked = 1
 
-    except: pass
+        if is_ranked == 0:
+            rank_list.append(0)
+
+    df_data = {
+        'Rank': rank_list,
+        'Handler': handler_list,
+
+    }
+    handler_rank_dataframe = df(data=df_data)
+    handler_rank_dataframe.sort_values(by=['Rank'],
+                                   ascending=[False], inplace=True) #TODO add another field for User model for "date of duty" then add another sorting process
+
+    print(handler_rank_dataframe)
+    team_leader =  handler_rank_dataframe.iloc[0]['Handler']
+
+    if not handler_list_arg:
+        team.team_leader = team_leader
+        team.save()
+
+    for item in deployment:
+        if item.handler != team_leader:
+            handler = item.handler
+            handler.position = "Handler"
+            handler.save()
+
+    team_leader.position = "Team Leader"
+    team_leader.save()
 
     if not handler_list_arg:
         return None
@@ -154,56 +153,56 @@ def update_port_info(team_list):
     return None
 
 
-def subtract_inventory(pre_dep, user):
+def subtract_inventory(user):
     #TODO dapat get
     try:
-        collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").exclude(quantity = 0)
+        collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").exclude(quantity = 0).first()
         collar.quantity -= 1
         collar.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory = collar, quantity = 1, user = user)
 
-        vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").exclude(quantity = 0)
+        vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").exclude(quantity = 0).first()
         vest.quantity -= 1
         vest.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
 
-        leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").exclude(quantity = 0)
+        leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").exclude(quantity = 0).first()
         leash.quantity -= 1
         leash.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
 
-        shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").exclude(quantity = 0)
+        shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").exclude(quantity = 0).first()
         shipping_crate.quantity -= 1
         shipping_crate.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=shipping_crate, quantity=1, user=user)
 
-        food = Food.objects.filter(foodtype="Adult Dog Food").exclude(quantity = 0)
+        food = Food.objects.filter(foodtype="Adult Dog Food").exclude(quantity = 0).first()
         food.quantity -= 1
         food.save()
         Food_Subtracted_Trail.objects.create(inventory=food, quantity=1, user=user)
 
-        medicines = Medicine.objects.filter(med_type="Vitamins").exclude(quantity = 0)
+        medicines = Medicine.objects.filter(med_type="Vitamins").exclude(quantity = 0).first()
         medicine_inv = Medicine_Inventory.objects.filter(medicine__in=medicines)
         medicine_inv.quantity -= 1
         medicine_inv.save()
         Medicine_Subtracted_Trail.objects.create(inventory=medicine_inv, quantity=1, user=user)
 
-        grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").exclude(quantity = 0)
+        grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").exclude(quantity = 0).first()
         grooming_kit.quantity -= 1
         grooming_kit.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=grooming_kit, quantity=1, user=user)
 
-        first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").exclude(quantity = 0)
+        first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").exclude(quantity = 0).first()
         first_aid_kit.quantity -= 1
         first_aid_kit.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=first_aid_kit, quantity=1, user=user)
 
-        oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").exclude(quantity = 0)
+        oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").exclude(quantity = 0).first()
         oral_dextrose.quantity -= 1
         oral_dextrose.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=oral_dextrose, quantity=1, user=user)
 
-        ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").exclude(quantity = 0)
+        ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").exclude(quantity = 0).first()
         ball.quantity -= 1
         ball.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=ball, quantity=1, user=user)
@@ -340,29 +339,28 @@ def deploy_dog_request():
     scheds = K9_Schedule.objects.filter(date_start=date.today()).filter(status = "Request").exclude(dog_request = None)
 
     for sched in scheds: #per k9
-        # sched.k9.training_status = 'Deployed'
-        # sched.k9.save()
+        if sched.dog_request.status == "Approved":
+            # sched.k9.training_status = 'Deployed'
+            # sched.k9.save()
 
-        # temporarily pull out from port
-        recent_port_deploy = Team_Dog_Deployed.objects.filter(team_requested=sched.dog_request).filter(date_pulled=None).latest('date_added')
-        recent_port_deploy.date_pulled = datetime.today().date()
-        recent_port_deploy.save()
+            # temporarily pull out from port
+            recent_port_deploy = Team_Dog_Deployed.objects.filter(team_requested=sched.dog_request).filter(date_pulled=None).latest('date_added')
+            recent_port_deploy.date_pulled = datetime.today().date()
+            recent_port_deploy.save()
 
-        if Team_Dog_Deployed.objects.filter(k9 = sched.k9, team_requested = sched.dog_request, status="Pending").count() == 0:
-            deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
-        handler = sched.k9.handler
-        handler.position = "Handler"
-        handler.save()
-        update_request_info(sched.dog_request)
+            if Team_Dog_Deployed.objects.filter(k9 = sched.k9, team_requested = sched.dog_request, status="Pending").count() == 0:
+                deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
+            handler = sched.k9.handler
+            handler.position = "Handler"
+            handler.save()
+            update_request_info(sched.dog_request)
+            tl = sched.dog_request.team_leader
 
-
-        tl = sched.dog_request.team_leader
-
-        try:
-            handler_to_tl = User.objects.get(id = tl.id)
-            handler_to_tl.position = "Team Leader"
-            handler_to_tl.save()
-        except: pass
+            try:
+                handler_to_tl = User.objects.get(id = tl.id)
+                handler_to_tl.position = "Team Leader"
+                handler_to_tl.save()
+            except: pass
 
 
     return None
@@ -373,13 +371,16 @@ def deploy_dog_request():
 @periodic_task(run_every=timedelta(seconds=30))
 def pull_dog_request():
 
-    requests = Dog_Request.objects.filter(end_date = date.today())
+    requests = Dog_Request.objects.filter(end_date__gt = date.today()).filter(status = "Approved")
 
     for request in requests:
         try:
             deployed = Team_Dog_Deployed.objects.filter(date_pulled = None).get(team_requested = request)
             deployed.date_pulled = date.today()
             deployed.save()
+
+            request.status = "Done"
+            request.save()
 
             handler = deployed.handler
             handler.position = "Handler"
@@ -393,6 +394,7 @@ def pull_dog_request():
         except: pass
     return None
 
+#TODO check if correct yung code
 #Every nth hour, check if arrival is confirmed by checking if Team_Dog_deployed status is still pending after start date
 def check_arrival_to_request(dog_request):
 
