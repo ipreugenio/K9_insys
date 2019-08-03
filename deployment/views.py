@@ -58,7 +58,7 @@ from deployment.templatetags import index as deployment_template_tags
 
 from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
     generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
-    , create_predeployment_inventory
+    , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 import random
 
@@ -119,9 +119,12 @@ def mass_populate():
     generate_maritime() # generates 500 objects
 
     # >>advanced
-
-    generate_dogbreed()
     generate_training() #Classify k9s
+    generate_k9_posttraining_decision() # For-Breeding or For-Deployment
+    generate_k9_deployment() # Randomly assign to ports
+
+    # >>fixes
+    generate_dogbreed()
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
     create_predeployment_inventory() #Inventory items for pre deployment
@@ -147,7 +150,6 @@ def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
     # mass_populate()
-    # check_handlers_with_multiple_k9s()
 
     form = AreaForm(request.POST or None)
     style = ""
@@ -661,7 +663,7 @@ def request_dog_details(request, id):
         #1 = true, 0 = false
         deployable = 1
         schedules = K9_Schedule.objects.filter(k9=k9).filter(status ="Request")
-        transfer_requests = Request_Transfer.objects.filter(k9 = k9)
+        transfer_requests = Request_Transfer.objects.filter(handler = k9.handler)
 
         #TODO obtain schedule of request then compare to start and end date of schedules (loop)
         for sched in schedules:
