@@ -396,9 +396,9 @@ def create_medicine_inventory(sender, instance, **kwargs):
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Training.objects.create(k9=instance, training='EDD')
-        Training.objects.create(k9=instance, training='NDD')
-        Training.objects.create(k9=instance, training='SAR')
+        Training.objects.create(k9=instance, training='EDD', stage = "Stage 0")
+        Training.objects.create(k9=instance, training='NDD', stage = "Stage 0")
+        Training.objects.create(k9=instance, training='SAR', stage = "Stage 0")
 
         Training_Schedule.objects.create(k9 = instance)
 

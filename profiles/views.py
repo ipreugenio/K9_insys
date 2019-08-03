@@ -43,6 +43,8 @@ from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 from deployment.tasks import subtract_inventory
 
+from deployment.views import team_location_details, request_dog_details
+
 # Create your views here.
 
 def notif(request):
@@ -523,7 +525,6 @@ def handler_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
 
-    
     dr = 0
     k9 = None
     training_sched = None
@@ -538,116 +539,152 @@ def handler_dashboard(request):
         k9 = K9.objects.get(handler=user)
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
+    except: pass
+
+    upcoming_deployment = None
+    current_assignment = None
+    current_port = None
+    current_request = None
+
+    try:
+        current_assignment = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled = None).last()
+
+        if current_assignment.team_assignment is not None:
+            current_port = current_assignment.team_assignment
+        elif current_assignment.team_requested is not None:
+            current_request = current_assignment.team_requested
+
+        upcoming_deployment = Dog_Request.objects.exclude(start_date__lte = date.today()).first()
+
+    except:
+        pass
+
+    print("Current Port")
+    print(current_port)
+    print("Current Request")
+    print(current_request)
 
     today = datetime.today()
 
+    k9_schedules = None
+    events = None
+    show_start = None
+    show_end = None
+
     items_list = []
-    if k9.training_status == "For-Deployment":
+    if k9 is not None:
+        if k9.training_status == "For-Deployment":
 
-        items_list = check_pre_deployment_items(user)
-        all_clear = items_list[0]
+            items_list = check_pre_deployment_items(user)
+            all_clear = items_list[0]
 
-        del items_list[0]
+            del items_list[0]
 
-        print("Items List")
-        print(items_list)
+            print("Items List")
+            print(items_list)
 
-        pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
-        initial_sched = pre_deployment_items.initial_sched
+            pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+            initial_sched = pre_deployment_items.initial_sched
 
-        delta = initial_sched.date_start - today.date()
-        if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
-            reveal_items = True
+            delta = initial_sched.date_start - today.date()
+            if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
+                reveal_items = True
 
 
-    # TODO try except for when handler does not yet have a k9
-    # TODO try except for when k9s still don't have a skill
-    # TODO try except when k9 has finished training
+        # TODO try except for when handler does not yet have a k9
+        # TODO try except for when k9s still don't have a skill
+        # TODO try except when k9 has finished training
 
-    try:
+
         training = Training.objects.get(k9=k9, training=k9.capability)
-        training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
-    except: pass
+        if training.stage != "Finished Training":
+            print("TRAINING STAGE")
+            print(training.stage)
+            training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
 
+            print("Training Sched")
+            print(training_sched.date_start)
+            print(training_sched.date_end)
 
-    print("ALL CLEAR")
-    print(all_clear)
-    print("REVEAL ITEMS")
-    print(reveal_items)
+        print("ALL CLEAR")
+        print(all_clear)
+        print("REVEAL ITEMS")
+        print(reveal_items)
 
-    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+        drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
 
-    if drf.exists():
-        dr = 1
-    else:
-        dr = 0
-
-    show_start = False
-    show_end = False
-
-    if request.method == 'POST':
-        start_training = request.POST.get('start_training')
-        end_training = request.POST.get('end_training')
-
-        confirm_deployment = request.POST.get('confirm_deployment')
-        if confirm_deployment:
-            confirm_pre_deployment_items(request, k9)
-            return redirect("profiles:handler_dashboard")
-
-        if start_training:
-            print("START TRAINING VALUE")
-            print(start_training)
-
-            try:
-                training_sched.date_start = today
-                training_sched.save()
-            except: pass
-        if end_training:
-            print("END TRAINING VALUE")
-            print(end_training)
-
-            try:
-                training_sched.date_end = today
-                training_sched.save()
-            except: pass
-
-        if form.is_valid():
-            checks = geoform['point'].value()
-            checked = ast.literal_eval(checks)
-           
-            toList = list(checked['coordinates'])
-          
-            lon = Decimal(toList[0])
-            lat = Decimal(toList[1])
-
-            f = form.save(commit=False)
-            f.longtitude = lon
-            f.latitude = lat
-            f.save()
-
-            messages.success(request, 'event')
-            return redirect("profiles:handler_dashboard")
-
-
-    k9_schedules = K9_Schedule.objects.filter(k9 = k9)
-    events = Dog_Request.objects.all()
-
-
-    try:
-        if training_sched.date_start is None and training_sched.date_end is None:
-            show_start = True
-
-        elif training_sched.date_start is not None and training_sched.date_end is None:
-            show_end = True
-
-        elif training_sched.date_start is not None and training_sched.date_end is not None:
-            show_start = True
-            show_end = True
-
+        if drf.exists():
+            dr = 1
         else:
-                pass
-    except:
-        pass
+            dr = 0
+
+        show_start = False
+        show_end = False
+
+        if request.method == 'POST':
+            start_training = request.POST.get('start_training')
+            end_training = request.POST.get('end_training')
+
+            confirm_deployment = request.POST.get('confirm_deployment')
+            if confirm_deployment:
+                confirm_pre_deployment_items(request, k9)
+                return redirect("profiles:handler_dashboard")
+
+            if start_training:
+                print("START TRAINING VALUE")
+                print(start_training)
+
+                try:
+                    training_sched.date_start = today
+                    training_sched.save()
+                except: pass
+            if end_training:
+                print("END TRAINING VALUE")
+                print(end_training)
+
+                try:
+                    training_sched.date_end = today
+                    training_sched.save()
+                except: pass
+
+            if form.is_valid():
+                checks = geoform['point'].value()
+                checked = ast.literal_eval(checks)
+
+                toList = list(checked['coordinates'])
+
+                lon = Decimal(toList[0])
+                lat = Decimal(toList[1])
+
+                f = form.save(commit=False)
+                f.longtitude = lon
+                f.latitude = lat
+                f.save()
+
+                messages.success(request, 'event')
+                return redirect("profiles:handler_dashboard")
+
+
+        k9_schedules = K9_Schedule.objects.filter(k9 = k9)
+        print("K9 Schedules")
+        for sched in k9_schedules:
+            print(sched.status)
+
+        try:
+            if training_sched.date_start is None and training_sched.date_end is None:
+                show_start = True
+
+            elif training_sched.date_start is not None and training_sched.date_end is None:
+                show_end = True
+
+            elif training_sched.date_start is not None and training_sched.date_end is not None:
+                show_start = True
+                show_end = True
+
+            else:
+                    pass
+        except:
+            pass
 
     cb = None
     try:
@@ -655,6 +692,11 @@ def handler_dashboard(request):
     except ObjectDoesNotExist:
         pass
 
+
+    print("Show Start")
+    print(show_start)
+    print("Show End")
+    print(show_end)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -668,7 +710,7 @@ def handler_dashboard(request):
         'form': form,
         'geoform': geoform,
         'geosearch': geosearch,
-        'events': events,
+        # 'events': events,
         'today': date.today(),
         'show_start': show_start,
         'show_end': show_end,
@@ -680,6 +722,9 @@ def handler_dashboard(request):
         'items_list' : items_list,
 
         'k9_schedules' : k9_schedules,
+        'current_port' : current_port,
+        'current_request' : current_request,
+        'upcoming_deployment' : upcoming_deployment
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -1555,6 +1600,7 @@ def load_event(request):
     print("ID RECEIVED")
     print(id)
 
+    dog_request = None
     try:
         dog_request = Dog_Request.objects.get(id = id)
     except: pass
@@ -1569,9 +1615,12 @@ def load_event_handler(request):
     id = request.GET.get('event_id')
     print("ID RECEIVED")
     print(id)
-    sched = K9_Schedule.objects.get(id = id)
+    sched = None
+    try:
+        sched = K9_Schedule.objects.get(id = id)
+    except: pass
     context = {
-      'sched' : 'sched'
+      'sched' : sched
     }
 
     return render(request, 'profiles/load_event_handler.html', context)

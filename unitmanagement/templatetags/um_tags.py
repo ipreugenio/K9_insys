@@ -132,3 +132,13 @@ def equipment_quantity(equipment_objects, i):
     object = equipment_objects[i]
 
     return object.quantity
+
+
+@register.filter
+def get_team_name(k9_schedule):
+    return str(k9_schedule.team.location.city)
+
+@register.filter
+def get_event_name(k9_schedule):
+
+    return k9_schedule.dog_request.event_name

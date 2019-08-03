@@ -110,7 +110,7 @@
                             </a>
 
                             {% elif request.session.session_user_position == "Team Leader" %}
-                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
+                            <a href="{% url 'unitmanagement:replenishment_form'%}" class="item">
                                 <i class="exclamation icon"></i>Replenish Assets
                             </a>
                             <a href="{% url 'unitmanagement:handler_incident_form'%}" class="item">

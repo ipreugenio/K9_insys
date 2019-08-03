@@ -202,9 +202,10 @@
 
        </div>
 
+
        <div class="ui basic segment" style="border-style: none;">
          <label>No. of K9s Scheduled: </label>
-         {% if data2.k9s_deployed >= data2.total_dogs_demand %}
+         {% if data2.k9s_deployed >= data2.k9s_needed %}
              <span class="ui green circular label">{{data2.k9s_deployed}}</span>
          {%else%}
              <span class="ui orange circular label">{{data2.k9s_deployed}}</span>
@@ -230,6 +231,8 @@
     </div>
   </div>
 
+    {% if user.position != "Handler" and user.position != "Team Leader" %}
+
     <div class="ui info message">
   <i class="close icon"></i>
   <div class="header">
@@ -239,13 +242,12 @@
       <li>Below is a list of available K9s that don't have conflicting schedules with the current request.</li>
       <li>Currently deployed K9s can also be listed here as long as k9 has no conflicting schedules with the request.</li>
       <li>Any of the K9s selected from the list will be scheduled and automatically deployed when the date of request arrives.</li>
-      <li>The current location of the K9 will be listed as "PCGK9 Taguig Base" if they have not gone through initial deployment. The current location will be listed by their last known deployment location(non-requests).</li>
+      <li>The current location will be listed by their last known deployment location(non-requests).</li>
       <li>If a team has finished it's request, the team is immediately sent back to the last known deployment location.</li>
-      <li>A notification will alert you a week before and on the date of request.</li>
   </ul>
 </div>
 
-  {% if data2.status == "Approved" %}
+  {% if data2.status == "Approved"%}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata3" class="ui nine column celled table">
@@ -312,6 +314,17 @@
 </div>
     {% endif %}
 
+{% else %}
+
+    <div class="ui visible message">
+      <div class="header">
+   You are not allowed to deploy k9s.
+  </div>
+
+  </div>
+
+{% endif %}
+
 </div>
 
 <script type="text/javascript">
@@ -321,7 +334,10 @@
         $('#tabledata2').DataTable({
               "order": [[ 4, "desc" ]]
         });
-        $('#tabledata3').DataTable();
+        $('#tabledata3').DataTable({
+              "order": []
+        });
+
         $('.menu .item').tab();
     });
 

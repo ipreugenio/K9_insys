@@ -6,7 +6,7 @@ from django.db.models import aggregates
 from django.contrib import messages
 
 from django.db.models import Count
-from django.db.models import Q
+from django.db.models import Q, F
 from django.views import generic
 from django.utils.safestring import mark_safe
 from geopy.geocoders import Nominatim
@@ -574,20 +574,22 @@ def dog_request(request):
 
 
 def request_dog_list(request):
-    data = Dog_Request.objects.all()
+    data = Dog_Request.objects.all().order_by('start_date')
     user = user_session(request)
     date_now = datetime.date.today()
 
     print(user)
     print(user.position)
 
-    if user.position == "Administrator":
+    if user.position == "Commander":
         areas = Area.objects.get(commander = user)
-        data = data.filter(area=areas)
+        data = data.filter(area=areas).filter(sector_type = "Small Event")
+    else:
+        data = data.filter(sector_type="Big Event")
 
     data1 = data.filter(status='Pending')
-    data2 = data.filter(status='Approved')
-
+    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed'))
+    data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
 
     # latest_date = Dog_Request.objects.latest('end_date')
     # latest_date = latest_date.end_date
@@ -605,6 +607,7 @@ def request_dog_list(request):
         'user':user,
         'data1':data1,
         'data2':data2,
+        'data3' : data3
     }
     return render (request, 'deployment/request_dog_list.html', context)
 
@@ -743,7 +746,7 @@ def request_dog_details(request, id):
         incident_count = 0
 
         try:
-            team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").latest('id')
+            team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").last()
             if (team_dog_deployed.date_pulled is None):
                 team_assignment_id = team_dog_deployed.team_assignment.id
                 team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
@@ -797,7 +800,7 @@ def request_dog_details(request, id):
             incident_count = 0
 
             try:
-                team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").latest('id')
+                team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").last()
                 if (team_dog_deployed.date_pulled is None):
                     team_assignment_id = team_dog_deployed.team_assignment.id
                     team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
@@ -888,7 +891,7 @@ def request_dog_details(request, id):
             # dog.save()
 
         style = "ui green message"
-        messages.success(request, 'Dogs has been successfully Deployed!')
+        messages.success(request, 'Dogs has been successfully Scheduled!')
 
         return redirect('deployment:request_dog_details', id=id)
 
@@ -1860,7 +1863,7 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
     can_transfer = 0
 
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).latest('id') #check current team_assignment
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).last() #check current team_assignment
         if (team_dog_deployed.date_pulled is None):
             date_deployed = team_dog_deployed.date_added
             delta = date.today() - date_deployed
