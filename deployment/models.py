@@ -621,3 +621,9 @@ class K9_Pre_Deployment_Items(models.Model):
         self.remove_old_instance()
 
         super(K9_Pre_Deployment_Items, self).save(*args, **kwargs)
+
+# #TODO K9 SCHEDULE
+# @receiver(post_save, sender=K9_Schedule)
+# def create_k9_sched_notif(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         if instance.status ==

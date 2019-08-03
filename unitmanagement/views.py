@@ -134,10 +134,7 @@ def index(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     
-    food = Medicine.objects.all()
-
-    for food in food:
-        print(food)
+   
     context = {
         'notif_data':notif_data,
         'count':count,

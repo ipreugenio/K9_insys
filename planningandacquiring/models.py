@@ -343,7 +343,7 @@ class K9(models.Model):
             elif d.today() == self.anestrus_date:
                 self.reproductive_stage = 'Anestrus'
             else:
-                pass
+                self.reproductive_stage = 'Anestrus'
 
         #TODO TRANSFER TO CELERY
         if self.age == 9:

@@ -112,7 +112,7 @@
         <form action="" method="POST" class="ui form" enctype="multipart/form-data" id="myForm">
             {% csrf_token %}
 
-            <input type="number" id='id_need' name='id_need'>
+            <input type="hidden" id='id_need' name='id_need'>
             <input type="hidden" id='id_need_total' name='id_need_total' step="0.01">
             <div class="four fields">
                     <div class="field">
