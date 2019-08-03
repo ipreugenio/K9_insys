@@ -212,6 +212,7 @@
 </div>
  <!--End Pre Deployment Items Modal-->
 
+ <div id = "id_event_load"></div>
 
 <style>
 
@@ -317,15 +318,6 @@ $(document).ready(function() {
           nowIndicator: true,
 
           events: [
-                <!--{% for i in events %}-->
-                <!--{-->
-                    <!--id: '{{ i.id }}',-->
-                    <!--title: '{{i.event_name}}',-->
-                    <!--start: '{{ i.start_date|date:"Y-m-d" }}',-->
-                    <!--end: '{{ i.end_date|date:"Y-m-d" }}',-->
-                    <!--allDay: 'true',-->
-                <!--},-->
-                <!--{% endfor %}-->
 
                     {% for i in k9_schedules %}
                     {
@@ -333,8 +325,10 @@ $(document).ready(function() {
 
                     {% if i.status == 'Request' %}
                     title: 'Request : {{i.dog_request}}',
+                    {% elif i.status == "Checkup" %}
+                    title : 'Physical Exam',
                     {% else %}
-                    title: 'Port : {{i.dog_request}}',
+                    title: 'Port : {{i.team}}',
                     {% endif %}
 
                     start: '{{ i.date_start|date:"Y-m-d" }}',
@@ -344,12 +338,24 @@ $(document).ready(function() {
                     {% endfor %}
             ],
 
-          eventClick : function(event, element){
-            $('.content').text(event.title);
-            $('.event_modal').modal('show');
-            
-          },
+          eventClick: function(event, element) {
+                var url = 'ajax_load_event_handler';
 
+                 $.ajax({
+                        url: url,
+                        data: {
+                        'event_id': event.id,},
+                        success: function (data) {
+                          $('#event_modal').modal('show');
+                          $("#id_event_load").html(data);
+                          },
+                        error:
+                            function(xhr){
+                            alert(xhr.statusText)
+                            return false;}
+                    });
+
+                 },
           }); // end #calendar
           
           
