@@ -709,7 +709,6 @@ def commander_dashboard(request):
         area_list.append(area)
     events = Dog_Request.objects.filter(area__in = area_list)
 
-    events = Dog_Request
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()

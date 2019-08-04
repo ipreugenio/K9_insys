@@ -128,11 +128,26 @@ def mass_populate():
 
     return None
 
+# Find handlerss with multiple k9s
+def check_handlers_with_multiple_k9s():
+
+    mult_k9 = []
+    users = User.objects.all()
+    for user in users:
+        k9_count = K9.objects.filter(handler=user).count()
+        if k9_count > 1:
+            mult_k9.append((user, k9_count))
+
+    for item in mult_k9:
+        print(item)
+
+    return None
 
 def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
     # mass_populate()
+    # check_handlers_with_multiple_k9s()
 
     form = AreaForm(request.POST or None)
     style = ""
@@ -343,6 +358,17 @@ def edit_team(request, id):
 def assigned_location_list(request):
     data = Team_Assignment.objects.all()
 
+    user = user_session(request)
+    date_now = datetime.date.today()
+
+    print(user)
+    print(user.position)
+
+    if user.position == "Commander":
+        areas = Area.objects.filter(commander=user)
+        locations = Location.objects.filter(area__in = areas)
+        data = data.filter(location__in=locations)
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -538,8 +564,15 @@ def dog_request(request):
 
 def request_dog_list(request):
     data = Dog_Request.objects.all()
-
+    user = user_session(request)
     date_now = datetime.date.today()
+
+    print(user)
+    print(user.position)
+
+    if user.position == "Commander":
+        areas = Area.objects.filter(commander = user)
+        data = data.filter(area__in=areas)
 
 
     # latest_date = Dog_Request.objects.latest('end_date')
@@ -612,8 +645,14 @@ def request_dog_details(request, id):
     TL = assign_TL(None, handler_list_arg=TL_candidates)
     data2.team_leader = TL
     data2.save()
-    tl_dog = K9.objects.get(handler = TL)
-    dogs_deployed = dogs_deployed.exclude(k9 = tl_dog)
+
+    #TODO Find issue where handler has multiple k9s
+    tl_dog = None
+    try:
+        if TL is not None:
+            tl_dog = K9.objects.get(handler = TL)
+            dogs_deployed = dogs_deployed.exclude(k9 = tl_dog)
+    except: pass
 
     #>>>> start of new Code for saving schedules instead of direct deployment
     # TODO Filter can deploy to with teams without date conflicts
