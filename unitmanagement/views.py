@@ -208,7 +208,7 @@ def yearly_vaccine_list(request):
             if nxt_dw <= dt.date.today():
                 dwd = [k9,nxt_dw]
                 k9_dw.append(dwd)
-            print(nxt_dw)
+            
     form = VaccinationUsedForm(request.POST or None)
 
     if request.method == "POST":
@@ -2749,7 +2749,7 @@ class TeamLeaderView(APIView):
         k9 = K9.objects.filter(id__in=k9_id)
 
         k9_perf = []
-
+        fou = []
         #get all k9s
         for k in k9:
 
@@ -2795,10 +2795,9 @@ class TeamLeaderView(APIView):
             perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
             k9_perf.append(perf_items)
 
-        fou = []
-
-        for td in tdd:
-            fou.append(str(td.k9.name) + ' - ' + str(td.handler.lastname))
+            f = str(k.name) + ' - ' + str(k.handler.lastname)
+            
+            fou.append(f)
 
         data = {
             "labels":labels,
@@ -2818,20 +2817,20 @@ class HandlerView(APIView):
         k9=None
         try:
             k9 = K9.objects.get(handler=user)
-            jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
-            feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
-            mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
-            apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
-            may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
-            jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
-            jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
-            aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
-            sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
-            oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
-            nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
-            dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+            jan = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+            feb = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+            mar = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+            apr = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+            may = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+            jun = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+            jul = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+            aug = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+            sep = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+            oct = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+            nov = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+            dec = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
 
-        except:
+        except ObjectDoesNotExist:
             jan=0
             feb=0
             mar=0
@@ -2981,7 +2980,7 @@ class AdminView(APIView):
 
             frt = 0
             for fr in fr:
-                mi = Food.objects.get(id=fr.id)
+                mi = Food.objects.get(id=fr.inventory.id)
                 t = fr.quantity * mi.price
                 frt = frt + t
 
@@ -2989,10 +2988,9 @@ class AdminView(APIView):
             
             mirt = 0
             for mir in mir:
-                mi = Food.objects.get(id=mir.id)
+                mi = Miscellaneous.objects.get(id=mir.inventory.id)
                 t = mir.quantity * mi.price
                 mirt = mirt + t
-
 
             if mr == None:
                 mr = 0
@@ -3010,7 +3008,7 @@ class AdminView(APIView):
 
         try:
             ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
-            ab = ab.grand_total
+            ab = ab.others_total + ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash   
         except ObjectDoesNotExist:
             ab = None
         data = {

@@ -31,7 +31,7 @@
                     </div>
                   </div>
                 </div>
-                  <canvas id="myChart2"></canvas>
+                  <canvas id="myChart2" height="110" ></canvas>
               </div>
             </div>
             <div class="eight wide column">
@@ -46,7 +46,7 @@
                         </div>
                       </div>
                   </div>
-                  <canvas id="myChart"></canvas>
+                  <canvas id="myChart" height="110" ></canvas>
               </div>
             </div>
 
@@ -62,86 +62,63 @@
                           </div>
                         </div>
                     </div>
-                    <canvas id="myChart3"></canvas>
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="myChart3" height="100" ></canvas>
+                    </div>
                 </div>
               </div>
       </div>
     </div>
     </div>
-
-
-
-            <div class = "ui segment">
-
-                 {% if k9 %}
-                    <h4>K9 Details</h4>
-                    <table class="ui very basic four column table">
-                    <thead>
-
-                    <tr>
-                    <th>Status: {{k9.training_status}}</th>
-                    <th>Type: {{k9.status}}</th>
-                    <th>Capability: {{k9.capability}}</th>
-                    </tr>
-                    </thead>
-
-                    </table>
-
-                    {% if reveal_arrival == True %}
-                    <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
-                    {% endif %}
-
-                    {% if reveal_arrival_dr == True %}
-                    <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
-                    {% endif %}
-                {% else %}
-                <div class = "ui segment">
-                    You currently don't have a K9.
-                </div>
-                {% endif %}
-
-
-
-
     <div class="six wide column" style="padding: 0%;padding-right: 1%;">
 
         <div class="ui basic segment" style="padding-left: 0%;">
-            
+            {% if k9 %}
+            <h4>Port</h4>
+            <p>{{ta}}</p>
+            <h4>K9 Details</h4> <span>{{ta.team_leader.k9}}</span>
+            <table class="ui very basic four column table">
+            <thead>
+
+            <tr>
+            <th>Status: {{k9.training_status}}</th>
+            <th>Type: {{k9.status}}</th>
+            <th>Capability: {{k9.capability}}</th>
+            </tr>
+            </thead>
+
+            </table>
+
+            {% if reveal_arrival == True %}
+            <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
+            {% endif %}
+
+            {% if reveal_arrival_dr == True %}
+            <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
+            {% endif %}
+        {% else %}
+        <div class = "ui segment">
+            You currently don't have a K9.
+        </div>
+        {% endif %}
+
                 <div class="ui black floating message">
-                    <p>Reminder</p>
+                    <p>Calendar</p>
                   </div>
-                <div class="ui orange floating message"  style="margin: 0%;padding:0%;">   
-
-                    <table class="ui basic table">
-                      <tr>
-                        <td>Someone is on leave: Will return on Date</td>
-                        <td class="center aligned three wide">
-                          <a href="#" class="ui tiny black button">Details</a>
-                        </td>
-                      </tr>
-                    </table>
-                </div>
-
+              
+                  <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
+                      <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
+                      <div class="ui buttons">
+                        <button class="ui button"  id = "prev" >Previous Year</button>
+                        <div class="or"></div>
+                        <button class="ui button"  id = "next" >Next Year</button>
+                      </div>
+  
+                      <div id = "calendar" style="margin-top:0%;"></div>
+                  </div>
         </div>
         </div>
       </div>
-      </div>
-
-
-      <div class="seven wide column" style="padding: 0%;margin:0%;">
-                <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
-                    <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
-                    <div class="ui buttons">
-                      <button class="ui button"  id = "prev" >Previous Year</button>
-                      <div class="or"></div>
-                      <button class="ui button"  id = "next" >Next Year</button>
-                    </div>
-
-                    <div id = "calendar" style="margin-top:0%;"></div>
-                </div>
-              </div>
-
-
     </div>
 </div>
 
@@ -213,7 +190,7 @@
                                                 {{form.location}}
                                             </div>
                                     </div>
-                                    <div class="ui right aligned segment" style="padding: 0px;">
+                                    <div class="ui right basic aligned segment" style="padding: 0px;">
                                         <button class = "ui button green" type="submit" >Submit</button>
                                     </div>
                                     <div class="ui placeholder segment">
@@ -328,8 +305,7 @@
   .fc-center>h2 {
      font-size:  18px !important;
      }
-
-  .fc-header, .fc-button, #prev, #next{
+  #prev, #next{
   background-color:orangered;
   color: white;
   }
@@ -338,10 +314,6 @@
   background-color: black
   }
 
-  #calendar {
-      max-width: 900px;
-      margin: 40px auto;
-  }
 </style>
 
 
@@ -558,7 +530,7 @@ $(document).ready(function() {
                 yAxes: [{
                 ticks: {
                     beginAtZero: true,
-                    step:1,
+                    // step:1,
                     suggestedMax:100,
                 }
                 }]
