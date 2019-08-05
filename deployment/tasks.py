@@ -216,7 +216,7 @@ def subtract_inventory(user):
 #Step 3
 #Deploy Team (only the ones who have confirmed) once deployment date hits
 # @periodic_task(run_every=crontab(hour=6, minute=30))
-# @periodic_task(run_every=timedelta(seconds=25))
+@periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
     print('check_initial_deployment_dates code is running')
     schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
@@ -242,7 +242,7 @@ def check_initial_deployment_dates():
             for pre_dep in pre_deps:
                 print("PRE DEP STATUS")
                 print(pre_dep.status)
-                if pre_dep.status == "Confirmed" and pre_deps.count() >= 2: #Dapat atleast 2 sila nidedeploy
+                if pre_dep.status == "Confirmed" and pre_deps.filter(status = "Confirmed").count() >= 2: #Dapat atleast 2 sila nidedeploy
                     pre_dep.status = "Done"
                     pre_dep.save()
                     k9 = pre_dep.k9
@@ -257,7 +257,7 @@ def check_initial_deployment_dates():
 
                     #TODO dito pa lang ibabawas yung items
 
-                elif pre_dep.status == "Pending" or (pre_dep.status == "Pending" and pre_deps.count() <= 2):
+                elif pre_dep.status == "Pending" or (pre_dep.status == "Pending" and pre_deps.filter(status = "Confirmed").count() < 2):
                     pre_dep.status = "Cancelled"
                     pre_dep.save()
 
@@ -278,7 +278,7 @@ def check_initial_deployment_dates():
 # Step 6
 # Check if TL has confirmed arrival. If not, escalate to admin
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-# @periodic_task(run_every=timedelta(seconds=30))
+@periodic_task(run_every=timedelta(seconds=30))
 def check_initial_dep_arrival():
 
     deployed = Team_Dog_Deployed.objects.filter(date_pulled=None).filter(status = "Pending").exclude(team_assignment = None)

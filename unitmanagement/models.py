@@ -212,7 +212,7 @@ class VaccinceRecord(models.Model):
         return str(self.k9)
 
     def save(self, *args, **kwargs):
-        if self.dhppil4_2 == True:
+        if self.dhppil4_2 == True and self.bordetella_2 == True and self.dhppil_cv_3 == True and self.anti_rabies == True:
             self.k9.training_status = 'Unclassified'
 
         if self.deworming_1 == True and self.deworming_2 == True and self.deworming_3 == True and self.deworming_4 == True and self.dhppil_cv_1 == True and self.dhppil_cv_2 == True and self.dhppil_cv_3 == True and self.heartworm_1 == True and self.heartworm_2 == True and self.heartworm_3 == True and self.heartworm_4 == True and self.heartworm_5 == True and self.heartworm_6 == True and self.heartworm_7 == True and self.heartworm_8 == True and self.anti_rabies == True and self.bordetella_1 == True and self.bordetella_2 == True and self.dhppil4_1 == True and self.dhppil4_2 == True and self.tick_flea_1 == True and self.tick_flea_2 == True and self.tick_flea_3 == True and self.tick_flea_4 == True and self.tick_flea_5 == True and self.tick_flea_6 == True and self.tick_flea_7 == True:

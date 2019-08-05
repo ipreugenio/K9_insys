@@ -37,7 +37,7 @@
                   {% endif %}
                   {% endif %}
 
-                    {% if k9 %}
+                {% if k9 %}
 
                     <div class="ui three column grid">
 
@@ -127,7 +127,7 @@
 
                         {% if k9.training_status == "On-Training" %}
 
-                        {% elif k9.training == "Stage 0" %}
+                        {% if k9.training == "Stage 0" %}
                         <th>Training Stage: Stage 1.1 </th>
                         {% elif k9.training == "Stage 1.1" %}
                         <th>Training Stage: Stage 1.2 </th>
@@ -152,13 +152,11 @@
                         {% endif %}
 
 
-                            <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
+                        <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
                             <div><strong>Date End :</strong> {{training_sched.date_end}}</div></th>
 
-                        {% else %}
-
-
                         {% endif %}
+
                     </tr>
                     </thead>
                     </table>
@@ -198,11 +196,12 @@
                         {% endif %}
 
                         </div>
-                        {% else %}
+
+                {% else %}
                         <div class = "ui segment">
                             You don't have a K9 yet.
                         </div>
-                        {% endif %}
+                {% endif %}
 
 
                       

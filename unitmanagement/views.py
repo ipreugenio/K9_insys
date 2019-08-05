@@ -3424,13 +3424,26 @@ def k9_checkup_pending(request):
     removal = TempCheckup.objects.all()
 
     style = ""
+    name= []
     #TODO Save schedule before deletion
     if request.method == "POST":
         for item in removal:
             sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
             sched.save()
             style = "ui green message"
-            messages.success(request, 'You have scheduled ' + str(item.k9) + ' for checkup on ' + str(item.date) + "!")
+            name.append(item.k9.name)
+
+        i = 0
+        msg = ''
+        while i < len(name):
+            if i == (len(name) - 1):
+                msg = msg + name[i] + '.'
+            else:
+                msg = msg + name[i] + ', '
+            i = i + 1
+
+
+        messages.success(request, 'You have scheduled ' + msg)
 
     removal.delete()
 
@@ -3650,13 +3663,14 @@ def current_team(K9):
 def k9_checkup_list_today(request):
 
     #TODO Highlight rows if today
-    checkups = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
+    checkups = K9_Schedule.objects.filter(Q(status = "Checkup") | Q(status = "Tri Monthly Checkup")).exclude(date_start__lt=datetime.today().date())
 
     k9_list = []
+    deployment_list = []
     for sched in checkups:
         k9_list.append(sched.k9)
-
-    #TODO show k9 if there are no valid checkups
+        deployment = K9_Schedule.objects.filter(status = "Initial Deployment").filter(k9 = sched.k9).exclude(date_start__lt=datetime.today().date()).first()
+        deployment_list.append(deployment.date_start)
 
     k9_exclude_list = [] #Does not need to be checkuped
     for k9 in k9_list:
@@ -3679,7 +3693,8 @@ def k9_checkup_list_today(request):
             checkup_list.append((checkup, False))
 
     context = {
-        'checkups' : checkup_list
+        'checkups' : checkup_list,
+        'deployment_list' : deployment_list
     }
 
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)

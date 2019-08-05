@@ -237,3 +237,14 @@ def delete():
     notif_delete = Notification.objects.filter(datetime=date.today - timedelta(days=60))
     notif_delete.delete()
 
+@periodic_task(run_every=crontab(hour=6, minute=0))
+def tri_monthly_checkup():
+
+    k9s = K9.objects.all()
+    for k9 in k9s:
+        k9_phex = PhysicalExam.objects.filter(k9 = k9).latest('id')
+        delta = datetime.today().date() - k9_phex.date
+        if k9_phex.cleared == True and delta.days >= 90:  # 3 months
+            K9_Schedule.objects.create(date_start = k9_phex.date + relativedelta(months=3), status = "Tri Monthly Checkup")
+
+    return None

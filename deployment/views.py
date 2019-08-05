@@ -288,7 +288,7 @@ def check_handlers_with_multiple_k9s():
 def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
-    # mass_populate()
+    mass_populate()
     # k9s = K9.objects.all()
     # for k9 in k9s:
     #     k9.save()
@@ -1613,8 +1613,7 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
             user_exclude = User.objects.filter(id__in=handler_exclude_list)
 
             # Get K9s ready for deployment #exclude already scheduled K9s
-            can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-                assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list).exclude(handler__in = user_exclude) #Same code in main
+            can_deploy = K9.objects.filter(training_status='For-Deployment').exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list).exclude(handler__in = user_exclude) #Same code in main
             # End Get K9s ready for deployment
 
             # print("CAN DEPLOY QUERYSET")
@@ -1666,7 +1665,7 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
 
                     # dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status="Scheduled",
                     #                                                         team_assignment = team).count()
-                    dogs_scheduled_count = K9_Schedule.objects.filter(status="Initial Deployment", team=team).count()
+                    dogs_scheduled_count = K9_Schedule.objects.filter(status="Initial Deployment", team=team).filter(k9__in = can_deploy).count()
                     if (team.total_dogs_deployed + k9s_assigned + dogs_scheduled_count) >= 2:  # There must be atleast 2 units per location #TODO Include schedule K9s
                         # print("Units per Location " + str(location))
                         # print(team.total_dogs_deployed + k9s_assigned)
@@ -1758,7 +1757,7 @@ def schedule_units(request):
         team_list.append(team)
 
         #dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status = "Scheduled", team_assignment = team).count()
-        dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).exclude(k9__in = k9s_tobe_redeployed).count()
+        dogs_scheduled_count = K9_Schedule.objects.filter(Q(status = "Initial Deployment") | Q(k9__in = k9s_tobe_redeployed)).filter(team = team).count()
 
         total_dogs_deployed_list.append(team.total_dogs_deployed + dogs_scheduled_count) #TODO Included scheduled K9s
 

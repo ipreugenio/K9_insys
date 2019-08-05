@@ -591,6 +591,7 @@ def generate_k9_posttraining_decision():
         try:
             k9 = K9.objects.get(id = id)
             k9.training_status = "For-Deployment"
+            k9.status = "Working Dog"
             k9.save()
         except: pass
 
@@ -598,6 +599,7 @@ def generate_k9_posttraining_decision():
         try:
             k9 = K9.objects.get(id = id)
             k9.training_status = "For-Breeding"
+            k9.status = "Working Dog"
             k9.save()
         except: pass
 
