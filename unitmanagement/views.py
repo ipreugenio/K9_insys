@@ -12,39 +12,32 @@ from django.db.models import Sum, Avg, Max, Q
 from django.core.exceptions import ObjectDoesNotExist
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
+from unitmanagement.serializers import K9Serializer
+from django.db.models import Q
+from dateutil.parser import parse
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+import calendar
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from planningandacquiring.forms import k9_detail_form
-from planningandacquiring.models import K9
+from planningandacquiring.models import K9, Actual_Budget
 
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History, Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine
+from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous_Received_Trail, Food_Received_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, RequestTransferForm, ReplenishmentForm
-from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
-from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord, VaccineUsed, Notification
-from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm
 
-from unitmanagement.models import PhysicalExam, Health, HealthMedicine, K9_Incident, Handler_On_Leave, K9_Incident, Handler_K9_History
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm
-from unitmanagement.forms import K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
 
-from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 
-from unitmanagement.serializers import K9Serializer
-from django.db.models import Q
-from dateutil.parser import parse
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 # Create your views here.
 
 import json
@@ -175,44 +168,47 @@ def yearly_vaccine_list(request):
         try:
             ar = VaccineUsed.objects.filter(disease__contains='Anti-Rabies').filter(k9=k9).latest('date_vaccinated')
             nxt_ar = ar.date_vaccinated + relativedelta(years=+1)
-        except:
-            dar = k9.date_created + relativedelta(months=+6)
-            nxt_ar = dar
+        except ObjectDoesNotExist:
+            nxt_ar = None
 
         try:
             br = VaccineUsed.objects.filter(disease__contains='Bordetella').filter(k9=k9).latest('date_vaccinated')
             nxt_br = br.date_vaccinated + relativedelta(years=+1)
-        except:
-            dbr = k9.date_created + relativedelta(months=+6)
-            nxt_br = dbr
+        except ObjectDoesNotExist:
+            nxt_br = None
 
         try:
             dh = VaccineUsed.objects.filter(disease__contains='DHPPiL4').filter(k9=k9).latest('date_vaccinated')
             nxt_dh = dh.date_vaccinated + relativedelta(years=+1)
-        except:
-            ddh = k9.date_created + relativedelta(months=+6)
-            nxt_dh = ddh
+        except ObjectDoesNotExist:
+           nxt_dh = None
 
         try:
             dw = VaccineUsed.objects.filter(disease__contains='Deworming').filter(k9=k9).latest('date_vaccinated')
-            nxt_dw = dw.date_vaccinated + relativedelta(months=+1)
-        except:
-            ddw = k9.date_created + relativedelta(months=+6)
-            nxt_dw = ddw
+            nxt_dw = dw.date_vaccinated + relativedelta(months=+3)
+        except ObjectDoesNotExist:
+            nxt_dw = None
 
-        if nxt_ar <= dt.date.today():
-            ard = [k9,nxt_ar]
-            k9_ar.append(ard)
-        if nxt_br <= dt.date.today():
-            brd = [k9,nxt_br]
-            k9_br.append(brd)
-        if nxt_dh <= dt.date.today():
-            dhd = [k9,nxt_dh]
-            k9_dh.append(dhd)
-        if nxt_dw <= dt.date.today():
-            dwd = [k9,nxt_dw]
-            k9_dw.append(dwd)
+        if nxt_ar != None:
+            if nxt_ar <= dt.date.today():
+                ard = [k9,nxt_ar]
+                k9_ar.append(ard)
 
+        if nxt_br != None:
+            if nxt_br <= dt.date.today():
+                brd = [k9,nxt_br]
+                k9_br.append(brd)
+
+        if nxt_dh != None:
+            if nxt_dh <= dt.date.today():
+                dhd = [k9,nxt_dh]
+                k9_dh.append(dhd)
+                
+        if nxt_dw != None:
+            if nxt_dw <= dt.date.today():
+                dwd = [k9,nxt_dw]
+                k9_dw.append(dwd)
+            
     form = VaccinationUsedForm(request.POST or None)
 
     if request.method == "POST":
@@ -242,6 +238,7 @@ def yearly_vaccine_list(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'today':dt.date.today(),
         'form':form,
         'k9_ar':k9_ar,
         'k9_dh':k9_dh,
@@ -2225,36 +2222,42 @@ def replenishment_form(request):
 
     form.fields['handler'].queryset = User.objects.filter(id=user.id)
 
-    formset1 = food_formset(request.POST or None, prefix='food')
-    formset2 = med_formset(request.POST or None, prefix='med')
-    formset3 = misc_formset(request.POST or None, prefix='misc')
+    formset1 = food_formset(request.POST or None)
+    formset2 = med_formset(request.POST or None)
+    formset3 = misc_formset(request.POST or None)
 
     # form
     if request.method == 'POST':
         print(form.errors)
+
         if form.is_valid():
-            f=form.save()
+            f=form.save(commit=False)
+
+            formset1 = food_formset(request.POST or None, prefix='food', instance=f)
+            formset2 = med_formset(request.POST or None, prefix='med', instance=f)
+            formset3 = misc_formset(request.POST or None, prefix='misc', instance=f)
 
             if formset1.is_valid() and formset2.is_valid() and formset3.is_valid():
-                for form in formset1:   
-                    form = form.save(commit=False)
-                    form.request = f
+               
+                for form1 in formset1:   
+                    form1 = form1.save(commit=False)
+                    form1.request = f
                     # form.save()
-                    print(form)
+                    print(form1)
 
           
-                for form in formset2:
-                    form = form.save(commit=False)
-                    form.request = f
+                for form2 in formset2:
+                    form2 = form2.save(commit=False)
+                    form2.request = f
                     # form.save()
-                    print(form)
+                    print(form2)
 
            
-                for form in formset3:
-                    form = form.save(commit=False)
-                    form.request = f
+                for form3 in formse31:
+                    form3 = form3.save(commit=False)
+                    form3.request = f
                     # form.save()
-                    print(form)
+                    print(form3)
             else:
                 message.warning(request, 'Invalid Input')
          
@@ -2746,7 +2749,7 @@ class TeamLeaderView(APIView):
         k9 = K9.objects.filter(id__in=k9_id)
 
         k9_perf = []
-
+        fou = []
         #get all k9s
         for k in k9:
 
@@ -2792,10 +2795,9 @@ class TeamLeaderView(APIView):
             perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
             k9_perf.append(perf_items)
 
-        fou = []
-
-        for td in tdd:
-            fou.append(str(td.k9.name) + ' - ' + str(td.handler.lastname))
+            f = str(k.name) + ' - ' + str(k.handler.lastname)
+            
+            fou.append(f)
 
         data = {
             "labels":labels,
@@ -2815,20 +2817,20 @@ class HandlerView(APIView):
         k9=None
         try:
             k9 = K9.objects.get(handler=user)
-            jan = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
-            feb = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
-            mar = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
-            apr = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
-            may = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
-            jun = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
-            jul = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
-            aug = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
-            sep = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
-            oct = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
-            nov = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
-            dec = Daily_Refresher.objects.filter(k9=k).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
+            jan = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=1).aggregate(avg=Avg('rating'))['avg']
+            feb = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=2).aggregate(avg=Avg('rating'))['avg']
+            mar = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=3).aggregate(avg=Avg('rating'))['avg']
+            apr = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=4).aggregate(avg=Avg('rating'))['avg']
+            may = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=5).aggregate(avg=Avg('rating'))['avg']
+            jun = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=6).aggregate(avg=Avg('rating'))['avg']
+            jul = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=7).aggregate(avg=Avg('rating'))['avg']
+            aug = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=8).aggregate(avg=Avg('rating'))['avg']
+            sep = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=9).aggregate(avg=Avg('rating'))['avg']
+            oct = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=10).aggregate(avg=Avg('rating'))['avg']
+            nov = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=11).aggregate(avg=Avg('rating'))['avg']
+            dec = Daily_Refresher.objects.filter(k9=k9).filter(date__year=datetime.now().year).filter(date__month=12).aggregate(avg=Avg('rating'))['avg']
 
-        except:
+        except ObjectDoesNotExist:
             jan=0
             feb=0
             mar=0
@@ -2949,6 +2951,70 @@ class TrainerView(APIView):
             "current":current,
             "demand":demand,
             "pie_data":pie_data,
+        }
+        return Response(data)
+
+class AdminView(APIView):
+    def get(self, request, format=None):
+        user = user_session(request)
+
+        month = datetime.today().month
+        print(month)
+
+        ctr = 1
+        temp_total = 0
+
+        list_month = []
+        list_month_name = []
+        while ctr <= month:
+            mr = Medicine_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
+            # .aggregate(sum=Sum('quantity'))['sum'] 
+
+            mrt = 0
+            for mr in mr:
+                mi = Medicine_Inventory.objects.get(id=mr.inventory.id)
+                t = mr.quantity * mi.medicine.price
+                mrt = mrt + t
+            
+            fr = Food_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
+
+            frt = 0
+            for fr in fr:
+                mi = Food.objects.get(id=fr.inventory.id)
+                t = fr.quantity * mi.price
+                frt = frt + t
+
+            mir = Miscellaneous_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr) 
+            
+            mirt = 0
+            for mir in mir:
+                mi = Miscellaneous.objects.get(id=mir.inventory.id)
+                t = mir.quantity * mi.price
+                mirt = mirt + t
+
+            if mr == None:
+                mr = 0
+            if fr == None:
+                fr = 0
+            if mir == None:
+                mir =0
+
+            temp_total = temp_total+mrt+frt+mirt
+
+            mon = calendar.month_name[ctr]
+            list_month_name.append(mon)
+            list_month.append(temp_total)
+            ctr = ctr+1
+
+        try:
+            ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
+            ab = ab.others_total + ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash   
+        except ObjectDoesNotExist:
+            ab = None
+        data = {
+         'list_month':list_month,
+         'list_month_name':list_month_name,
+         'ab':ab,
         }
         return Response(data)
 

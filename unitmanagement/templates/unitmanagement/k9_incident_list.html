@@ -11,7 +11,7 @@
 </div>
 {% if user.position == 'Team Leader' %}
 <div class="ui segment" data-tab="first">
-    <table id="tabledata1" class="ui five column celled table">
+    <table id="tabledata1" class="ui celled table">
         <thead>
             <tr>
                 <th>Date Reported</th>
@@ -27,8 +27,8 @@
                 <td>{{data.date}}</td>
                 <td>{{data.incident}}</td>
                 <td>{{data.k9}}</td>
-                <td>{{data.reported_by}}</td>
-                <td class="center aligned three wide">
+                <td class="four wide">{{data.reported_by}}</td>
+                <td class="center aligned two wide">
                     <a href="{% url 'unitmanagement:k9_retreived' data.id %}" class="ui blue button">Retrieved</a>
                 </td>
             </tr>
@@ -39,7 +39,7 @@
 </div>
 {% elif user.position == 'Administrator' %}
 <div class="ui segment" data-tab="first">
-        <table id="tabledata1" class="ui five column celled table">
+        <table id="tabledata1" class="ui celled table">
             <thead>
                 <tr>
                     <th>Date Reported</th>
@@ -58,11 +58,11 @@
                     <td>{{data.k9}}</td>
                     <td>{{data.reported_by}}</td>
                     {% if data.k9.assignment == 'None' %}
-                        <td>PCGK9 Taguig</td>
+                        <td class="four wide">PCGK9 Taguig</td>
                     {%else%}
-                        <td>{{data.k9.assignment}}</td>
+                        <td class="four wide">{{data.k9.assignment}}</td>
                     {%endif%}
-                    <td class="center aligned three wide">
+                    <td class="center aligned two wide">
                         <a href="{% url 'unitmanagement:k9_retreived' data.id %}" class="ui blue button">Retrieved</a>
                     </td>
                 </tr>
@@ -90,12 +90,12 @@
                     <td>{{data.k9}}</td>
                     <td>{{data.reported_by}}</td>
                     {% if data.k9.assignment == 'None' %}
-                        <td>PCGK9 Taguig</td>
+                        <td class="four wide">PCGK9 Taguig</td>
                     {%else%}
-                        <td>{{data.k9.assignment}}</td>
+                        <td class="four wide">{{data.k9.assignment}}</td>
                     {%endif%}
                     <td>{{data.clinic}}</td>
-                    <td class="center aligned three wide">
+                    <td class="center aligned two wide">
                         <button class="ui tiny blue button flip" id = "{{data.id}}" type="button">Select</button>
                     </td>
                 </tr>

@@ -113,18 +113,18 @@
             </table>
 
         </center>
-    <div class="two fields">
+  
+    <div class="field">
+        <label>Diagnosis</label>
+        {{form.remarks}}
+    </div>
+   
+    <div class="inline fields">
         <div class="field">
-            <label>Diagnosis</label>
-            {{form.remarks}}
-        </div>
-         <div class="field">
-
-             <br>
-         <label><h3>Cleared</h3></label>
             {{form.cleared}}
-
         </div>
+        <label><h3>Please click the Checkbox if the K9 is cleared for Physical
+        Examination.</h3></label>
     </div>
         <div class="ui inverted right aligned segment" style="padding: 0px;">
             <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>

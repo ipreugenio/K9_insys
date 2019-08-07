@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <th colspan="2">Number of Procured k9</th>
-                    <td colspan="1" class="right aligned" id='p_count'>0</td>
+                    <td colspan="1" class="right aligned" id='p_count' name='p_count'>0</td>
                 </tr>
                 <tr style="font-weight: bold;" class="right aligned">
                     <th colspan="2">Total K9</th>
@@ -112,7 +112,7 @@
         <form action="" method="POST" class="ui form" enctype="multipart/form-data" id="myForm">
             {% csrf_token %}
 
-            <input type="hidden" id='id_need' name='id_need'>
+            <input type="number" id='id_need' name='id_need'>
             <input type="hidden" id='id_need_total' name='id_need_total' step="0.01">
             <div class="four fields">
                     <div class="field">

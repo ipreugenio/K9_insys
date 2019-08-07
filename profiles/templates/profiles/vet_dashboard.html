@@ -13,21 +13,30 @@
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="ui two column grid">
-                                    <div class="four wide column">
+                                    <div class="three wide column">
                                             <div class="card">
                                                     <div class="content">
-                                                        <i class="huge syringe blue icon pop">{{vac_pending}}</i>
+                                                        <i class="huge syringe blue icon">{{vac_count}}</i>
                                                     </div>
                                                     <div class="extra content">
                                                         <strong>
-                                                            <a href="#">INITIAL VACCINATIONS</a>
+                                        <a href="{% url 'unitmanagement:vaccination_list'%}">PREVENTIVE
+                                                            HEALTH PROGRAM VACCINATION </a>
                                                         </strong>
                                                     </div>
                                                 </div> 
                                     </div>
-                                    <div class="column left aligned">
+                                    <div class="thirteen wide column left aligned">
                                             <div class="ui grid">
-                                                <div class="column">asd</div>
+                                    
+                                                    {% for a,b in vac_list%}
+                                                    <div class="five wide column" style="margin: 2px;padding:2px;">
+                                                           
+                                                        <strong>{{a}} - </strong>
+                                                        <span style="color:orangered;">{{b}}</span>
+                                                      
+                                                    </div>
+                                                    {% endfor %}
                                             </div>                        
                                     </div>
                                 </div>
@@ -46,18 +55,23 @@
                                             <div class="four wide column">
                                                     <div class="card">
                                                             <div class="content">
-                                                                <i class="huge syringe purple icon pop">{{vac_pending}}</i>
+                                                                <i class="huge syringe purple icon">{{yearly_count}}</i>
                                                             </div>
                                                             <div class="extra content">
                                                                 <strong>
-                                                                    <a href="#">YEARLY VACCINATIONS</a>
+                                    <a href="{% url 'unitmanagement:yearly_vaccine_list'%}">YEARLY VACCINATIONS</a>
                                                                 </strong>
                                                             </div>
                                                         </div> 
                                             </div>
-                                            <div class="column left aligned">
+                                            <div class="twelve wide column left aligned">
                                                     <div class="ui grid">
-                                                        <div class="column">asd</div>
+                                                        {% for a,b in yearly_list%}
+                                                        <div class="column">
+                                                            <strong>{{a}} - </strong>
+                                                            <span style="color:orangered;">{{b}}</span>
+                                                        </div>
+                                                        {% endfor %}
                                                     </div>                        
                                             </div>
                                         </div>
@@ -73,8 +87,8 @@
                                     <div class="card">
                                                 <div class="content">
                                                     <i class="huge red heartbeat icon"></i>
-                                                    <i class="huge green icon">{{cv1}}</i>
-                                                    <i class="huge blue icon">{{cv1}}</i>
+                                                    <i class="huge green icon">2</i>
+                                                    <i class="huge blue icon">5</i>
                                                 </div>
                                                 <div class="extra content right aligned">
                                                   
@@ -171,20 +185,6 @@
                             <div class="ui raised center aligned segment">
                                 <div class="card">
                                     <div class="content">
-                                        <i class="huge first aid green icon">{{health_pending}}</i>
-                                    </div>
-                                    <div class="extra content">
-                                        <strong>
-                                            <a href="{% url 'unitmanagement:k9_sick_list'%}">HEALTH CONCERNS</a>
-                                        </strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
                                         <i class="huge exclamation black icon">{{incident}}</i>
                                     </div>
                                     <div class="extra content">
@@ -242,42 +242,7 @@
         </div>
     </div>    
 </div>
-<div class="ui flowing popup transition hidden">
-    <table class="ui very basic table">
-        <tr>
-            <th>1st dose DHPPiL+CV</th>
-            <td>{{cv1}}</td>
-        </tr>
-        <tr>
-            <th>2nd dose DHPPiL+CV</th>
-            <td>{{cv2}}</td>
-        </tr>
-        <tr>
-            <th>3rd dose DHPPiL+CV</th>
-            <td>{{cv3}}</td>
-        </tr>
-        <tr>
-            <th>1st dose Bordetella</th>
-            <td>{{bd1}}</td>
-        </tr>
-        <tr>
-            <th>2nd dose Bordetella</th>
-            <td>{{bd2}}</td>
-        </tr>
-        <tr>
-            <th>Anti-Rabies</th>
-            <td>{{rabies}}</td>
-        </tr>
-        <tr>
-            <th>1st dose DHPPiL4</th>
-            <td>{{dh1}}</td>
-        </tr>
-        <tr>
-            <th>2nd dose DHPPiL4</th>
-            <td>{{dh2}}</td>
-        </tr>
-    </table>
-</div>
+
 <style>
 #prev, #next{
     background-color:orangered;
@@ -286,12 +251,6 @@
 </style>
     <script>
         $(document).ready(function() {
-            $('.pop').popup({
-                position : 'bottom center',
-                inline: false,
-                hoverable  : true,
-                popup: '.flowing.popup'
-            });
 
             var endpoint = '../../unitmanagement/vet/api'
             var in_heat = [];
@@ -357,24 +316,6 @@
             
         });
         </script>
-
-
-<script>
-
-<style>
-.fc-header, .fc-button, #prev, #next{
-  background-color:orangered;
-  color: white;
-}
-
- #calendar {
-    max-width: 900px;
-    margin: 40px auto;
- }
-</style>
-</script>
-
-
 <script>
 
      $('#calendar').fullCalendar({

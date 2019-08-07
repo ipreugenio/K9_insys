@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateparse import parse_date
-
+from dateutil.relativedelta import relativedelta
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed, K9_Supplier, K9_Litter, K9_Mated
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm,DateK9Form
 
@@ -505,33 +505,38 @@ def add_K9_parents(request):
     #all in-heat today
     heat = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(last_estrus_date=dt.today())
 
+    print(heat)
 
     #heat today
     momh = []
     sickh = []
     b_arrh = []
 
-    heat_list = []
-    for heat in heat:
-        heat_list.append(heat.id)
+    # heat_list = []
+    # for heat in heat:
+    #     heat_list.append(heat.id)
 
-        h = Health.objects.filter(dog=heat).count()
-        momh.append(heat)
-        sickh.append(h)
+    #     h = Health.objects.filter(dog=heat).count()
+    #     momh.append(heat)
+    #     sickh.append(h)
 
-        birth = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_no'))['sum']
-        death = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_died'))['sum']
+    #     birth = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_no'))['sum']
+    #     death = K9_Litter.objects.filter(mother=heat).aggregate(sum=Sum('litter_died'))['sum']
 
-        if birth != None or death != None:
-            total = (birth / (birth+death)) * 100
-        else:
-            total=100
+    #     if birth != None or death != None:
+    #         total = (birth / (birth+death)) * 100
+    #     else:
+    #         total=100
         
-        b_arrh.append(int(total))
+    #     b_arrh.append(int(total))
 
-    hlist = zip(momh,sickh,b_arrh)
-
-    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus")).exclude(id__in=heat_list)
+    # hlist = zip(momh,sickh,b_arrh)
+    # for a,b,c in hlist:
+    #     print(a,b,c)
+        
+    mother  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).filter(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
+    
+    # .exclude(id__in=heat_list)
     
     father = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6)
     mother_all  = K9.objects.filter(sex="Female").filter(training_status = "For-Breeding").filter(age__gte = 1).filter(age__lte = 6).exclude(Q(reproductive_stage = "Estrus") | Q(reproductive_stage = "Proestrus"))
@@ -704,7 +709,7 @@ def add_K9_parents(request):
     context = {
         'Title': "K9_Breeding",
         'today': dt.today(),
-        'hlist': hlist,
+        # 'hlist': hlist,
         'style': style,
         'mlist' : mlist,
         'flist' : flist,
@@ -798,7 +803,6 @@ def in_heat_change(request):
         
         k9 = K9.objects.get(id=id)
         k9.last_proestrus_date = date
-        k9.reproductive_stage = 'Proestrus'
         k9.save()
         
         return redirect('planningandacquiring:add_K9_parents_form')
@@ -915,7 +919,7 @@ def add_K9_offspring(request, id):
             for form in formset:
                 k9 = form.save(commit=False)
                 k9.source = "Breeding"
-                k9.breed = breed
+                k9.breed = data.mother.breed
                 k9.birth_date = date
                 k9.save()
                 
@@ -2373,7 +2377,7 @@ def budgeting(request):
 
     ny_dead = []
     for kd in all_k9:
-        b = Dog_Breed.objects.get(breed = kd.breed)
+        b = Dog_Breed.objects.filter(sex='Male').get(breed = kd.breed)
         if (kd.age + 1) >= b.life_span:
             ny_dead.append(kd.breed)
             
@@ -2408,7 +2412,7 @@ def budgeting(request):
     difference_k9 = k9_cy - k9_ny
     born_ny=0
     for b in k9_breeded:
-        d = Dog_Breed.objects.get(breed=b.mother.breed)
+        d = Dog_Breed.objects.filter(sex='Female').get(breed=b.mother.breed)
         born_ny = born_ny + d.litter_number
 
      
@@ -2427,15 +2431,15 @@ def budgeting(request):
     if not SAR_demand:
         SAR_demand = 0
 
-    sar = Dog_Breed.objects.filter(skill_recommendation='SAR')
-    ndd = Dog_Breed.objects.filter(skill_recommendation='NDD')
-    edd = Dog_Breed.objects.filter(skill_recommendation='EDD')
+    sar = Dog_Breed.objects.filter(skill_recommendation='SAR').filter(sex='Male')
+    ndd = Dog_Breed.objects.filter(skill_recommendation='NDD').filter(sex='Male')
+    edd = Dog_Breed.objects.filter(skill_recommendation='EDD').filter(sex='Male')
 
     if request.method == "POST":
            
         need_procure_ny =  int(request.POST.get('id_need'))
         total_p =  Decimal(request.POST.get('id_need_total'))
-        
+
         #get dog food based on dog count
         # k9 = all_k9 - dead + born + Forecasted added_procured
         # monthly 
@@ -2485,7 +2489,7 @@ def budgeting(request):
 
         for (n,(item1,item2,item3,item4,item5)) in enumerate(dog_food):
             total_food =+ item4
-
+     
         #MEDICINE EXPIRATION
         mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 
@@ -3060,7 +3064,7 @@ def budgeting(request):
                     
             
             return redirect('planningandacquiring:budget_list')
-        except:
+        except ObjectDoesNotExist:
             pb = Proposal_Budget.objects.create(k9_current=k9_ny, k9_needed=need_procure_ny, k9_breeded=born_ny, food_milk_total=total_food, vac_prev_total=vac_total, medicine_total=total_medicine, vet_supply_total=vet_total, kennel_total=ken_total, others_total=oth_total, training_total=train_total, grand_total=grand_total, date_created=dt.today(),k9_current_train = k9_current_train,k9_total=total_p)
 
             #item, price, quantity, total
@@ -3168,11 +3172,11 @@ def load_budget(request):
 
         stat = True
         all_k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost")
-        print(stat)
+        print('status',stat)
 
         #K9 to be born and die
         k9_breeded = K9_Mated.objects.filter(status='Pregnant')
-        print(k9_breeded)
+        print('k9 breed',k9_breeded)
         ny_breeding = [] 
         ny_data = []
         for kb in k9_breeded:
@@ -3190,7 +3194,7 @@ def load_budget(request):
 
         #Total count of all dogs born next year by breed,
         breed_u = np.unique(ny_breeding)
-
+        print('ny_breed', breed_u)
         p = pd.DataFrame(ny_data, columns=['Breed', 'Litter'])
         h = p.groupby(['Breed']).sum()
 
@@ -3203,7 +3207,7 @@ def load_budget(request):
 
         ny_dead = []
         for kd in all_k9:
-            b = Dog_Breed.objects.get(breed = kd.breed)
+            b = Dog_Breed.objects.filter(sex='Male').get(breed = kd.breed)
             if (kd.age + 1) >= b.life_span:
                 ny_dead.append(kd.breed)
                 
@@ -3216,7 +3220,7 @@ def load_budget(request):
         all_k = all_k9.values_list('breed', flat=True).order_by()
 
         all_ku = np.unique(all_k)
-
+        print('all_k', all_k)
         all_dogs = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
 
         all_kk = []
@@ -3232,7 +3236,7 @@ def load_budget(request):
         difference_k9 = k9_cy - k9_ny
         born_ny=0
         for b in k9_breeded:
-            d = Dog_Breed.objects.get(breed=b.mother.breed)
+            d = Dog_Breed.objects.filter(sex='Female').get(breed=b.mother.breed)
             born_ny = born_ny + d.litter_number
         #get dog food based on dog count
         # k9 = all_k9 - dead + born + Forecasted added_procured
@@ -3255,6 +3259,8 @@ def load_budget(request):
         sum_puppy = Food.objects.filter(foodtype='Puppy Dog Food').aggregate(sum=Sum('quantity'))['sum']
         sum_adult = Food.objects.filter(foodtype='Adult Dog Food').aggregate(sum=Sum('quantity'))['sum']
 
+        print('sum',sum_milk)
+        
         #milk
         tm = total_milk - sum_milk
         tmp = milk.inventory.price
@@ -3269,7 +3275,7 @@ def load_budget(request):
         ta = total_adult_food - sum_adult
         tap = adult.inventory.price
         tat = round((ta*tap),2)
-
+      
         dm = [milk,tmp,int(tm),tmt,int(born_ny)]
         dp = [puppy,tpp,int(tp),tpt,int(born_ny)]
         da = [adult,tap,int(ta),tat,int(need_procure_ny+k9_ny)]
@@ -3284,6 +3290,7 @@ def load_budget(request):
         for (n,(item1,item2,item3,item4,item5)) in enumerate(dog_food):
             total_food =+ item4
 
+        print('df',dog_food)
         #MEDICINE EXPIRATION
         mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 

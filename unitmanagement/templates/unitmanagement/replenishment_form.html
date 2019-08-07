@@ -22,20 +22,20 @@
         <div class="column">
             <div class="ui horizontal divider">Dog Food</div>
             <div class="ui inverted segment">
-                {% for form in food_formset %}
-                <div class="formset_class1" id="{{ form.prefix }}-row">
+                {% for form1 in food_formset %}
+                <div class="formset_class1" id="{{ form1.prefix }}-row">
                     <div class="three fields">
                         <div class="field">
                             <label>Dog Food</label>
-                            {{form.food}}
+                            {{form1.food}}
                         </div>
                         <div class="field">
                             <label>Unit</label>
-                            {{form.unit}}
+                            {{form1.unit}}
                         </div>
                         <div class="field">
                             <label>Quantity</label>
-                            {{form.quantity}}
+                            {{form1.quantity}}
                         </div>
                     </div>
                 </div>
@@ -47,20 +47,20 @@
         <div class="column">
             <div class="ui horizontal divider">Medicine</div>
             <div class="ui inverted segment">
-            {% for form in med_formset %}
-            <div class="formset_class2" id="{{ form.prefix }}-row">
+            {% for form2 in med_formset %}
+            <div class="formset_class2" id="{{ form2.prefix }}-row">
                 <div class="three fields">
                     <div class="field">
                         <label>Medicine</label>
-                        {{form.medicine}}
+                        {{form2.medicine}}
                     </div>
                     <div class="field">
                         <label>Unit</label>
-                        {{form.unit}}
+                        {{form2.unit}}
                     </div>
                     <div class="field">
                         <label>Quantity</label>
-                        {{form.quantity}}
+                        {{form2.quantity}}
                     </div>
                 </div>
             </div>
@@ -71,20 +71,20 @@
         <div class="column">
             <div class="ui horizontal divider">Miscellaneous</div>
             <div class="ui inverted segment">
-            {% for form in misc_formset %}
-            <div class="formset_class3" id="{{ form.prefix }}-row">
+            {% for form3 in misc_formset %}
+            <div class="formset_class3" id="{{ form3.prefix }}-row">
                 <div class="three fields">
                     <div class="field">
                         <label>Miscellaneous</label>
-                        {{form.miscellaneous}}
+                        {{form3.miscellaneous}}
                     </div>
                     <div class="field">
                         <label>Unit</label>
-                        {{form.unit}}
+                        {{form3.unit}}
                     </div>
                     <div class="field">
                         <label>Quantity</label>
-                        {{form.quantity}}
+                        {{form3.quantity}}
                     </div>
                 </div>
             </div>
@@ -106,17 +106,17 @@
         
         $(function() {
             $('#myForm .formset_class1').formset({
-                prefix: '{{ formset.prefix }}'
+                prefix: '{{ form1.prefix }}'
             });            
         })
         $(function() {
             $('#myForm .formset_class2').formset({
-                prefix: '{{ formset.prefix }}'
+                prefix: '{{ form2.prefix }}'
             });            
         })
         $(function() {
             $('#myForm .formset_class3').formset({
-                prefix: '{{ formset.prefix }}'
+                prefix: '{{ form3.prefix }}'
             });            
         })
 
