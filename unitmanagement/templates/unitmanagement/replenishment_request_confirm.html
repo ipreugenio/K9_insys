@@ -5,6 +5,11 @@
     <h2 class="ui header">
         {{title}}
     </h2>
+    {% if messages %}
+    {% for message in messages %}
+        <div class="{{style}}" > {{ message }}</div>
+    {% endfor %}
+    {% endif %}
 </div>
 
 <div class="ui top attached tabular menu">
@@ -28,7 +33,7 @@
                     <td>{{data.0.handler}}</td>
                     <td>{{data.1}}</td>
                     <td class="center aligned">
-                        <button class="ui basic blue button">Select</button>
+                        <a href="{% url 'unitmanagement:replenishment_approval' data.0.id %}" class="ui basic blue button">Select</a>
                     </td>
                 </tr>
                 
@@ -37,13 +42,13 @@
         </table>
     </div>
     <div class="ui tab segment" data-tab="second">
-        <table id="tabledata1" class="ui four column celled table">
+        <table id="tabledata1" class="ui column celled table">
             <thead>
                 <tr>
-                    <th>Date Approved</th>
-                    <th>Team Leader</th>
+                    <th class="two wide">Date Approved</th>
+                    <th class="three wide">Team Leader</th>
                     <th>Port</th>
-                    <th>Approved by</th>
+                    <th class="three wide">Approved by</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,11 +76,11 @@
         
     $(document).ready(function() {
         $('#tabledata1').DataTable({
-            "order": [[ 0, "desc" ]]
+            "order": [[ 0, "asc" ]]
         });
 
         $('#tabledata2').DataTable({
-            "order": [[ 0, "desc" ]]
+            "order": [[ 0, "asc" ]]
         });
 
         $('.menu .item').tab();
