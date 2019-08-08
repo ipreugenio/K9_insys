@@ -385,6 +385,7 @@ def assigned_location_list(request):
 
     return render(request, 'deployment/assigned_location_list.html', context)
 
+#NOTE You cannot deploy k9s in this view anymore
 def team_location_details(request, id):
     data = Team_Assignment.objects.get(id=id)
     print(data.id)
@@ -402,10 +403,16 @@ def team_location_details(request, id):
        user_deploy.append(h.UserID)
 
     # #filter K9 where handler = person_info and k9 assignment = None
-    can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment').filter(assignment='None')
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Pulled-Out')
+    can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment')
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed').filter(date_pulled = None)
+    dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).exclude(date_pulled = None)#.filter(status='Pulled-Out')
 
+    tl_dog = None
+    for tdd in dogs_deployed:
+        if tdd.k9.handler.position == "Team Leader":
+            tl_dog = tdd.k9
+    if tl_dog is not None:
+        dogs_deployed = dogs_deployed.exclude(k9 = tl_dog)
 
     if request.method == 'POST':
         checks =  request.POST.getlist('checks') # get the id of all the dogs checked
@@ -451,6 +458,8 @@ def team_location_details(request, id):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+
+        'tl_dog' : tl_dog
     }
 
     return render(request, 'deployment/team_location_details.html', context)
@@ -625,6 +634,7 @@ def request_dog_details(request, id):
     print(can_deploy)
 
     # dogs deployed to Dog Request
+    # Don't need to filter data2.status == "Approved" since wala rin naman k9_schedule if naka pending pa yung request
     dogs_deployed = K9_Schedule.objects.filter(dog_request=data2) #.filter(status='Request') (unnecessary filter)
 
     sar_deployed = 0
@@ -643,10 +653,20 @@ def request_dog_details(request, id):
 
         TL_candidates.append(item.k9.handler)
 
+    #TODO
 
-    TL = assign_TL(None, handler_list_arg=TL_candidates)
-    data2.team_leader = TL
-    data2.save()
+    print("TL Candidates")
+    print(TL_candidates)
+    TL = None
+    if len(TL_candidates) >= 1:
+        TL = assign_TL(None, handler_list_arg=TL_candidates)
+
+        if not (datetime.datetime.today().date() >= data2.start_date and datetime.datetime.today().date() <= data2.end_date):
+            TL.position = "Handler"
+            TL.save()
+
+        data2.team_leader = TL
+        data2.save()
 
     #TODO Find issue where handler has multiple k9s
     tl_dog = None

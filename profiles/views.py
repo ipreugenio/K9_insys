@@ -41,6 +41,7 @@ from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,C
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
+from deployment.tasks import subtract_inventory
 
 # Create your views here.
 
@@ -146,6 +147,7 @@ def dashboard(request):
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
     ua_count = 1 #change this
 
+    ab = None
     try:
         ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
 
@@ -217,15 +219,18 @@ def team_leader_dashboard(request):
         k9 = K9.objects.get(handler = user)
     except:pass
 
-    ta = Team_Assignment.objects.get(team_leader=user)
+    ta = None
+    try:
+        ta = Team_Assignment.objects.get(team_leader=user)
+        incident_count = Incidents.objects.filter(location=ta.location).count()
+        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(
+            date_pulled=None)  # only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
+        tdd_count = tdd.count()
 
-    incident_count = Incidents.objects.filter(location = ta.location).count()
+        # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
+        for_arrival = tdd.filter(status="Pending")
+    except: pass
 
-    tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_pulled = None) #only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
-    tdd_count = tdd.count()
-
-    # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
-    for_arrival = tdd.filter(status = "Pending")
 
     #TODO check arrival of units at request and from request to port
     #NOTE: There are no requests with conflicting schedules that have the same handler, much less the same TL.
@@ -479,6 +484,8 @@ def confirm_pre_deployment_items(request, k9):
     pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
     pre_deployment_items.status = "Confirmed"
     pre_deployment_items.save()
+
+    subtract_inventory(k9.handler)
 
     return False
 
