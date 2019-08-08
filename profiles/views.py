@@ -1504,6 +1504,32 @@ def user_add_confirmed(request):
     return render(request, 'profiles/user_add_confirmed.html', context)
 
 
+def load_event(request):
+
+    id = request.GET.get('event_id')
+    print("ID RECEIVED")
+    print(id)
+
+    try:
+        dog_request = Dog_Request.objects.get(id = id)
+    except: pass
+
+    context = {
+        'dog_request' : dog_request
+    }
+
+    return render(request, 'profiles/load_event.html', context)
+
+def load_event_handler(request):
+    id = request.GET.get('event_id')
+    print("ID RECEIVED")
+    print(id)
+    sched = K9_Schedule.objects.get(id = id)
+    context = {
+      'sched' : 'sched'
+    }
+
+    return render(request, 'profiles/load_event_handler.html', context)
 
 class ScheduleView(APIView):
     def get(self, request, format=None):
@@ -1604,6 +1630,9 @@ def update_event(request):
 
     return render(request, 'module/something.html', context)
 
+
 class UserView(viewsets.ModelViewSet):
     queryset = AuthUser.objects.all()
     serializer_class = UserSerializer
+
+

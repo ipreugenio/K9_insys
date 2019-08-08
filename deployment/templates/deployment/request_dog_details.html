@@ -318,7 +318,9 @@
 
     $(document).ready(function() {
         $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
+        $('#tabledata2').DataTable({
+              "order": [[ 4, "desc" ]]
+        });
         $('#tabledata3').DataTable();
         $('.menu .item').tab();
     });

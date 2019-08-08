@@ -168,20 +168,28 @@
            <th>Name</th>
            <th>Serial Number</th>
            <th>Capability</th>
-           <th>Handler</th>
-           <th></th>
+           <th>Personnel</th>
+             <th>Position</th>
          </tr>
      </thead>
      <tbody>
+     {% if tl_dog %}
+        <tr>
+            <td>{{tl_dog.name}}</td>
+        <td>{{tl_dog.serial_number}}</td>
+        <td>{{tl_dog.capability}}</td>
+        <td>{{tl_dog.handler}}</td>
+        <td>Team Leader</td>
+        </tr>
+        {% endif %}
+
         	{% for dogs_deployed in dogs_deployed %}
          <tr>
            <td>{{dogs_deployed.k9.name}}</td>
            <td>{{dogs_deployed.k9.serial_number}}</td>
            <td>{{dogs_deployed.k9.capability}}</td>
            <td>{{dogs_deployed.k9.handler}}</td>
-           <td class="ui center aligned" style="width:15%;">
-              <a href="{% url 'deployment:remove_dog_deployed' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
-            </td>
+             <td>Handler</td>
          </tr>
          	{% endfor %}
      </tbody>
@@ -232,7 +240,9 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
+        $('#tabledata1').DataTable({
+              "order": [[ 4, "desc" ]]
+        });
         $('#tabledata2').DataTable();
         $('#tabledata3').DataTable({
               "order": [[ 4, "desc" ]]

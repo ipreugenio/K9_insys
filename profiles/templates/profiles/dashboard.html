@@ -172,6 +172,11 @@
         </div>
     </div>    
 </div>
+
+
+  <div id = "id_event_load"></div>
+
+
 <style>
 #prev, #next{
   background-color:orangered;
@@ -197,6 +202,24 @@
 
           eventTextColor: "white",
 
+          eventClick: function(event, element) {
+                var url = 'ajax_load_event';
+
+                 $.ajax({
+                        url: url,
+                        data: {
+                        'event_id': event.id,},
+                        success: function (data) {
+                          $('#event_modal').modal('show');
+                          $("#id_event_load").html(data);
+                          },
+                        error:
+                            function(xhr){
+                            alert(xhr.statusText)
+                            return false;}
+                    });
+
+                 },
 
           events: [
                 {% for i in events %}

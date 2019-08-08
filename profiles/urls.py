@@ -46,6 +46,12 @@ urlpatterns = [
     path('team-leader-dashboard/ajax_load_locations', views.load_locations, name='ajax_load_locations'),
     path('team-leader-dashboard/ajax_load_map', views.load_map, name='ajax_load_map'),
 
+    path('operations-dashboard/ajax_load_event', views.load_event, name = "ajax_load_event"),
+    path('team-leader-dashboard/ajax_load_event', views.load_event, name = "ajax_load_event"),
+    path('commander-dashboard/ajax_load_event', views.load_event, name = "ajax_load_event"),
+    path('dashboard/ajax_load_event', views.load_event, name = "ajax_load_event"),
+    path('handler-dashboard/ajax_load_event', views.load_event, name = "ajax_load_event_handler"),
+
     path('schedule/api', views.ScheduleView.as_view()),
 
     # path('user/api', views.UserListView.as_view()),
