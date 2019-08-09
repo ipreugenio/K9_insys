@@ -27,7 +27,7 @@ from planningandacquiring.models import K9, Actual_Budget
 
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous_Received_Trail, Food_Received_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, ItemReplenishmentForm
 
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
 
@@ -2221,56 +2221,17 @@ def replenishment_form(request):
     style = 'ui green message'
     form = ReplenishmentForm(request.POST or None)
 
-    food_formset = inlineformset_factory(Replenishment_Request, Food_Request, form=RequestFood, extra=1, can_delete=True)
-
-    med_formset = inlineformset_factory(Replenishment_Request, Medicine_Request, form=RequestMedicine, extra=1, can_delete=True)
-    
-    misc_formset = inlineformset_factory(Replenishment_Request, Miscellaneous_Request,form=RequestMiscellaneous, extra=1, can_delete=True)
-
-    form.fields['handler'].queryset = User.objects.filter(id=user.id)
-
-    formset1 = food_formset(request.POST or None)
-    formset2 = med_formset(request.POST or None)
-    formset3 = misc_formset(request.POST or None)
-
-    # form
+    form2 = formset_factory(ItemReplenishmentForm, can_delete=True)
+    formset = form2()
     if request.method == 'POST':
-        print(form.errors)
+        if form.is_valid:
+            f1 = form.save(commit=False)    
+            formset = form2(request.POST,)
 
-        if form.is_valid():
-            f=form.save(commit=False)
-
-            formset1 = food_formset(request.POST or None, prefix='food', instance=f)
-            formset2 = med_formset(request.POST or None, prefix='med', instance=f)
-            formset3 = misc_formset(request.POST or None, prefix='misc', instance=f)
-
-            if formset1.is_valid() and formset2.is_valid() and formset3.is_valid():
-               
-                for form1 in formset1:   
-                    form1 = form1.save(commit=False)
-                    form1.request = f
-                    # form.save()
-                    print(form1)
-
-          
-                for form2 in formset2:
-                    form2 = form2.save(commit=False)
-                    form2.request = f
-                    # form.save()
-                    print(form2)
-
-           
-                for form3 in formse31:
-                    form3 = form3.save(commit=False)
-                    form3.request = f
-                    # form.save()
-                    print(form3)
-            else:
-                message.warning(request, 'Invalid Input')
-         
-            return redirect('unitmanagement:replenishment_form')
-            # return redirect('profiles:handler_dashboard')
-
+            if formset.is_valid:
+                for forms in formset:
+                   #TODO SAVE FORMS
+                    print('type',forms['item_type'].value())
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -2283,9 +2244,7 @@ def replenishment_form(request):
         'count':count,
         'user':user,
         'form':form,
-        'med_formset':med_formset(),
-        'food_formset':food_formset(),
-        'misc_formset':misc_formset(),
+        'form2':formset,
     }
     return render (request, 'unitmanagement/replenishment_form.html', context)
 
@@ -3560,17 +3519,42 @@ def load_checkups(request):
 
     return render(request, 'unitmanagement/ajax_load_checkups.html', context)
 
+def load_item(request):
+    item_type = request.GET.get('type')
+    
+    if item_type == 'Dog Food':
+        item = Food.objects.all()
+    elif item_type == 'Medicine':
+        item = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
+    elif item_type == 'Medicine':
+        item = Miscellaneous.objects.exclude(misc_type='Vet Supply')
+    else:
+        item = None
+    return render(request, 'unitmanagement/dropdown_item.html', {'item': item})
+
 def load_item_food(request):
-    fd = None
+    uom = None
+
     try:
-        food_id = request.GET.get('id')
-        fd = Food.objects.get(id=food_id)
+        id = request.GET.get('id')
+        item_type = request.GET.get('type')
+
+        if item_type == 'Dog Food':
+            item = Food.objects.get(id=id)
+            uom = item.unit
+        elif item_type == 'Medicine':
+            item = Medicine_Inventory.objects.get(id=id)
+            uom = item.medicine.uom
+        elif item_type == 'Medicine':
+            item = Miscellaneous.objects.get(id=id)
+            uom = item.uom
+        else:
+            uom = None
     except:
         pass
 
     data = {
-        'food':fd.id,
-        'unit':fd.unit,
+        'uom':uom,
     }
     return JsonResponse(data)
 

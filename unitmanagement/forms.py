@@ -358,4 +358,28 @@ class ReplenishmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReplenishmentForm, self).__init__(*args, **kwargs)
 
+class ItemReplenishmentForm(forms.Form):
+    TYPE = (
+        ('------------', '------------'),
+        ('Dog Food', 'Dog Food'),
+        ('Medicine', 'Medicine'),
+        ('Miscellaneous', 'Miscellaneous'),
+    )
+    item_type = forms.CharField(widget=forms.Select(choices=TYPE))
+    # item_id = forms.IntegerField()
+    item = forms.CharField(widget=forms.Select())
+    uom = forms.CharField()
+    quantity = forms.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        super(ItemReplenishmentForm, self).__init__(*args, **kwargs)
+        self.fields['uom'].widget.attrs['readonly'] = True
+        self.fields['item_type'].widget.attrs['class'] = 'type'
+        # self.fields['item_id'].widget.attrs['class'] = 'id'
+        self.fields['item'].widget.attrs['class'] = 'item'
+        self.fields['uom'].widget.attrs['class'] = 'uom'
+        self.fields['item_type'].widget.attrs['name'] = 'item_type'
+        self.fields['item'].widget.attrs['name'] = 'item'
+        self.fields['uom'].widget.attrs['name'] = 'uom'
+        self.fields['quantity'].widget.attrs['name'] = 'quantity'
     

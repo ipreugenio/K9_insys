@@ -8,7 +8,7 @@
     </h2>
 </div>
 
-<form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" >
+<form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" data-teams-url="{% url 'unitmanagement:load_item' %}">
     {% csrf_token %}    
     <div class="three fields">
             <div class="field">
@@ -18,82 +18,32 @@
         <div class="field"></div>
         <div class="field"></div>
     </div>
-   <div class="ui equal width grid">
-        <div class="column">
-            <div class="ui horizontal divider">Dog Food</div>
-            <div class="ui inverted segment">
-                {% for form1 in food_formset %}
-                <div class="formset_class1" id="{{ form1.prefix }}-row">
-                    <div class="three fields">
-                        <div class="field">
-                            <label>Dog Food</label>
-                            {{form1.food}}
-                        </div>
-                        <div class="field">
-                            <label>Unit</label>
-                            {{form1.unit}}
-                        </div>
-                        <div class="field">
-                            <label>Quantity</label>
-                            {{form1.quantity}}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {{food_formset.management_form}}
-            </div>
-           
-        </div> 
-        <div class="column">
-            <div class="ui horizontal divider">Medicine</div>
-            <div class="ui inverted segment">
-            {% for form2 in med_formset %}
-            <div class="formset_class2" id="{{ form2.prefix }}-row">
-                <div class="three fields">
+    <div class="ui inverted segment">
+            {% for form in form2 %}
+            <div class="formset_class" id="{{ form.prefix }}-row">
+                <div class="four fields">
                     <div class="field">
-                        <label>Medicine</label>
-                        {{form2.medicine}}
+                        <label>Type</label>
+                        {{form.item_type}}
                     </div>
                     <div class="field">
-                        <label>Unit</label>
-                        {{form2.unit}}
+                        <label>Item</label>
+                        {{form.item}}
+                    </div>
+                    <div class="field">
+                        <label>UOM</label>
+                        {{form.uom}}
                     </div>
                     <div class="field">
                         <label>Quantity</label>
-                        {{form2.quantity}}
+                        {{form.quantity}}
                     </div>
                 </div>
             </div>
             {% endfor %}
-            {{med_formset.management_form}}
-            </div>
-        </div>
-        <div class="column">
-            <div class="ui horizontal divider">Miscellaneous</div>
-            <div class="ui inverted segment">
-            {% for form3 in misc_formset %}
-            <div class="formset_class3" id="{{ form3.prefix }}-row">
-                <div class="three fields">
-                    <div class="field">
-                        <label>Miscellaneous</label>
-                        {{form3.miscellaneous}}
-                    </div>
-                    <div class="field">
-                        <label>Unit</label>
-                        {{form3.unit}}
-                    </div>
-                    <div class="field">
-                        <label>Quantity</label>
-                        {{form3.quantity}}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-            {{misc_formset.management_form}}
-            </div>
-        </div>
-   </div>
-
+    
+            {{form2.management_form}}
+    </div>
    <div class="ui basic center aligned segment">
         <button class="ui green button" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
    </div>
@@ -101,78 +51,53 @@
 
 <script type="text/javascript">
         
+
     $(document).ready(function() {
-        $('#tabledata').DataTable();
+    
+    $(function() {
+        $('#myForm .formset_class').formset({
+            prefix: '{{ formset.prefix }}'
+        });            
+    })
+        $(".type" ).bind('change', function() {
+        var url = $("#myForm").attr("data-teams-url");
+        var type = $(this).val();  
+        var id_val = $(this).attr('id');
+        $.ajax({                       
+            url: url,
+            data: {
+            'type': type       
+            },
+            success: function (data) {
+            var res = id_val.split("-"); 
+            $('#id_form-'+res[1]+'-item').html(data); 
+            }
+        });
+
+        });
+
+        $(".item" ).bind('change', function() {
+        var id = $(this).val();  
+        var id_val = $(this).attr('id');
+
+        var res = id_val.split("-"); 
+        var type = $('#id_form-'+res[1]+'-item_type').val();
         
-        $(function() {
-            $('#myForm .formset_class1').formset({
-                prefix: '{{ form1.prefix }}'
-            });            
-        })
-        $(function() {
-            $('#myForm .formset_class2').formset({
-                prefix: '{{ form2.prefix }}'
-            });            
-        })
-        $(function() {
-            $('#myForm .formset_class3').formset({
-                prefix: '{{ form3.prefix }}'
-            });            
-        })
-
-
-        $(".food_item" ).bind('change', function() {
-            var id = $(this).val();
-            var id_val = $(this).attr('id');
-            var url = 'replenishment_form/ajax_load_item_food';  
-            $.ajax({                      
-                url: url,    
-                type : 'GET',           
-                dataType : 'json',     
-                data: {
-                'id': id,   
-                },
-                success: function (data) {
-                    var res = id_val.split("-"); 
-                    $('#id_food_request_set-'+res[1]+'-unit').val(data.unit); 
-                }
-            });
-
+        var url = 'replenishment_form/ajax_load_item_food'; 
+        $.ajax({                       
+            url: url,    
+            type : 'GET',           
+            dataType : 'json',    
+            data: {
+            'id': id,
+            'type': type,    
+            },
+            success: function (data) {
+            var res = id_val.split("-"); 
+            $('#id_form-'+res[1]+'-uom').val(data.uom); 
+            }
         });
 
-        $(".medicine_item" ).bind('change', function() {
-            var id = $(this).val();
-            var id_val = $(this).attr('id');
-            var url = 'replenishment_form/ajax_load_item_med';  
-            $.ajax({                      
-                url: url,    
-                type : 'GET',           
-                dataType : 'json',     
-                data: {
-                'id': id,   
-                },
-                success: function (data) {
-                    var res = id_val.split("-"); 
-                    $('#id_medicine_request_set-'+res[1]+'-unit').val(data.unit); 
-                }
-            });
-        });
-        $(".miscellaneous_item" ).bind('change', function() {
-            var id = $(this).val();
-            var id_val = $(this).attr('id');
-            var url = 'replenishment_form/ajax_load_item_misc';  
-            $.ajax({                      
-                url: url,    
-                type : 'GET',           
-                dataType : 'json',     
-                data: {
-                'id': id,   
-                },
-                success: function (data) {
-                    var res = id_val.split("-"); 
-                    $('#id_miscellaneous_request_set-'+res[1]+'-unit').val(data.unit); 
-                }
-            });
         });
 
     });

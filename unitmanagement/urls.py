@@ -80,6 +80,8 @@ urlpatterns = [
     
     path('replenishment_confirm', views.replenishment_confirm, name='replenishment_confirm'),
     path('replenishment_approval/<int:id>', views.replenishment_approval, name='replenishment_approval'),
+    path('load_item/', views.load_item, name='load_item'),
+
 
     path('confirm_item_request/<int:id>', views.confirm_item_request, name='confirm_item_request'),
 
