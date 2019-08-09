@@ -1031,6 +1031,8 @@ def vet_dashboard(request):
         ab_k9 = 0
         ab_total = None
 
+    classify_count = K9.objects.filter(status='Material Dog').filter(training_status='Trained').count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1052,6 +1054,7 @@ def vet_dashboard(request):
         'ab_k9':ab_k9,
         'checkup_now':checkup_now,
         'checkup_upcoming':checkup_upcoming,
+        'classify_count':classify_count,
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
