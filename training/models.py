@@ -33,7 +33,7 @@ class K9_Handler(models.Model):
 class Training(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
     training = models.CharField('training', max_length=50, default="None")
-    stage = models.CharField('stage', max_length=200, default="Stage 1.1")
+    stage = models.CharField('stage', max_length=200, default="Stage 0")
     stage1_1 = models.CharField('stage1_1', blank=True, null=True, max_length=500, default="0")
     stage1_2 = models.CharField('stage1_2', blank=True, null=True, max_length=500, default="0")
     stage1_3 = models.CharField('stage1_3', blank=True, null=True, max_length=500, default="0")

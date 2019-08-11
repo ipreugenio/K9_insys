@@ -581,7 +581,7 @@ def request_dog_list(request):
     print(user)
     print(user.position)
 
-    if user.position == "Administrator":
+    if user.position == "Commander":
         areas = Area.objects.get(commander = user)
         data = data.filter(area=areas)
 
@@ -743,7 +743,7 @@ def request_dog_details(request, id):
         incident_count = 0
 
         try:
-            team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").latest('id')
+            team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").last()
             if (team_dog_deployed.date_pulled is None):
                 team_assignment_id = team_dog_deployed.team_assignment.id
                 team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
@@ -797,7 +797,7 @@ def request_dog_details(request, id):
             incident_count = 0
 
             try:
-                team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").latest('id')
+                team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").last()
                 if (team_dog_deployed.date_pulled is None):
                     team_assignment_id = team_dog_deployed.team_assignment.id
                     team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
@@ -888,7 +888,7 @@ def request_dog_details(request, id):
             # dog.save()
 
         style = "ui green message"
-        messages.success(request, 'Dogs has been successfully Deployed!')
+        messages.success(request, 'Dogs has been successfully Scheduled!')
 
         return redirect('deployment:request_dog_details', id=id)
 
@@ -1860,7 +1860,7 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
     can_transfer = 0
 
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).latest('id') #check current team_assignment
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9, status="Deployed").filter(team_assignment = team).last() #check current team_assignment
         if (team_dog_deployed.date_pulled is None):
             date_deployed = team_dog_deployed.date_added
             delta = date.today() - date_deployed

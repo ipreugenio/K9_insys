@@ -40,7 +40,9 @@ urlpatterns = [
     path('choose-location/ajax_load_units', views.load_units, name='ajax_load_units'),
     path('choose-location/ajax_load_units_selected', views.load_units_selected, name='ajax_load_units_selected'),
 
-    path('schedule-units', views.schedule_units, name = 'schedule_units')
+    path('schedule-units', views.schedule_units, name = 'schedule_units'),
+
+
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),

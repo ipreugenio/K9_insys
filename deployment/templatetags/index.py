@@ -263,7 +263,7 @@ def calculate_distance_from_current_team(K9, team_id):
 @register.filter
 def current_location(K9, request_id):
     try:
-        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9, status = "Deployed").latest('id')
+        team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment = None).latest('id')
         print("NOT NONE TEAM DOG DEPLOYED")
         print(team_dog_deployed.__dict__)
 
@@ -282,7 +282,7 @@ def current_location(K9, request_id):
 
 @register.filter
 def current_team(K9, request_id):
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment = None).latest('id')
     team_assignment = None
 
     if (team_dog_deployed.date_pulled is not None):

@@ -230,6 +230,8 @@
     </div>
   </div>
 
+    {% if user.position != "Handler" and user.position != "Team Leader" %}
+
     <div class="ui info message">
   <i class="close icon"></i>
   <div class="header">
@@ -245,7 +247,7 @@
   </ul>
 </div>
 
-  {% if data2.status == "Approved" %}
+  {% if data2.status == "Approved"%}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata3" class="ui nine column celled table">
@@ -311,6 +313,17 @@
   <p>Go back to details tab to deny or approve request.</p>
 </div>
     {% endif %}
+
+{% else %}
+
+    <div class="ui visible message">
+      <div class="header">
+   You are not allowed to deploy k9s.
+  </div>
+
+  </div>
+
+{% endif %}
 
 </div>
 

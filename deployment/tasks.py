@@ -444,7 +444,7 @@ def check_arrivals():
 
     for dog_request in dog_requests:
         check_arrival_to_request(dog_request)
-        update_request_info()
+        update_request_info(dog_request)
 
     update_port_info(team_list)
 

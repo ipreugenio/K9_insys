@@ -2915,7 +2915,7 @@ class HandlerView(APIView):
             sched = K9_Schedule.objects.filter(k9=k9).filter(date_end__gte=today)
 
             for items in sched:
-                i = [items.dog_request.location,items.dog_request.event_name,items.dog_request.total_dogs_demand,items.dog_request.total_dogs_deployed, items.date_start, items.date_end]
+                i = [items.dog_request.location,items.dog_request.event_name,items.dog_request.k9s_needed,items.dog_request.k9s_deployed, items.date_start, items.date_end]
                 sched_items.append(i)
 
         perf_items = [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]

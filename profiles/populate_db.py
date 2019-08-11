@@ -12,6 +12,8 @@ from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 from deployment.tasks import assign_TL
 
+import re
+
 def generate_city_ph():
 
     CITY = (
@@ -1184,6 +1186,46 @@ def fix_dog_duplicates():
 
     return None
 
+def generate_team_name(location):
+    team_name = ""
+
+    x_list = re.split("\s", str(location.area))
+    new_x = ""
+    for x in x_list:
+        print(x[0])
+        new_x += x[0]
+
+    team_name += new_x
+    team_name += " Team "
+    team_name += location.city
+    team_name += " "
+
+    return team_name
+
+def fix_port_names():
+
+    areas = Area.objects.all()
+
+    for area in areas:
+        locations = Location.objects.filter(area = area)
+
+        city_list = []
+        for location in locations:
+            city_list.append(location.city)
+
+        for city in city_list:
+            locations = Location.objects.filter(city = city)
+            ctr = 0
+            for location in locations:
+                letter_order = chr(ord('a') + ctr).capitalize()
+                team = Team_Assignment.objects.get(location = location)
+                team_name = generate_team_name(location)
+                team_name += letter_order
+                team.team = team_name
+                team.save()
+                ctr += 1
+
+    return None
 
 def create_predeployment_inventory():
 

@@ -47,9 +47,10 @@
     </tr>
     </thead>
 </table>
+    {% elif sched.status == "Initial Deployment" %}
+    <div class="header">Team: {{sched.team.team}}</div>
     {% else %}
-    <div class="header">Team: {{sched.team}}</div>
-
+      No Info
     {% endif %}
 </div>
 

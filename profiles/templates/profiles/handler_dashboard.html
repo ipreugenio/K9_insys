@@ -37,8 +37,10 @@
                   {% endif %}
                   {% endif %}
 
-            
-                  <div class="ui three column grid">
+                    {% if k9 %}
+
+                    <div class="ui three column grid">
+
                     <div class="column">
                         <div class="ui raised segment center aligned">
                             <div class="card">
@@ -55,37 +57,58 @@
                                     </strong>
                                 </div>
                             </div>
-                          
-                          
                         </div>
                     </div>
+
                     <div class="column">
-                        <div class="ui raised segment">
-                            <div class="ui statistic">
-                              <div class="value">
-                                07/30/18
-                              </div>
-                              <div class="label">
-                                Upcoming Deployment
-                              </div>
+                        <div class="ui raised segment center aligned">
+                            <div class="card">
+                                <div class="content">
+                                    <h3>
+                                        No upcoming deployments
+                                    </h3>
+                                </div>
+                                <div class="extra content">
+                                    <strong>
+                                        <a href="#">UPCOMING DEPLOYMENT</a>
+                                    </strong>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
+
                     <div class="column">
-                        <div class="ui raised segment">
-                            <div class="ui statistic">
-                              <div class="value">
-                                <i class="ship icon"></i> 5
-                              </div>
-                              <div class="label" style="font-size: 11px;">
-                                (Add info on port/request details)
-                              </div>
+                        <div class="ui raised segment center aligned">
+                            <div class="card">
+                                <div class="content">
+                                    <h3>
+                                         {% if current_port is not None %}
+                                            {{current_port}}
+                                        {% elif current_request is not None %}
+                                            {{current_request}}
+                                        {% else %}
+                                            You are currently undeployed
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                                <div class="extra content">
+                                    <strong>
+                                        {% if current_port is not None %}
+                                            <a href="{% url 'deployment:team_location_details' current_port.id %}">CURRENT ASSIGNMENT</a>
+                                        {% elif current_request is not None %}
+                                            <a href="{% url 'deployment:request_dog_details' current_request.id %}">CURRENT ASSIGNMENT</a>
+                                        {% else %}
+                                            <a href="#">CURRENT ASSIGNMENT</a>
+                                        {% endif %}
+                                    </strong>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
+
                   </div>
 
-                    {% if k9 %}
+
                     <div class = "ui segment" id = "start_end_training">
                     <table class="ui very basic four column table">
                     <thead>
@@ -317,6 +340,7 @@ $(document).ready(function() {
           eventTextColor: "white",
           nowIndicator: true,
 
+          {% if k9_schedules %}
           events: [
 
                     {% for i in k9_schedules %}
@@ -324,11 +348,13 @@ $(document).ready(function() {
                     id: '{{ i.id }}',
 
                     {% if i.status == 'Request' %}
-                    title: 'Request : {{i.dog_request}}',
-                    {% elif i.status == "Checkup" %}
+                    title: '{{i|get_event_name}}',
+                    {% elif i.status == 'Checkup' %}
                     title : 'Physical Exam',
+                    {% elif i.status == 'Initial Deployment' %}
+                    title : '{{i|get_team_name}}',
                     {% else %}
-                    title: 'Port : {{i.team}}',
+
                     {% endif %}
 
                     start: '{{ i.date_start|date:"Y-m-d" }}',
@@ -337,6 +363,7 @@ $(document).ready(function() {
                     },
                     {% endfor %}
             ],
+            {% endif %}
 
           eventClick: function(event, element) {
                 var url = 'ajax_load_event_handler';
