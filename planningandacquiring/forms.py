@@ -101,6 +101,8 @@ class ProcuredK9Form(forms.Form):
     color = forms.ChoiceField(choices=COLORS)
     sex = forms.ChoiceField(choices=SEX)
     image = forms.ImageField()
+    height = forms.DecimalField(decimal_places=2)
+    weight = forms.DecimalField(decimal_places=2)
 
     def __init__(self, *args, **kwargs):
         super(ProcuredK9Form, self).__init__(*args, **kwargs)
