@@ -54,7 +54,10 @@ def in_heat_notifs():
             
         #TODO
         # k9 might be pregnant
-        # k9 might give birth 
+
+        # k9 might give birth
+        
+         
 
 @periodic_task(run_every=timedelta(seconds=30)) 
     def k9_sched():

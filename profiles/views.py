@@ -869,46 +869,46 @@ def vet_dashboard(request):
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=14:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st Deworming')
-                php_vac.append('1st Deworming')
+                php_vac.append('Deworming')
         #4 weeks
         if vr.deworming_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=24:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd Deworming')
                 dwd = [k9,vu]
-                php_vac.append('2nd Deworming')
+                php_vac.append('Deworming')
         #6 weeks
         if vr.deworming_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=42:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd Deworming')
                 dwd = [k9,vu]
-                php_vac.append('3rd Deworming')
+                php_vac.append('Deworming')
         #6 weeks
         if vr.dhppil_cv_1 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=42:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st dose DHPPiL+CV Vaccination')
-                php_vac.append('1st dose DHPPiL+CV Vaccination')
+                php_vac.append('DHPPiL+CV')
         #6 weeks
         if vr.heartworm_1 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=42:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st Heartworm Prevention')
-                php_vac.append('1st Heartworm Prevention')
+                php_vac.append('Heartworm')
         #8 weeks
         if vr.bordetella_1 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=56:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st dose Bordetella Bronchiseptica Bacterin')
-                php_vac.append('1st dose Bordetella Bronchiseptica Bacterin')
+                php_vac.append('Bordetella Bronchiseptica Bacterin')
 
         #8 weeks
         if vr.tick_flea_1 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=42:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st Tick and Flea Prevention')
-                php_vac.append('1st Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
 
         
         #9 weeks
@@ -916,73 +916,73 @@ def vet_dashboard(request):
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=63:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd dose DHPPiL+CV')
-                php_vac.append('2nd dose DHPPiL+CV')
+                php_vac.append('DHPPiL+CV')
         #9 weeks
         if vr.deworming_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=63:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='4th Deworming')
-                php_vac.append('4th Deworming')
+                php_vac.append('Deworming')
 
         #10 weeks
         if vr.heartworm_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=63:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd Heartworm Prevention')
-                php_vac.append('2nd Heartworm Prevention')
+                php_vac.append('Heartworm')
         #11 weeks
         if vr.bordetella_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=63:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd dose Bordetella Bronchiseptica Bacterin')
-                php_vac.append('2nd dose Bordetella Bronchiseptica Bacterin')
+                php_vac.append('Bordetella Bronchiseptica Bacterin')
         #12 weeks
         if vr.anti_rabies == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=84:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='Anti-Rabies Vaccination')
-                php_vac.append('Anti-Rabies Vaccination')
+                php_vac.append('Anti-Rabies')
 
         #12 weeks
         if vr.tick_flea_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=84:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd Tick and Flea Prevention')
-                php_vac.append('2nd Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
 
         #12 weeks
         if vr.dhppil_cv_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=84:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd dose DHPPiL+CV Vaccination')
-                php_vac.append('3rd dose DHPPiL+CV Vaccination')
+                php_vac.append('DHPPiL+CV')
         
         #14 weeks
         if vr.heartworm_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=98:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd Heartworm Prevention')
-                php_vac.append('3rd Heartworm Prevention')
+                php_vac.append('Heartworm')
 
         #15 weeks
         if vr.dhppil4_1 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=105:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st dose DHPPiL4 Vaccination')
-                php_vac.append('1st dose DHPPiL4 Vaccination')
+                php_vac.append('DHPPiL4')
         #16 weeks
         if vr.tick_flea_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=112:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd Tick and Flea Prevention')
-                php_vac.append('3rd Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
         
         #18 weeks
         if vr.dhppil4_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=126:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd dose DHPPiL4 Vaccination')
-                php_vac.append('2nd dose DHPPiL4')
+                php_vac.append('DHPPiL4')
 
         #18 weeks
         if vr.heartworm_4 == False:
@@ -990,60 +990,60 @@ def vet_dashboard(request):
             if k9.age_days >=126:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='4th Heartworm Prevention')
                 dwd = [k9,vu]
-                php_vac.append('4th Heartworm Prevention')
+                php_vac.append('Heartworm')
 
         #20 weeks
         if vr.tick_flea_4 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=140:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='4th Tick and Flea Prevention')
-                php_vac.append('4th Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
         #22 weeks
         if vr.heartworm_5 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=154:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='5th Heartworm Prevention')
-                php_vac.append('5th Heartworm Prevention')
+                php_vac.append('Heartworm')
 
         #24 weeks
         if vr.tick_flea_5 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=168:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='5th Tick and Flea Prevention')
-                php_vac.append('5th Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
         #26 weeks
         if vr.heartworm_6 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=182:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='6th Heartworm Prevention')
-                php_vac.append('6th Heartworm Prevention')
+                php_vac.append('Heartworm')
         
         #28 weeks
         if vr.tick_flea_6 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=196:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='6th Tick and Flea Prevention')
-                php_vac.append('6th Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
 
         #30 weeks
         if vr.heartworm_7 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=210:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='7th Heartworm Prevention')
-                php_vac.append('7th Heartworm Prevention')
+                php_vac.append('Heartworm')
         #32 weeks
         if vr.tick_flea_7 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=224:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='7th Tick and Flea Prevention')
-                php_vac.append('7th Tick and Flea Prevention')
+                php_vac.append('Tick and Flea')
         
         #34 weeks
         if vr.heartworm_8 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=238:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='8th Heartworm Prevention')
-                php_vac.append('8th Heartworm Prevention')
+                php_vac.append('Heartworm')
 
     php_vacc = np.sort(php_vac)
 
@@ -1072,6 +1072,8 @@ def vet_dashboard(request):
         ab_k9 = 0
         ab_total = None
 
+    classify_count = K9.objects.filter(status='Material Dog').filter(training_status='Trained').count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1093,6 +1095,7 @@ def vet_dashboard(request):
         'ab_k9':ab_k9,
         'checkup_now':checkup_now,
         'checkup_upcoming':checkup_upcoming,
+        'classify_count':classify_count,
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
