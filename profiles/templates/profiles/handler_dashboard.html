@@ -65,12 +65,20 @@
                             <div class="card">
                                 <div class="content">
                                     <h3>
+                                        {% if upcoming_deployment is None %}
                                         No upcoming deployments
+                                        {% else %}
+                                        {{ upcoming_deployment }}
+                                        {% endif %}
                                     </h3>
                                 </div>
                                 <div class="extra content">
                                     <strong>
+                                        {% if upcoming_deployment is None %}
                                         <a href="#">UPCOMING DEPLOYMENT</a>
+                                        {% else %}
+                                        <a href="{% url 'deployment:request_dog_details'  upcoming_deployment.id %}">UPCOMING DEPLOYMENT</a>
+                                        {% endif %}
                                     </strong>
                                 </div>
                             </div>

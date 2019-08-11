@@ -545,6 +545,7 @@ def handler_dashboard(request):
     current_assignment = None
     current_port = None
     current_request = None
+
     try:
         current_assignment = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled = None).last()
 
@@ -552,6 +553,8 @@ def handler_dashboard(request):
             current_port = current_assignment.team_assignment
         elif current_assignment.team_requested is not None:
             current_request = current_assignment.team_requested
+
+        upcoming_deployment = Dog_Request.objects.exclude(start_date__lte = date.today()).first()
 
     except:
         pass
@@ -720,7 +723,8 @@ def handler_dashboard(request):
 
         'k9_schedules' : k9_schedules,
         'current_port' : current_port,
-        'current_request' : current_request
+        'current_request' : current_request,
+        'upcoming_deployment' : upcoming_deployment
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 

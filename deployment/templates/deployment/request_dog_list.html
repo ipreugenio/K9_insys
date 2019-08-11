@@ -49,7 +49,7 @@
     </table>
 </div>
 <div class = "ui tab segment" data-tab="second">
-    <table class="ui small celled table" id="tabledata1">
+    <table class="ui small celled table" id="tabledata2">
         <thead>
             <th class="two wide">Start date</th>
             <th class="two wide">End date</th>
@@ -63,7 +63,22 @@
         </thead>
         <tbody>
             {% for Data in data2 %}
-            <tr>
+            <tr >
+                <td>{{Data.start_date | date:'Y-m-d'}}</td>
+                <td>{{Data.end_date| date:'Y-m-d'}}</td>
+                    <td>{{Data.duration}} days</td>
+                <td>{{Data.requester}}</td>
+                <td>{{Data.event_name}}</td>
+                <td>{{Data.location}}</td>
+                <td>{{Data.k9s_needed}}</td>
+                <td>{{Data.k9s_deployed}}</td>
+                <td style="text-align:center;">
+                    <a href="{% url 'deployment:request_dog_details' Data.id %}" class = "tiny ui blue basic button">Select</a>
+                </td>
+            </tr>
+        {% endfor %}
+        {% for Data in data3 %}
+                <tr class = "error">
                 <td>{{Data.start_date | date:'Y-m-d'}}</td>
                 <td>{{Data.end_date| date:'Y-m-d'}}</td>
                     <td>{{Data.duration}} days</td>
@@ -85,10 +100,10 @@
 
 	$(document).ready(function() {
 		$('#tabledata1').DataTable( {
-        "order": [[ 0, "asc" ]]
+        "order": []
         });
         $('#tabledata2').DataTable( {
-        "order": [[ 0, "asc" ]]
+        "order": []
         });
 		$('.menu .item').tab();
 	});

@@ -6,7 +6,7 @@ from django.db.models import aggregates
 from django.contrib import messages
 
 from django.db.models import Count
-from django.db.models import Q
+from django.db.models import Q, F
 from django.views import generic
 from django.utils.safestring import mark_safe
 from geopy.geocoders import Nominatim
@@ -574,7 +574,7 @@ def dog_request(request):
 
 
 def request_dog_list(request):
-    data = Dog_Request.objects.all()
+    data = Dog_Request.objects.all().order_by('start_date')
     user = user_session(request)
     date_now = datetime.date.today()
 
@@ -583,11 +583,13 @@ def request_dog_list(request):
 
     if user.position == "Commander":
         areas = Area.objects.get(commander = user)
-        data = data.filter(area=areas)
+        data = data.filter(area=areas).filter(sector_type = "Small Event")
+    else:
+        data = data.filter(sector_type="Big Event")
 
     data1 = data.filter(status='Pending')
-    data2 = data.filter(status='Approved')
-
+    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed'))
+    data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
 
     # latest_date = Dog_Request.objects.latest('end_date')
     # latest_date = latest_date.end_date
@@ -605,6 +607,7 @@ def request_dog_list(request):
         'user':user,
         'data1':data1,
         'data2':data2,
+        'data3' : data3
     }
     return render (request, 'deployment/request_dog_list.html', context)
 

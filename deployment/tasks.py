@@ -398,7 +398,7 @@ def pull_dog_request():
 #Every nth hour, check if arrival is confirmed by checking if Team_Dog_deployed status is still pending after start date
 def check_arrival_to_request(dog_request):
 
-    deployed = Team_Dog_Deployed.objects.filter(team_requested = dog_request)
+    deployed = Team_Dog_Deployed.objects.filter(team_requested = dog_request).filter(date_pulled = None)
 
     for item in deployed:
         if item.status == "Pending" and dog_request.start_date == date.today():
@@ -415,7 +415,7 @@ def check_arrival_to_request(dog_request):
 def check_arrival_to_ports_via_request(team_assignment):
 
     deployed = Team_Dog_Deployed.objects.filter(team_assignment=team_assignment)
-    recent_request_deployment = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_request=None).exclude(date_pulled = None).latest('date_pulled')
+    recent_request_deployment = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_request=None).filter(date_pulled = None).latest('date_pulled')
     today = datetime.today().date()
     for item in deployed:
         delta = today - recent_request_deployment.date
