@@ -13,8 +13,6 @@
 </div>
 
 {% if df_is_empty == False %}
-
-
  <div class="ui info message">
   <i class="close icon"></i>
   <div class="header">
@@ -169,17 +167,17 @@
 <!--</div>-->
 
 
-<!--{% else %}-->
-<!--<div class="ui icon message">-->
-  <!--<i class="exclamation icon"></i>-->
-  <!--<div class="content">-->
-    <!--<div class="header">-->
-      <!--No units available-->
-    <!--</div>-->
-    <!--<p>There are no units available to be deployed right now based on current port requirements. Come back later!</p>-->
-  <!--</div>-->
-<!--</div>-->
-<!--{% endif %}-->
+{% else %}
+<div class="ui icon message">
+  <i class="exclamation icon"></i>
+  <div class="content">
+    <div class="header">
+      No units available
+    </div>
+    <p>There are no units ready to be deployed right now based on current port requirements. Come back later!</p>
+  </div>
+</div>
+{% endif %}
 
 
 

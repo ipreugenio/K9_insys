@@ -100,7 +100,7 @@
                                       <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                                 </div>
                             </div>
-                        {% elif all_clear == True %}
+                        {% elif all_clear == True and reveal_items == True%}
                          <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
                         <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                         {% else %}

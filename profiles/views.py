@@ -210,9 +210,15 @@ def team_leader_dashboard(request):
     for_arrival = tdd.filter(status = "Pending")
 
     #TODO check arrival of units at request and from request to port
-    # try:
-    #     tr = Dog_Request.objects.filter().filter(team_leader=user)
-    # except: pass
+    #NOTE: There are no requests with conflicting schedules that have the same handler, much less the same TL.
+
+    #Handlers are pulled out from current assignment through Team_Dog_Deployed then is assigned to Dog_Request.
+    #Dog_Request TLs are assigned as soon as deployment date hits
+    #After dog request ends, everyone reverts back to "Handler" position. Note that Team_Assignment TLs cannot be deployed to Requests, making life easier
+
+    try:
+        dr = Dog_Request.objects.filter(team_leader=user)
+    except: pass
 
     for_arrival_request = None
     for_arrival_r_to_p = None

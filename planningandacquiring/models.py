@@ -320,14 +320,14 @@ class K9(models.Model):
                 self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
             
             self.last_estrus_date = self.last_proestrus_date + relativedelta(days=10)
-            self.metestrus_date = self.estrus_date + relativedelta(month=2)
             self.anestrus_date = self.metestrus_date + relativedelta(months=4)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
             self.next_estrus_date = self.next_proestrus_date + relativedelta(days=10)
+            self.metestrus_date = self.next_estrus_date + relativedelta(months=2)
 
             if d.today() == self.last_proestrus_date:
                 self.reproductive_stage = 'Proestrus'
-            elif d.today() == self.estrus_date:
+            elif d.today() == self.next_estrus_date:
                 self.reproductive_stage = 'Estrus'
             elif d.today() == self.metestrus_date:
                 self.reproductive_stage = 'Metestrus'
@@ -353,7 +353,7 @@ class K9(models.Model):
             self.in_heat_months = 0
             self.last_proestrus_date = None
             self.next_proestrus_date = None
-            self.estrus_date = None
+            self.next_estrus_date = None
             self.metestrus_date = None
             self.anestrus_date = None
 

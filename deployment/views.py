@@ -1496,7 +1496,11 @@ def schedule_units(request):
     #
     # #END K9s estimated training duration
 
+    pre_dep = K9_Pre_Deployment_Items.objects.filter(status="Cancelled")
 
+    k9s_tobe_redeployed = []
+    for item in pre_dep:
+        k9s_tobe_redeployed.append(item.k9)
 
     # Prioritize Locations
     locations = Location.objects.all()
@@ -1523,7 +1527,7 @@ def schedule_units(request):
         team_list.append(team)
 
         #dogs_scheduled_count = Team_Dog_Deployed.objects.filter(status = "Scheduled", team_assignment = team).count()
-        dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).count()
+        dogs_scheduled_count = K9_Schedule.objects.filter(status = "Initial Deployment", team = team).exclude(k9__in = k9s_tobe_redeployed).count() 
 
         total_dogs_deployed_list.append(team.total_dogs_deployed + dogs_scheduled_count) #TODO Include scheduled K9s
 
@@ -1579,12 +1583,14 @@ def schedule_units(request):
          #End Sort incidents
     #End Prioritize Location
 
+    #TODO For those whose deploymetns are cancelled, pwede sila isama
 
-    #TODO repeat temporary assignment with new dataframe (removed unassigned indexes)
+
+
     #Temporary assignment
     k9s_scheduled_list = []
     # k9s_scheduled = Team_Dog_Deployed.objects.filter(status="Scheduled")
-    k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment")
+    k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in = k9s_tobe_redeployed)
 
     for item in k9s_scheduled:
         k9s_scheduled_list.append(item.k9.id)

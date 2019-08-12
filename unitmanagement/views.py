@@ -406,8 +406,11 @@ def physical_exam_form(request, id=None):
             k9.save()
 
             style = "ui green message"
-            messages.success(request, 'Physical Exam has been successfully recorded!')
+            messages.success(request, 'Physical Exam for ' + str(k9) + ' has been successfully recorded!')
             form = PhysicalExamForm()
+
+            if id:
+                return redirect('unitmanagement:k9_checkup_list_today')
 
         else:
             style = "ui red message"
@@ -2840,27 +2843,29 @@ def load_k9_data(request):
 def k9_checkup_pending(request):
     removal = TempCheckup.objects.all()
 
+    style = ""
     #TODO Save schedule before deletion
     if request.method == "POST":
         for item in removal:
             sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
             sched.save()
+            style = "ui green message"
+            messages.success(request, 'You have scheduled ' + str(item.k9) + ' for checkup on ' + str(item.date) + "!")
 
     removal.delete()
 
-    # TODO remove all checkups missed
-    #TODO remove checkups pag valid ba yung latest checkup
+    # TODO remove all checkups missed ./
+    # TODO remove checkups pag valid ba yung latest checkup
     # TODO remove if missed na yung deployment date
 
-    current_appointments = K9_Schedule.objects.filter(status = "Checkup")
+    current_appointments = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
 
     k9s_exclude = []
 
     for item in current_appointments:
             k9s_exclude.append(item.k9)
 
-
-    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude)
+    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude).exclude(date_start__lt=datetime.today().date())
     date_form = DateForm()
 
     k9s_exclude2 = []
@@ -2870,16 +2875,16 @@ def k9_checkup_pending(request):
         print(item.k9)
         print(str(datetime.today().date()) + " - " + str(item.date_start) + " = " + str(delta.days))
 
-        # phex = False
-        # try:
-        #     checkup = PhysicalExam.objects.filter(dog=item.k9).latest('id')
-        #     delta2 = datetime.today().date() - checkup.date
-        #     if checkup.cleared == True and delta2.days <= 90:  # also checks if last checkup is within 3 months
-        #         phex = True #Pag true, wag na isama sa checkup list kasi valid pa
-        # except:
-        #     pass
+        phex = False
+        try:
+            checkup = PhysicalExam.objects.filter(dog=item.k9).latest('id')
+            delta2 = datetime.today().date() - checkup.date
+            if checkup.cleared == True and delta2.days <= 90:  # also checks if last checkup is within 3 months
+                phex = True #Pag true, wag na isama sa checkup list kasi valid pa
+        except:
+            pass
 
-        if delta.days > 0:  # Nalagapasan na checkup date
+        if delta.days > 0 and phex == False:  # Nalagapasan na checkup date
             k9s_exclude2.append(item.k9)
 
     pending_schedule = pending_schedule.exclude(k9__in = k9s_exclude2)
@@ -2888,7 +2893,8 @@ def k9_checkup_pending(request):
         'k9_pending': pending_schedule,
         'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
-        'selected_list': []
+        'selected_list': [],
+        'style' : style
     }
 
     return render(request, 'unitmanagement/k9_checkup_pending.html', context)
@@ -2994,7 +3000,7 @@ def current_team(K9):
 def k9_checkup_list_today(request):
 
     #TODO Highlight rows if today
-    checkups = K9_Schedule.objects.filter(status = "Checkup")
+    checkups = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
 
     k9_list = []
     for sched in checkups:
@@ -3015,8 +3021,15 @@ def k9_checkup_list_today(request):
 
     checkups = checkups.exclude(k9__in = k9_exclude_list)
 
+    checkup_list = []
+    for checkup in checkups:
+        if checkup.date_start == datetime.today().date():
+            checkup_list.append((checkup, True))
+        else:
+            checkup_list.append((checkup, False))
+
     context = {
-        'checkups' : checkups
+        'checkups' : checkup_list
     }
 
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)

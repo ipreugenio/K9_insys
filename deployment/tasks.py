@@ -126,6 +126,11 @@ def assign_TL(team, handler_list_arg = None):
             team.team_leader = team_leader
             team.save()
 
+        for item in deployment:
+            if item.handler != team_leader:
+                handler = item.handler.position = "Handler"
+                handler.save()
+
         team_leader.position = "Team Leader"
         team_leader.save()
 
@@ -332,11 +337,14 @@ def deploy_dog_request():
     # When Schedule is today, change training status to deployed
     scheds = K9_Schedule.objects.filter(date_start=date.today()).filter(status = "Request").exclude(dog_request = None)
 
-    for sched in scheds:
+    for sched in scheds: #per k9
         # sched.k9.training_status = 'Deployed'
         # sched.k9.save()
 
         deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
+        handler = sched.k9.handler
+        handler.position = "Handler"
+        handler.save()
         update_request_info(sched.dog_request)
 
         #temporarily pull out from port
