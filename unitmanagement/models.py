@@ -363,6 +363,10 @@ class Notification(models.Model):
         ('medicine_done', 'medicine_done'),
         ('medicine_given', 'medicine_given'),
         ('call_back', 'call_back'),
+        ('pregnancy', 'pregnancy'),
+        ('breeding', 'breeding'),
+        ('initial_deployment', 'initial_deployment'),
+        ('checkup', 'checkup'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)

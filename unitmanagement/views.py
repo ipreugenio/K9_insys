@@ -51,7 +51,7 @@ def notif(request):
 
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
-    elif user_in_session.position == 'Handler':
+    elif user_in_session.position == 'Handler' or user_in_session.position == 'Team Leader':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime').exclude(notif_type='handler_on_leave').exclude(notif_type='handler_died')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
@@ -127,6 +127,18 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('deployment:incident_detail', id = notif.other_id)
+    elif notif.notif_type == 'pregnancy':
+        notif.viewed = True
+        notif.save()
+        return redirect('planningandacquiring:breeding_list', id = notif.other_id)
+    elif notif.notif_type == 'breeding':
+        notif.viewed = True
+        notif.save()
+        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=pregnant')
+    elif notif.notif_type == 'initial_deployment' or notif.notif_type == 'checkup':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
 
 
 def index(request):
@@ -134,10 +146,7 @@ def index(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     
-    food = Medicine.objects.all()
-
-    for food in food:
-        print(food)
+   
     context = {
         'notif_data':notif_data,
         'count':count,

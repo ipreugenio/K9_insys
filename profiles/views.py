@@ -54,21 +54,28 @@ def notif(request):
     
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
-    elif user_in_session.position == 'Handler':
+    elif user_in_session.position == 'Handler' or user_in_session.position == 'Team Leader':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
-   
+        
     return notif
 
 def notif_list(request):
 
     notif_data = notif(request)
+
+    dept_notif = notif_data.filter(notif_type='dog_request').filter(notif_type='location_incident').filter(notif_type='call_back').filter(notif_type='initial_deployment')
+    
+    um_notif = notif_data.exclude(notif_type='dog_request').exclude(notif_type='location_incident').exclude(notif_type='call_back').exclude(notif_type='initial_deployment')
+
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
 
     context={
         'notif_data':notif_data,
+        'dept_notif':dept_notif,
+        'um_notif':um_notif,
         'count':count,
         'user':user,
     }

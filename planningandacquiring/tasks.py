@@ -52,14 +52,37 @@ def in_heat_notifs():
         if (k9_breed.last_estrus_date + relativedelta(days=4)) == date.today():
             Notification.objects.create(k9=k9_breed, message=str(k9_breed) + ' is 3rd session of mating is today!', notif_type='heat_cycle')
             
-        #TODO
-        # k9 might be pregnant
+    #TODO
+    # k9 might be pregnant
 
-        # k9 might give birth
+    # k9 might give birth
+    km = K9_Mated.objects.filter(status='Pregnant')
+    for kmm in km:
+        due = kmm.date_mated + relativedelta(days=63)
+        if date.today() == due:
+            Notification.objects.create(k9=kmm.mother, message=str(kmm.mother) + ' might give birth within this week!', notif_type='pregnancy')
+            
+    kb = K9_Mated.objects.filter(status='Breeding')
+    for kbb in kb:
+        due = kmm.date_mated + relativedelta(days=22)
+        if date.today() == due:
+            Notification.objects.create(k9=kbb.mother, message=' Please confirm if ' + str(kbb.mother) + 'is pregnant or not.', notif_type='breeding')
         
          
 
 @periodic_task(run_every=timedelta(seconds=30)) 
     def k9_sched():
         # k9_schedule
+        ke = K9_Schedule.objects.exclude(status='Checkup').filter(date_start__lt=date.today())
+        for kee in ke:
+            k9 = K9.objects.get(id=ks.k9.id)
+            Notification.objects.create(k9=kee.k9, position='Handler', user=k9.handler,message='Your schedule deployment/event is today.', notif_type='initial_deployment')
+
         #Check-up
+        ks = K9_Schedule.objects.filter(status='Checkup').filter(date_start=date.today())
+        for kss in ks:
+            k9 = K9.objects.get(id=ks.k9.id)
+
+            Notification.objects.create(k9=kss.k9, position='Handler', user=k9.handler,message=str(k9) + 'is due for check-up today.', notif_type='checkup')
+        
+        
