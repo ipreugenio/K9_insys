@@ -20,18 +20,18 @@
     <table id="tabledata1" class="ui celled table">
         <thead>
             <tr>
-                <th>Handler</th>
                 <th>K9</th>
+                <th>Handler</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in k9_mia %}
             <tr>
-                <th>{{data.handler}}</th>
                 <td>{{data}}</td>
+                <th>{{data.handler}}</th>
                 <td style="text-align:center;" class="two wide">
-                    <a href="{% url 'unitmanagement:handler_incident_form'%}" class="ui tiny basic blue button">Select</a>
+                    <a href="#" class="ui tiny basic blue button">Select</a>
                 </td>
             </tr>
             {% endfor %}

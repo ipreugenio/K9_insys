@@ -294,9 +294,9 @@ def classify_k9_list(request):
 
     print(k9s_for_grading)
 
-    data_unclassified = K9.objects.filter(training_status="Unclassified").filter(status="Material Dog")
+    data_unclassified = K9.objects.filter(training_status="Unclassified").filter(status="Material Dog").order_by('birth_date')
     data_classified = K9.objects.filter(training_status="Classified").filter(status="Material Dog").filter(handler = None)
-    data_ontraining = K9.objects.filter(training_status="On-Training").filter(status="Material Dog").filter(pk__in = k9s_for_grading)
+    data_ontraining = K9.objects.filter(training_status="On-Training").filter(status="Material Dog").filter(pk__in = k9s_for_grading).order_by('birth_date')
     data_trained = K9.objects.filter(training_status="Trained").filter(status="Material Dog")
 
     NDD_count = K9.objects.filter(capability='NDD').count()

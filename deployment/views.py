@@ -150,6 +150,9 @@ def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
     # mass_populate()
+    # k9s = K9.objects.all()
+    # for k9 in k9s:
+    #     k9.save()
 
     form = AreaForm(request.POST or None)
     style = ""
@@ -1459,10 +1462,20 @@ def assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list): #Note: n
                 print("TEMP K9")
                 print(item.k9)
 
+            handlers = Personal_Info.objects.filter(city=location.city)
+
+            handler_exclude_list = []  # append the id of the handlers
+            for h in handlers:
+                handler_exclude_list.append(h.UserID.id)
+            # print(handler_can_deploy)
+
+            # get instance of user using personal_info.id
+            # id of user is the fk.id of person_info
+            user_exclude = User.objects.filter(id__in=handler_exclude_list)
 
             # Get K9s ready for deployment #exclude already scheduled K9s
             can_deploy = K9.objects.filter(training_status='For-Deployment').filter(
-                assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list) #Same code in main
+                assignment=None).exclude(pk__in=k9_id_list).exclude(pk__in=k9s_scheduled_list).exclude(handler__in = user_exclude) #Same code in main
             # End Get K9s ready for deployment
 
             print("CAN DEPLOY QUERYSET")

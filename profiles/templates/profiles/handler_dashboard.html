@@ -126,9 +126,33 @@
                     <th>Capability: {{k9.capability}}</th>
 
                         {% if k9.training_status == "On-Training" %}
-                    <th>Training Stage: {{k9.training_level}} </th>
 
-                        <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
+                        {% elif k9.training == "Stage 0" %}
+                        <th>Training Stage: Stage 1.1 </th>
+                        {% elif k9.training == "Stage 1.1" %}
+                        <th>Training Stage: Stage 1.2 </th>
+                        {% elif k9.training == "Stage 1.2" %}
+                        <th>Training Stage: Stage 1.3 </th>
+
+                        {% elif k9.training == "Stage 1.3" %}
+                        <th>Training Stage: Stage 2.1 </th>
+                        {% elif k9.training == "Stage 2.1" %}
+                        <th>Training Stage: Stage 2.2 </th>
+                        {% elif k9.training == "Stage 2.2" %}
+                        <th>Training Stage: Stage 2.3 </th>
+
+                        {% elif k9.training == "Stage 2.3" %}
+                        <th>Training Stage: Stage 3.1 </th>
+                        {% elif k9.training == "Stage 3.1" %}
+                        <th>Training Stage: Stage 3.2 </th>
+                        {% elif k9.training == "Stage 3.2" %}
+                        <th>Training Stage: Stage 3.3 </th>
+                        {% elif k9.training == "Stage 3.3" %}
+                        <th>Training Stage: Final Stage</th>
+                        {% endif %}
+
+
+                            <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
                             <div><strong>Date End :</strong> {{training_sched.date_end}}</div></th>
 
                         {% else %}

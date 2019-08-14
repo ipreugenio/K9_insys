@@ -93,7 +93,8 @@
               <div class="column">
                   <div class="ui raised segment">
                       <strong>Team</strong>
-                      <p> {{ta.team}}</p>
+
+                      <a href="{% url 'deployment:team_location_details' ta.id %}"><p> {{ta.team}}</p></a>
                     </div>
                 </div>
           </div>

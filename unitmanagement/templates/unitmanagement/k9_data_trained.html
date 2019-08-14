@@ -10,10 +10,18 @@
                 <form action="{% url 'training:assign_k9_duty' k9.id %}" class="ui form" method="POST">
                 {% csrf_token %}
                 <div class="ui tiny info message">
-                    <ul class="list">
+                    <header>Steps</header>
+                    <ol>
+                        <li>Check For-Breeding Count and Number of K9s per Skill.</li>
+                        <li>Check Sick Record of K9</li>
+                        <li>Check Training Record of K9</li>
+                    </ol>
+                    <header>Note</header>
+                    <ul>
                         <li>Less Sickly K9 would be prefered For-Breeding</li>
                         <li>Training Score 85 and above would be ideal for For-Deployment.</li>
                         <li>Dont forget to check the remarks!</li>
+                        <li>If sick record needs validation, check phsique of k9.</li>
                     </ul>
                 </div>
                 <div class="four fields">
@@ -34,25 +42,12 @@
                         <input type="number" value="{{k9.age}}" readonly>
                     </div>
                 </div>
-                <div class="four fields">
+                <div class="two fields">
                         <div class="field">
                             <label>Capability</label>
                             <input type="text" value="{{k9.capability}}" readonly>
                         </div>
-                        <div class="field">
-                            <label>Height (cm)</label>
-                            <input type="number" value="{{k9.height}}" name="height">
-                            <div class="ui pointing blue basic label">
-                                Update Height
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label>Weight (kg)</label>
-                            <input type="number" value="{{k9.weight}}" name="weight">
-                            <div class="ui pointing blue basic label">
-                                Update Weight
-                            </div>
-                        </div>
+                    
                         <div class="field">
                             <label>Training Score</label>
                             <input type="text" value="{{train.grade}}" readonly>
@@ -65,14 +60,28 @@
                             </div>
                       </div>
                       <div class="field">
-                        <label for="">Dam (Female) </label>
+                        <label for="">Dam (Female) {{k9.capability}} {{k9.breed}} Breeders</label>
                         <input type="text" value="{{female}}" readonly>
                       </div>
                       <div class="field">
-                            <label for="">Sire (Male)</label>
+                            <label for="">Sire (Male) {{k9.capability}} {{k9.breed}} Breeders</label>
                             <input type="text" value="{{male}}" readonly>
                         </div>
                     </div>
+
+                    <div class="three fields">
+                        <div class="field">
+                        </div>
+                        <div class="field">
+                            <label for="">Total {{k9.breed}} Breeders</label>
+                        <input type="text" value="{{breeder_count_by_breed}}" readonly>
+                        </div>
+                        <div class="field">
+                            <label for="">Total Breeders </label>
+                            <input type="text" value="{{total_breeders}}" readonly>
+                        </div>
+                    </div>
+
                     <div id = 'sick' class="ui segment"> 
                         <table class="ui small two celled table">
                             <thead>
