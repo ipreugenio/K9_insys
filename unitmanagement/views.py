@@ -3455,7 +3455,6 @@ def load_appointments(request):
     return render(request, 'unitmanagement/ajax_load_appointments.html', context)
 
 
-#TODO Hide items from available units when they are already scheduled
 def load_checkups(request):
     fullstring = request.GET.get('fullstring')
     fullstring = json.loads(fullstring)
