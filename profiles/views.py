@@ -135,7 +135,7 @@ def dashboard(request):
     up_count = K9.objects.filter(status='Working Dog').filter(handler=None).count()
     tq_count = Request_Transfer.objects.filter(status='Pending').count()
 
-    pre_dep_items = K9_Pre_Deployment_Items.objects.exclude(status = "Cancelled")
+    pre_dep_items = K9_Pre_Deployment_Items.objects.filter(Q(status = "Pending") | Q(status = "Confirmed") | Q(status = "Done"))
     k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment")
     k9s_scheduled_list = []
     for item in k9s_scheduled:
@@ -145,7 +145,7 @@ def dashboard(request):
     for item in pre_dep_items:
         exclude_k9_list.append(item.k9.id)
 
-    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(handler=None).exclude(pk__in = exclude_k9_list).exclude(pk__in = k9s_scheduled_list).count() #initial deployment k9s
+    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(pk__in = exclude_k9_list).exclude(handler=None).exclude(pk__in = k9s_scheduled_list).count() #initial deployment k9s
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
     ua_count = 1 #change this
 
