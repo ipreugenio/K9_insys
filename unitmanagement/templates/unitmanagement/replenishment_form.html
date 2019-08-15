@@ -7,9 +7,17 @@
         <div class="sub header">Input items Here</div>
     </h2>
 </div>
+<div class="ui info message">
+    <div class="header">
+        Fileds can be blank. Only input the items you need.
+    </div>
+    <ul class="list">
+      <li>A total of 10 items or less can be requested at a time.</li>
+    </ul>
+  </div>
 
 <form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" data-teams-url="{% url 'unitmanagement:load_item' %}">
-    {% csrf_token %}    
+    {% csrf_token %}
     <div class="three fields">
             <div class="field">
                 <label>Requester</label>
@@ -41,7 +49,7 @@
                 </div>
             </div>
             {% endfor %}
-    
+
             {{form2.management_form}}
     </div>
    <div class="ui basic center aligned segment">
@@ -54,44 +62,51 @@
     $(function() {
         $('#myForm .formset_class').formset({
             prefix: '{{ formset.prefix }}'
-        });            
+        });
     })
+    $(document).ready(function() {
+
+    // $(function() {
+    //     $('#myForm .formset_class').formset({
+    //         prefix: '{{ formset.prefix }}'
+    //     });
+    // })
         $(".type" ).bind('change', function() {
         var url = $("#myForm").attr("data-teams-url");
-        var type = $(this).val();  
+        var type = $(this).val();
         var id_val = $(this).attr('id');
-        $.ajax({                       
+        $.ajax({
             url: url,
             data: {
-            'type': type       
+            'type': type
             },
             success: function (data) {
-            var res = id_val.split("-"); 
-            $('#id_form-'+res[1]+'-item').html(data); 
+            var res = id_val.split("-");
+            $('#id_form-'+res[1]+'-item').html(data);
             }
         });
 
         });
 
         $(".item" ).bind('change', function() {
-        var id = $(this).val();  
+        var id = $(this).val();
         var id_val = $(this).attr('id');
 
-        var res = id_val.split("-"); 
+        var res = id_val.split("-");
         var type = $('#id_form-'+res[1]+'-item_type').val();
-        
-        var url = 'replenishment_form/ajax_load_item_food'; 
-        $.ajax({                       
-            url: url,    
-            type : 'GET',           
-            dataType : 'json',    
+
+        var url = 'replenishment_form/ajax_load_item_food';
+        $.ajax({
+            url: url,
+            type : 'GET',
+            dataType : 'json',
             data: {
             'id': id,
-            'type': type,    
+            'type': type,
             },
             success: function (data) {
-            var res = id_val.split("-"); 
-            $('#id_form-'+res[1]+'-uom').val(data.uom); 
+            var res = id_val.split("-");
+            $('#id_form-'+res[1]+'-uom').val(data.uom);
             }
         });
 

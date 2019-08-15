@@ -11,51 +11,48 @@
                     <div class="ui equal width height grid">
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="large user purple icon"></i>
-                                        <i class="large paw purple icon"></i>
-                                        <i class="huge purple icon">{{c_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="user purple icon"></i>
+                                        <i class="paw purple icon"></i>
+                                        <i class="purple icon">{{c_count}}</i>
                                         
                                     </div>
-                                    <div class="extra content">
-                                        <strong>
+                                    <div class="label">
+                                        
                                             <a href="{% url 'unitmanagement:classified_list' %}">ASSIGN HANDLER TO K9</a>
-                                        </strong>
+                                        
                                     </div>
                                 </div>                                         
                             </div>     
                         </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="large shopping basket olive icon"></i>
-                                        <i class="huge olive icon">{{item_req_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="shopping basket olive icon"></i>
+                                        <i class="olive icon">{{item_req_count}}</i>
                                     </div>
-                                    <div class="extra content">
-                                      <br>
-                                        <strong>
-                                            <a href="#">ITEM REQUESTS</a>
-                                            <!-- href="{% url 'unitmanagement:classified_list' %}" -->
-                                        </strong>
+                                    <div class="label">
+
+                                            <a href="{% url 'unitmanagement:replenishment_confirm' %}">ITEM REPLENISHMENT REQUESTS</a>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="large question black icon"></i>
-                                        <i class="large paw black icon"></i>
-                                        <i class="huge black icon">{{up_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="question black icon"></i>
+                                        <i class="paw black icon"></i>
+                                        <i class="black icon">{{up_count}}</i>
                                     </div>
-                                    <div class="extra content">
+                                    <div class="label">
                                         <br>
-                                        <strong>
+
                                             <a href="{% url 'unitmanagement:k9_unpartnered_list' %}">UNPARTNERED K9's</a>
-                                        </strong>
                                     </div>
                                 </div>
                             </div>
@@ -63,14 +60,13 @@
                 
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge bus brown icon">{{tq_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="bus brown icon">{{tq_count}}</i>
                                     </div>
-                                    <div class="extra content">
-                                        <strong>
-                                            <a href="#">TRANSFER REQUESTS</a>
-                                        </strong>
+                                    <div class="label">
+                                        <br>
+                                            <a href="{% url 'unitmanagement:transfer_request_list' %}">TRANSFER REQUESTS</a>
                                     </div>
                                 </div>
                             </div>
@@ -82,14 +78,26 @@
                     <div class="ui equal width height grid">
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge compass blue icon">{{dept_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="compass blue icon">{{dept_count}}</i>
                                     </div>
-                                    <div class="extra content">
-                                        <strong>
+                                    <div class="label">
                                             <a href="{% url 'deployment:schedule_units' %}">K9's
                                             FOR INITIAL DEPLOYMENT</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="tasks orange icon">{{pre_req_count}}</i>
+                                    </div>
+                                    <div class="label">
+                                        <strong>
+                                            <a href="{% url 'deployment:pre_req_unconfirmed'%}">INSUFFICIENT PRE-REQUIREMENT ITEMS</a>
                                         </strong>
                                     </div>
                                 </div>
@@ -97,42 +105,24 @@
                         </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge tasks orange icon">{{pq_count}}</i>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="exclamation circle red icon">{{ua_count}}</i>
                                     </div>
-                                    <div class="extra content">
-                                        <strong>
-                                            <a href="#">UNCONFIRMED PRE-REQUIREMENT</a>
-                                        </strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <div class="ui raised center aligned segment">
-                                <div class="card">
-                                    <div class="content">
-                                        <i class="huge exclamation circle red icon">{{ua_count}}</i>
-                                    </div>
-                                    <div class="extra content">
-                                        <strong>
+                                    <div class="label">
                                             <a href="{% url 'unitmanagement:k9_mia_list'%}">UNCONFIRMED ARRIVALS</a>
-                                        </strong>
                                     </div>
                                 </div>
                             </div>
                         </div> 
                         <div class="column">
                                 <div class="ui raised center aligned segment">
-                                    <div class="card">
-                                        <div class="content">
-                                            <i class="huge exclamation paw teal icon">{{ab_k9}}</i>
+                                    <div class="ui small statistic">
+                                        <div class="value">
+                                            <i class="exclamation paw teal icon">{{ab_k9}}</i>
                                         </div>
-                                        <div class="extra content">
-                                            <strong>
-                                                <a href="{% url 'planningandacquiring:add_procured_k9'% ">K9 ACQUISITION COUNTDOWN</a>
-                                            </strong>
+                                        <div class="label">
+                                                <a href="{% url 'planningandacquiring:add_procured_k9'%} ">K9 ACQUISITION COUNTDOWN</a>
                                         </div>
                                     </div>
                                 </div>

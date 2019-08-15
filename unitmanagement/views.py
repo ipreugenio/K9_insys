@@ -93,7 +93,7 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'heat_cycle':
         notif.viewed = True
         notif.save()
-        return redirect('unitmanagement:reproductive_edit', id = notif.k9.id)
+        return redirect('planningandacquiring:add_K9_parents_form')
     elif notif.notif_type == 'k9_sick' :
         notif.viewed = True
         notif.save()
@@ -130,12 +130,16 @@ def redirect_notif(request, id):
     elif notif.notif_type == 'pregnancy':
         notif.viewed = True
         notif.save()
-        return redirect('planningandacquiring:breeding_list', id = notif.other_id)
+        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=pregnant')
     elif notif.notif_type == 'breeding':
         notif.viewed = True
         notif.save()
-        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=pregnant')
+        return HttpResponseRedirect('../../planningandacquiring/breeding_list/?type=breeding')
     elif notif.notif_type == 'initial_deployment' or notif.notif_type == 'checkup':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'k9_given':
         notif.viewed = True
         notif.save()
         return redirect('profiles:handler_dashboard')
@@ -145,8 +149,13 @@ def index(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    
-   
+    d = dt.date.today() + relativedelta(days=63) 
+
+    a = dt.date.today() + relativedelta(days=22) 
+
+    print(d)
+    print(a)
+
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -168,7 +177,7 @@ def yearly_vaccine_list(request):
     for v in vr:
         list_k9.append(v.k9.id)
 
-    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
+    k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").filter(id__in=list_k9)
 
     k9_ar = []
     k9_dh = []
@@ -1338,9 +1347,9 @@ def trained_list(request):
 
     data = K9.objects.filter(training_status = "Trained")
 
-    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
-    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").count()
+    NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
+    EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
+    SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(status="Missing").count()
 
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
@@ -1985,6 +1994,8 @@ def reassign_assets(request, id):
             k.handler=h
             k.save()
 
+            Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
+
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:k9_unpartnered_list')
 
@@ -2039,7 +2050,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
          
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(assignment=None).exclude(id__in=cb_list) 
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list) 
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2230,17 +2241,34 @@ def replenishment_form(request):
     style = 'ui green message'
     form = ReplenishmentForm(request.POST or None)
 
-    form2 = formset_factory(ItemReplenishmentForm, can_delete=True)
+    form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
     formset = form2()
     if request.method == 'POST':
         if form.is_valid:
-            f1 = form.save(commit=False)    
-            formset = form2(request.POST,)
+            f1 = form.save()    
+            formset = form2(request.POST)
 
             if formset.is_valid:
                 for forms in formset:
                    #TODO SAVE FORMS
-                    print('type',forms['item_type'].value())
+                    if forms['item_type'].value() != '------------':
+                        uom = forms['uom'].value()
+                        quantity = forms['quantity'].value()
+
+                        if forms['item_type'].value() == 'Dog Food':
+                            item_id = forms['item'].value()
+                            item = Food.objects.get(id=item_id)
+                            Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Medicine':
+                            item_id = forms['item'].value()
+                            item = Medicine_Inventory.objects.get(id=item_id)
+                            Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Miscellaneous':
+                            item_id = forms['item'].value()
+                            item = Miscellaneous.objects.get(id=item_id)
+                            Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
+
+                return redirect('profiles:team_leader_dashboard')
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -2418,10 +2446,10 @@ def on_leave_decision(request, id):
 # Reproductive Cycle
 def reproductive_list(request):
     style=''
-    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female')
-    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female')
-    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female')
-    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female')
+    proestrus = K9.objects.filter(reproductive_stage='Proestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    estrus = K9.objects.filter(reproductive_stage='Estrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    metestrus = K9.objects.filter(reproductive_stage='Metestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    anestrus = K9.objects.filter(reproductive_stage='Anestrus').filter(sex='Female').filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2535,6 +2563,9 @@ def choose_handler_list(request, id):
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
             h.save()
+
+            
+            Notification.objects.create(position='Handler', user=h, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:classified_list')
@@ -3018,9 +3049,9 @@ class TrainerView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
 
-        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
-        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
-        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").count()
+        NDD_count = K9.objects.filter(capability='NDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
+        EDD_count = K9.objects.filter(capability='EDD').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
+        SAR_count = K9.objects.filter(capability='SAR').exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").exclude(training_status = "For-Breeding").exclude(status="Missing").count()
 
 
         NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
@@ -3542,7 +3573,7 @@ def load_item(request):
     item_type = request.GET.get('type')
     
     if item_type == 'Dog Food':
-        item = Food.objects.all()
+        item = Food.objects.filter(foodtype='Adult Dog Food')
     elif item_type == 'Medicine':
         item = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
     elif item_type == 'Medicine':
@@ -3654,12 +3685,49 @@ def k9_checkup_list_today(request):
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)
 
 def k9_mia_list(request):
-
+    style = "ui green message"
     k9_mia = K9.objects.filter(training_status = "MIA")
 
+    k9_list = []
+    
+    for km in k9_mia:
+        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).exclude(date_pulled=None).latest('date_pulled')
+
+        loc = None
+        if tdd.team_assignment != None:
+            loc = tdd.team_assignment
+        else:
+            loc = tdd.team_requested
+        
+        a = [km,loc,tdd]
+        k9_list.append(a)
+
+    print(k9_mia)
+    print(k9_list)
+    
     context = {
-        'k9_mia' : k9_mia
+        'k9_list' : k9_list,
+        'style' : style,
     }
 
     return render(request, 'unitmanagement/k9_mia_list.html', context)
+
+
+def k9_mia_change(request,id):
+    status =  request.GET.get('status')
+    
+    k9 = K9.objects.get(id=id)
+    if status == 'missing':
+        k9.status = 'Missing'
+        k9.training_status = 'Missing'
+        k9.save()
+
+    elif status == 'late':
+        k9.status = 'Working Dog'
+        k9.training_status = 'Deployed'
+        k9.save()
+
+    style = "ui green message"
+    messages.success(request, 'You have updated K9 unit status.')    
+    return redirect('unitmanagement:k9_mia_list')
 

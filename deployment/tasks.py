@@ -22,7 +22,7 @@ import pandas as pd
 # 1 week before end of deployment
 # start and end of deployment
 #8:30AM
-@periodic_task(run_every=crontab(hour=8, minute=30))
+# @periodic_task(run_every=crontab(hour=8, minute=30))
 def deployment_notifs():
     request = Dog_Request.objects.all()
 
@@ -216,7 +216,7 @@ def subtract_inventory(user):
 #Step 3
 #Deploy Team (only the ones who have confirmed) once deployment date hits
 # @periodic_task(run_every=crontab(hour=6, minute=30))
-@periodic_task(run_every=timedelta(seconds=25))
+# @periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
     print('check_initial_deployment_dates code is running')
     schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
@@ -278,7 +278,7 @@ def check_initial_deployment_dates():
 # Step 6
 # Check if TL has confirmed arrival. If not, escalate to admin
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def check_initial_dep_arrival():
 
     deployed = Team_Dog_Deployed.objects.filter(date_pulled=None).filter(status = "Pending").exclude(team_assignment = None)
@@ -305,14 +305,9 @@ def check_initial_dep_arrival():
     return None
 
 
-@periodic_task(run_every=timedelta(seconds=10))
-def test():
-    print('Test Hello')
-
 # @periodic_task(run_every=timedelta(seconds=10))
-# def test_error():
-#     k9 = K9.objects.get(id = 3000)
-
+# def test():
+#     print('Test Hello')
 
 def update_request_info(dog_request):
 
@@ -333,7 +328,7 @@ def update_request_info(dog_request):
 
 #TODO remove creation of duplicates
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def deploy_dog_request():
     # When Schedule is today, change training status to deployed
     scheds = K9_Schedule.objects.filter(date_start=date.today()).filter(status = "Request").exclude(dog_request = None)
@@ -368,7 +363,7 @@ def deploy_dog_request():
 
 #Pull out dogs where request end date is now
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def pull_dog_request():
 
     requests = Dog_Request.objects.filter(end_date__gt = date.today()).filter(status = "Approved")

@@ -122,13 +122,12 @@
         <div class="six wide column" style="padding: 0%;padding-right: 1%;">
             <div class="ui basic segment" style="padding-left:0%;"> 
                 <div class="ui raised segment center aligned">
-                        <div class="ui horizontal statistic">
+                        <div class="ui statistic">
                             <div class="value">
-                                <i class="bus blue icon"></i>
-                                {n}
+                                <i class="bus blue icon">{{rq}}</i>
                             </div>
                             <div class="label">
-                                Events that need action?
+                        <a href="{% url 'deployment:request_dog_list'%}">UPCOMING EVENTS</a>
                             </div>
                         </div>
                 </div>

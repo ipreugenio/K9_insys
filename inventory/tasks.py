@@ -17,7 +17,7 @@ from django.db.models import Sum
 # All Dogs in PCGK9 base
 # exclude: dead, deployed, adopted
 # 6AM
-@periodic_task(run_every=crontab(hour=6, minute=0))
+# @periodic_task(run_every=crontab(hour=6, minute=0))
 def auto_subtract():
     # TODO Vitamins consumption
     # vitamins = Medicine_Inventory.objects.filter(medicine__med_type='Vitamins').exclude(quantity=0).order_by('quantity')

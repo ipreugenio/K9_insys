@@ -55,7 +55,7 @@ urlpatterns = [
     path('choose-handler-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
     path('health-history/ajax_load_stamp', views.load_stamp, name='ajax_load_stamp'),
     path('ajax_load_k9', views.load_k9, name='ajax_load_k9'),
-    
+
     path('k9-sick-details/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('k9-incident-list/ajax_load_incident', views.load_incident, name='ajax_load_incident'),
     path('k9-sick-details/ajax_load_image', views.load_image, name='ajax_load_image'),
@@ -65,19 +65,19 @@ urlpatterns = [
     path('reassign-assets/ajax_load_handler', views.load_handler, name='load_handler'),
     path('trained-list/ajax_load_k9_data', views.load_k9_data, name='ajax_load_k9_data'),
     path('transfer-request-list/ajax_load_transfer', views.load_transfer, name='load_transfer'),
-    
+
     path('reassign-assets/<int:id>', views.reassign_assets, name='reassign_assets'),
     path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
     path('trained-list', views.trained_list, name='trained_list'),
     path('classified-list', views.classified_list, name='classified_list'),
     #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     path('transfer-request-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
-    
+
     path('replenishment_form', views.replenishment_form, name='replenishment_form'),
     path('replenishment_form/ajax_load_item_food', views.load_item_food, name='load_item_food'),
     path('replenishment_form/ajax_load_item_med', views.load_item_med, name='load_item_med'),
     path('replenishment_form/ajax_load_item_misc', views.load_item_misc, name='load_item_misc'),
-    
+
     path('replenishment_confirm', views.replenishment_confirm, name='replenishment_confirm'),
     path('replenishment_approval/<int:id>', views.replenishment_approval, name='replenishment_approval'),
     path('load_item/', views.load_item, name='load_item'),
@@ -102,5 +102,7 @@ urlpatterns = [
     path('physical-exam-form/<int:id>', views.physical_exam_form, name='physical_exam_form'),
 
     path('k9-mia-list', views.k9_mia_list, name ='k9_mia_list'),
+    path('k9_mia_change/<int:id>', views.k9_mia_change, name ='k9_mia_change')
+
     #path('/<int:id>/', views., name=''),
 ];

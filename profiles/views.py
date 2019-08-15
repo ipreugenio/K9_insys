@@ -51,14 +51,14 @@ def notif(request):
     serial = request.session['session_serial']
     account = Account.objects.get(serial_number=serial)
     user_in_session = User.objects.get(id=account.UserID.id)
-    
+
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler' or user_in_session.position == 'Team Leader':
         notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
-        
+
     return notif
 
 def notif_list(request):
@@ -66,7 +66,7 @@ def notif_list(request):
     notif_data = notif(request)
 
     dept_notif = notif_data.filter(notif_type='dog_request').filter(notif_type='location_incident').filter(notif_type='call_back').filter(notif_type='initial_deployment')
-    
+
     um_notif = notif_data.exclude(notif_type='dog_request').exclude(notif_type='location_incident').exclude(notif_type='call_back').exclude(notif_type='initial_deployment')
 
     count = notif_data.filter(viewed=False).count()
@@ -164,7 +164,7 @@ def dashboard(request):
         ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
 
         aq = K9.objects.filter(date_created__year=datetime.today().year).count()
-        
+
         ab_k9 = (ab.k9_needed + ab.k9_breeded) - aq
 
         if ab_k9 < 0:
@@ -176,6 +176,67 @@ def dashboard(request):
     except ObjectDoesNotExist:
         ab_k9 = 0
         ab_total = None
+
+    kdi = K9_Pre_Deployment_Items.objects.filter(status='Pending').exclude(initial_sched__date_end__lt=date.today())
+
+    pre_req_count = 0
+    for kp in kdi:
+        date_1 = kp.initial_sched.date_start - relativedelta(days=5)
+        if date.today() >= date_1:
+            pre_req_count = pre_req_count+1
+
+    collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    food = Food.objects.filter(foodtype="Adult Dog Food").aggregate(sum=Sum('quantity'))['sum']
+    medicines = Medicine_Inventory.objects.filter(medicine__med_type="Vitamins").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+    ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+
+    item_list = []
+    if collar < 0:
+        a = abs(collar)
+        b = ['Collar',a]
+        item_list.append(b)
+    if vest < 0:
+        a = abs(vest)
+        b = ['Vest',a]
+        item_list.append(b)
+    if leash < 0:
+        a = abs(leash)
+        b = ['Leash',a]
+        item_list.append(b)
+    if shipping_crate < 0:
+        a = abs(shipping_crate)
+        b = ['Shipping Crate',a]
+        item_list.append(b)
+    if food < 0:
+        a = abs(food)
+        b = ['Food',a]
+        item_list.append(b)
+    if medicines < 0:
+        a = abs(medicines)
+        b = ['Vitamins',a]
+        item_list.append(b)
+    if grooming_kit < 0:
+        a = abs(grooming_kit)
+        b = ['Grooming Kit',a]
+        item_list.append(b)
+    if first_aid_kit < 0:
+        a = abs(first_aid_kit)
+        b = ['First Aid Kit',a]
+        item_list.append(b)
+    if oral_dextrose < 0:
+        a = abs(oral_dextrose)
+        b = ['Oral Dextrose',a]
+        item_list.append(b)
+    if ball < 0:
+        a = abs(ball)
+        b = ['Ball',a]
+        item_list.append(b)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -205,6 +266,7 @@ def dashboard(request):
         'dept_count': dept_count,
         'pq_count': pq_count,
         'ua_count': ua_count,
+        'pre_req_count':len(item_list),
 
         'notif_data':notif_data,
         'count':count,
@@ -274,8 +336,8 @@ def team_leader_dashboard(request):
     if td_dr:
         reveal_for_arrival_request = True
 
-    print("For arrival")
-    print(for_arrival)
+    # print("For arrival")
+    # print(for_arrival)
 
     check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
     check_arrival_dr = CheckArrivalForm(request.POST or None, for_arrival=td_dr)
@@ -318,8 +380,8 @@ def team_leader_dashboard(request):
         if check_arrival.is_valid():
 
             handlers_arrived_id = check_arrival['team_member'].value()
-            print("Handlers Arrived")
-            print(handlers_arrived_id)
+            # print("Handlers Arrived")
+            # print(handlers_arrived_id)
 
             handlers_arrived = User.objects.filter(pk__in = handlers_arrived_id)
 
@@ -335,11 +397,12 @@ def team_leader_dashboard(request):
             messages.success(request, 'Arrival succesfully confirmed')
             return redirect("profiles:team_leader_dashboard")
         else:
-            print(check_arrival.errors)
+            # print(check_arrival.errors)
+            pass
 
     cb = None
     try:
-        cb = Call_Back_K9.objects.get(k9__handler=user)        
+        cb = Call_Back_K9.objects.get(k9__handler=user)
     except ObjectDoesNotExist:
         pass
 
@@ -356,7 +419,7 @@ def team_leader_dashboard(request):
     except ObjectDoesNotExist:
         rro = None
 
-    print('rr',rro)
+    # print('rr',rro)
     context = {
         'incident_count':incident_count,
         'ta':ta,
@@ -569,10 +632,10 @@ def handler_dashboard(request):
     except:
         pass
 
-    print("Current Port")
-    print(current_port)
-    print("Current Request")
-    print(current_request)
+    # print("Current Port")
+    # print(current_port)
+    # print("Current Request")
+    # print(current_request)
 
     today = datetime.today()
 
@@ -590,8 +653,8 @@ def handler_dashboard(request):
 
             del items_list[0]
 
-            print("Items List")
-            print(items_list)
+            # print("Items List")
+            # print(items_list)
 
             pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
             initial_sched = pre_deployment_items.initial_sched
@@ -608,18 +671,18 @@ def handler_dashboard(request):
 
         training = Training.objects.get(k9=k9, training=k9.capability)
         if training.stage != "Finished Training":
-            print("TRAINING STAGE")
-            print(training.stage)
+            # print("TRAINING STAGE")
+            # print(training.stage)
             training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
 
-            print("Training Sched")
-            print(training_sched.date_start)
-            print(training_sched.date_end)
+            # print("Training Sched")
+            # print(training_sched.date_start)
+            # print(training_sched.date_end)
 
-        print("ALL CLEAR")
-        print(all_clear)
-        print("REVEAL ITEMS")
-        print(reveal_items)
+        # print("ALL CLEAR")
+        # print(all_clear)
+        # print("REVEAL ITEMS")
+        # print(reveal_items)
 
         drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
 
@@ -641,16 +704,16 @@ def handler_dashboard(request):
                 return redirect("profiles:handler_dashboard")
 
             if start_training:
-                print("START TRAINING VALUE")
-                print(start_training)
+                # print("START TRAINING VALUE")
+                # print(start_training)
 
                 try:
                     training_sched.date_start = today
                     training_sched.save()
                 except: pass
             if end_training:
-                print("END TRAINING VALUE")
-                print(end_training)
+                # print("END TRAINING VALUE")
+                # print(end_training)
 
                 try:
                     training_sched.date_end = today
@@ -676,9 +739,9 @@ def handler_dashboard(request):
 
 
         k9_schedules = K9_Schedule.objects.filter(k9 = k9)
-        print("K9 Schedules")
-        for sched in k9_schedules:
-            print(sched.status)
+        # print("K9 Schedules")
+        # for sched in k9_schedules:
+            # print(sched.status)
 
         try:
             if training_sched.date_start is None and training_sched.date_end is None:
@@ -698,15 +761,15 @@ def handler_dashboard(request):
 
     cb = None
     try:
-        cb = Call_Back_K9.objects.get(k9__handler=user)        
+        cb = Call_Back_K9.objects.get(k9__handler=user)
     except ObjectDoesNotExist:
         pass
 
 
-    print("Show Start")
-    print(show_start)
-    print("Show End")
-    print(show_end)
+    # print("Show Start")
+    # print(show_start)
+    # print("Show End")
+    # print(show_end)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -743,7 +806,7 @@ def vet_dashboard(request):
     today = datetime.today()
 
     vac_pending = VaccinceRecord.objects.filter(Q(dhppil_cv_1=False) | Q(dhppil_cv_2=False) | Q(dhppil_cv_3=False) | Q(anti_rabies=False) | Q(bordetella_1=False) | Q(bordetella_2=False) | Q(dhppil4_1=False) | Q(dhppil4_2=False)).count()
-    
+
     #TODO Physical Exam
     checkups = K9_Schedule.objects.filter(status = "Checkup").exclude(date_start__lt=datetime.today().date())
 
@@ -753,7 +816,7 @@ def vet_dashboard(request):
 
     #TODO show k9 if there are no valid checkups
 
-    k9_exclude_list = [] #Does not need to be 
+    k9_exclude_list = [] #Does not need to be
     for k9 in k9_list:
         try:
             checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
@@ -774,14 +837,14 @@ def vet_dashboard(request):
         if checkup.date_start == datetime.today().date():
             checkup_list.append(checkup)
             k9_list.append(checkup.k9)
-    
- 
+
+
     checkup_now = len(checkup_list)
     checkup_upcoming = checkups.exclude(k9__in = k9_list).count()
-    print('checkup', checkup_now,checkup_upcoming)
+    # print('checkup', checkup_now,checkup_upcoming)
 
     #k9 to be scheduled for checkup
-    
+
 
 
     #health pending
@@ -790,13 +853,13 @@ def vet_dashboard(request):
     health_pending = h_c +th_c
     # pending incidents
     incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()
-    
+
     # Mated K9's
     mated_count = K9_Mated.objects.filter(status='Breeding').count()
     # pregnant K9's
     pregnant_count = K9_Mated.objects.filter(status='Pregnant').count()
 
-    
+
     #Initial Vaccinations
     i_vac =  VaccinceRecord.objects.filter(status='Pending')
 
@@ -818,7 +881,7 @@ def vet_dashboard(request):
     k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost").filter(id__in=list_k9)
 
     yearly = []
-    
+
     for k9 in k9:
         try:
             ar = VaccineUsed.objects.filter(disease__contains='Anti-Rabies').filter(k9=k9).latest('date_vaccinated')
@@ -855,21 +918,21 @@ def vet_dashboard(request):
         if nxt_dh != None:
             if nxt_dh <= date.today():
                 yearly.append('DHPPiL4')
-                
+
         if nxt_dw != None:
             if nxt_dw <= date.today():
                 yearly.append('Deworming')
 
-        
-    print(yearly)
+
+    # print(yearly)
 
     kd_index = pd.Index(yearly)
     y_values = kd_index.value_counts().keys().tolist()
     y_counts = kd_index.value_counts().tolist()
-    
-    print('value', y_values)
-    print('count', y_counts)
-    
+
+    # print('value', y_values)
+    # print('count', y_counts)
+
     yearly_list = zip(y_values,y_counts)
     yearly_count = sum(y_counts)
 
@@ -924,7 +987,7 @@ def vet_dashboard(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st Tick and Flea Prevention')
                 php_vac.append('Tick and Flea')
 
-        
+
         #9 weeks
         if vr.dhppil_cv_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -970,7 +1033,7 @@ def vet_dashboard(request):
             if k9.age_days >=84:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd dose DHPPiL+CV Vaccination')
                 php_vac.append('DHPPiL+CV')
-        
+
         #14 weeks
         if vr.heartworm_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -990,7 +1053,7 @@ def vet_dashboard(request):
             if k9.age_days >=112:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd Tick and Flea Prevention')
                 php_vac.append('Tick and Flea')
-        
+
         #18 weeks
         if vr.dhppil4_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -1031,7 +1094,7 @@ def vet_dashboard(request):
             if k9.age_days >=182:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='6th Heartworm Prevention')
                 php_vac.append('Heartworm')
-        
+
         #28 weeks
         if vr.tick_flea_6 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -1051,7 +1114,7 @@ def vet_dashboard(request):
             if k9.age_days >=224:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='7th Tick and Flea Prevention')
                 php_vac.append('Tick and Flea')
-        
+
         #34 weeks
         if vr.heartworm_8 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -1061,10 +1124,10 @@ def vet_dashboard(request):
 
     php_vacc = np.sort(php_vac)
 
-    vac_index = pd.Index(php_vacc) 
+    vac_index = pd.Index(php_vacc)
     vac_values = vac_index.value_counts().keys().tolist()
     vac_counts = vac_index.value_counts().tolist()
-    
+
     vac_list = zip(vac_values,vac_counts)
     vac_count = sum(vac_counts)
 
@@ -1073,7 +1136,7 @@ def vet_dashboard(request):
         ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
 
         aq = K9.objects.filter(date_created__year=datetime.today().year).count()
-        
+
         ab_k9 = (ab.k9_needed + ab.k9_breeded) - aq
 
         if ab_k9 < 0:
@@ -1100,6 +1163,7 @@ def vet_dashboard(request):
     pending_schedule = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in=k9s_exclude).exclude(
         date_start__lt=datetime.today().date()).count()
 
+    unfit_count = K9.objects.filter(fit=False).count()
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1123,6 +1187,7 @@ def vet_dashboard(request):
         'checkup_upcoming':checkup_upcoming,
         'classify_count':classify_count,
         'pending_schedule' : pending_schedule
+        'unfit_count':unfit_count,
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
@@ -1146,8 +1211,8 @@ def commander_dashboard(request):
     data = data.filter(area=areas)
 
     pending_sched = data.filter(status='Pending').count()
-    
-    print(pending_sched)   
+
+    # print(pending_sched)
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1163,7 +1228,7 @@ def commander_dashboard(request):
 
 def operations_dashboard(request):
     user = user_session(request)
-    
+
     form = RequestForm(request.POST or None)
 
     geoform = GeoForm(request.POST or None)
@@ -1172,8 +1237,10 @@ def operations_dashboard(request):
 
     events = Dog_Request.objects.filter(sector_type = "Big Event")
 
+    rq = Dog_Request.objects.filter(sector_type = "Big Event").filter(end_date__lt=datetime.today()).count()
+
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         form.validate_date()
         if form.is_valid():
 
@@ -1185,15 +1252,15 @@ def operations_dashboard(request):
 
             checks = geoform['point'].value()
             checked = ast.literal_eval(checks)
-            print(checked['coordinates'])
+            # print(checked['coordinates'])
             toList = list(checked['coordinates'])
-            print(toList)
+            # print(toList)
             lon = Decimal(toList[0])
             lat = Decimal(toList[1])
-            print("LONGTITUDE")
-            print(lon)
-            print("LATITUDE")
-            print(lat)
+            # print("LONGTITUDE")
+            # print(lon)
+            # print("LATITUDE")
+            # print(lat)
             location.longtitude = lon
             location.latitude = lat
 
@@ -1232,7 +1299,8 @@ def operations_dashboard(request):
         'geosearch': geosearch,
         'width' :width,
 
-        'events' : events
+        'events' : events,
+        'rq' : rq,
     }
     return render (request, 'profiles/operations_dashboard.html', context)
 
@@ -1262,7 +1330,7 @@ def trainer_dashboard(request):
     return render (request, 'profiles/trainer_dashboard.html', context)
 
 def profile(request):
-   
+
     # first_day = datetime.date.today().replace(day=1)
     # last_day = datetime.date.today().replace(day=calendar.monthrange(datetime.date.today().year, datetime.date.today().month)[1])
 
@@ -1273,25 +1341,25 @@ def profile(request):
     today = datetime.today()
 
     serial = request.session['session_serial']
-    print(serial)
-    
+    # print(serial)
+
     account = Account.objects.get(serial_number=serial)
     user = User.objects.get(id = account.UserID.id)
-    p_info = Personal_Info.objects.get(UserID=user) 
+    p_info = Personal_Info.objects.get(UserID=user)
     e_info = Education.objects.get(UserID=user)
 
-    print(account.UserID.position)
+    # print(account.UserID.position)
 
     uform = add_User_form(request.POST or None,  request.FILES or None, instance = user)
     pform = add_personal_form(request.POST or None, instance = p_info)
     eform = add_education_form(request.POST or None, instance = e_info)
 
     if request.method == 'POST':
-        print(uform.errors)
+        # print(uform.errors)
         if uform.is_valid():
-            print(pform.errors)
+            # print(pform.errors)
             if pform.is_valid():
-                print(eform.errors)
+                # print(eform.errors)
                 if eform.is_valid():
                     if uform.status == 'No Longer Employed':
                         uform.partnered = False
@@ -1310,7 +1378,7 @@ def profile(request):
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
-    
+
     context={
         # 'phex': phex,
         # 'vac': vac,
@@ -1358,7 +1426,7 @@ def login(request):
         serial = request.POST['serial_number']
         password = request.POST['password']
         # user_auth = authenticate(request, username=serial, password=password)
-        print(password)
+        # print(password)
 
         # auth_login(request, user_auth)
         request.session["session_serial"] = serial
@@ -1370,7 +1438,7 @@ def login(request):
         request.session["partnered"] = user.partnered
         request.session["session_username"] = str(user)
 
-        print(request.session["partnered"])
+        # print(request.session["partnered"])
         #TRAINOR, OPERATIONS
         if user.position == 'Aministrator':
             return HttpResponseRedirect('../dashboard')
@@ -1398,7 +1466,7 @@ def add_User(request):
     style = ""
 
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         if form.is_valid():
             new_form = form.save()
             formID = new_form.pk
@@ -1433,7 +1501,7 @@ def add_personal_info(request):
     form = add_personal_form(request.POST)
     style = ""
     if request.method == 'POST':
-        print(form.errors)
+        # print(form.errors)
         if form.is_valid():
             personal_info = form.save(commit=False)
             UserID = request.session["session_userid"]
@@ -1463,7 +1531,6 @@ def add_personal_info(request):
         'count':count,
         'user':user,
     }
-    print(form)
     return render(request, 'profiles/add_personal_info.html', context)
 
 def add_education(request):
@@ -1500,7 +1567,6 @@ def add_education(request):
         'count':count,
         'user':user,
     }
-    print(form)
     return render(request, 'profiles/add_education.html', context)
 
 def add_account(request):
@@ -1513,7 +1579,7 @@ def add_account(request):
     if request.method == 'POST':
         if form.is_valid():
             form = form.save(commit=False)
-            form.username = 'O-' + str(data.id) 
+            form.username = 'O-' + str(data.id)
             form.first_name = data.firstname
             form.last_name = data.lastname
             form.save()
@@ -1559,14 +1625,14 @@ def user_listview(request):
         u.save()
 
         try:
-            k = K9.objects.get(handler=u) 
+            k = K9.objects.get(handler=u)
             k.handler = None
             k.save()
         except:
             pass
 
         messages.success(request, 'User status has been updated to '+ u.status +'!')
-        
+
 
     context = {
         'Title' : 'User List',
@@ -1620,8 +1686,8 @@ def user_add_confirmed(request):
 def load_event(request):
 
     id = request.GET.get('event_id')
-    print("ID RECEIVED")
-    print(id)
+    # print("ID RECEIVED")
+    # print(id)
 
     dog_request = None
     try:
@@ -1636,8 +1702,8 @@ def load_event(request):
 
 def load_event_handler(request):
     id = request.GET.get('event_id')
-    print("ID RECEIVED")
-    print(id)
+    # print("ID RECEIVED")
+    # print(id)
     sched = None
     try:
         sched = K9_Schedule.objects.get(id = id)
@@ -1662,7 +1728,7 @@ class ScheduleView(APIView):
         user = user_session(request)
 
         today = datetime.now()
-        print(date.today())
+        # print(date.today())
 
         k9 = K9.objects.get(handler=user)
         sched = K9_Schedule.objects.filter(k9=k9).filter(date_end__gte= today)
@@ -1688,11 +1754,11 @@ class NotificationListView(APIView):
 
         #TODO
         if current_user.position == 'Handler':
-            k9 = K9.objects.get(handler=current_user)  
+            k9 = K9.objects.get(handler=current_user)
             notif = Notification.objects.filter(k9=k9)
         else:
             notif = Notification.objects.filter(position=current_user.position)
-        
+
         serializer = NotificationSerializer(notif, many=True)
         return Response(serializer.data)
 
@@ -1735,11 +1801,11 @@ def update_event(request):
         #python_date_end = python_date_end + relativedelta.relativedelta(days=1)
 
 
-    print("ID : " + event_id)
-    print("TITLE : " + event_title)
-    print("START : " + str(python_date_start))
-    print("END : " + str(python_date_end))
-    print("ALLDAY : " + event_allDay)
+    # print("ID : " + event_id)
+    # print("TITLE : " + event_title)
+    # print("START : " + str(python_date_start))
+    # print("END : " + str(python_date_end))
+    # print("ALLDAY : " + event_allDay)
 
     try:
         event = Events.objects.get(id=event_id)
@@ -1760,5 +1826,3 @@ def update_event(request):
 class UserView(viewsets.ModelViewSet):
     queryset = AuthUser.objects.all()
     serializer_class = UserSerializer
-
-

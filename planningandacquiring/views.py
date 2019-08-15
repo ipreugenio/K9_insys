@@ -250,14 +250,16 @@ def add_procured_k9(request):
                     bday = cd.get('birth_date')
                     sex = cd.get('sex')
                     color = cd.get('color')
+                    breed = cd.get('breed')
+                    image = cd.get('image')
                     dhpp = cd.get('date_dhhp')
                     rabies = cd.get('date_rabies')
                     bordertella = cd.get('date_bordertela')
                     deworm = cd.get('date_deworm')
-                    height = cd.get('date_bordertela')
-                    weight = cd.get('date_deworm')
+                    height = cd.get('height')
+                    weight = cd.get('weight')
 
-                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, height=height,weight=weight)
+                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, breed=breed,height=height,weight=weight,image=image)
                     
                     VaccineUsed.objects.create(k9=k9,disease='DHPPiL4',date_vaccinated=dhpp,done=True)
                     
