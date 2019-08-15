@@ -1186,7 +1186,7 @@ def vet_dashboard(request):
         'checkup_now':checkup_now,
         'checkup_upcoming':checkup_upcoming,
         'classify_count':classify_count,
-        'pending_schedule' : pending_schedule
+        'pending_schedule' : pending_schedule,
         'unfit_count':unfit_count,
     }
     return render (request, 'profiles/vet_dashboard.html', context)
