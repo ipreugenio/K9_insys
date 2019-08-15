@@ -10,7 +10,7 @@
                 <form action="{% url 'training:assign_k9_duty' k9.id %}" class="ui form" method="POST">
                 {% csrf_token %}
                 <div class="ui tiny info message">
-                    <header>Steps</header>
+                    <header>Priority</header>
                     <ol>
                         <li>Check For-Breeding Count and Number of K9s per Skill.</li>
                         <li>Check Sick Record of K9</li>
@@ -53,12 +53,8 @@
                             <input type="text" value="{{train.grade}}" readonly>
                         </div>
                     </div>
-                    <div class="three fields">
-                      <div class="field">
-                            <div class="ui large red label">
-                                <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
-                            </div>
-                      </div>
+                    <div class="two fields">
+
                       <div class="field">
                         <label for="">Dam (Female) {{k9.capability}} {{k9.breed}} Breeders</label>
                         <input type="text" value="{{female}}" readonly>
@@ -69,9 +65,7 @@
                         </div>
                     </div>
 
-                    <div class="three fields">
-                        <div class="field">
-                        </div>
+                    <div class="two fields">
                         <div class="field">
                             <label for="">Total {{k9.breed}} Breeders</label>
                         <input type="text" value="{{breeder_count_by_breed}}" readonly>
@@ -81,6 +75,11 @@
                             <input type="text" value="{{total_breeders}}" readonly>
                         </div>
                     </div>
+                    <div class="field">
+                            <div class="ui large red label">
+                                <a class="detail" href="#" id='btn2'>Sick Record: {{h_count}}</a>
+                            </div>
+                      </div>
 
                     <div id = 'sick' class="ui segment"> 
                         <table class="ui small two celled table">

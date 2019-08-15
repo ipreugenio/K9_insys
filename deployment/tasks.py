@@ -257,7 +257,7 @@ def check_initial_deployment_dates():
 
                     #TODO dito pa lang ibabawas yung items
 
-                elif pre_dep.status == "Pending" or pre_deps.count() < 2:
+                elif pre_dep.status == "Pending" or (pre_dep.status == "Pending" and pre_deps.count() <= 2):
                     pre_dep.status = "Cancelled"
                     pre_dep.save()
 

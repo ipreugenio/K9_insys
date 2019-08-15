@@ -1796,7 +1796,7 @@ def schedule_units(request):
                 messages.warning(request, 'Dates should have atleast 1 week allowance on Row ' + msg)
 
             idx = 0
-            for form in  formset:
+            for form in formset:
                 if form.is_valid and invalid == False:
                     # try:
                     deployment_date = form['deployment_date'].value()
@@ -1829,16 +1829,17 @@ def schedule_units(request):
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()
 
-                style = "ui green message"
-                messages.success(request, 'Units have been successfully scheduled for deployment!')
+
                     # except:
                     #     style = "ui red message"
                     #     messages.warning(request, 'Error!')
                     #     print(form.errors)
                 idx += 1
 
-                if invalid == False:
-                    return redirect('profiles:dashboard')
+            if invalid == False:
+                style = "ui green message"
+                messages.success(request, 'Units have been successfully scheduled for deployment!')
+                return redirect('profiles:dashboard')
 
     df_is_empty = False
     if location_dataframe.empty:

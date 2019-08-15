@@ -101,6 +101,6 @@ urlpatterns = [
     path('physical-exam-form/', views.physical_exam_form, name='physical_exam_form'),
     path('physical-exam-form/<int:id>', views.physical_exam_form, name='physical_exam_form'),
 
-    path('k9-mia-list', views.k9_mia_list, name ='k9_mia_list')
+    path('k9-mia-list', views.k9_mia_list, name ='k9_mia_list'),
     #path('/<int:id>/', views., name=''),
 ];

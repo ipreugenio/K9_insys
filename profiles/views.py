@@ -153,7 +153,7 @@ def dashboard(request):
         exclude_k9_list.append(item.k9.id)
 
     dept_count = K9.objects.filter(training_status='For-Deployment').exclude(pk__in = exclude_k9_list).exclude(handler=None).count() #initial deployment k9s
-    pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
+    pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() #TODO change algo
     ua_count = K9.objects.filter(training_status = "MIA").count()
 
     print("Dept Count")
@@ -1088,6 +1088,18 @@ def vet_dashboard(request):
 
     classify_count = K9.objects.filter(status='Material Dog').filter(training_status='Trained').count()
 
+    current_appointments = K9_Schedule.objects.filter(status="Checkup").exclude(date_start__lt=datetime.today().date())
+    k9s_exclude = []
+    for item in current_appointments:
+        k9s_exclude.append(item.k9)
+
+    cancelled_init_dep = K9_Pre_Deployment_Items.objects.filter(status="Cancelled")
+    for item in cancelled_init_dep:
+        k9s_exclude.append(item.k9)
+
+    pending_schedule = K9_Schedule.objects.filter(status="Initial Deployment").exclude(k9__in=k9s_exclude).exclude(
+        date_start__lt=datetime.today().date()).count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1110,6 +1122,7 @@ def vet_dashboard(request):
         'checkup_now':checkup_now,
         'checkup_upcoming':checkup_upcoming,
         'classify_count':classify_count,
+        'pending_schedule' : pending_schedule
     }
     return render (request, 'profiles/vet_dashboard.html', context)
 
@@ -1640,7 +1653,7 @@ def unconfirmed_pre_req(request):
 
     pre_dep = K9_Pre_Deployment_Items.objects.filter(status = None)
 
-    
+
 
     return None
 
