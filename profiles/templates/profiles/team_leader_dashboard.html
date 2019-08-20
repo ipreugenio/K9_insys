@@ -135,12 +135,26 @@
     <div class="six wide column" style="padding: 0%;padding-right: 1%;">
 
         <div class="ui basic segment" style="padding-left: 0%;">
-          
+                {%if ki %}
+                <div class="ui info message">
+                  <ul class="list">
+                    {%if ki.incident == 'Lost'%}
+                    <li>You have reported your K9 Lost.</li>
+                    {%elif ki.incident == 'Stolen'%}
+                    <li>You have reported your K9 Stolen.</li>
+                    {%elif ki.incident == 'Accident'%}
+                    <li>You have reported your K9 in an Accident.</li>
+                    <a href="#" class="ui tiny red button died_btn">Died</a>
+                    <a href="{% url 'unitmanagement:k9_accident' ki.id %}?accident=recovered" class="ui tiny blue button">Recovered</a>
+                    {%endif%}
+                  </ul>
+                </div>
+                {%endif%}
 
                 <div class="ui black floating message">
                     <p>Calendar</p>
                   </div>
-              
+
                   <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
                       <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
                       <div class="ui buttons">
@@ -148,17 +162,17 @@
                         <div class="or"></div>
                         <button class="ui button"  id = "next" >Next Year</button>
                       </div>
-  
+
                       <div id = "calendar" style="margin-top:0%;"></div>
                   </div>
 
                   {%if cb %}
                   {%if cb.status == 'Pending' %}
                   <div class="ui info message">
-                     
+
                       <div class="header">
                         <i></i>
-                          YOU HAVE BEEN CALLED BACK TO BASE! 
+                          YOU HAVE BEEN CALLED BACK TO BASE!
                           <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
                       </div>
                       <ul class="list">
@@ -174,31 +188,31 @@
                           <div class="header">
                               Admin is awaiting your arrival back to base.
                           </div>
-                        </div> 
+                        </div>
                     </div>
                     {% endif %}
                     {% endif %}
-                    
+
                   {% if k9 %}
                   <h4>Port</h4>
                   <p>{{ta.location}}</p>
-                 <strong>K9 : {{k9}}</strong> 
+                 <strong>K9 : {{k9}}</strong>
                   <table class="ui very basic four column table">
                   <thead>
-      
+
                   <tr>
                   <th>Status: {{k9.training_status}}</th>
                   <th>Type: {{k9.status}}</th>
                   <th>Capability: {{k9.capability}}</th>
                   </tr>
                   </thead>
-      
+
                   </table>
-      
+
                   {% if reveal_arrival == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
                   {% endif %}
-      
+
                   {% if reveal_arrival_dr == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
                   {% endif %}
@@ -370,6 +384,29 @@
 
     </div>
 </div>
+
+{% if ki %}
+<div class="ui modal" id= 'died_modal'>
+    <div class="header">{{k9}}</div>
+    <div class="content">
+      <form class = 'ui form' action="{% url 'unitmanagement:k9_accident' ki.id %}?accident=died" method="POST"> {% csrf_token %}
+        <div class="two fields">
+          <div class="field">
+            <label for="">Date Died</label>
+            <input type="date" name='date_died'>
+          </div>
+          <div class="field">
+              <label for="">Death Certificate</label>
+              <input type="file" name='death_cert'>
+            </div>
+        </div>
+        <center>
+          <button class="ui green button" type="submit">Submit</button>
+        </center>
+      </form>
+    </div>
+  </div>
+  {% endif %}
 <!--End Request Arrival Modal-->
 
   <div id = "id_event_load"></div>
@@ -413,6 +450,9 @@
     <script>
 $(document).ready(function() {
 
+  $( ".died_btn" ).click(function() {
+          $('#died_modal').modal('show');
+        });
  //Calendar
 
       $('#calendar').fullCalendar({
@@ -515,6 +555,7 @@ $(document).ready(function() {
 <script>
 
 $(document).ready(function() {
+
     var endpoint = '../../unitmanagement/team-leader/api'
     var defaultData = [];
     var labels = [];
@@ -667,7 +708,6 @@ $(document).ready(function() {
 
     }
 
-    
 });
       
 </script>

@@ -294,14 +294,16 @@ def team_leader_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
 
-
     k9 = None
     for_arrival = None
     check_arrival = None
     reveal_arrival = False
 
+    ki = None
     try:
         k9 = K9.objects.get(handler = user)
+        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(
+            status='Pending').latest('id')
     except:pass
 
     ta = None
@@ -369,7 +371,13 @@ def team_leader_dashboard(request):
             f.longtitude = lon
             f.latitude = lat
             f.sector_type = "Small Event"
-            f.save()
+
+            delta = f.start_date - datetime.today().date()
+
+            if delta.days >= 7:
+                f.save()
+            else:
+                messages.success(request, 'Request must be atleast 1 week from today!')
 
             # location =
             #
@@ -452,7 +460,9 @@ def team_leader_dashboard(request):
         'reveal_for_arrival_request' : reveal_for_arrival_request,
         'check_arrival_dr' : check_arrival_dr,
 
-        'upcoming_request' : dr
+        'upcoming_request' : dr,
+
+        'ki' : ki
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
@@ -614,8 +624,11 @@ def handler_dashboard(request):
     reveal_items = False
 
     k9 = None
+    ki = None
     try:
         k9 = K9.objects.get(handler=user)
+        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(
+            status='Pending').latest('id')
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     except: pass
@@ -803,7 +816,9 @@ def handler_dashboard(request):
         'k9_schedules' : k9_schedules,
         'current_port' : current_port,
         'current_request' : current_request,
-        'upcoming_deployment' : upcoming_deployment
+        'upcoming_deployment' : upcoming_deployment,
+
+        'ki' : ki
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 

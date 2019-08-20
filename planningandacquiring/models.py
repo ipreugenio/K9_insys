@@ -208,6 +208,7 @@ class K9(models.Model):
     weight = models.DecimalField('weight',max_digits=50, decimal_places=2,default=0)
     fit = models.BooleanField(default=True)
     date_created = models.DateField('date_created', default=now, blank=True, null=True)
+    death_cert = models.FileField(upload_to='k9_image', blank=True, null=True)
     #partnered = models.BooleanField(default=False)
 
     # def best_fertile_notification(self):

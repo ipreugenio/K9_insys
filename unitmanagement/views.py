@@ -1808,24 +1808,24 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list')
 
-def k9_accident(request, id):
-    accident = request.GET.get('accident')
-    data = K9_Incident.objects.get(id=id)
-    data.status = 'Done'
-    data.save()
-
-    k9 = K9.objects.get(id=data.k9.id)
-
-    if accident == 'recovered':
-        k9.status = 'Working Dog'
-        messages.success(request, 'K9 has recovered!')
-    else:
-        k9.status = 'Died'
-        k9.training_status = 'Died'
-        messages.success(request, 'K9 died..')
-
-    k9.save()
-    return redirect('unitmanagement:k9_incident_list')
+# def k9_accident(request, id):
+#     accident = request.GET.get('accident')
+#     data = K9_Incident.objects.get(id=id)
+#     data.status = 'Done'
+#     data.save()
+#
+#     k9 = K9.objects.get(id=data.k9.id)
+#
+#     if accident == 'recovered':
+#         k9.status = 'Working Dog'
+#         messages.success(request, 'K9 has recovered!')
+#     else:
+#         k9.status = 'Died'
+#         k9.training_status = 'Died'
+#         messages.success(request, 'K9 died..')
+#
+#     k9.save()
+#     return redirect('unitmanagement:k9_incident_list')
 
 def health_list_handler(request):
     user = user_session(request)
@@ -2240,54 +2240,54 @@ def transfer_request_form(request):
     }
     return render (request, 'unitmanagement/transfer_request_form.html', context)
 
-def replenishment_form(request):
-    user = user_session(request)
-    style = 'ui green message'
-    form = ReplenishmentForm(request.POST or None)
-
-    form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
-    formset = form2()
-    if request.method == 'POST':
-        if form.is_valid:
-            f1 = form.save()    
-            formset = form2(request.POST)
-
-            if formset.is_valid:
-                for forms in formset:
-                   #TODO SAVE FORMS
-                    if forms['item_type'].value() != '------------':
-                        uom = forms['uom'].value()
-                        quantity = forms['quantity'].value()
-
-                        if forms['item_type'].value() == 'Dog Food':
-                            item_id = forms['item'].value()
-                            item = Food.objects.get(id=item_id)
-                            Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
-                        elif forms['item_type'].value() == 'Medicine':
-                            item_id = forms['item'].value()
-                            item = Medicine_Inventory.objects.get(id=item_id)
-                            Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
-                        elif forms['item_type'].value() == 'Miscellaneous':
-                            item_id = forms['item'].value()
-                            item = Miscellaneous.objects.get(id=item_id)
-                            Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
-
-                return redirect('profiles:team_leader_dashboard')
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-
-    context = {
-        'title': "Item Replenishment Request Form",
-        'style': style,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-        'form':form,
-        'form2':formset,
-    }
-    return render (request, 'unitmanagement/replenishment_form.html', context)
+# def replenishment_form(request):
+#     user = user_session(request)
+#     style = 'ui green message'
+#     form = ReplenishmentForm(request.POST or None)
+#
+#     form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
+#     formset = form2()
+#     if request.method == 'POST':
+#         if form.is_valid:
+#             f1 = form.save()
+#             formset = form2(request.POST)
+#
+#             if formset.is_valid:
+#                 for forms in formset:
+#                    #TODO SAVE FORMS
+#                     if forms['item_type'].value() != '------------':
+#                         uom = forms['uom'].value()
+#                         quantity = forms['quantity'].value()
+#
+#                         if forms['item_type'].value() == 'Dog Food':
+#                             item_id = forms['item'].value()
+#                             item = Food.objects.get(id=item_id)
+#                             Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
+#                         elif forms['item_type'].value() == 'Medicine':
+#                             item_id = forms['item'].value()
+#                             item = Medicine_Inventory.objects.get(id=item_id)
+#                             Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
+#                         elif forms['item_type'].value() == 'Miscellaneous':
+#                             item_id = forms['item'].value()
+#                             item = Miscellaneous.objects.get(id=item_id)
+#                             Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
+#
+#                 return redirect('profiles:team_leader_dashboard')
+#     #NOTIF SHOW
+#     notif_data = notif(request)
+#     count = notif_data.filter(viewed=False).count()
+#     user = user_session(request)
+#
+#     context = {
+#         'title': "Item Replenishment Request Form",
+#         'style': style,
+#         'notif_data':notif_data,
+#         'count':count,
+#         'user':user,
+#         'form':form,
+#         'form2':formset,
+#     }
+#     return render (request, 'unitmanagement/replenishment_form.html', context)
 
 def replenishment_confirm(request):
     user = user_session(request)
@@ -2569,7 +2569,7 @@ def choose_handler_list(request, id):
             h.save()
 
             
-            Notification.objects.create(position='Handler', user=h, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
+            Notification.objects.create(position='Handler', user=h, notif_type='k9_given', message= str(k9) + ' has been assigned to you.')
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:classified_list')
@@ -3750,3 +3750,95 @@ def k9_mia_change(request,id):
     messages.success(request, 'You have updated K9 unit status.')    
     return redirect('unitmanagement:k9_mia_list')
 
+#unitmanagement views.py
+#CHANGE REPLENISHMENT FORM
+def replenishment_form(request):
+    user = user_session(request)
+    style = 'ui green message'
+    form = ReplenishmentForm(request.POST or None)
+    form.fields['handler'].queryset = User.objects.filter(id=user.id)
+    form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
+    formset = form2()
+    if request.method == 'POST':
+        if form.is_valid:
+            f1 = form.save()
+            formset = form2(request.POST)
+
+            if formset.is_valid:
+                for forms in formset:
+                   #TODO SAVE FORMS
+                    if forms['item_type'].value() != '------------':
+                        uom = forms['uom'].value()
+                        quantity = forms['quantity'].value()
+
+                        if forms['item_type'].value() == 'Dog Food':
+                            item_id = forms['item'].value()
+                            item = Food.objects.get(id=item_id)
+                            Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Medicine':
+                            item_id = forms['item'].value()
+                            item = Medicine_Inventory.objects.get(id=item_id)
+                            Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Miscellaneous':
+                            item_id = forms['item'].value()
+                            item = Miscellaneous.objects.get(id=item_id)
+                            Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
+
+                return redirect('profiles:team_leader_dashboard')
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context = {
+        'title': "Item Replenishment Request Form",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'form':form,
+        'form2':formset,
+    }
+    return render (request, 'unitmanagement/replenishment_form.html', context)
+
+
+def k9_accident(request, id=None):
+    accident = request.GET.get('accident')
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.save()
+
+    k9 = K9.objects.get(id=data.k9.id)
+
+    if accident == 'recovered':
+        k9.status = 'Working Dog'
+        messages.success(request, 'K9 has recovered!')
+        k9.save()
+    elif accident == 'Died':
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
+        messages.success(request, 'K9 died..')
+        k9.save()
+
+    if request.method == 'POST':
+        data2 = K9_Incident.objects.get(id=id)
+        data2.status = 'Done'
+        data2.save()
+
+        dc = request.POST['death_cert']
+        dd = request.POST['date_died']
+
+        k9 = K9.objects.get(id=data.k9.id)
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
+        k9.death_cert = dc
+        k9.death_date = dd
+
+        h = User.objects.get(id=k9.handler.id)
+        h.partnered = False
+        h.save()
+
+        k9.handler = None
+        k9.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
