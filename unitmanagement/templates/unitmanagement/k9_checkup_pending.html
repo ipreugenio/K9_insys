@@ -50,7 +50,7 @@
                 <td>{{item.k9|render_k9_checkbox:selected_list}}</td>
                 <td>{{item.k9}}</td>
                 <td>{{item.k9.handler}}</td>
-                <td>{{item.date_start}}</td>
+                <td>{{item.date_start | date:"Y-m-d"}}</td>
             </tr>
             {% endfor %}
 
@@ -98,7 +98,7 @@
 <script type="text/javascript">
 
 	 $('#tabledata').DataTable( {
-        "order": [[ 0, "desc" ]]
+        "order": [[ 3, "asc" ]]
         });
 
 		$('.menu .item').tab();

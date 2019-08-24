@@ -91,6 +91,8 @@ class PhysicalExamForm(forms.ModelForm):
         # a = K9.objects.filter(id=request.session['phex_k9_id'])
         # self.fields['dog'].initial = a
 
+
+
 class HealthForm(forms.ModelForm):
     CHOICE = (
         (True,'Yes'),

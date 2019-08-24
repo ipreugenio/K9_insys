@@ -371,7 +371,7 @@ def health_form(request):
     return render (request, 'unitmanagement/health_form.html', context)
 
 #TODO MAKE INITIAL VALUE OF DOG
-def physical_exam_form(request):
+def physical_exam_form(request, id=None):
     form = PhysicalExamForm(request.POST or None)
     user_serial = request.session['session_serial']
     user_s = Account.objects.get(serial_number=user_serial)
@@ -379,6 +379,12 @@ def physical_exam_form(request):
 
     if 'phex_k9_id' in request.session:
         form.initial['dog'] = K9.objects.get(id=request.session['phex_k9_id'])
+
+    if id:
+        k9 = K9.objects.get(id = id)
+        form.initial['dog'] = k9
+        form.fields['dog'].queryset =  K9.objects.filter(id=id)
+        # form.fields['dog'].widget.attrs['disabled'] = True
 
     style=""
     if request.method == 'POST':
@@ -1225,7 +1231,7 @@ def trained_list(request):
     ts =[]
     for d in data:
         a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
-        ts.append(a.date_end.date)
+        ts.append(a.date_end.date())
 
 
     #NOTIF SHOW
@@ -2064,7 +2070,7 @@ def choose_handler_list(request, id):
             h.save()
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
-            return redirect('unitmanagement:k9_unpartnered_list')
+            return redirect('unitmanagement:classified_list')
 
         else:
             style = "ui red message"
@@ -2817,18 +2823,41 @@ def k9_checkup_pending(request):
 
     removal.delete()
 
+    # TODO remove all checkups missed
+    #TODO remove checkups pag valid ba yung latest checkup
+    # TODO remove if missed na yung deployment date
 
     current_appointments = K9_Schedule.objects.filter(status = "Checkup")
 
-    k9s_scheduled = []
+    k9s_exclude = []
 
     for item in current_appointments:
-        k9s_scheduled.append(item.k9)
+            k9s_exclude.append(item.k9)
 
-    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_scheduled)
+
+    pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude)
     date_form = DateForm()
 
-    print(pending_schedule)
+    k9s_exclude2 = []
+    for item in pending_schedule:
+        delta = datetime.today().date() - item.date_start
+
+        print(item.k9)
+        print(str(datetime.today().date()) + " - " + str(item.date_start) + " = " + str(delta.days))
+
+        # phex = False
+        # try:
+        #     checkup = PhysicalExam.objects.filter(dog=item.k9).latest('id')
+        #     delta2 = datetime.today().date() - checkup.date
+        #     if checkup.cleared == True and delta2.days <= 90:  # also checks if last checkup is within 3 months
+        #         phex = True #Pag true, wag na isama sa checkup list kasi valid pa
+        # except:
+        #     pass
+
+        if delta.days > 0:  # Nalagapasan na checkup date
+            k9s_exclude2.append(item.k9)
+
+    pending_schedule = pending_schedule.exclude(k9__in = k9s_exclude2)
 
     context = {
         'k9_pending': pending_schedule,
@@ -2936,54 +2965,33 @@ def current_team(K9):
 
     return team_assignment
 
-# def transfer_request(request,location_id):
 
-#     #TODO check if date of transfer has conflict
-#     #TODO if unit is transferring,prompt commander/operations if he wants to replace units assigned to a request
+def k9_checkup_list_today(request):
 
-#     serial=request.session['session_serial']
-#     account=Account.objects.get(serial_number=serial)
-#     user_in_session=User.objects.get(id=account.UserID.id)
-#     personal_info=Personal_Info.objects.get(id=user_in_session.id)
+    #TODO Highlight rows if today
+    checkups = K9_Schedule.objects.filter(status = "Checkup")
 
-#     k9=K9.objects.get(handler=user_in_session)
+    k9_list = []
+    for sched in checkups:
+        k9_list.append(sched.k9)
 
-#     team=current_team(k9)
+    #TODO show k9 if there are no valid checkups
 
-#     location=Location.objects.get(id=location_id)
-#     team_to_transfer=Team_Assignment.objects.get(location=location)
+    k9_exclude_list = [] #Does not need to be checkuped
+    for k9 in k9_list:
+        try:
+            checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
+            delta = datetime.today().date() - checkup.date
+            if checkup.cleared == True and delta.days <= 90: #3 months
+                k9_exclude_list.append(k9)
+                print(checkup.cleared)
+                print(delta.days)
+        except: pass
 
-#     can_transfer=0
+    checkups = checkups.exclude(k9__in = k9_exclude_list)
 
-#     try:
-#         team_dog_deployed=Team_Dog_Deployed.objects.filter(k9=k9,status="Deployed").filter(team_assignment=team).latest('id')#checkcurrentteam_assignment
-#         if(team_dog_deployed.date_pulled is None):
-#             date_deployed=team_dog_deployed.date_added
-#             delta=date.today()-date_deployed
-#             duration=delta.days
+    context = {
+        'checkups' : checkups
+    }
 
-#             if k9.capability=="SAR":
-#                 if team_to_transfer.SAR_deployed<team_to_transfer.SAR_demand:
-#                     can_transfer=1
-#             elif K9.capability=="NDD":
-#                 if team_to_transfer.NDD_deployed<team_to_transfer.NDD_demand:
-#                     can_transfer=1
-#             else:
-#                 if team_to_transfer.EDD_deployed<team_to_transfer.EDD_demand:
-#                     can_transfer=1
-
-#             if duration>=730 and (team.total_dogs_deployed-1)>=2 and can_transfer==0 and team_to_transfer.location.city!=personal_info.city:
-#                 can_transfer=1
-
-#             if can_transfer==1:
-#                 team_dog_deployed.date_pulled=date.today()
-#                 team_dog_deployed.save()
-#                 deploy=Team_Dog_Deployed.objects.create(k9=k9,team_assignment=team_to_transfer)
-
-#     except:
-#             pass
-
-
-#     context={}
-
-#     return render(request,'unitmanagement/transfer_request.html',context)
+    return render(request, 'unitmanagement/k9_checkup_list_today.html', context)

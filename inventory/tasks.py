@@ -7,7 +7,12 @@ from celery.decorators import periodic_task
 from datetime import timedelta, date, datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-       
+
+from inventory.models import Medicine_Subtracted_Trail, Medicine_Received_Trail, Medicine_Inventory, Medicine, Food_Subtracted_Trail, Food, Miscellaneous, Miscellaneous_Subtracted_Trail, Safety_Stock
+from planningandacquiring.models import K9
+from unitmanagement.models import Notification
+from django.db.models import Sum
+
 # TODO TEST
 # All Dogs in PCGK9 base
 # exclude: dead, deployed, adopted
@@ -21,12 +26,12 @@ def auto_subtract():
     for vitamins in vitamins:
         if v > 0:
             if v > vitamins.quantity:
-                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
+                Medicine_Subtracted_Trail.objects.create(inventory=vitamins, quantity=vitamins.quantity)
                 v = v-vitamins.quantity
                 vitamins.quantity = 0 
                 vitamins.save()
             else: 
-                Medicine_Subtract_Trail.objects.create(inventory=vitamins, quantity=v)
+                Medicine_Subtracted_Trail.objects.create(inventory=vitamins, quantity=v)
                 vitamins.quantity = vitamins.quantity-v
                 v=0
                 vitamins.save()

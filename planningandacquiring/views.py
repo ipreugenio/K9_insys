@@ -476,7 +476,7 @@ def confirm_failed_pregnancy(request, id):
         data.status = 'Pregnant'
         mom.training_status = 'Breeding'
 
-        messages.success(request, 'You have confirmed that ' + str(data.mother) + 'is pregnent.')
+        messages.success(request, 'You have confirmed that ' + str(data.mother) + ' is pregnant.')
 
     elif decision == 'failed':
         data.status = 'Failed'
@@ -488,7 +488,7 @@ def confirm_failed_pregnancy(request, id):
     data.save()
     mom.save()
 
-    return redirect('planningandacquiring:breeding_list')
+    return redirect('profiles:vet_dashboard')
 
 def add_K9_parents(request):
     style = "ui teal message"

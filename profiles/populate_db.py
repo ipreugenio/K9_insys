@@ -7,7 +7,7 @@ from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, 
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule
 
-
+from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 def generate_city_ph():
 
@@ -533,6 +533,7 @@ def generate_training():
 
         k9.training_status = 'Trained'
         k9.training_level = "Finished Training"
+        k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
         k9.save()
 
         print(str(k9))
@@ -1039,5 +1040,42 @@ def fix_dog_duplicates():
                 k9.save()
                 print(str(k9.name))
                 ctr += 1
+
+    return None
+
+
+def create_predeployment_inventory():
+
+    randomizer = random.randint(30, 100)
+    collar = Miscellaneous.objects.create(miscellaneous = "Collar", misc_type = "Kennel Supply", uom = "pc", quantity = randomizer)
+    randomizer = random.randint(30, 100)
+    vest = Miscellaneous.objects.create(miscellaneous="Vest", misc_type="Kennel Supply", uom="pc",
+                                          quantity=randomizer)
+    randomizer = random.randint(30, 100)
+    leash = Miscellaneous.objects.create(miscellaneous="Leash", misc_type="Kennel Supply", uom="pc",
+                                        quantity=randomizer)
+    randomizer = random.randint(30, 100)
+    shipping_crate = Miscellaneous.objects.create(miscellaneous="Shipping Crate", misc_type="Kennel Supply", uom="pc",
+                                         quantity=randomizer)
+
+    randomizer = random.randint(100, 250)
+    food = Food.objects.create(food = "Pedigree", foodtype = "Adult Dog Food", unit = "kilograms", quantity=randomizer)
+
+    randomizer = random.randint(50, 150)
+    medicine = Medicine.objects.create(medicine = "Medicine Sample X", med_type = "Vitamins", uom = "mg")
+    med_inv = Medicine_Inventory.objects.create(medicine = medicine, quantity=randomizer)
+
+    randomizer = random.randint(30, 100)
+    grooming_kit = Miscellaneous.objects.create(miscellaneous="Grooming Kit", misc_type="Kennel Supply", uom="pc",
+                                          quantity=randomizer)
+    randomizer = random.randint(30, 100)
+    first_aid_kit = Miscellaneous.objects.create(miscellaneous="First Aid Kit", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer)
+    randomizer = random.randint(30, 100)
+    oral_dextrose = Miscellaneous.objects.create(miscellaneous="Oral Dextrose", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer)
+    randomizer = random.randint(30, 100)
+    ball = Miscellaneous.objects.create(miscellaneous="Ball", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer)
 
     return None

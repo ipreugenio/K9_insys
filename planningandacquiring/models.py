@@ -269,7 +269,7 @@ class K9(models.Model):
             bday = 0
         return bday
 
-    def calculate_months_before():
+    def calculate_months_before(birthday):
         today = d.today()
         birthdate = birthday
         bday = 13 - birthdate.month

@@ -35,7 +35,15 @@ def list_item(List, i):
 @register.filter
 def list_item_date(List, i):
 
-    return List[i]
+    date = List[i]
+
+    year = date.year
+    month = date.month
+    day = date. day
+
+    new_date = datetime(year=year, month=month, day=day)
+
+    return new_date.strftime("%Y-%m-%d")
 
 @register.filter
 def formset_item(formset, i):

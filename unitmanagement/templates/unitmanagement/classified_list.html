@@ -32,7 +32,7 @@
                 <td >{{data.breed}}</td>
                 <td>{{data.color}}</td>
                 <td >{{data.sex}}</td>
-                <td>{{data.age}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} mons</td>
                 <td style="text-align:center;" class="two wide">
                     <a href="{% url 'unitmanagement:choose_handler_list' data.id %}" class="ui tiny basic blue button">Select</a>
                 </td>
@@ -46,7 +46,9 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable();
+        $('#tabledata1').DataTable(
+             "order": [[ 4, "desc" ]]
+        );
         $('.menu .item').tab();
 
     });

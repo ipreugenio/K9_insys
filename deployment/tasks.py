@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from unitmanagement.models import Notification
 from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule, Team_Assignment, K9_Pre_Deployment_Items
+from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Food, Food_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
 from profiles.models import User
 
 from pandas import DataFrame as df
@@ -146,6 +147,64 @@ def update_port_info(team_list):
     return None
 
 
+def subtract_inventory(pre_dep, user):
+    #TODO dapat get
+    try:
+        collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").exclude(quantity = 0)
+        collar.quantity -= 1
+        collar.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory = collar, quantity = 1, user = user)
+
+        vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").exclude(quantity = 0)
+        vest.quantity -= 1
+        vest.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
+
+        leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").exclude(quantity = 0)
+        leash.quantity -= 1
+        leash.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
+
+        shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").exclude(quantity = 0)
+        shipping_crate.quantity -= 1
+        shipping_crate.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=shipping_crate, quantity=1, user=user)
+
+        food = Food.objects.filter(foodtype="Adult Dog Food").exclude(quantity = 0)
+        food.quantity -= 1
+        food.save()
+        Food_Subtracted_Trail.objects.create(inventory=food, quantity=1, user=user)
+
+        medicines = Medicine.objects.filter(med_type="Vitamins").exclude(quantity = 0)
+        medicine_inv = Medicine_Inventory.objects.filter(medicine__in=medicines)
+        medicine_inv.quantity -= 1
+        medicine_inv.save()
+        Medicine_Subtracted_Trail.objects.create(inventory=medicine_inv, quantity=1, user=user)
+
+        grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").exclude(quantity = 0)
+        grooming_kit.quantity -= 1
+        grooming_kit.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=grooming_kit, quantity=1, user=user)
+
+        first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").exclude(quantity = 0)
+        first_aid_kit.quantity -= 1
+        first_aid_kit.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=first_aid_kit, quantity=1, user=user)
+
+        oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").exclude(quantity = 0)
+        oral_dextrose.quantity -= 1
+        oral_dextrose.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=oral_dextrose, quantity=1, user=user)
+
+        ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").exclude(quantity = 0)
+        ball.quantity -= 1
+        ball.save()
+        Miscellaneous_Subtracted_Trail.objects.create(inventory=ball, quantity=1, user=user)
+    except:
+        pass
+
+    return None
+
 #Steps 1 and 2 is in Handler Dashboard (Confirmation of Pre Deploment Items)
 
 #Step 3
@@ -271,7 +330,7 @@ def update_request_info(dog_request):
 @periodic_task(run_every=timedelta(seconds=30))
 def deploy_dog_request():
     # When Schedule is today, change training status to deployed
-    scheds = K9_Schedule.objects.filter(date_start=date.today()).exclude(dog_request = None)
+    scheds = K9_Schedule.objects.filter(date_start=date.today()).filter(status = "Request").exclude(dog_request = None)
 
     for sched in scheds:
         # sched.k9.training_status = 'Deployed'
@@ -303,17 +362,19 @@ def pull_dog_request():
     requests = Dog_Request.objects.filter(end_date = date.today())
 
     for request in requests:
-        deployed = Team_Dog_Deployed.objects.filter(date_pulled = None).get(team_requested = request)
-        deployed.date_pulled = date.today()
-        deployed.save()
+        try:
+            deployed = Team_Dog_Deployed.objects.filter(date_pulled = None).get(team_requested = request)
+            deployed.date_pulled = date.today()
+            deployed.save()
 
-        handler = deployed.handler
-        handler.position = "Handler"
-        handler.save()
+            handler = deployed.handler
+            handler.position = "Handler"
+            handler.save()
 
-        #TODO Create Team_Dog_Deployed for last port assignment
-        recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).latest('date_pulled')
-        new_deploy = Team_Dog_Deployed.objects.create(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending")
+            #TODO Create Team_Dog_Deployed for last port assignment
+            recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).latest('date_pulled')
+            new_deploy = Team_Dog_Deployed.objects.create(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending")
+        except: pass
     return None
 
 #Every nth hour, check if arrival is confirmed by checking if Team_Dog_deployed status is still pending after start date
@@ -350,7 +411,7 @@ def check_arrival_to_ports_via_request(team_assignment):
 
 
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def check_arrivals():
 
     team_assignments = Team_Assignment.objects.all()

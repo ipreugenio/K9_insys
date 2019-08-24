@@ -1,0 +1,48 @@
+{% extends "profiles/sidebar_um.html" %}
+{% load static %}
+
+{% block content %}
+<div class="ui basic segment"  style="margin-bottom:0px;">
+    <h2 class="ui header">
+        K9 Checkup List
+        <div class="sub header">Select a K9 for Physical Examination</div>
+    </h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+
+<div class = "ui segment">
+
+    <table id="tabledata" class="ui celled table">
+        <thead>
+            <tr>
+                <th>K9</th>
+                <th>Handler</th>
+                <th>Checkup Date</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for data in checkups %}
+            <tr>
+                <td>{{data.k9}}</td>
+                <td >{{data.k9.handler}}</td>
+                <td>{{data.date_start}}</td>
+                <td style="text-align:center;" class="two wide">
+                    <a href="{% url 'unitmanagement:physical_exam_form' data.k9.id %}" class="ui tiny basic blue button">Select</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+
+{% endblock %}

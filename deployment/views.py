@@ -57,7 +57,8 @@ from deployment.templatetags import index as deployment_template_tags
 
 
 from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
-    generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed
+    generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
+    , create_predeployment_inventory
 
 import random
 
@@ -123,6 +124,7 @@ def mass_populate():
     generate_training() #Classify k9s
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
+    create_predeployment_inventory() #Inventory items for pre deployment
 
     return None
 
@@ -1672,7 +1674,9 @@ def schedule_units(request):
 
     if request.method == 'POST':
         invalid = False
-        if  formset.is_valid:
+        msg = ''
+        ctr = 0
+        if formset.is_valid:
             for form in formset:
                 if form.is_valid:
                     try:
@@ -1684,49 +1688,62 @@ def schedule_units(request):
                         delta = deployment_date - datetime.date.today()
                         print("Delta")
                         print(delta.days)
-                        if delta.days < 7:
-                            style = "ui red message"
-                            messages.warning(request, 'Dates should have atleast 1 week allowance')
-                            invalid = True
+
                     except:pass
+
+                if delta.days < 7:
+                    invalid = True
+                    ctr = ctr + 1
+                    msg = msg + str(ctr)+ ', '
+
+            if invalid == True:
+                style = "ui red message"
+                messages.warning(request, 'Dates should have atleast 1 week allowance on Row ' + msg)
 
             idx = 0
             for form in  formset:
                 if form.is_valid and invalid == False:
-                    try:
-                        deployment_date = form['deployment_date'].value()
-                        deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
-                        print("Deployment Date")
-                        print(deployment_date)
+                    # try:
+                    deployment_date = form['deployment_date'].value()
+                    deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
+                    print("Deployment Date")
+                    print(deployment_date)
 
-                        delta = deployment_date - datetime.date.today()
-                        print("Delta")
-                        print(delta.days)
-                        if delta.days < 7:
-                            style = "ui red message"
-                            messages.warning(request, 'Dates should have atleast 1 week allowance')
-                        else:
-                            team = team_list[idx]
-                            temp = temp_list[idx]
-
-                            print("Temp")
-                            print(temp)
-                            for item in temp:
-                                print("Item")
-                                print(item)
-                                #TODO error when saving for some reason
-                                #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
-                                deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
-                                print(deploy)
-                                deploy.save()
-                                pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
-                                pre_req_item.save()
-                            style = "ui green message"
-                            messages.success(request, 'Units have been successfully scheduled for deployment!')
-                    except:
+                    delta = deployment_date - datetime.date.today()
+                    print("Delta")
+                    print(delta.days)
+                    if delta.days < 7:
                         style = "ui red message"
-                        messages.warning(request, 'Error!')
-                        print(form.errors)
+                        messages.warning(request, 'Dates should have atleast 1 week allowance')
+                    else:
+                        team = team_list[idx]
+                        temp = temp_list[idx]
+
+                        print("Temp")
+                        print(temp)
+
+                        for item in temp:
+                            print("Item")
+                            print(item)
+
+                            #TODO Issue when saving team_assingment (everyone is scheduled under one team)
+                            #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
+                            deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
+                            print(deploy)
+                            deploy.save()
+                            pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
+                            pre_req_item.save()
+
+                style = "ui green message"
+                messages.success(request, 'Units have been successfully scheduled for deployment!')
+                    # except:
+                    #     style = "ui red message"
+                    #     messages.warning(request, 'Error!')
+                    #     print(form.errors)
+                idx += 1
+
+                if invalid == False:
+                    return redirect('profiles:dashboard')
 
     df_is_empty = False
     if location_dataframe.empty:

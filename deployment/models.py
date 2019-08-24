@@ -439,9 +439,9 @@ class Team_Dog_Deployed(models.Model):
     def save(self, *args, **kwargs):
         self.handler = self.k9.handler
         if self.status == 'Deployed':
-            k9 = K9.objects.get(id=self.k9.id)
-            k9.training_status = 'Deployed'
-            k9.save()
+            # k9 = K9.objects.get(id=self.k9.id)
+            self.k9.training_status = 'Deployed'
+            self.k9.save()
             try:
                 ta = Team_Assignment.objects.get(id=self.team_assignment)
                 if self.k9.capability == 'EDD':

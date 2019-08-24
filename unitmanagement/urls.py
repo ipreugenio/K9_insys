@@ -8,7 +8,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('index', views.index, name='index'),
     path('health-form', views.health_form, name='health_form'),
-    path('physical-exam-form', views.physical_exam_form, name='physical_exam_form'),
     path('health-record', views.health_record, name='health_record'),
     path('health-history/<int:id>', views.health_history, name='health_history'),
     path('health-history-handler', views.health_history_handler, name='health_history_handler'),
@@ -78,8 +77,10 @@ urlpatterns = [
 
     path('k9-checkup-pending', views.k9_checkup_pending, name='k9_checkup_pending'),
     path('ajax_load_appointments', views.load_appointments, name='ajax_load_appointments'),
-    path('ajax_load_checkups', views.load_checkups, name='ajax_load_checkups')
+    path('ajax_load_checkups', views.load_checkups, name='ajax_load_checkups'),
 
-
+    path('k9-checkup-list-today', views.k9_checkup_list_today, name = 'k9_checkup_list_today'),
+    path('physical-exam-form/', views.physical_exam_form, name='physical_exam_form'),
+    path('physical-exam-form/<int:id>', views.physical_exam_form, name='physical_exam_form'),
     #path('/<int:id>/', views., name=''),
 ];

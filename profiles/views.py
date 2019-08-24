@@ -38,6 +38,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from profiles.serializers import NotificationSerializer, UserSerializer
 from deployment.views import load_map, load_locations
+import re
 # Create your views here.
 
 def notif(request):
@@ -127,7 +128,18 @@ def dashboard(request):
     item_req_count = 3 #change this
     up_count = K9.objects.filter(status='Working Dog').filter(handler=None).count()
     tq_count = Request_Transfer.objects.filter(status='Pending').count()
-    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(handler=None).count()
+
+    pre_dep_items = K9_Pre_Deployment_Items.objects.exclude(status = "Cancelled")
+    k9s_scheduled = K9_Schedule.objects.filter(status="Initial Deployment")
+    k9s_scheduled_list = []
+    for item in k9s_scheduled:
+        k9s_scheduled_list.append(item.k9.id)
+
+    exclude_k9_list = []
+    for item in pre_dep_items:
+        exclude_k9_list.append(item.k9.id)
+
+    dept_count = K9.objects.filter(status='Working Dog').filter(training_status='For-Deployment').exclude(handler=None).exclude(pk__in = exclude_k9_list).exclude(pk__in = k9s_scheduled_list).count() #initial deployment k9s
     pq_count = K9_Pre_Deployment_Items.objects.filter(status='Pending').count() # change algo
     ua_count = 1 #change this
 
@@ -165,7 +177,7 @@ def dashboard(request):
     return render (request, 'profiles/dashboard.html', context)
 
 
-#TODO all Team dogs deployed under the team of TL with "Pending status)
+#TODO all Team dogs deployed under the team of TL with "Pending status" are to be confirmed for arrival
 def team_leader_dashboard(request):
     user = user_session(request)
     ta = None
@@ -198,6 +210,10 @@ def team_leader_dashboard(request):
     for_arrival = tdd.filter(status = "Pending")
 
     #TODO check arrival of units at request and from request to port
+    # try:
+    #     tr = Dog_Request.objects.filter().filter(team_leader=user)
+    # except: pass
+
     for_arrival_request = None
     for_arrival_r_to_p = None
 
@@ -309,8 +325,9 @@ def check_pre_deployment_items(user):
     items_list.append(all_clear)
 
     try:
-        checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
-        if checkup.cleared == True:
+        checkup = PhysicalExam.objects.filter(dog=k9).latest('id')
+        delta = datetime.today().date() - checkup.date
+        if checkup.cleared == True and delta.days <= 90: #also checks if last checkup is within 3 months
             phex = True
     except: phex = False
     items_list.append((phex, "Physical Exam"))
@@ -1175,13 +1192,15 @@ def update_event(request):
     print("END : " + str(python_date_end))
     print("ALLDAY : " + event_allDay)
 
-    event = Events.objects.get(id=event_id)
-    event.event_name = event_title
-    event.start_date = python_date_start
-    event.end_date = python_date_end
+    try:
+        event = Events.objects.get(id=event_id)
+        event.event_name = event_title
+        event.start_date = python_date_start
+        event.end_date = python_date_end
 
-    event.all_day = event_allDay
-    event.save()
+        event.all_day = event_allDay
+        event.save()
+    except: pass
 
 
     context = {"event": event}
