@@ -293,11 +293,13 @@ def team_leader_dashboard(request):
     for_arrival = None
     check_arrival = None
     reveal_arrival = False
-
+    ki = None
     try:
         k9 = K9.objects.get(handler = user)
+        ki = K9_Incident.objects.filter(Q(incident='Stolen')|Q(incident='Accident')|Q(incident='Lost')).filter(status='Pending').latest('id')
     except:pass
 
+    
     ta = None
     try:
         ta = Team_Assignment.objects.get(team_leader=user)
@@ -439,6 +441,7 @@ def team_leader_dashboard(request):
         'cb':cb,
         'dr':dr,
         'rro':rro,
+        'ki':ki,
 
         'for_arrival' : for_arrival,
         'check_arrival' : check_arrival,
@@ -608,8 +611,10 @@ def handler_dashboard(request):
     reveal_items = False
 
     k9 = None
+    ki = None
     try:
         k9 = K9.objects.get(handler=user)
+        ki = K9_Incident.objects.filter(Q(incident='Stolen')|Q(incident='Accident')|Q(incident='Lost')).filter(status='Pending').latest('id')
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     except: pass
@@ -788,6 +793,7 @@ def handler_dashboard(request):
         'show_start': show_start,
         'show_end': show_end,
         'training_sched' : training_sched,
+        'ki' : ki,
 
         'pre_deployment_item' : pre_deployment_items,
         'reveal_items' : reveal_items,

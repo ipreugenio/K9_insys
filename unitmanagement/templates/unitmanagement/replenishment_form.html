@@ -16,7 +16,7 @@
     </ul>
   </div>
 
-<form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm" data-teams-url="{% url 'unitmanagement:load_item' %}">
+<form action="" class="ui form" enctype="multipart/form-data" method="POST" id="myForm">
     {% csrf_token %}
     <div class="three fields">
             <div class="field">
@@ -46,6 +46,10 @@
                         <label>Quantity</label>
                         {{form.quantity}}
                     </div>
+                    <div class="field">
+                        <label>Inventory Quantity</label>
+                        {{form.on_hand}}
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -64,53 +68,63 @@
             prefix: '{{ formset.prefix }}'
         });
     })
+
     $(document).ready(function() {
-
-    // $(function() {
-    //     $('#myForm .formset_class').formset({
-    //         prefix: '{{ formset.prefix }}'
-    //     });
-    // })
         $(".type" ).bind('change', function() {
-        var url = $("#myForm").attr("data-teams-url");
-        var type = $(this).val();
-        var id_val = $(this).attr('id');
-        $.ajax({
-            url: url,
-            data: {
-            'type': type
-            },
-            success: function (data) {
+            var url = 'replenishment_form/ajax_load_item';
+            var type = $(this).val();
+            var id_val = $(this).attr('id');
+            $.ajax({
+                url: url,
+                data: {
+                'type': type
+                },
+                success: function (data) {
+                var res = id_val.split("-");
+                $('#id_form-'+res[1]+'-item').html(data);
+                }
+            });
+
+        });
+
+
+    $(".item" ).bind('change', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+
             var res = id_val.split("-");
-            $('#id_form-'+res[1]+'-item').html(data);
+            var type = $('#id_form-'+res[1]+'-item_type').val();
+
+            var url = 'replenishment_form/ajax_load_item_food';
+            $.ajax({
+                url: url,
+                type : 'GET',
+                dataType : 'json',
+                data: {
+                'id': id,
+                'type': type,
+                },
+                success: function (data) {
+                var res = id_val.split("-");
+                $('#id_form-'+res[1]+'-uom').val(data.uom);
+                $('#id_form-'+res[1]+'-on_hand').val(data.quantity);
+                }
+            });
+
+            });
+
+        $(".quantity" ).bind('keyup', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+
+            var res = id_val.split("-");
+            var on_hand =  $('#id_form-'+res[1]+'-on_hand').val()
+            console.log(on_hand, id)
+
+            if(id > on_hand){
+                alert('Inventory Item Insufficient.');
             }
         });
-
-        });
-
-        $(".item" ).bind('change', function() {
-        var id = $(this).val();
-        var id_val = $(this).attr('id');
-
-        var res = id_val.split("-");
-        var type = $('#id_form-'+res[1]+'-item_type').val();
-
-        var url = 'replenishment_form/ajax_load_item_food';
-        $.ajax({
-            url: url,
-            type : 'GET',
-            dataType : 'json',
-            data: {
-            'id': id,
-            'type': type,
-            },
-            success: function (data) {
-            var res = id_val.split("-");
-            $('#id_form-'+res[1]+'-uom').val(data.uom);
-            }
-        });
-
-        });
-
+    });
 </script>
  {% endblock %}

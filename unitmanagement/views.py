@@ -1804,7 +1804,7 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list')
 
-def k9_accident(request, id):
+def k9_accident(request, id=None):
     accident = request.GET.get('accident')
     data = K9_Incident.objects.get(id=id)
     data.status = 'Done'
@@ -1815,13 +1815,35 @@ def k9_accident(request, id):
     if accident == 'recovered':
         k9.status = 'Working Dog'
         messages.success(request, 'K9 has recovered!')
-    else:
-        k9.status = 'Died'
-        k9.training_status = 'Died'
+        k9.save()
+    elif accident == 'Died':
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
         messages.success(request, 'K9 died..')
+        k9.save()
 
-    k9.save()
-    return redirect('unitmanagement:k9_incident_list')
+    if request.method == 'POST':
+        data2 = K9_Incident.objects.get(id=id)
+        data2.status = 'Done'
+        data2.save()
+
+        dc=request.POST['death_cert']
+        dd=request.POST['date_died']
+
+        k9 = K9.objects.get(id=data.k9.id)
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
+        k9.death_cert = dc
+        k9.death_date = dd
+
+        h = User.objects.get(id=k9.handler.id)
+        h.partnered = False
+        h.save()
+
+        k9.handler= None
+        k9.save()
+       
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 def health_list_handler(request):
     user = user_session(request)
@@ -2240,7 +2262,7 @@ def replenishment_form(request):
     user = user_session(request)
     style = 'ui green message'
     form = ReplenishmentForm(request.POST or None)
-
+    form.fields['handler'].queryset = User.objects.filter(id=user.id)
     form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
     formset = form2()
     if request.method == 'POST':
@@ -3584,12 +3606,12 @@ def load_checkups(request):
 
 def load_item(request):
     item_type = request.GET.get('type')
-    
+    print(item_type)
     if item_type == 'Dog Food':
-        item = Food.objects.filter(foodtype='Adult Dog Food')
+        item = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='Sack - 20kg')
     elif item_type == 'Medicine':
         item = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
-    elif item_type == 'Medicine':
+    elif item_type == 'Miscellaneous':
         item = Miscellaneous.objects.exclude(misc_type='Vet Supply')
     else:
         item = None
@@ -3597,7 +3619,7 @@ def load_item(request):
 
 def load_item_food(request):
     uom = None
-
+    quantity= None
     try:
         id = request.GET.get('id')
         item_type = request.GET.get('type')
@@ -3605,19 +3627,24 @@ def load_item_food(request):
         if item_type == 'Dog Food':
             item = Food.objects.get(id=id)
             uom = item.unit
+            quantity = item.quantity
         elif item_type == 'Medicine':
             item = Medicine_Inventory.objects.get(id=id)
             uom = item.medicine.uom
+            quantity = item.quantity
         elif item_type == 'Medicine':
             item = Miscellaneous.objects.get(id=id)
             uom = item.uom
+            quantity = item.quantity
         else:
             uom = None
+            quantity= None
     except:
         pass
 
     data = {
         'uom':uom,
+        'quantity':quantity,
     }
     return JsonResponse(data)
 

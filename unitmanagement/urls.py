@@ -74,6 +74,7 @@ urlpatterns = [
     path('transfer-request-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
 
     path('replenishment_form', views.replenishment_form, name='replenishment_form'),
+    path('replenishment_form/ajax_load_item', views.load_item, name='load_item'),
     path('replenishment_form/ajax_load_item_food', views.load_item_food, name='load_item_food'),
     path('replenishment_form/ajax_load_item_med', views.load_item_med, name='load_item_med'),
     path('replenishment_form/ajax_load_item_misc', views.load_item_misc, name='load_item_misc'),
@@ -102,7 +103,10 @@ urlpatterns = [
     path('physical-exam-form/<int:id>', views.physical_exam_form, name='physical_exam_form'),
 
     path('k9-mia-list', views.k9_mia_list, name ='k9_mia_list'),
-    path('k9_mia_change/<int:id>', views.k9_mia_change, name ='k9_mia_change')
+    path('k9_mia_change/<int:id>', views.k9_mia_change, name ='k9_mia_change'),
+
+    path('k9_accident/<int:id>', views.k9_accident, name ='k9_accident'),
+    path('k9_accident', views.k9_accident, name ='k9_accident'),
 
     #path('/<int:id>/', views., name=''),
 ];

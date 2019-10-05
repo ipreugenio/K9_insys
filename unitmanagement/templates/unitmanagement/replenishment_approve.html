@@ -12,6 +12,13 @@
     {% endif %}
 </div>
 <div class="ui segment">
+        {% if rr.status == 'Confirmed'%}
+        <div class="ui info message">
+            <div class="header">
+                Awaiting confirmation that Items are received.
+            </div>  
+        </div>
+        {%endif%}
         <form action="" method="POST" class="ui form">
                 {% csrf_token %}
                 <div class="two fields">
@@ -93,9 +100,11 @@
                     </div>
             
                 </div>
+                {% if rr.status == 'Pending'%}
                 <center>
-                    <button class="ui green button" type='submit'>Approve</button>
+                    <button  type="submit" class="ui orange button">Send Items</button>
                 </center>
+                {% endif%}
             </form>            
 </div>
 

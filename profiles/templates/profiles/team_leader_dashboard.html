@@ -135,7 +135,21 @@
     <div class="six wide column" style="padding: 0%;padding-right: 1%;">
 
         <div class="ui basic segment" style="padding-left: 0%;">
-          
+                {%if ki %}
+                <div class="ui info message">
+                  <ul class="list">
+                    {%if ki.incident == 'Lost'%}
+                    <li>You have reported your K9 Lost.</li>
+                    {%elif ki.incident == 'Stolen'%}
+                    <li>You have reported your K9 Stolen.</li>
+                    {%elif ki.incident == 'Accident'%}
+                    <li>You have reported your K9 in an Accident.</li>
+                    <a href="#" class="ui tiny red button died_btn">Died</a>
+                    <a href="{% url 'unitmanagement:k9_accident' ki.id %}?accident=recovered" class="ui tiny blue button">Recovered</a>
+                    {%endif%}
+                  </ul>
+                </div>
+                {%endif%}
 
                 <div class="ui black floating message">
                     <p>Calendar</p>
@@ -370,6 +384,29 @@
 
     </div>
 </div>
+
+{% if ki %}
+<div class="ui modal" id= 'died_modal'>
+    <div class="header">{{k9}}</div>
+    <div class="content">
+      <form class = 'ui form' action="{% url 'unitmanagement:k9_accident' ki.id %}?accident=died" method="POST"> {% csrf_token %}
+        <div class="two fields">
+          <div class="field">
+            <label for="">Date Died</label>
+            <input type="date" name='date_died'>
+          </div>
+          <div class="field">
+              <label for="">Death Certificate</label>
+              <input type="file" name='death_cert'>
+            </div>
+        </div>
+        <center>
+          <button class="ui green button" type="submit">Submit</button>
+        </center>
+      </form>
+    </div>
+  </div>
+  {% endif %}
 <!--End Request Arrival Modal-->
 
   <div id = "id_event_load"></div>
@@ -413,6 +450,9 @@
     <script>
 $(document).ready(function() {
 
+  $( ".died_btn" ).click(function() {
+          $('#died_modal').modal('show');
+        });
  //Calendar
 
       $('#calendar').fullCalendar({
@@ -515,6 +555,7 @@ $(document).ready(function() {
 <script>
 
 $(document).ready(function() {
+
     var endpoint = '../../unitmanagement/team-leader/api'
     var defaultData = [];
     var labels = [];
