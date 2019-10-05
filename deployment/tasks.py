@@ -122,7 +122,13 @@ def assign_TL(team, handler_list_arg = None):
                                    ascending=[False], inplace=True) #TODO add another field for User model for "date of duty" then add another sorting process
 
     print(handler_rank_dataframe)
-    team_leader =  handler_rank_dataframe.iloc[0]['Handler']
+
+    try:
+        team_leader =  handler_rank_dataframe.iloc[0]['Handler']
+        team_leader.position = "Team Leader"
+        team_leader.save()
+    except:
+        team_leader = None
 
     if not handler_list_arg:
         team.team_leader = team_leader
@@ -133,9 +139,6 @@ def assign_TL(team, handler_list_arg = None):
             handler = item.handler
             handler.position = "Handler"
             handler.save()
-
-    team_leader.position = "Team Leader"
-    team_leader.save()
 
     if not handler_list_arg:
         return None
@@ -216,7 +219,7 @@ def subtract_inventory(user):
 #Step 3
 #Deploy Team (only the ones who have confirmed) once deployment date hits
 # @periodic_task(run_every=crontab(hour=6, minute=30))
-@periodic_task(run_every=timedelta(seconds=25))
+#@periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
     print('check_initial_deployment_dates code is running')
     schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
@@ -278,7 +281,7 @@ def check_initial_deployment_dates():
 # Step 6
 # Check if TL has confirmed arrival. If not, escalate to admin
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def check_initial_dep_arrival():
 
     deployed = Team_Dog_Deployed.objects.filter(date_pulled=None).filter(status = "Pending").exclude(team_assignment = None)

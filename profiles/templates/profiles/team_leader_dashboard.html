@@ -154,7 +154,7 @@
                 <div class="ui black floating message">
                     <p>Calendar</p>
                   </div>
-              
+
                   <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
                       <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
                       <div class="ui buttons">
@@ -162,17 +162,17 @@
                         <div class="or"></div>
                         <button class="ui button"  id = "next" >Next Year</button>
                       </div>
-  
+
                       <div id = "calendar" style="margin-top:0%;"></div>
                   </div>
 
                   {%if cb %}
                   {%if cb.status == 'Pending' %}
                   <div class="ui info message">
-                     
+
                       <div class="header">
                         <i></i>
-                          YOU HAVE BEEN CALLED BACK TO BASE! 
+                          YOU HAVE BEEN CALLED BACK TO BASE!
                           <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
                       </div>
                       <ul class="list">
@@ -188,31 +188,31 @@
                           <div class="header">
                               Admin is awaiting your arrival back to base.
                           </div>
-                        </div> 
+                        </div>
                     </div>
                     {% endif %}
                     {% endif %}
-                    
+
                   {% if k9 %}
                   <h4>Port</h4>
                   <p>{{ta.location}}</p>
-                 <strong>K9 : {{k9}}</strong> 
+                 <strong>K9 : {{k9}}</strong>
                   <table class="ui very basic four column table">
                   <thead>
-      
+
                   <tr>
                   <th>Status: {{k9.training_status}}</th>
                   <th>Type: {{k9.status}}</th>
                   <th>Capability: {{k9.capability}}</th>
                   </tr>
                   </thead>
-      
+
                   </table>
-      
+
                   {% if reveal_arrival == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
                   {% endif %}
-      
+
                   {% if reveal_arrival_dr == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
                   {% endif %}
@@ -708,7 +708,6 @@ $(document).ready(function() {
 
     }
 
-    
 });
       
 </script>

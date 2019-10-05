@@ -935,7 +935,7 @@ def add_K9_offspring(request, id):
                 k9_count = k9_count+1
 
             died =  request.POST.get('litter_died')
-            K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=k9_count, litter_died=died)
+            K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=int(k9_count), litter_died=int(died))
             
             #Mom
             mom = K9.objects.get(id=data.mother.id)
@@ -1893,8 +1893,8 @@ def handler_report(request):
     for h in handler_disinct:
         for key, value in h.items():
             print(value)
-            positive = handler.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
-            negative = handler.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
+            positive = handler_disinct.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
+            negative = handler_disinct.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
                 incident="MIA") | Q(incident="Died")).count()
             handler_name = handler.filter(handler=value).latest('date')
             arr = [handler_name.handler, positive, negative]

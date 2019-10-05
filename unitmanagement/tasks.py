@@ -237,7 +237,7 @@ def delete():
     notif_delete = Notification.objects.filter(datetime=date.today - timedelta(days=60))
     notif_delete.delete()
 
-@periodic_task(run_every=crontab(hour=6, minute=0))
+# @periodic_task(run_every=crontab(hour=6, minute=0))
 def tri_monthly_checkup():
 
     k9s = K9.objects.all()

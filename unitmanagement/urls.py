@@ -104,9 +104,9 @@ urlpatterns = [
 
     path('k9-mia-list', views.k9_mia_list, name ='k9_mia_list'),
     path('k9_mia_change/<int:id>', views.k9_mia_change, name ='k9_mia_change'),
-
+    # add in unitmanagement urls.py
+    path('replenishment_form/ajax_load_item', views.load_item, name='load_item'),
     path('k9_accident/<int:id>', views.k9_accident, name ='k9_accident'),
     path('k9_accident', views.k9_accident, name ='k9_accident'),
-
     #path('/<int:id>/', views., name=''),
 ];

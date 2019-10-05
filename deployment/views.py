@@ -288,7 +288,7 @@ def check_handlers_with_multiple_k9s():
 def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
-    mass_populate()
+    # mass_populate()
     # k9s = K9.objects.all()
     # for k9 in k9s:
     #     k9.save()
@@ -729,7 +729,7 @@ def request_dog_list(request):
     else:
         data = data.filter(sector_type="Big Event")
 
-    data1 = data.filter(status='Pending')
+    data1 = data.filter(status='Pending').exclude(start_date__lt = datetime.date.today())
     data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed'))
     data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
 
@@ -988,7 +988,7 @@ def request_dog_details(request, id):
         can_deploy_outside_AOR_dataframe.sort_values(by=["Distance", "Maritime", "Incident"],
                                          ascending=[True, True, True])
 
-        can_deploy_dataframe = pd.concat([can_deploy_dataframe, can_deploy_outside_AOR_dataframe])  #Puts within AOR on top first
+        can_deploy_dataframe = pd.concat([can_deploy_dataframe, can_deploy_outside_AOR_dataframe])#Puts within AOR on top first
         can_deploy_dataframe.reset_index(drop=True, inplace=True)
 
     if request.method == 'POST':
@@ -1128,6 +1128,7 @@ def view_schedule(request, id):
     }
 
     return render(request, 'deployment/k9_schedule.html', context)
+
 
 def deployment_area_details(request):
     user = user_session(request)

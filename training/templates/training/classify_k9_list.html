@@ -82,7 +82,7 @@
             {% for data_unclassified in data_unclassified %}
             <tr>
                 <td>{{data_unclassified.name}}</td>
-                <td>{{data_unclassified.age}} years and {{data_unclassified.month_remainder}} months</td>
+                <td>{{data_unclassified.age}}</td>
                 <td style="text-align:center;">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -121,7 +121,7 @@
             <td>{{data_ontraining}}</td>
             <td>{{data_ontraining.handler}}</td>
             <td >{{data_ontraining.breed}}</td>
-            <td>{{data_ontraining.age}} years and {{data_ontraining.month_remainder}} months</td>
+            <td>{{data_ontraining.age}}</td>
             <td>{{data_ontraining.capability}}</td>
             <td>{{data_ontraining.training_level}}</td>
             <td style="width:25%;" class="ui center aligned">
@@ -143,8 +143,8 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('#tabledata1').DataTable({ "order": []  });
-        $('#tabledata3').DataTable({ "order": []  });
+        $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
+        $('#tabledata3').DataTable({ "order": [[ 3, "desc" ]]  });
         $('.menu .item').tab();
 
     });

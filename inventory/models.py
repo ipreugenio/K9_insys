@@ -98,6 +98,8 @@ class Medicine_Subtracted_Trail(models.Model):
         return self.inventory.medicine.medicine_fullname + ' : ' +str(self.date_subtracted)
 
     def save(self, *args, **kwargs):
+        self.name = str(self.inventory)
+        self.price = self.inventory.medicine.price
         super(Medicine_Subtracted_Trail, self).save(*args, **kwargs)
 #Food
 class Food(models.Model):
