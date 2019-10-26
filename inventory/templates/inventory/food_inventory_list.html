@@ -10,13 +10,14 @@
     {% endif %}
 </div>
 
-<table id="tabledata" class="ui four column celled table responsive nowrap" style="width:100%">
+<table id="tabledata" class="ui five column celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
             <th>Food</th>
             <th>Type</th>
             <th>Quantity</th>
             <th>Unit</th>
+            <th>Price</th>
             <th></th>
         </tr>
     </thead>
@@ -31,6 +32,7 @@
                     <td>{{ data.foodtype }}</td>
                     <td>{{ data.quantity }}</td>
                     <td>{{ data.unit }}</td>
+                    <td>{{ data.price }}</td>
                     <td class="two wide center aligned">
                         <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                             <i class="teal list ol icon"></i>
@@ -48,6 +50,7 @@
                     <td>{{ data.foodtype }}</td>
                     <td>{{ data.quantity }}</td>
                     <td>{{ data.unit }}</td>
+                    <td>{{ data.price }}</td>
                     <td class="two wide center aligned">
                         <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                             <i class="teal list ol icon"></i>
@@ -68,6 +71,7 @@
                     <td>{{ data.foodtype }}</td>
                     <td>{{ data.quantity }}</td>
                     <td>{{ data.unit }}</td>
+                    <td>{{ data.price }}</td>
                     <td class="two wide center aligned">
                         <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                             <i class="teal list ol icon"></i>
@@ -85,6 +89,7 @@
                     <td>{{ data.foodtype }}</td>
                     <td>{{ data.quantity }}</td>
                     <td>{{ data.unit }}</td>
+                    <td>{{ data.price }}</td>
                     <td class="two wide center aligned">
                         <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                             <i class="teal list ol icon"></i>
@@ -105,6 +110,7 @@
                 <td>{{ data.foodtype }}</td>
                 <td>{{ data.quantity }}</td>
                 <td>{{ data.unit }}</td>
+                <td>{{ data.price }}</td>
                 <td class="two wide center aligned">
                     <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
@@ -122,6 +128,7 @@
                 <td>{{ data.foodtype }}</td>
                 <td>{{ data.quantity }}</td>
                 <td>{{ data.unit }}</td>
+                <td>{{ data.price }}</td>
                 <td class="two wide center aligned">
                     <a href="{% url 'inventory:food_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>

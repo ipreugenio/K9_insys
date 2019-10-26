@@ -10,12 +10,13 @@
     {% endif %}
 </div>
 
-<table id="tabledata" class="ui four column celled table responsive nowrap" style="width:100%">
+<table id="tabledata" class="ui five column celled table responsive nowrap" style="width:100%">
     <thead>
         <tr>
             <th>Miscellaneous</th>
             <th>Type</th>
             <th>Quantity</th>
+            <th>Price</th>
             <th></th>
         </tr>
     </thead>
@@ -27,6 +28,7 @@
                 </td>
                 <td>{{ data.misc_type }}</td>
                 <td>{{ data.quantity }}</td>
+                <td>{{data.price}}</td>   
                 <td class="two wide center aligned">
                     <a href="{% url 'inventory:miscellaneous_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal list ol icon"></i>
@@ -37,7 +39,7 @@
                     <a href="{% url 'inventory:miscellaneous_subtract_form' data.id %}" style="margin-right:10px;">
                         <i class="teal truck icon"></i>
                     </a>
-                </td>       
+                </td>    
             </tr>
             {% endfor %}
         </tbody>

@@ -16,6 +16,7 @@
             <th>Medicine</th>
             <th>Dose/Uom</th>
             <th>Quantity</th>
+            <th>Price</th>
             <th></th>
         </tr>
     </thead>
@@ -27,6 +28,7 @@
                 </td>
                 <td>{{ data.medicine.dosage }}</td>
                 <td>{{ data.quantity }}</td>
+                <td>{{ data.medicine.price }}</td>
                 <td class="two wide center aligned">
                     <a href="{% url 'inventory:medicine_count_form' data.id %}" style="margin-right:10px;">
                         <i class="teal boxes icon"></i>
