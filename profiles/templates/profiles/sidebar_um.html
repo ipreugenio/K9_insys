@@ -23,15 +23,24 @@
                             <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">
                                 <i class="retweet icon"></i>Reallocate Assets
                             </a>
-                            <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">
-                                <i class="clipboard list icon"></i>On-Leave Request list
-                            </a>
+                            <!--<a href="{% url 'unitmanagement:on_leave_list'%}" class="item">-->
+                                <!--<i class="clipboard list icon"></i>On-Leave Request list-->
+                            <!--</a>-->
                             <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
                                 <i class="clipboard list icon"></i>K9 Incident List
                             </a>
                             <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
                                 <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
                             </a>
+                            <a href="{% url 'unitmanagement:due_retired_list'%}" class="item">
+                                    <i class="clipboard list icon"></i>Due for
+                                    Retirement List
+                                </a>
+                            <a href="{% url 'unitmanagement:k9_mia_list'%}" class="item">
+                                    <i class="clipboard list icon"></i>Unconfirmed Arrivals
+                                </a>
+
+
                             {% elif request.session.session_user_position == "Veterinarian" %}
                             <!-- <a href="{% url 'profiles:add_User_form'%}" class="item">
                                 <i class="user plus icon"></i>Add User Form
@@ -70,6 +79,9 @@
                              <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
                                 <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
                             </a>
+                            <a href="{% url 'unitmanagement:k9_checkup_list_today'%}" class="item">
+                                <i class="clipboard list icon"></i>K9s for Checkup
+                            </a>
 
 
                             {% elif request.session.session_user_position == "Handler" %}
@@ -93,12 +105,12 @@
                                 <i class="clipboard list icon"></i>Health Concern List
                             </a>
                             {% endif %}
-                            <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
-                                <i class="question icon"></i>On-Leave Request
-                            </a>
+                            <!--<a href="{% url 'unitmanagement:on_leave_request'%}" class="item">-->
+                                <!--<i class="question icon"></i>On-Leave Request-->
+                            <!--</a>-->
 
                             {% elif request.session.session_user_position == "Team Leader" %}
-                            <a href="{% url 'unitmanagement:request_form'%}" class="item">
+                            <a href="{% url 'unitmanagement:replenishment_form'%}" class="item">
                                 <i class="exclamation icon"></i>Replenish Assets
                             </a>
                             <a href="{% url 'unitmanagement:handler_incident_form'%}" class="item">

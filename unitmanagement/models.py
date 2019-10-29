@@ -2,9 +2,9 @@ from django.db import models
 
 from profiles.models import User
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
+from deployment.models import Incidents, Team_Assignment, Team_Dog_Deployed
 from training.models import Training, Training_Schedule
 from profiles.models import User, Account
-from deployment.models import K9_Schedule, Incidents, Location
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime, date, timedelta
@@ -14,9 +14,11 @@ from planningandacquiring.models import K9
 from django.contrib.auth.models import User as AuthUser
 
 # Create your models here.
+
+
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
-    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)    
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     date = models.DateField('date', auto_now_add=True)
 
     def __str__(self):
@@ -28,6 +30,7 @@ class K9_Incident(models.Model):
         ('Lost', 'Lost'),
         ('Accident', 'Accident'),
         ('Sick', 'Sick'),
+        ('Missing', 'Missing')
     )
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
@@ -65,11 +68,11 @@ class Health(models.Model):
 
     def expire(self):
         expired = self.date_done + timedelta(days=7)
-        e = expired - date.today() 
+        e = expired - date.today()
         return e.days
 
     def expire_date(self):
-        expired = self.date_done + timedelta(days=7) 
+        expired = self.date_done + timedelta(days=7)
         return expired
 
     def save(self, *args, **kwargs):
@@ -107,7 +110,7 @@ class Transaction_Health(models.Model):
     incident = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='initial')
     follow_up = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True, related_name='follow_up')
     status = models.CharField('status', max_length=200, default="Pending")
-    
+
 class PhysicalExam(models.Model):
     EXAMSTATUS = (
         ('Normal', 'Normal'),
@@ -165,16 +168,21 @@ class PhysicalExam(models.Model):
         return str(self.date) + ': ' + str(self.dog.name)
 
 class VaccinceRecord(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Done', 'Done'),
+    )
+
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     deworming_1 = models.BooleanField(default=False)     #2weeks
     deworming_2 = models.BooleanField(default=False)     #4weeks
     deworming_3 = models.BooleanField(default=False)     #6weeks
     deworming_4 = models.BooleanField(default=False)     #9weeks
-   
+
     dhppil_cv_1 = models.BooleanField(default=False)     #6weeks *
     dhppil_cv_2 = models.BooleanField(default=False)     #9weeks *
     dhppil_cv_3 = models.BooleanField(default=False)     #12weeks *
-    
+
     heartworm_1 = models.BooleanField(default=False)     #6weeks
     heartworm_2 = models.BooleanField(default=False)     #10weeks
     heartworm_3 = models.BooleanField(default=False)     #14weeks
@@ -183,7 +191,7 @@ class VaccinceRecord(models.Model):
     heartworm_6 = models.BooleanField(default=False)     #26weeks
     heartworm_7 = models.BooleanField(default=False)     #30weeks
     heartworm_8 = models.BooleanField(default=False)     #34weeks
-   
+
     anti_rabies = models.BooleanField(default=False)     #12weeks *
 
     bordetella_1 = models.BooleanField(default=False)    #8weeks *
@@ -199,13 +207,18 @@ class VaccinceRecord(models.Model):
     tick_flea_5 = models.BooleanField(default=False)     #24weeks
     tick_flea_6 = models.BooleanField(default=False)     #28weeks
     tick_flea_7 = models.BooleanField(default=False)     #32weeks
-
+    status = models.CharField('status', choices=STATUS, max_length=200, default='Pending')
     def __str__(self):
         return str(self.k9)
 
     def save(self, *args, **kwargs):
-        if self.dhppil4_2 == True:
+        if self.dhppil4_2 == True and self.bordetella_2 == True and self.dhppil_cv_3 == True and self.anti_rabies == True:
             self.k9.training_status = 'Unclassified'
+            self.k9.save()
+
+        if self.deworming_1 == True and self.deworming_2 == True and self.deworming_3 == True and self.deworming_4 == True and self.dhppil_cv_1 == True and self.dhppil_cv_2 == True and self.dhppil_cv_3 == True and self.heartworm_1 == True and self.heartworm_2 == True and self.heartworm_3 == True and self.heartworm_4 == True and self.heartworm_5 == True and self.heartworm_6 == True and self.heartworm_7 == True and self.heartworm_8 == True and self.anti_rabies == True and self.bordetella_1 == True and self.bordetella_2 == True and self.dhppil4_1 == True and self.dhppil4_2 == True and self.tick_flea_1 == True and self.tick_flea_2 == True and self.tick_flea_3 == True and self.tick_flea_4 == True and self.tick_flea_5 == True and self.tick_flea_6 == True and self.tick_flea_7 == True:
+            self.status = 'Done'
+        
         super(VaccinceRecord, self).save(*args, **kwargs)
 
 
@@ -221,35 +234,42 @@ class VaccineUsed(models.Model):
     image = models.FileField(upload_to='health_image', blank=True, null=True)
     done = models.BooleanField(default=False)
     date = models.DateField('date', auto_now_add=True)
-    
+
     def __str__(self):
         return str(self.k9) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
 
+class Replenishment_Request(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Received', 'Received'),
+    )
 
-#TODO
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='tl_request')
+    status = models.CharField('status', max_length=200, default="Pending", choices=STATUS)
+    approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='admin_give')
+    date_approved = models.DateField('date_approved', null=True, blank=True)
+    date_received = models.DateField('date_received', null=True, blank=True)
+    date_requested = models.DateField('date_requested', auto_now_add=True)
 # Request Equipment Connect to K9_Pre_Deployment Equipments
-class Equipment_Request(models.Model):
-    equipment = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
+class Miscellaneous_Request(models.Model):
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True,related_name='misc_replenishment')
+    miscellaneous = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Medicine_Request(models.Model):
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True, related_name='med_replenishment')
+    medicine = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
 
 class Food_Request(models.Model):
+    request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True,related_name='food_replenishment')
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.IntegerField('quantity', null=True, blank=True)
-    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
-    status = models.CharField('status', max_length=200, default="Pending")
-
-
+    unit = models.CharField('unit', max_length=200, null=True, blank=True)
+    
 class Handler_On_Leave(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='handler_leave')
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
@@ -295,13 +315,29 @@ class Handler_Incident(models.Model):
             self.k9.handler = None
         super(Handler_Incident, self).save(*args, **kwargs)
 
+class Request_Transfer(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Denied', 'Denied'),
+        ('Done', 'Done'),
+    )
 
-# class Request_Transfer(models.Model):
-#     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     date_created =  models.DateField('date_created', auto_now_add=True)
-#     date_of_transfer = models.DateField('date_created', null=True, blank=True)
-#     location_from = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_from')
-#     location_to = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='location_to')
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date_created =  models.DateField('date_created', auto_now_add=True)
+    date_of_transfer = models.DateField('date_created', null=True, blank=True)
+    location_from = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_from', null=True, blank=True)
+    location_to = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_to', null=True, blank=True)
+    status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
+    remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
+
+class Call_Back_K9(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+    )
+    date_created =  models.DateField('date_created', auto_now_add=True)
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
 
 class Notification(models.Model):
     POSITION = (
@@ -318,7 +354,7 @@ class Notification(models.Model):
         ('heat_cycle', 'heat_cycle'),
         ('location_incident', 'location_incident'),
         ('equipment_request', 'equipment_request'), #VERIFY
-        ('k9_died', 'k9_died'), 
+        ('k9_died', 'k9_died'),
         ('k9_sick', 'k9_sick'),
         ('k9_stolen', 'k9_stolen'),
         ('k9_accident', 'k9_accident'),
@@ -327,6 +363,12 @@ class Notification(models.Model):
         ('retired_k9', 'retired_k9'),
         ('medicine_done', 'medicine_done'),
         ('medicine_given', 'medicine_given'),
+        ('call_back', 'call_back'),
+        ('pregnancy', 'pregnancy'),
+        ('breeding', 'breeding'),
+        ('initial_deployment', 'initial_deployment'),
+        ('checkup', 'checkup'),
+        ('k9_given', 'k9_given'),
     )
 
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
@@ -351,10 +393,19 @@ def create_medicine_inventory(sender, instance, **kwargs):
         Medicine_Inventory.objects.create(medicine=instance, quantity=0)
 
 # K9 Training
+# @receiver(post_save, sender=K9)
+# def create_training_record(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Training.objects.create(k9=instance, training=instance.capability)
+#         Training_Schedule.objects.create(k9 = instance)
+
 @receiver(post_save, sender=K9)
 def create_training_record(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Training.objects.create(k9=instance, training=instance.capability)
+        Training.objects.create(k9=instance, training='EDD', stage = "Stage 0")
+        Training.objects.create(k9=instance, training='NDD', stage = "Stage 0")
+        Training.objects.create(k9=instance, training='SAR', stage = "Stage 0")
+
         Training_Schedule.objects.create(k9 = instance)
 
 #create vaccine record, and vaccine used
@@ -402,14 +453,14 @@ def create_k9_vaccines(sender, instance, **kwargs):
 
 #######################################################################################################################
 
-#TODO EDIT 
+#TODO EDIT
 @receiver(post_save, sender=PhysicalExam)
 def phex_next_date(sender, instance, **kwargs):
     if kwargs.get('created', False):
         instance.date_next_exam = instance.date + relativedelta(year=+1)
         instance.save()
 
-#TODO EDIT    
+#TODO EDIT
 # HANDLER INCIDENT repored
 @receiver(post_save, sender=Handler_Incident)
 def create_handler_incident_notif(sender, instance, **kwargs):
@@ -426,7 +477,7 @@ def create_handler_incident_notif(sender, instance, **kwargs):
                             other_id = instance.id,
                             notif_type = 'handler_on_leave',
                             message= 'On-Leave Request! ' + str(instance.handler))
-#TODO HEALTH TEST                            
+#TODO HEALTH TEST
 @receiver(post_save, sender=Health)
 def create_handler_health_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -436,7 +487,7 @@ def create_handler_health_notif(sender, instance, **kwargs):
                             notif_type = 'medicine_given',
                             message= 'Health Concern has been reviewed. See Details.')
 
-#TODO K9 INCIDENT Add died and accident 
+#TODO K9 INCIDENT Add died and accident
 @receiver(post_save, sender=K9_Incident)
 def create_k9_incident_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
@@ -446,28 +497,53 @@ def create_k9_incident_notif(sender, instance, **kwargs):
                             other_id = instance.id,
                             notif_type = 'k9_sick',
                             message= str(instance.k9.name) + ' has a health concern! ')
-        elif instance.incident == 'Lost': 
+        elif instance.incident == 'Lost':
             Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
                             other_id = instance.id,
                             notif_type = 'k9_lost',
                             message= str(instance.k9.name) + ' is reported Lost! ')
-        elif instance.incident == 'Stolen': 
+        elif instance.incident == 'Stolen':
             Notification.objects.create(k9 = instance.k9,
                             position = 'Administrator',
                             other_id = instance.id,
                             notif_type = 'k9_stolen',
                             message= str(instance.k9.name) + ' is reported Stolen! ')
 
+# #TODO EQUIPMENT Verify
+# @receiver(post_save, sender=Equipment_Request)
+# def create_damaged_equipment_notif(sender, instance, **kwargs):
+#     if kwargs.get('created', False):
+#         Notification.objects.create(user = instance.handler,
+#                             position = 'Administrator',
+#                             other_id=instance.id,
+#                             notif_type = 'equipment_request',
+#                             message='Equipment Concern!')
+
 #TODO EQUIPMENT Verify
-@receiver(post_save, sender=Equipment_Request)
-def create_damaged_equipment_notif(sender, instance, **kwargs):
+@receiver(post_save, sender=Call_Back_K9)
+def back_to_base(sender, instance, **kwargs):
     if kwargs.get('created', False):
-        Notification.objects.create(user = instance.handler,
-                            position = 'Administrator',
-                            other_id=instance.id,
-                            notif_type = 'equipment_request',
-                            message='Equipment Concern!')
+        td = Team_Dog_Deployed.objects.filter(k9=instance.k9).filter(date_pulled=None)[0]
+        ta = Team_Assignment.objects.filter(id=td.team_assignment.id)[0]
+        Notification.objects.create(user =  ta.team_leader,
+                                position = 'Handler',
+                                other_id=instance.k9.id,
+                                notif_type = 'back_to_base',
+                                message= str(instance.k9.handler) + ' and '+str(instance.k9)+ ' has been called back to base.')
+
+@receiver(post_save, sender=AuthUser)
+def account_create(sender, instance, **kwargs):
+    if kwargs.get('created', False):
+        try:
+            UserID = User.objects.last()
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+        except:
+            UserID = User.objects.create(position='Administrator',rank='PO1',firstname=instance.username, lastname='Superuser', middlename='Su',birthdate=date.today())
+            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
+            instance.first_name = instance.username
+            instance.last_name = 'Superuser'
+            instance.save()
 
 #LOCATION INCIDENT reported
 @receiver(post_save, sender=Incidents)
@@ -486,7 +562,7 @@ def location_incident(sender, instance, **kwargs):
                                 position = 'Administrator',
                                 other_id=instance.id,
                                 notif_type = 'location_incident',
-                                message= str(instance.user) + ' has reported an incident at ' + 
+                                message= str(instance.user) + ' has reported an incident at ' +
                                 str(instance.location) + '.')
         else:
             Notification.objects.create(user = instance.user,
@@ -495,19 +571,3 @@ def location_incident(sender, instance, **kwargs):
                                 notif_type = 'location_incident',
                                 message= str(instance.user) + c + str(instance.type) +
                                 ' incident at ' + str(instance.location) + '.')
-
-@receiver(post_save, sender=AuthUser)
-def account_create(sender, instance, **kwargs):
-    if kwargs.get('created', False):
-        try:
-            UserID = User.objects.last()
-            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
-        except:
-            UserID = User.objects.create(position='Administrator',rank='PO1',firstname=instance.username, lastname='Superuser', middlename='Su',birthdate=date.today())
-            Account.objects.create(UserID = UserID,serial_number=instance.username, email_address=instance.email, password=instance.password)
-            instance.first_name = instance.username
-            instance.last_name = 'Superuser'
-            instance.save()
-        
-
-

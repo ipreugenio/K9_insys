@@ -26,9 +26,9 @@
             <tr>
                 
                 <td>{{data.name}}</td>
+                <td>{{data.serial_number}}</td>
                 <td>{{data.breed}}</td>
                 <td>{{data.age}}</td>
-                <td>{{data.sex}}</td>
                 <td>{{data.capability}}</td>
                 <td class="ui center aligned">
                     <a class = 'ui blue tiny basic button' href="{% url 'unitmanagement:reassign_assets' data.id %}">Select</a>

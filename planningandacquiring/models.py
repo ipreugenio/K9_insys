@@ -6,7 +6,8 @@ from datetime import date as d
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory
-
+from deployment.models import Team_Assignment, Team_Dog_Deployed
+import calendar
 #from unitmanagement.models import Notification
 
 
@@ -195,17 +196,19 @@ class K9(models.Model):
     in_heat_months = models.IntegerField('in_heat_months', default = 6)
     last_proestrus_date = models.DateField(blank=True, null=True)
     next_proestrus_date = models.DateField(blank=True, null=True)
-    estrus_date = models.DateField(blank=True, null=True)
+    last_estrus_date = models.DateField(blank=True, null=True)
+    next_estrus_date = models.DateField(blank=True, null=True)
     metestrus_date = models.DateField(blank=True, null=True)
     anestrus_date = models.DateField(blank=True, null=True)
     supplier =  models.ForeignKey(K9_Supplier, on_delete=models.CASCADE, blank=True, null=True) #if procured
     litter_no = models.IntegerField('litter_no', default = 0)
     last_date_mated = models.DateField(blank=True, null=True)
     trained = models.CharField('trained', choices=TRAINED, max_length=100, blank=True, null=True)
-    height = models.DecimalField('height',max_digits=50, decimal_places=2,blank=True, null=True)
-    weight = models.DecimalField('weight',max_digits=50, decimal_places=2,blank=True, null=True)
+    height = models.DecimalField('height',max_digits=50, decimal_places=2,default=0)
+    weight = models.DecimalField('weight',max_digits=50, decimal_places=2,default=0)
     fit = models.BooleanField(default=True)
     date_created = models.DateField('date_created', default=now, blank=True, null=True)
+    death_cert = models.FileField(upload_to='k9_image', blank=True, null=True)
     #partnered = models.BooleanField(default=False)
 
     # def best_fertile_notification(self):
@@ -274,6 +277,13 @@ class K9(models.Model):
         bday = 13 - birthdate.month
         return bday
 
+    def month_remainder(self):
+        if d.today().month >= self.birth_date.month:
+            month_remainder = d.today().month - self.birth_date.month
+        else:
+            month_remainder = 12 - self.birth_date.month + d.today().month
+        return month_remainder
+
     def save(self, *args, **kwargs):
         #litter
         if self.sex == 'Female':
@@ -291,41 +301,55 @@ class K9(models.Model):
                 self.litter_no = 0
 
         
+        try:
+            td = Team_Dog_Deployed.objects.filter(k9__id=self.id).filter(date_pulled=None)[0]
+            loc = Team_Assignment.objects.get(id=td.id)
+            self.assignment = str(loc)
+        except:
+            self.assignment = None
+
+        if self.handler != None:
+            self.handler.partnered = True
+            self.handler.save()
+
         days = d.today() - self.birth_date
         self.year_retired = self.birth_date + relativedelta(years=+10)
-        self.age_month = self.age_days / 30
         self.age_days = days.days
         self.age = self.calculate_age()
         self.training_id = self.id
-
+              
         #last_proestrus_date in heat
         #estrus_date start of session,10,12,14
         if self.sex == 'Female':
             if self.last_proestrus_date == None:
-                self.last_proestrus_date = self.birth_date + relativedelta(months=+self.in_heat_months)
+                self.last_proestrus_date = d.today() + relativedelta(months=+self.in_heat_months)
             
-            self.estrus_date = self.last_proestrus_date + relativedelta(days=10)
-            self.metestrus_date = self.estrus_date + relativedelta(month=2)
+            self.last_estrus_date = self.last_proestrus_date + relativedelta(days=9)
+            self.metestrus_date = self.last_estrus_date + relativedelta(month=2)
             self.anestrus_date = self.metestrus_date + relativedelta(months=4)
             self.next_proestrus_date = self.last_proestrus_date + relativedelta(months=+self.in_heat_months)
+            self.next_estrus_date = self.next_proestrus_date + relativedelta(days=9)
 
-            if d.today() == self.last_proestrus_date:
+            m = d.today() - relativedelta(days=9)
+            p = d.today() + relativedelta(days=9)
+
+            if self.last_proestrus_date <= d.today() and self.last_proestrus_date >= m:
                 self.reproductive_stage = 'Proestrus'
-            elif d.today() == self.estrus_date:
+            elif d.today() == self.last_estrus_date:
                 self.reproductive_stage = 'Estrus'
+            elif self.last_proestrus_date >=  d.today() and self.last_proestrus_date <= p:
+                self.reproductive_stage = 'Proestrus'
             elif d.today() == self.metestrus_date:
                 self.reproductive_stage = 'Metestrus'
             elif d.today() == self.anestrus_date:
                 self.reproductive_stage = 'Anestrus'
             else:
-                pass
+                self.reproductive_stage = 'Anestrus'
 
+        #TODO TRANSFER TO CELERY
         if self.age == 9:
-            self.training_status = 'Due-For-Retirement'
-            self.status = 'Working Dog'
-            #TODO notif 1 year
-            from unitmanagement.models import Notification
-            Notification.objects.create(message= str(self.name) +' is due to retire next year.')
+            self.status = 'Due-For-Retirement'
+            
         elif self.age == 10:
             self.training_status = 'Retired'
             self.year_retired = self.birth_date + td(days=(10*365))
@@ -337,7 +361,8 @@ class K9(models.Model):
             self.in_heat_months = 0
             self.last_proestrus_date = None
             self.next_proestrus_date = None
-            self.estrus_date = None
+            self.last_estrus_date = None
+            self.next_estrus_date = None
             self.metestrus_date = None
             self.anestrus_date = None
 
@@ -345,6 +370,8 @@ class K9(models.Model):
         # lead_zero = str(self.id).zfill(5)
         # serial_number = '#%s' % (lead_zero)
         # self.serial_number = str(serial_number)
+
+        self.age_month = (self.age * 12) + self.month_remainder()
         super(K9, self).save(*args, **kwargs)
 
 
@@ -356,6 +383,23 @@ class K9_Litter(models.Model):
     father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
     litter_no = models.IntegerField('litter_no', blank=True, null=True)
     litter_died = models.IntegerField('litter_died', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.litter_no == None:
+            self.litter_no = 0
+        if self.litter_died == None:
+            self.litter_died = 0
+
+        litter = int(self.litter_no) - int(self.litter_died)
+
+        if  self.mother.litter_no < litter:
+            self.mother.litter_no = litter
+            self.mother.save()
+
+        if  self.father.litter_no < litter:
+            self.father.litter_no = litter
+            self.father.save()
+        super(K9_Litter, self).save(*args, **kwargs)
 
 class K9_Past_Owner(models.Model):
     SEX = (
@@ -436,7 +480,7 @@ class Proposal_Budget(models.Model):
     k9_current = models.IntegerField('k9_current', default=0) #current k9
     k9_needed = models.IntegerField('k9_needed', default=0) #needed to procure k9
     k9_breeded = models.IntegerField('k9_breeded', default=0) # born k9
-    k9_current_train = models.IntegerField('k9_current_train', default=0) #current k9 that needs training
+    # k9_current_train = models.IntegerField('k9_current_train', default=0) #current k9 that needs training
     k9_total = models.DecimalField('k9_total', default=0, max_digits=50, decimal_places=2,)
     food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=2,)
     vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=2,)
@@ -461,7 +505,14 @@ class Proposal_K9(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
+
+class Proposal_Training(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=18000, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
 class Proposal_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
@@ -470,7 +521,7 @@ class Proposal_Milk_Food(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Vac_Prev(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -479,7 +530,7 @@ class Proposal_Vac_Prev(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Medicine(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -488,7 +539,7 @@ class Proposal_Medicine(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Vet_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -497,7 +548,7 @@ class Proposal_Vet_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Kennel_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -506,7 +557,7 @@ class Proposal_Kennel_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
     
 class Proposal_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -515,7 +566,7 @@ class Proposal_Others(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Budget(models.Model):
     k9_current = models.IntegerField('k9_current', default=0)
@@ -540,7 +591,12 @@ class Actual_K9(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
+    
+class Actual_Training(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=18000, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
 class Actual_Milk_Food(models.Model):
@@ -548,9 +604,7 @@ class Actual_Milk_Food(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Vac_Prev(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -559,7 +613,6 @@ class Actual_Vac_Prev(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Medicine(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -568,31 +621,24 @@ class Actual_Medicine(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Vet_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Kennel_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
     
 class Actual_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)

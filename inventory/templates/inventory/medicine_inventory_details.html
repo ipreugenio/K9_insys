@@ -22,12 +22,16 @@
             {% csrf_token %}
             <span>{{type}}</span>
             {% if type == 'Vaccine' %}
-            <div class = "two fields">
-                <div class="ten wide field">
+            <div class = "three fields">
+                <div class="field">
                     <label>Medicine</label>
                     {{form.medicine}}
                 </div>
-                <div class="six wide field">
+                <div class="field">
+                    <label>Immunization</label>
+                    {{form.immunization}}
+                </div>
+                <div class="field">
                     <label>Type</label>
                     {{form.med_type}}
                 </div>
@@ -48,7 +52,7 @@
                 </div>
             </div>
             {% else %}
-            <div class = "two fields">
+            <div class = "three fields">
                 <div class="ten wide field">
                     <label>Medicine</label>
                     {{form.medicine}}

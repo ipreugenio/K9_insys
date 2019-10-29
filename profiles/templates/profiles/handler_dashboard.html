@@ -9,47 +9,114 @@
       {{geoform.media}}
       <div class="ui grid" style="margin: 0%; padding: 0%;">
         <div class="two column row">
-            <div class="nine wide column"  style="margin-right:0%;">
-                  <div class="ui three column grid">
+            <div class="ten wide column"  style="margin-right:0%;">
+                {%if cb %}
+                {%if cb.status == 'Pending' %}
+                <div class="ui info message">
+                   
+                    <div class="header">
+                      <i></i>
+                        YOU HAVE BEEN CALLED BACK TO BASE! 
+                        <a href="{% url 'unitmanagement:confirm_going_back' cb.id %}" class="ui orange small button">Confirm</a>
+                    </div>
+                    <ul class="list">
+                      <li>Please confirm that
+                          you have received the message and will return at your most earliest
+                          convenient time. </li>
+                    </ul>
+                  </div>
+                  {% else %}
+                  <div class="ui info icon message">
+                      <i class="exclamation icon"></i>
+                      <div class="content">
+                        <div class="header">
+                            Admin is awaiting your arrival back to base.
+                        </div>
+                      </div> 
+                  </div>
+                  {% endif %}
+                  {% endif %}
+
+                {% if k9 %}
+
+                    <div class="ui three column grid">
+
                     <div class="column">
-                        <div class="ui raised segment">
-                          <div class="ui statistic">
-                            <div class="value">
-                              <i class="green check icon"></i>
+                        <div class="ui raised segment center aligned">
+                            <div class="card">
+                                <div class="content">
+                                    {%if dr == 1%}
+                                    <i class="huge green check icon"></i>
+                                    {%else%}
+                                    <i class="huge red close icon"></i>
+                                    {%endif%}
+                                </div>
+                                <div class="extra content">
+                                    <strong>
+                                        <a href="{% url 'deployment:daily_refresher_form'%}">DAILY REFRESHER</a>
+                                    </strong>
+                                </div>
                             </div>
-                            <div class="label">
-                              Daily Refresher
-                            </div>
-                          </div>
                         </div>
                     </div>
+
                     <div class="column">
-                        <div class="ui raised segment">
-                            <div class="ui statistic">
-                              <div class="value">
-                                <i class="plane icon"></i> 5
-                              </div>
-                              <div class="label">
-                                Sample Item
-                              </div>
+                        <div class="ui raised segment center aligned">
+                            <div class="card">
+                                <div class="content">
+                                    <h3>
+                                        {% if upcoming_deployment is None %}
+                                        No upcoming deployments
+                                        {% else %}
+                                        {{ upcoming_deployment }}
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                                <div class="extra content">
+                                    <strong>
+                                        {% if upcoming_deployment is None %}
+                                        <a href="#">UPCOMING DEPLOYMENT</a>
+                                        {% else %}
+                                        <a href="{% url 'deployment:request_dog_details'  upcoming_deployment.id %}">UPCOMING DEPLOYMENT</a>
+                                        {% endif %}
+                                    </strong>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
+
                     <div class="column">
-                        <div class="ui raised segment">
-                            <div class="ui statistic">
-                              <div class="value">
-                                <i class="plane icon"></i> 5
-                              </div>
-                              <div class="label">
-                                Sample Item
-                              </div>
+                        <div class="ui raised segment center aligned">
+                            <div class="card">
+                                <div class="content">
+                                    <h3>
+                                         {% if current_port is not None %}
+                                            {{current_port}}
+                                        {% elif current_request is not None %}
+                                            {{current_request}}
+                                        {% else %}
+                                            You are currently undeployed
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                                <div class="extra content">
+                                    <strong>
+                                        {% if current_port is not None %}
+                                            <a href="{% url 'deployment:team_location_details' current_port.id %}">CURRENT ASSIGNMENT</a>
+                                        {% elif current_request is not None %}
+                                            <a href="{% url 'deployment:request_dog_details' current_request.id %}">CURRENT ASSIGNMENT</a>
+                                        {% else %}
+                                            <a href="#">CURRENT ASSIGNMENT</a>
+                                        {% endif %}
+                                    </strong>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
+
                   </div>
 
-                    {% if k9 %}
+
                     <div class = "ui segment" id = "start_end_training">
                     <table class="ui very basic four column table">
                     <thead>
@@ -58,16 +125,38 @@
                     <th>Type: {{k9.status}}</th>
                     <th>Capability: {{k9.capability}}</th>
 
-                        {% if k9.training_level %}
-                    <th>Training Stage: {{k9.training_level}} </th>
+                        {% if k9.training_status == "On-Training" %}
+
+                        {% if k9.training == "Stage 0" %}
+                        <th>Training Stage: Stage 1.1 </th>
+                        {% elif k9.training == "Stage 1.1" %}
+                        <th>Training Stage: Stage 1.2 </th>
+                        {% elif k9.training == "Stage 1.2" %}
+                        <th>Training Stage: Stage 1.3 </th>
+
+                        {% elif k9.training == "Stage 1.3" %}
+                        <th>Training Stage: Stage 2.1 </th>
+                        {% elif k9.training == "Stage 2.1" %}
+                        <th>Training Stage: Stage 2.2 </th>
+                        {% elif k9.training == "Stage 2.2" %}
+                        <th>Training Stage: Stage 2.3 </th>
+
+                        {% elif k9.training == "Stage 2.3" %}
+                        <th>Training Stage: Stage 3.1 </th>
+                        {% elif k9.training == "Stage 3.1" %}
+                        <th>Training Stage: Stage 3.2 </th>
+                        {% elif k9.training == "Stage 3.2" %}
+                        <th>Training Stage: Stage 3.3 </th>
+                        {% elif k9.training == "Stage 3.3" %}
+                        <th>Training Stage: Final Stage</th>
+                        {% endif %}
+
 
                         <th><h3>Training</h3><div><strong>Date Start :</strong> {{training_sched.date_start}}</div>
                             <div><strong>Date End :</strong> {{training_sched.date_end}}</div></th>
 
-                        {% else %}
-
-
                         {% endif %}
+
                     </tr>
                     </thead>
                     </table>
@@ -90,23 +179,57 @@
                         </form>
                         {% endif %}
 
-                        </div>
+                        {% if reveal_items == True %}
+                            <div class="ui two column grid">
+                                <div class="six wide column">
+                                    <input class = "ui green button" type="submit"  value="Confirm Initial Deployment" id = "reveal_predep_checklist">
+                                </div>
+                                 <div class="ten wide column">
+                                     <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
+                                      <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
+                                </div>
+                            </div>
+                        {% elif all_clear == True and reveal_items == True %}
+                         <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
+                        <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                         {% else %}
+                        {% endif %}
+
+                        </div>
+
+                {% else %}
                         <div class = "ui segment">
                             You don't have a K9 yet.
                         </div>
-                        {% endif %}
+                {% endif %}
 
 
-
+                      
                   <div class="ui raised segment" >
                       <canvas id="myChart" height="355" ></canvas>
                   </div>
               </div>
 
-              <div class="seven wide column" style="padding: 0%;margin:0%;">
+              <div class="six wide column" style="padding: 0%;margin:0%;">
+                    {%if ki %}
+                    <div class="ui info message">
+                      <ul class="list">
+                        {%if ki.incident == 'Lost'%}
+                        <li>You have reported your K9 Lost.</li>
+                        {%elif ki.incident == 'Stolen'%}
+                        <li>You have reported your K9 Stolen.</li>
+                        {%elif ki.incident == 'Accident'%}
+                        <li>You have reported your K9 in an Accident.</li>
+                        <a href="#" class="ui tiny red button died_btn">Died</a>
+                        <a href="{% url 'unitmanagement:k9_accident' ki.id %}?accident=recovered" class="ui tiny blue button">Recovered</a>
+                        {%endif%}
+                      </ul>
+                    </div>
+                    {%endif%}
+                    <div class="ui inverted segment">
+                            <h4>Calendar</h4>
+                          </div>
                 <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
-                    <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>                
                     <div class="ui buttons">
                       <button class="ui button"  id = "prev" >Previous Year</button>
                       <div class="or"></div>
@@ -119,108 +242,6 @@
         </div>
       </div>
 
-      <!--Modal--> 
-      <div class="ui modal" id = 'modal1'>
-          <i class="close icon"></i>
-          <div class="header">Add Event</div>
-         
-          <div class="scrolling content">
-              <form class="ui form" method="POST">
-                  {% csrf_token %}
-                <div class="three fields">
-                    <div class="field">
-                        <label>Requester</label>
-                        {{form.requester}}
-                      </div>
-                      <div class="field">
-                        <label>Mobile Number</label>
-                        {{form.phone_number}}
-                      </div>
-                      <div class="field">
-                        <label>Email</label>
-                        {{form.email_address}}
-                      </div>
-                </div>
-                <div class="four fields">
-                    <div class="field">
-                        <label>Event Name</label>
-                        {{form.event_name}}
-                      </div>
-                      <div class="field">
-                        <label>Type</label>
-                        {{form.event_type}}
-                      </div>
-                      <div class="field">
-                        <label>Start Date</label>
-                        {{form.start_date}}
-                      </div>
-                      <div class="field">
-                          <label>End Date</label>
-                          {{form.end_date}}
-                        </div>
-                </div>
-                <div class="three fields">
-                    <div class="field">
-                        <label>NDD Needed</label>
-                        {{form.NDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>EDD Needed</label>
-                        {{form.EDD_needed}}
-                      </div>
-                      <div class="field">
-                        <label>SAR Needed</label>
-                        {{form.SAR_needed}}
-                      </div>
-                </div>
-                <div class="field">
-                    <label>Remarks</label>
-                    {{form.remarks}}
-                </div>
-                <div class="field">
-                    <label>Place</label>
-                    {{form.location}}
-                  </div>
-  
-                  <div class="ui two column grid">
-                    <div class="seven wide column">
-                        <center>
-                            <label>Search Location</label>
-                            <div class="ui fluid category search">
-                              <div class="ui icon input">
-                                {{geosearch.search}}
-                                <i class="search icon"></i>
-                              </div>
-                              <div class="results"></div>
-                            </div>
-                            <br>
-                            <button id = "btn_search" class="ui blue button" type="button">Search</button>
-      
-                            <div  id ="id_location_cards"></div>
-                        </center>
-  
-                    </div>
-                    <div class="nine wide column">
-                        <label>Geotag Location</label>
-                        <div id = "id_geomap">
-                            {{geoform.point}}
-                        </div>
-                    </div>
-                  </div>
-                  <br>
-                    <center>
-                        <button class="ui green button" type="submit">Submit</button>
-                    </center>
-                </form>
-          </div>
-        
-        </div>
-        <!--End of Modal-->
-
-        <div class="ui mini modal" id = 'modal2'>
-          <i class="close icon"></i>
-          <div class="header">Event Added</div>
-        </div>
 
         {% if messages %}
         {% for message in messages %}
@@ -229,38 +250,82 @@
         {% endif %}
     </div>
 
-    <div class="ui modal event_modal">
+
+   <!--Pre Deployment Items Modal-->
+
+<div class="ui mini modal" id = 'modal3'>
       <i class="close icon"></i>
-      <div class="header">Header</div>
-      <div class="scrolling content">Something</div>
-       
+    <div class="header"><h2>Pre Deployment Requirements</h2></div>
+    <div class="scrolling content">
+             {% for item in items_list %}
+                    {% if item.0 == True %}
+                    <h4><i class="green check icon"></i>{{item.1}}</h4>
+                    {%else%}
+                    <h4><i class="red close icon"></i>{{item.1}}</h4>
+                    {%endif%}
+                {% endfor %}
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+            {% if all_clear == True %}
+            <button class="ui green button" type="submit" name = "confirm_deployment" value="Confirm Deployment"><i class="ship icon"></i>Confirm Deployment</button>
+
+            {% else %}
+            <button class="ui disabled green button"><i class="ship icon"></i>Confirm Deployment</button>
+
+            {% endif %}
+        </form>
+
     </div>
+</div>
+
+{% if ki %}
+<div class="ui modal" id= 'died_modal'>
+    <div class="header">{{k9}}</div>
+    <div class="content">
+      <form class = 'ui form' action="{% url 'unitmanagement:k9_accident' ki.id %}?accident=died" method="POST"> {% csrf_token %}
+        <div class="two fields">
+          <div class="field">
+            <label for="">Date Died</label>
+            <input type="date" name='date_died'>
+          </div>
+          <div class="field">
+              <label for="">Death Certificate</label>
+              <input type="file" name='death_cert'>
+            </div>
+        </div>
+        <center>
+          <button class="ui green button" type="submit">Submit</button>
+        </center>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+ <!--End Pre Deployment Items Modal-->
+
+ <div id = "id_event_load"></div>
+
 <style>
 
-  #calendar .fc-dayGridMonth-view .fc-scroller {
-  overflow-x: hidden !important;
-  overflow-y: hidden !important;
-  }
-
-  .fc-center>h2 {
-     font-size:  18px !important; 
-     }
-
-  .fc-header, .fc-button, #prev, #next{
+#prev, #next{
   background-color:orangered;
   color: white;
   }
 
+/*
   #calendar {
       max-width: 900px;
       margin: 40px auto;
-  }
+  } */
 </style>
-    
+
 <script>
 $(document).ready(function() {
       // alert($('.msg').val());
-
+      $( ".died_btn" ).click(function() {
+          $('#died_modal').modal('show');
+        });
       
       if($('.msg').val() == 'event'){
         $('#modal2').modal('show');
@@ -282,9 +347,6 @@ $(document).ready(function() {
             console.log(error_data)
           }
       })
-
-    console.log(sched)
-
 
     function setChart(){
         var ctx = document.getElementById('myChart');
@@ -340,7 +402,7 @@ $(document).ready(function() {
 
           defaultView: 'month',
           weekNumbers: 'true',
-          editable: true,
+          editable: false,
           selectable: true,
           eventLimit: 3,
           showNonCurrentDates: true,
@@ -349,25 +411,50 @@ $(document).ready(function() {
           eventTextColor: "white",
           nowIndicator: true,
 
+          {% if k9_schedules %}
           events: [
-                {% for i in events %}
-                {
-                     id: '{{ i.id }}',
-                    title: '{{i.event_name}}',
-                    start: '{{ i.start_date|date:"Y-m-d" }}',
-                    end: '{{ i.end_date|date:"Y-m-d" }}',
+
+                    {% for i in k9_schedules %}
+                    {
+                    id: '{{ i.id }}',
+
+                    {% if i.status == 'Request' %}
+                    title: '{{i|get_event_name}}',
+                    {% elif i.status == 'Checkup' %}
+                    title : 'Physical Exam',
+                    {% elif i.status == 'Initial Deployment' %}
+                    title : '{{i|get_team_name}}',
+                    {% else %}
+
+                    {% endif %}
+
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
                     allDay: 'true',
-                },
-                {% endfor %}
-
+                    },
+                    {% endfor %}
             ],
+            {% endif %}
 
-          eventClick : function(event, element){
-            $('.content').text(event.title);
-            $('.event_modal').modal('show');
-            
-          },
+          eventClick: function(event, element) {
+                var url = 'ajax_load_event_handler';
 
+                 $.ajax({
+                        url: url,
+                        data: {
+                        'event_id': event.id,},
+                        success: function (data) {
+
+                          $("#id_event_load").html(data);
+                           $('#event_modal').modal('show');
+                          },
+                        error:
+                            function(xhr){
+                            alert(xhr.statusText)
+                            return false;}
+                    });
+
+                 },
           }); // end #calendar
           
           
@@ -380,39 +467,17 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('nextYear');
         });
 
-        //Add event modal
-        $( "#add_event_btn" ).click(function() {
-          $('#modal1').modal('setting', 'closable', false)
-          .modal('show');
-        });
-
-         //GeoMap
-         $("#btn_search").click(function () {
-          var url = 'ajax_load_locations';  // get the url of the `load_locations` view
-          var search_query = $("#id_search").val();  // get the search query from the HTML input
-
-          $.ajax({                       // initialize an AJAX request
-            url: url,                    // set the url of the request
-            data: {
-              'search_query': search_query, // add the search query to the GET parameters
-              'width' : 480
-            },
-            success: function (data) {   // `data` is the return of the `load_locations` view function
-              $("#id_location_cards").html(data);  // replace the contents of the #id_location_cards input with the data that came from the server
-            },
-                error:
-            function(xhr){
-                alert("Error: " + xhr.statusText);
-                //alert(xhr.responseText) --> to get the full details of error
-                return false;
-                }
-          });
-
-        });
      
 });
 </script>
 
+
+<script>
+
+    $( "#reveal_predep_checklist" ).click(function() {
+  $('#modal3').modal('setting', 'closable', false).modal('show');
+});
+</script>
 
 
 {% endblock %}

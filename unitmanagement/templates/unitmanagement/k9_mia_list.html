@@ -1,0 +1,61 @@
+{% extends "profiles/sidebar_um.html" %}
+{% load um_tags %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="ui inverted segment" style="padding:20px;">
+    <h3 class="ui inverted header">Unconfirmed Arrival List
+    <div class="sub header">List of Units that did not arrive on duty. Select a unit to confirm status.</div>
+    </h3>
+
+     {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+
+<div class="ui segment">
+    <table id="tabledata1" class="ui celled table">
+        <thead>
+            <tr>
+                <th>K9</th>
+                <th>Handler</th>
+                <th>Port/Event</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in k9_list %}
+            <tr>
+                <td class="two wide">{{data.0}}</td>
+                <td class="two wide">{{data.0.handler}}</td>
+                <td>{{data.1}}</td>
+                <td class="two wide">{{data.2.date_pulled|date:'Y-m-d'}}</td>
+                <td style="text-align:center;" class="three wide">
+                    <a href="{% url 'unitmanagement:k9_mia_change' data.0.id %}?status=late" class="ui tiny basic orange button">Late</a>
+                    <a href="{% url 'unitmanagement:k9_mia_change' data.0.id %}?status=missing" class="ui tiny basic red button">Missing</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#tabledata1').DataTable({
+             "order": [[ 0, "desc" ]]
+        });
+        $('.menu .item').tab();
+
+
+
+    });
+
+</script>
+
+{% endblock %}

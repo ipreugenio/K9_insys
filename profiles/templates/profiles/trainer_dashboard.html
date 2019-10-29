@@ -5,46 +5,48 @@
 {% block dashboard %}
   <div class="container fluid">
     <div class="ui basic segment">
-        <div class="ui two column grid">
+        <div class="ui two column equal height grid">
             <div class="row">
-                <div class="four wide column">
+                <div class="column">
                   <div class="ui raised segment  center aligned">
                       <div class="ui violet statistic">
                           <div class="value">
                             <i class="tags icon"></i> {{unclassified}}
                           </div><br>
-                          <a class="label" href="#">
-                            Unclassified K9's
-                          </a>
-                        </div>
-                  </div>
-               
-                  <div class="ui raised segment center aligned">
-                      <div class="ui green statistic">
-                          <div class="value">
-                            <i class="pencil alternate icon"></i> {{grade}}
-                          </div><br>
-                          <a class="label" href="#">
-                            For Grading
-                          </a>
+                          <div class="label">
+                              <a href="{% url 'training:classify_k9_list'%}?type=unclassified">
+                                  UNCLASSIFIED K9's
+                                </a>
+                          </div>
                         </div>
                   </div>
                 </div>
-                <div class="twelve wide column">
-                  <div class="ui two column grid">
-                    <div class="column">
-                        <div class="ui raised segment">
-                            <canvas id="myChart"></canvas>
-                        </div>
+                <div class="column">
+                    <div class="ui raised segment center aligned">
+                        <div class="ui green statistic">
+                            <div class="value">
+                              <i class="pencil alternate icon"></i> {{grade}}
+                            </div><br>
+                            <div class="label">
+                                <a href="{% url 'training:classify_k9_list'%}?type=grading">
+                                    FOR-GRADING
+                                  </a>
+                            </div>
+                          </div>
                     </div>
-                    <div class="column">
-                        <div class="ui raised segment">
-                            <canvas id="myChart2"></canvas>
-                        </div>
-                      </div>
-                  </div>
-                  
                 </div>
+            </div>
+            <div class="row">
+              <div class="column">
+                  <div class="ui raised segment">
+                      <canvas id="myChart"></canvas>
+                  </div>
+              </div>
+              <div class="column">
+                  <div class="ui raised segment">
+                      <canvas id="myChart2"></canvas>
+                  </div>
+              </div>
             </div>
           </div>
     </div>
@@ -94,6 +96,19 @@ $(document).ready(function() {
             title: {
                 display: true,
                 text: "Current and Required K9"
+            }, 
+            scales: {
+                xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    step:1,
+                }
+                }],
+                yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                }
+                }]
             },
           }
         });

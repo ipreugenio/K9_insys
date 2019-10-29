@@ -40,7 +40,11 @@ urlpatterns = [
     path('choose-location/ajax_load_units', views.load_units, name='ajax_load_units'),
     path('choose-location/ajax_load_units_selected', views.load_units_selected, name='ajax_load_units_selected'),
 
-    path('schedule-units', views.schedule_units, name = 'schedule_units')
+    path('schedule-units', views.schedule_units, name = 'schedule_units'),
+
+    path('pre_req_unconfirmed', views.pre_req_unconfirmed, name='pre_req_unconfirmed'),
+    path('pre_req_unconfirmed/ajax_load_pre_req', views.load_pre_req, name='load_pre_req'),
+
     # path('dogs-deployed', views.deployed_dogs, name='deployed_dogs'),
     # path('dogs-requested', views.requested_dogs, name='requested_dogs'),
     # path('deploy-number-dogs', views.deploy_number_dogs, name='deploy_number_dogs'),

@@ -3,11 +3,16 @@ import random
 from datetime import timedelta, datetime
 from profiles.models import User, Account, Personal_Info, Education
 from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
-from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment
+from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
+    K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule
 
+from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
+from deployment.tasks import assign_TL
+
+import re
 
 def generate_city_ph():
 
@@ -237,11 +242,10 @@ def generate_user():
     fake = Faker()
 
 
-    handler_count = 300
-    commander_count = 14
-    teamleader_count = 45
-    vet_count = 20
-    operations = 1
+    handler_count = 329
+    commander_count = 30
+    vet_count = 19
+    operations = 2
     trainor = 4
     admin = 15
 
@@ -250,15 +254,13 @@ def generate_user():
 
         position = ""
 
-        if ctr <= 300:
+        if ctr <= 329:
             position = "Handler"
-        elif ctr >= 301 and ctr <= 314:
+        elif ctr >= 330 and ctr <= 360:
             position = "Commander"
-        elif ctr >= 315 and ctr <= 360:
-            position = "Team Leader"
-        elif ctr >= 361 and ctr <= 380:
+        elif ctr >= 361 and ctr <= 379:
             position = "Veterinarian"
-        elif ctr == 381:
+        elif ctr == 380 or ctr == 381:
             position = "Operations"
         elif ctr >= 382 and ctr <= 385:
             position = "Trainer"
@@ -388,6 +390,33 @@ def generate_breed():
 
     return BREED[randomizer][0]
 
+def generate_k9_color():
+    COLOR = (
+        ('Black', 'Black'),
+        ('Chocolate', 'Chocolate'),
+        ('Yellow', 'Yellow'),
+        ('Dark Golden', 'Dark Golden'),
+        ('Light Golden', 'Light Golden'),
+        ('Cream', 'Cream'),
+        ('Golden', 'Golden'),
+        ('Brindle', 'Brindle'),
+        ('Silver Brindle', 'Silver Brindle'),
+        ('Gold Brindle', 'Gold Brindle'),
+        ('Salt and Pepper', 'Salt and Pepper'),
+        ('Gray Brindle', 'Gray Brindle'),
+        ('Blue and Gray', 'Blue and Gray'),
+        ('Tan', 'Tan'),
+        ('Black-Tipped Fawn', 'Black-Tipped Fawn'),
+        ('Mahogany', 'Mahogany'),
+        ('White', 'White'),
+        ('Black and White', 'Black and White'),
+        ('White and Tan', 'White and Tan')
+    )
+
+    randomizer = random.randint(0, 18)
+
+    return COLOR[randomizer][0]
+
 def generate_skill():
     SKILL = (
         ('NDD', 'NDD'),
@@ -451,7 +480,7 @@ def generate_training():
     fake = Faker()
 
     k9_sample = assign_handler_random() #Get all k9s with available handlers
-    k9_sample = random.sample(k9_sample, int(len(k9_sample) * .70))
+    k9_sample = random.sample(k9_sample, int(len(k9_sample) * .80))
 
     k9s = K9.objects.filter(pk__in = k9_sample)
 
@@ -480,6 +509,7 @@ def generate_training():
         train_sched.date_start = training_start_alpha
         train_sched.date_end = training_start_alpha + timedelta(days=20)
 
+        #TODO populate does not reach stage 3.3
         grade_list = []
         stage = "Stage 0"
         for idx in range(9):
@@ -503,15 +533,15 @@ def generate_training():
                 stage = "Stage 3.1"
             elif idx == 7:
                 stage = "Stage 3.2"
-            elif stage == 8:
+            elif idx == 8:
                 stage = "Stage 3.3"
 
-            if idx <= 7:
+            # if idx <= 8: 
 
-                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+            sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
                                                                date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
-                train_sched.save()
+            train_sched.save()
 
 
         training.stage1_1 = grade_list[0]
@@ -532,6 +562,8 @@ def generate_training():
 
         k9.training_status = 'Trained'
         k9.training_level = "Finished Training"
+        k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+        k9.trained = "Trained"
         k9.save()
 
         print(str(k9))
@@ -539,9 +571,122 @@ def generate_training():
 
     return None
 
+
+def generate_k9_posttraining_decision():
+
+    k9s = K9.objects.filter(training_status = "Trained")
+    k9_id_list = []
+    for k9 in k9s:
+        k9_id_list.append(k9.id)
+    k9_sample = random.sample(k9_id_list, int(len(k9_id_list) * .80)) #80% of all trained k9s
+
+    for_deployment = random.sample(k9_sample, int(len(k9_sample) * .80))
+    for k9 in for_deployment:
+        try:
+            k9_sample.remove(k9)
+        except: pass
+    for_breeding = k9_sample
+
+    for id in for_deployment:
+        try:
+            k9 = K9.objects.get(id = id)
+            k9.training_status = "For-Deployment"
+            k9.status = "Working Dog"
+            k9.save()
+        except: pass
+
+    for id in for_breeding:
+        try:
+            k9 = K9.objects.get(id = id)
+            k9.training_status = "For-Breeding"
+            k9.status = "Working Dog"
+            k9.save()
+        except: pass
+
+    return None
+
+def select_port_assign(k9):
+
+    ports = Team_Assignment.objects.filter(total_dogs_deployed__lt = 5)
+
+    if k9.capability == "SAR":
+        ports = ports.filter(SAR_deployed__lt = 1)
+    elif k9.capability == "NDD":
+        ports = ports.filter(NDD_deployed__lt=2)
+    elif k9.capability == "EDD":
+        ports = ports.filter(EDD_deployed__lt=2)
+
+    port_id_list = []
+    for port in ports:
+        port_id_list.append(port.id)
+
+    randomizer = random.randint(0, len(port_id_list) - 1)
+    location = Location.objects.get(id = port_id_list[randomizer])
+    return Team_Assignment.objects.get(location = location)
+
+# Randomly assign to ports
+def generate_k9_deployment():
+    fake = Faker()
+
+    k9s = K9.objects.filter(training_status = "For-Deployment")
+
+    k9_id_list = []
+    for k9 in k9s:
+        k9_id_list.append(k9.id)
+    k9_sample = random.sample(k9_id_list, int(len(k9_id_list) * .80))
+
+    for id in k9_sample:
+
+        k9 = K9.objects.get(id = id)
+
+        train_sched = Training_Schedule.objects.get(k9 = k9, stage = "Stage 3.3")
+        deployment_date = train_sched.date_end
+        deployment_date += timedelta(days= random.randint(7, 14))
+
+        team = select_port_assign(k9)
+        sched = K9_Schedule.objects.create(team = team, k9=k9, status="Initial Deployment",
+                                            date_start=deployment_date)
+        sched.save()
+        pre_req_item = K9_Pre_Deployment_Items.objects.create(k9=k9, initial_sched=sched, status="Done")
+        deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = k9,
+                                                  date_added = deployment_date + timedelta(days= random.randint(1, 6)))
+        deploy.save()
+
+        if k9.capability == "SAR":
+            team.SAR_deployed += 1
+        elif k9.capability == "NDD":
+            team.NDD_deployed += 1
+        elif k9.capability == "EDD":
+            team.EDD_deployed += 1
+        team.save()
+
+        assign_TL(team)
+        print("K9 : " + str(k9))
+        print("Team Assignment : " + str(team))
+
+
+    return None
+
+def generate_k9_supplier():
+    fake = Faker()
+
+    for x in range(0, 12):
+        contact = "+63" + fake.msisdn()[:10]
+        supplier = K9_Supplier.objects.create(name=fake.name(), organization=fake.company(), address=fake.address(),
+                                          contact_no=contact)
+        supplier.save()
+    return None
+
 #Half of K9s are classified
 def generate_k9():
     fake = Faker()
+
+    suppliers = K9_Supplier.objects.all()
+
+    if suppliers.count() == 0:
+        generate_k9_supplier()
+        suppliers = K9_Supplier.objects.all()
+
     for x in range (0, 300):
 
         randomizer = random.randint(0, 1)
@@ -560,7 +705,7 @@ def generate_k9():
             gender = "Female"
 
         print("Color : " + fake.safe_color_name())
-        color = fake.safe_color_name()
+        color = generate_k9_color()
         print("Breed : " + generate_breed())
         breed = generate_breed()
 
@@ -574,13 +719,14 @@ def generate_k9():
         k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement")
         k9.save()
 
-        #TODO get supplier and randomize the k9's supplier
+
         if k9.source == "Procurement":
-            contact = "+63" + fake.msisdn()[:10]
-            supplier = K9_Supplier.objects.create(name = fake.name(), organization = fake.company(), address = fake.address(), contact_no = contact)
-            supplier.save()
-            k9.supplier = supplier
-            k9.save()
+            try:
+                randomizer = random.randint(0, suppliers.count() - 1)
+                supplier = K9_Supplier.objects.get(id = randomizer)
+                k9.supplier = supplier
+                k9.save()
+            except: pass
 
     return None
 
@@ -791,6 +937,7 @@ def generate_location():
         team = Team_Assignment.objects.create(location = location)
         team.save()
 
+
     return None
 
 
@@ -915,7 +1062,7 @@ def generate_incident():
 
         remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
 
-        date = fake.date_between(start_date="-30y", end_date="-20y")
+        date = fake.date_between(start_date="-10y", end_date="-5y")
 
         incident = Incidents.objects.create(user = user, date = date, incident = incident_txt, location = location, type = type, remarks = remarks)
         incident.save()
@@ -952,7 +1099,7 @@ def generate_maritime():
         boat_type = BOAT_TYPE[randomizer][0]
         print("Boat type : " + boat_type)
 
-        date = fake.date_between(start_date="-30y", end_date="-20y")
+        date = fake.date_between(start_date="-10y", end_date="-5y")
 
         passenger_count = random.randint(20, 100)
 
@@ -980,7 +1127,13 @@ def generate_dogbreed():
         randomizer = random.randint(0, 4)
         temperament = temperament_list[randomizer]
 
-        Dog_Breed.objects.create(breed=data,life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+        Dog_Breed.objects.create(breed=data,sex='Male',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+
+    for data2 in arr:
+        randomizer = random.randint(0, 4)
+        temperament = temperament_list[randomizer]
+
+        Dog_Breed.objects.create(breed=data2,sex='Female',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=17000)
 
     return None
 
@@ -1026,8 +1179,112 @@ def fix_dog_duplicates():
     for item in k9_list:
         k9s = K9.objects.filter(name = item)
         ctr = 1
-        for k9 in k9s:
-            k9.name = k9.name + " " + str(ctr)
-            k9.save()
+        if k9s.count() > 1:
+            for k9 in k9s:
+                k9.name = k9.name + " " + str(ctr)
+                k9.save()
+                print(str(k9.name))
+                ctr += 1
 
     return None
+
+def generate_team_name(location):
+    team_name = ""
+
+    x_list = re.split("\s", str(location.area))
+    new_x = ""
+    for x in x_list:
+        print(x[0])
+        new_x += x[0]
+
+    team_name += new_x
+    team_name += " Team "
+    team_name += location.city
+    team_name += " "
+
+    return team_name
+
+def fix_port_names():
+
+    areas = Area.objects.all()
+
+    for area in areas:
+        locations = Location.objects.filter(area = area)
+
+        city_list = []
+        for location in locations:
+            city_list.append(location.city)
+
+        for city in city_list:
+            locations = Location.objects.filter(city = city)
+            ctr = 0
+            for location in locations:
+                letter_order = chr(ord('a') + ctr).capitalize()
+                team = Team_Assignment.objects.get(location = location)
+                team_name = generate_team_name(location)
+                team_name += letter_order
+                team.team = team_name
+                team.save()
+                ctr += 1
+
+    return None
+
+def create_predeployment_inventory():
+
+    randomizer = random.randint(30, 100)
+    collar = Miscellaneous.objects.create(miscellaneous = "Collar", misc_type = "Kennel Supply", uom = "pc", quantity = randomizer, price=199.12)
+    randomizer = random.randint(30, 100)
+    vest = Miscellaneous.objects.create(miscellaneous="Vest", misc_type="Kennel Supply", uom="pc",
+                                          quantity=randomizer, price=900.21)
+    randomizer = random.randint(30, 100)
+    leash = Miscellaneous.objects.create(miscellaneous="Leash", misc_type="Kennel Supply", uom="pc",
+                                        quantity=randomizer, price=230.41)
+    randomizer = random.randint(30, 100)
+    shipping_crate = Miscellaneous.objects.create(miscellaneous="Shipping Crate", misc_type="Kennel Supply", uom="pc",
+                                         quantity=randomizer, price=1500.24)
+
+    randomizer = random.randint(100, 250)
+    food = Food.objects.create(food = "Pedigree", foodtype = "Adult Dog Food", unit = "kilograms", quantity=randomizer, price=120)
+
+    randomizer = random.randint(50, 150)
+    medicine = Medicine.objects.create(medicine = "Medicine Sample X", med_type = "Vitamins", uom = "mg", price=32.12)
+    
+    randomizer = random.randint(30, 100)
+    grooming_kit = Miscellaneous.objects.create(miscellaneous="Grooming Kit", misc_type="Kennel Supply", uom="pc",
+                                          quantity=randomizer, price=321.12)
+    randomizer = random.randint(30, 100)
+    first_aid_kit = Miscellaneous.objects.create(miscellaneous="First Aid Kit", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer, price=211.12)
+    randomizer = random.randint(30, 100)
+    oral_dextrose = Miscellaneous.objects.create(miscellaneous="Oral Dextrose", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer, price=140.12)
+    randomizer = random.randint(30, 100)
+    ball = Miscellaneous.objects.create(miscellaneous="Ball", misc_type="Kennel Supply", uom="pc",
+                                                quantity=randomizer, price=260.33)
+
+    
+    #Create Mandatory Vaccine and Prevention
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Rabies Immune Globulin', med_type='Vaccine', immunization='Anti-Rabies', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Bronchicine CAe', med_type='Vaccine', immunization='Bordetella Bronchiseptica Bacterin', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='VANGUARD PLUS 5 L4 CV', med_type='Vaccine', immunization='DHPPiL+CV', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Versican Plus DHPPi/L4', med_type='Vaccine', immunization='DHPPiL4', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='PetArmor Sure Shot 2x', med_type='Preventive', immunization='Deworming', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Heartgard', med_type='Preventive', immunization='Heartworm', price=randomizer)
+    randomizer = random.randint(100, 1000)
+
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Frontline', med_type='Preventive', immunization='Tick and Flea', price=randomizer)
+
+    return None
+

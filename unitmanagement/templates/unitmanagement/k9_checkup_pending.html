@@ -8,6 +8,12 @@
     <div class="sub header">Schedule k9 for checkup pre-requirement before initial deployment.</div>
     </h1>
 
+     {% if messages %}
+        {% for message in messages %}
+            <div class="{{style}}" > {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
 </div>
 
 <div class="ui info message">
@@ -50,7 +56,7 @@
                 <td>{{item.k9|render_k9_checkbox:selected_list}}</td>
                 <td>{{item.k9}}</td>
                 <td>{{item.k9.handler}}</td>
-                <td>{{item.date_start}}</td>
+                <td>{{item.date_start | date:"Y-m-d"}}</td>
             </tr>
             {% endfor %}
 
@@ -98,7 +104,7 @@
 <script type="text/javascript">
 
 	 $('#tabledata').DataTable( {
-        "order": [[ 0, "desc" ]]
+        "order": [[ 3, "asc" ]]
         });
 
 		$('.menu .item').tab();

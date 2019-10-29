@@ -5,10 +5,10 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
-from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed, Food_Request, Medicine_Request
-from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident, All_Item_Request
+from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Miscellaneous_Request, VaccineUsed, Food_Request, Medicine_Request, Request_Transfer, Replenishment_Request
+from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
 from planningandacquiring.models import K9
-from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
+from inventory.models import Medicine, Miscellaneous, Medicine_Inventory, Food
 from profiles.models import Account, User
 from django.db.models import Q
 
@@ -74,13 +74,14 @@ class PhysicalExamForm(forms.ModelForm):
     eyes = forms.CharField(label = 'eyes', widget = forms.Select(choices=EXAMSTATUS))
     ears = forms.CharField(label = 'ears', widget = forms.Select(choices=EXAMSTATUS))
     remarks = forms.CharField(label = 'remarks', widget = forms.Textarea(attrs={'rows':'4'}))
+    cleared = forms.BooleanField(label = 'cleared', widget=forms.CheckboxInput)
 
     class Meta:
         model = PhysicalExam
         fields = ('dog', 'cage_number', 'general_appearance', 'integumentary',
         'musculo_skeletal', 'respiratory', 'genito_urinary', 'nervous', 'circulatory', 'digestive',
         'mucous_membrances', 'lymph_nodes', 'eyes', 'ears', 'remarks', 'date_next_exam',
-        'heart_rate','respiratory_rate','temperature','weight')
+        'heart_rate','respiratory_rate','temperature','weight', 'cleared')
 
     def __init__(self, *args, **kwargs):
         super(PhysicalExamForm, self).__init__(*args, **kwargs)
@@ -89,6 +90,8 @@ class PhysicalExamForm(forms.ModelForm):
         self.fields['date_next_exam'].required = False
         # a = K9.objects.filter(id=request.session['phex_k9_id'])
         # self.fields['dog'].initial = a
+
+
 
 class HealthForm(forms.ModelForm):
     CHOICE = (
@@ -216,29 +219,21 @@ class VaccinationYearlyForm(forms.ModelForm):
         self.fields['veterinary'].required = False
         self.fields['done'].required = False
 
-class RequestEquipment(forms.ModelForm):
+class RequestTransferForm(forms.ModelForm):
     class Meta:
-        model = Equipment_Request
-        fields = ('equipment', 'quantity')
+        model = Request_Transfer
+        fields = ('handler', 'date_of_transfer', 'location_from', 'location_to')
+
+        widgets = {
+            'date_of_transfer': DateInput(),
+        }
+
 
     def __init__(self, *args, **kwargs):
-        super(RequestEquipment, self).__init__(*args, **kwargs)
-
-class RequestMedicine(forms.ModelForm):
-    class Meta:
-        model = Medicine_Request
-        fields = ('medicine', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestMedicine, self).__init__(*args, **kwargs)
-
-class RequestFood(forms.ModelForm):
-    class Meta:
-        model = Food_Request
-        fields = ('food', 'quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(RequestFood, self).__init__(*args, **kwargs)
+        super(RequestTransferForm, self).__init__(*args, **kwargs)
+        self.fields['handler'].widget.attrs['disabled'] = True
+        self.fields['location_from'].widget.attrs['disabled'] = True
+        self.fields['location_from'].required = False
         
 class K9IncidentForm(forms.ModelForm):
     CONCERN = (
@@ -308,27 +303,88 @@ class ReproductiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReproductiveForm, self).__init__(*args, **kwargs)
         self.fields['last_proestrus_date'].required = False
+        self.fields['reproductive_stage'].required = False
+        self.fields['reproductive_stage'].widget.attrs['disabled'] = True
 
-class RequestEquipment(forms.ModelForm):
+
+class RequestMiscellaneous(forms.ModelForm):
+    miscellaneous = forms.ModelChoiceField(queryset = Miscellaneous.objects.all())
     class Meta:
-        model = Equipment_Request
-        fields = ('equipment', 'quantity')
+        model = Miscellaneous_Request
+        fields = ('miscellaneous', 'quantity', 'unit')
 
     def __init__(self, *args, **kwargs):
-        super(RequestEquipment, self).__init__(*args, **kwargs)
+        super(RequestMiscellaneous, self).__init__(*args, **kwargs)
+        self.fields['miscellaneous'].widget.attrs['class'] = 'miscellaneous_item'
+        self.fields['unit'].widget.attrs['class'] = 'miscellaneous_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['miscellaneous'].required = False
+        # self.fields['quantity'].required = False
 
 class RequestMedicine(forms.ModelForm):
+    medicine = forms.ModelChoiceField(queryset = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine'))
     class Meta:
         model = Medicine_Request
-        fields = ('medicine', 'quantity')
+        fields = ('medicine', 'quantity','unit')
 
     def __init__(self, *args, **kwargs):
         super(RequestMedicine, self).__init__(*args, **kwargs)
+        self.fields['medicine'].widget.attrs['class'] = 'medicine_item'
+        self.fields['unit'].widget.attrs['class'] = 'medicine_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['medicine'].required = False
+        # self.fields['quantity'].required = False
 
 class RequestFood(forms.ModelForm):
+    food = forms.ModelChoiceField(queryset = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='Sack - 20kg'))
     class Meta:
         model = Food_Request
-        fields = ('food', 'quantity')
+        fields = ('food', 'quantity','unit')
 
     def __init__(self, *args, **kwargs):
         super(RequestFood, self).__init__(*args, **kwargs)
+        self.fields['food'].widget.attrs['class'] = 'food_item'
+        self.fields['unit'].widget.attrs['class'] = 'food_unit'
+        self.fields['unit'].widget.attrs['readonly'] = True
+        # self.fields['food'].required = False
+        # self.fields['quantity'].required = False
+
+class ReplenishmentForm(forms.ModelForm):
+    handler = forms.ModelChoiceField(queryset = User.objects.all(), empty_label=None)
+    class Meta:
+        model= Replenishment_Request
+        fields = ('handler',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ReplenishmentForm, self).__init__(*args, **kwargs)
+
+class ItemReplenishmentForm(forms.Form):
+    TYPE = (
+        ('------------', '------------'),
+        ('Dog Food', 'Dog Food'),
+        ('Medicine', 'Medicine'),
+        ('Miscellaneous', 'Miscellaneous'),
+    )
+    item_type = forms.CharField(widget=forms.Select(choices=TYPE))
+    # item_id = forms.IntegerField()
+    item = forms.CharField(widget=forms.Select())
+    uom = forms.CharField()
+    quantity = forms.IntegerField()
+    on_hand = forms.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        super(ItemReplenishmentForm, self).__init__(*args, **kwargs)
+        self.fields['uom'].widget.attrs['readonly'] = True
+        self.fields['item_type'].widget.attrs['class'] = 'type'
+        self.fields['quantity'].widget.attrs['class'] = 'quantity'
+        self.fields['item'].widget.attrs['class'] = 'item'
+        self.fields['uom'].widget.attrs['class'] = 'uom'
+        self.fields['item_type'].widget.attrs['name'] = 'item_type'
+        self.fields['item'].widget.attrs['name'] = 'item'
+        self.fields['uom'].widget.attrs['name'] = 'uom'
+        self.fields['quantity'].widget.attrs['name'] = 'quantity'
+        self.fields['on_hand'].widget.attrs['name'] = 'on_hand'
+        self.fields['on_hand'].widget.attrs['class'] = 'on_hand'
+        self.fields['on_hand'].required = False
+        self.fields['on_hand'].widget.attrs['readonly'] = True
+    

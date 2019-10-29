@@ -28,12 +28,21 @@
         </thead>
         <tbody>
             {% for data in k9_dw %}
-            <tr>
+            {% if data.1 == today%}
+            <tr class="positive">
                 <td>{{data.0}}</td>
-                <td class="center aligned">{{data.1}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
+            {% elif today > data.1%}
+            <tr class="negative">
+                <td>{{data.0}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td class="three wide column center aligned"><a href="#"
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
+            </tr>
+            {%endif%}
             {% endfor %}
         </tbody>
     </table>
@@ -49,12 +58,21 @@
         </thead>
         <tbody>
             {% for data in k9_dh %}
-            <tr>
+            {% if data.1 == today%}
+            <tr class="positive">
                 <td>{{data.0}}</td>
-                <td class="center aligned">{{data.1}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='DHPP'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
+            {% elif today > data.1%}
+            <tr class="negative">
+                <td>{{data.0}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td class="three wide column center aligned"><a href="#"
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
+            </tr>
+            {%endif%}
             {% endfor %}
         </tbody>
     </table>
@@ -69,13 +87,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for data in k9_aw %}
-            <tr>
+            {% for data in k9_ar %}
+            {% if data.1 == today%}
+            <tr class="positive">
                 <td>{{data.0}}</td>
-                <td class="center aligned">{{data.1}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Anti-Rabies'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
+            {% elif today > data.1%}
+            <tr class="negative">
+                <td>{{data.0}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td class="three wide column center aligned"><a href="#"
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
+            </tr>
+            {%endif%}
             {% endfor %}
         </tbody>
     </table>
@@ -91,12 +118,21 @@
         </thead>
         <tbody>
             {% for data in k9_br %}
-            <tr>
+            {% if data.1 == today%}
+            <tr class="positive">
                 <td>{{data.0}}</td>
-                <td class="center aligned">{{data.1}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Bordertella'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
+            {% elif today > data.1%}
+            <tr class="negative">
+                <td>{{data.0}}</td>
+                <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td class="three wide column center aligned"><a href="#"
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
+            </tr>
+            {%endif%}
             {% endfor %}
         </tbody>
     </table>
@@ -107,7 +143,7 @@
 
 $(document).ready(function() {
     $( ".btn_modal" ).bind( "click", function() {
-        var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
+        var url = 'vaccination-list/ajax_load_yearly_vac';  
         id = $(this).attr('id');
         type = $(this).data('type');
        
@@ -124,10 +160,18 @@ $(document).ready(function() {
         $('#id_modal_data').modal('show');
     });
 
-    $('#tabledata1').DataTable();
-    $('#tabledata2').DataTable();
-    $('#tabledata3').DataTable();
-    $('#tabledata4').DataTable();
+    $('#tabledata1').DataTable({
+        "order": [[ 1, "asc" ]]
+    });
+    $('#tabledata2').DataTable({
+        "order": [[ 1, "asc" ]]
+    });
+    $('#tabledata3').DataTable({
+        "order": [[ 1, "asc" ]]
+    });
+    $('#tabledata4').DataTable({
+        "order": [[ 1, "asc" ]]
+    });
     $('.menu .item').tab();
 
 });

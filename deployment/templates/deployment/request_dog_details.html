@@ -113,22 +113,31 @@
         <th>Name</th>
         <th>Serial Number</th>
         <th>Capability</th>
-        <th>Handler</th>
-          <th>Status</th>
-         <th></th>
+        <th>Personnel</th>
+          <th>Position</th>
+          <!--<th></th>-->
       </tr>
   </thead>
   <tbody>
+        {% if tl_dog %}}
+        <tr>
+            <td>{{tl_dog.name}}</td>
+        <td>{{tl_dog.serial_number}}</td>
+        <td>{{tl_dog.capability}}</td>
+        <td>{{tl_dog.handler}}</td>
+        <td>Team Leader</td>
+        </tr>
+        {% endif %}
        {% for dogs_deployed in dogs_deployed %}
       <tr>
         <td>{{dogs_deployed.k9.name}}</td>
         <td>{{dogs_deployed.k9.serial_number}}</td>
         <td>{{dogs_deployed.k9.capability}}</td>
         <td>{{dogs_deployed.k9.handler}}</td>
-          <td></td>
-          <td class="ui center aligned" style="width:15%;">
-           <a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>
-         </td>
+        <td>Handler</td>
+          <!--<td class="ui center aligned" style="width:15%;">-->
+           <!--<a href="{% url 'deployment:remove_dog_request' dogs_deployed.id %}" onclick="return confirm('Are you sure?')" class="ui red basic button">Pull-out</a>-->
+         <!--</td>-->
       </tr>
         {% endfor %}
   </tbody>
@@ -193,9 +202,10 @@
 
        </div>
 
+
        <div class="ui basic segment" style="border-style: none;">
          <label>No. of K9s Scheduled: </label>
-         {% if data2.k9s_deployed >= data2.total_dogs_demand %}
+         {% if data2.k9s_deployed >= data2.k9s_needed %}
              <span class="ui green circular label">{{data2.k9s_deployed}}</span>
          {%else%}
              <span class="ui orange circular label">{{data2.k9s_deployed}}</span>
@@ -221,6 +231,8 @@
     </div>
   </div>
 
+    {% if user.position != "Handler" and user.position != "Team Leader" %}
+
     <div class="ui info message">
   <i class="close icon"></i>
   <div class="header">
@@ -230,13 +242,12 @@
       <li>Below is a list of available K9s that don't have conflicting schedules with the current request.</li>
       <li>Currently deployed K9s can also be listed here as long as k9 has no conflicting schedules with the request.</li>
       <li>Any of the K9s selected from the list will be scheduled and automatically deployed when the date of request arrives.</li>
-      <li>The current location of the K9 will be listed as "PCGK9 Taguig Base" if they have not gone through initial deployment. The current location will be listed by their last known deployment location(non-requests).</li>
+      <li>The current location will be listed by their last known deployment location(non-requests).</li>
       <li>If a team has finished it's request, the team is immediately sent back to the last known deployment location.</li>
-      <li>A notification will alert you a week before and on the date of request.</li>
   </ul>
 </div>
 
-  {% if data2.status == "Approved" %}
+  {% if data2.status == "Approved"%}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata3" class="ui nine column celled table">
@@ -263,14 +274,14 @@
         {% for idx, can_deploy in can_deploy_df.iterrows %}
         <tr class="ui center aligned">
             <td style="width:10%;">
-                <input type="checkbox" name="checks" value="{{can_deploy.id}}">
+                <input type="checkbox" name="checks" value={{can_deploy.K9.id}}>
               </td>
             <td>{{idx|add_one}}</td>
             <td>{{can_deploy.K9.name}}</td>
              <td>{{can_deploy.K9.serial_number}}</td>
             <td>{{can_deploy.K9.capability}}</td>
             <td>{{can_deploy.K9.handler}}</td>
-            <td>{{can_deploy.Location}}</td>
+            <td>{{can_deploy.Location.place}}</td>
             <td>{{can_deploy.Area}}</td>
             <td>{{can_deploy.Distance}} miles</td>
             <td>{{can_deploy.Maritime}}</td>
@@ -284,7 +295,7 @@
     </table>
 
     <div class="ui basic center aligned segment" style="padding: 0px;">
-        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Deploy</button>
+        <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Schedule K9s</button>
     </div>
   </form>
   {% elif data2.status == "Done" %}
@@ -303,14 +314,30 @@
 </div>
     {% endif %}
 
+{% else %}
+
+    <div class="ui visible message">
+      <div class="header">
+   You are not allowed to deploy k9s.
+  </div>
+
+  </div>
+
+{% endif %}
+
 </div>
 
 <script type="text/javascript">
 
     $(document).ready(function() {
         $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
+        $('#tabledata2').DataTable({
+              "order": [[ 4, "desc" ]]
+        });
+        $('#tabledata3').DataTable({
+              "order": []
+        });
+
         $('.menu .item').tab();
     });
 
