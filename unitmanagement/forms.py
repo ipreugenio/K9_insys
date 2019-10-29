@@ -6,7 +6,7 @@ from django.forms import formset_factory, inlineformset_factory, modelformset_fa
 from django.contrib.sessions.models import Session
 
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Equipment_Request, VaccineUsed, Food_Request, Medicine_Request
-from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
+from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident, All_Item_Request
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory
 from profiles.models import Account, User
@@ -308,7 +308,6 @@ class ReproductiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ReproductiveForm, self).__init__(*args, **kwargs)
         self.fields['last_proestrus_date'].required = False
-
 
 class RequestEquipment(forms.ModelForm):
     class Meta:

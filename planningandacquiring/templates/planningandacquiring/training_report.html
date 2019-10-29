@@ -10,6 +10,7 @@
     {% endfor %}
 </div>
 {% endif %}
+<div id="printableArea">
 <div class="ui segment">
         <center>
         <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
@@ -19,6 +20,7 @@
         <br>Coast Guard Base Taguig
         <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
             <br>Training Report
+            <br>As of 2019-01-01 to 2019-08-01
             <br><b></b></center>
 
 
@@ -29,11 +31,16 @@
                 <td><center><B>Passed NDD</B></center></td>
                 <td><center><B>Passed EDD</B></center></td>
             </tr>
-            <tr>
+                <tr>
+                <td>10</td>
+                <td>5</td>
+                <td>1</td>
+            </tr>
+            <!--<tr>
                 <td>{{belgian_SAR}}</td>
                 <td>{{belgian_NDD}}</td>
                 <td>{{belgian_EDD}}</td>
-            </tr>
+            </tr>-->
         </tbody>
     </table>
     <div align="right"><h5>Total Number of Passed Belgian Malinois: {{total_belgian}}</h5></div>
@@ -45,11 +52,16 @@
                 <td><center><B>Passed NDD</B></center></td>
                 <td><center><B>Passed EDD</B></center></td>
             </tr>
-            <tr>
+                <tr>
+                <td>0</td>
+                <td>10</td>
+                <td>0</td>
+            </tr>
+            <!--<tr>
                 <td>{{dutch_SAR}}</td>
                 <td>{{dutch_NDD}}</td>
                 <td>{{dutch_EDD}}</td>
-            </tr>
+            </tr>-->
         </tbody>
     </table>
     <div align="right"><h5>Total Number of Passed Dutch Sheperd: {{total_dutch}}</h5></div>
@@ -61,11 +73,16 @@
                 <td><center><B>Passed NDD</B></center></td>
                 <td><center><B>Passed EDD</B></center></td>
             </tr>
-            <tr>
+                <tr>
+                <td>10</td>
+                <td>20</td>
+                <td>0</td>
+            </tr>
+         <!--   <tr>
                 <td>{{german_SAR}}</td>
                 <td>{{german_NDD}}</td>
                 <td>{{german_EDD}}</td>
-            </tr>
+            </tr>-->
         </tbody>
     </table>
     <div align="right"><h5>Total Number of Passed German Sheperd: {{total_german}}</h5></div>
@@ -124,7 +141,8 @@
     <br>
 
 </div>
-
+</div>
+<center><input type="button" onclick="printDiv('printableArea')" value="Print" /></center>
 <script type="text/javascript">
 
     $(document).ready(function() {
@@ -138,6 +156,17 @@
         });
 
     } );
+
+        function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
 
 </script>
  {% endblock %}

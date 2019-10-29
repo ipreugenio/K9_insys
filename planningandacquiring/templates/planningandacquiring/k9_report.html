@@ -10,6 +10,7 @@
     {% endfor %}
 </div>
 {% endif %}
+<div id="printableArea">
 <div class="ui segment">
         <center>
         <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
@@ -19,6 +20,7 @@
         <br>Coast Guard Base Taguig
         <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
             <br>K9 Generalized Report
+            <br>As of 2019-01-01 to 2019-08-01
             <br><b></b></center>
 
 
@@ -26,30 +28,30 @@
         <tbody>
             <tr>
                 <td>Puppy</td>
-                <td>{{puppy}}</td>
+                <td>5</td>
             </tr>
                     <tr>
                 <td>Unclassified</td>
-                <td>{{unclassified}}</td>
+                <td>10</td>
             </tr>
                     <tr>
                 <td>Classified</td>
-                <td>{{classified}}</td>
+                <td>10</td>
             </tr>
                     <tr>
                 <td>On Training</td>
-                <td>{{on_training}}</td>
+                <td>30</td>
             </tr>
                     <tr>
                 <td>Trained</td>
-                <td>{{trained}}</td>
+                <td>30</td>
             </tr>
                     <tr>
                 <td>For Breeding</td>
-                <td>{{for_breeding}}</td>
+                <td>20</td>
             </tr>            <tr>
                 <td>For Deployment</td>
-                <td>{{for_deployment}}</td>
+                <td>100</td>
             </tr>
                     <tr>
                 <td>Breeding</td>
@@ -91,6 +93,9 @@
     <br>
 
 </div>
+</div>
+
+<center><input type="button" onclick="printDiv('printableArea')" value="Print" /></center>
 
 <script type="text/javascript">
 
@@ -106,5 +111,17 @@
 
     } );
 
+    function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
+
 </script>
  {% endblock %}
+

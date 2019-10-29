@@ -45,6 +45,8 @@ from datetime import datetime as dt
 
 from datetime import timedelta
 
+from itertools import chain
+
 from datetime import date
 
 # from faker import Faker
@@ -1650,7 +1652,6 @@ def vet_report(request):
             arr = [medi.medicine, k9_count]
             med_data.append(arr)
 
-    print(k9_count)
     print(med_distinct)
 
     # SICKNESS
@@ -1719,6 +1720,88 @@ def inventory_report(request):
     to_date = request.session["to_date"]
     user = user_session(request)
 
+
+##### MEDICINES #####
+    medsused = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
+    mu_data = []
+    mu_disinct = medsused.values('inventory').distinct()
+
+    med_subtracted_quantity = 0
+    med_total_expenses = 0
+    med_received_quantity = 0
+
+    medsreceived = Medicine_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
+
+    for mu in mu_disinct:
+        for key, value in mu.items():
+
+            med = medsused.filter(inventory__id=value).latest('id')
+            received = medsreceived.filter(inventory__id=value).latest('id')
+            med_subtracted_quantity += med.quantity
+            med_total_expenses = med_subtracted_quantity * med.price
+            med_received_quantity += received.quantity
+            arr = [med.inventory, med_received_quantity, med_subtracted_quantity, med.price, med_total_expenses]
+            mu_data.append(arr)
+
+##### MISCELLANEOUS #####
+
+    miscused = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
+    misc_data = []
+    misc_disinct = miscused.values('inventory').distinct()
+
+    misc_subtracted_quantity = 0
+    misc_total_expenses = 0
+    misc_received_quantity = 0
+
+    miscreceived = Miscellaneous_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
+
+    miscellaneous = Miscellaneous.objects.all()
+
+    for misc in misc_disinct:
+        for key, value in misc.items():
+
+            mi = miscused.filter(inventory__id=value).latest('id')
+            received = miscreceived.filter(inventory__id=value).latest('id')
+           # print(miscellaneous)
+            m = miscellaneous.filter(id=value).latest('id')
+            misc_subtracted_quantity += mi.quantity
+            misc_total_expenses = misc_subtracted_quantity * m.price
+            misc_received_quantity += received.quantity
+            arr = [mi.inventory, misc_received_quantity, misc_subtracted_quantity, m.price, misc_total_expenses]
+            misc_data.append(arr)
+
+##### FOOD #####
+
+    foodused = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
+    food_data = []
+    food_disinct = foodused.values('inventory').distinct()
+
+    food_subtracted_quantity = 0
+    food_total_expenses = 0
+    food_received_quantity = 0
+
+    foodreceived = Food_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
+
+    item = Food.objects.all()
+
+    for food in food_disinct:
+        for key, value in food.items():
+            fo = foodused.filter(inventory__id=value).latest('id')
+            received = foodreceived.filter(inventory__id=value).latest('id')
+            f = item.filter(id=value).latest('id')
+
+            food_subtracted_quantity += fo.quantity
+            food_total_expenses = food_subtracted_quantity * f.price
+            food_received_quantity += received.quantity
+
+            print(fo.quantity)
+            print(food_subtracted_quantity)
+            print(received.quantity)
+            print(food_received_quantity)
+
+            arr = [fo.inventory, food_received_quantity, food_subtracted_quantity, f.price, food_total_expenses]
+            food_data.append(arr)
+
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
@@ -1726,6 +1809,9 @@ def inventory_report(request):
         'from_date': from_date,
         'to_date': to_date,
         'user': user,
+        'mu_data': mu_data,
+        'misc_data': misc_data,
+        'food_data': food_data,
 
     }
 
@@ -1992,29 +2078,28 @@ def dog_request_report(request):
     event_data = []
     event_distinct = event.values('requester').distinct()
 
-    deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
-    dog_distinct = deployed.values('k9').distinct()
-    dog_data = []
-
-    for d in dog_distinct:
-        for key, value2 in d.items():
-            print(value2)
-            print(dog_distinct)
-            SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
-            NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
-            EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
-            print(SAR)
-            print(NDD)
-            print(EDD)
-            print("HELLO")
+    # deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
+    # dog_distinct = deployed.values('request').distinct()
+    # dog_data = []
+    #
+    # for d in dog_distinct:
+    #     for key, value2 in d.items():
+    #         print(value2)
+    #         print(dog_distinct)
+    #         SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
+    #         NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
+    #         EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
+    #         print("HELLO")
 
     for e in event_distinct:
         for key, value in e.items():
             print(value)
             print(event_distinct)
 
+            #Team_Dog_Deployed.objects.filter(team_requested=event.requester)
+
             event = event.filter(requester=value).latest('start_date')
-            arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
+            arr = [event.event_name, event.k9s_needed, event.k9s_deployed]
             event_data.append(arr)
 
 
