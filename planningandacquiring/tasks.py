@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from unitmanagement.models import Notification
 from planningandacquiring.models import K9, K9_Mated
 from django.db.models import Q
+from deployment.models import K9_Schedule
 
 # @periodic_task(run_every=crontab(hour=9, minute=0))
 # def test():
@@ -36,7 +37,7 @@ def update_in_heat():
         p.save()
 
 # @periodic_task(run_every=crontab(hour=8, minute=50))
-# @periodic_task(run_every=timedelta(seconds=10)) 
+# @periodic_task(run_every=timedelta(seconds=25))
 def in_heat_notifs():
     print('in-heat')
     # HEAT CYCLE
@@ -65,7 +66,7 @@ def in_heat_notifs():
             
 
 # @periodic_task(run_every=timedelta(seconds=30))
-@periodic_task(run_every=timedelta(seconds=10))  
+@periodic_task(run_every=timedelta(seconds=25))
 def k9_confirm_pregancy():
     # k9 might give birth
     print('running')
@@ -79,7 +80,7 @@ def k9_confirm_pregancy():
     # k9 might get pregnant
     kb = K9_Mated.objects.filter(status='Breeding')
     for kbb in kb:
-        due = kmm.date_mated + relativedelta(days=22)
+        due = kbb.date_mated + relativedelta(days=22)
         print('breeding', due)
         if date.today() == due:
             Notification.objects.create(k9=kbb.mother, position='Veterinarian', message='Please confirm if ' + str(kbb.mother) + ' is pregnant or not.', notif_type='breeding', other_id=kbb.id)

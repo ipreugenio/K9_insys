@@ -935,7 +935,7 @@ def add_K9_offspring(request, id):
                 k9_count = k9_count+1
 
             died =  request.POST.get('litter_died')
-            K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=k9_count, litter_died=died)
+            K9_Litter.objects.create(mother=data.mother, father=data.father, litter_no=int(k9_count), litter_died=int(died))
             
             #Mom
             mom = K9.objects.get(id=data.mother.id)

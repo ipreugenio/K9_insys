@@ -288,7 +288,7 @@ def check_handlers_with_multiple_k9s():
 def add_area(request):
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
-    mass_populate()
+    # mass_populate()
     # k9s = K9.objects.all()
     # for k9 in k9s:
     #     k9.save()

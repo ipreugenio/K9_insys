@@ -67,7 +67,7 @@
                 <td>{{data.0.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='DHPP'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPP'>Select</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -91,7 +91,7 @@
                 <td>{{data.0.age_days}}</td>
                 <td >{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Anti-Rabies'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Anti-Rabies'>Select</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -115,7 +115,7 @@
                 <td>{{data.0.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Bordertella'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Bordertella'>Select</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -133,13 +133,13 @@
             </tr>
         </thead>
         <tbody>
-            {% for data in k9_dh %}
+            {% for data in k9_d4 %}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.0.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
-                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='DHPPIL4'>Select</a></td>
+                class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPPIL4'>Select</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -164,7 +164,7 @@
                     <td>{{data.0.age_days}}</td>
                     <td>{{data.1.disease}}</td>
                     <td class="three wide column center aligned"><a href="#"
-                    class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Heartworm'>Select</a></td>
+                    class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Heartworm'>Select</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -189,7 +189,7 @@
                         <td>{{data.0.age_days}}</td>
                         <td>{{data.1.disease}}</td>
                         <td class="three wide column center aligned"><a href="#"
-                        class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='TickFlee'>Select</a></td>
+                        class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='TickFlee'>Select</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -200,7 +200,11 @@
 <script>
 
     $(document).ready(function() {
+
+        $('.menu .item').tab();
     
+    });
+
         $('#tabledata1').DataTable({
             "order": [[ 1, "desc" ]]
         });
@@ -222,9 +226,6 @@
         $('#tabledata7').DataTable({
             "order": [[ 1, "desc" ]]
         });
-        $('.menu .item').tab();
-    
-    });
     $( ".btn_modal" ).bind( "click", function() {
             var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
             id = $(this).attr('id');

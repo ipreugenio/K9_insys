@@ -176,67 +176,73 @@ def dashboard(request):
     except ObjectDoesNotExist:
         ab_k9 = 0
         ab_total = None
-
-    kdi = K9_Pre_Deployment_Items.objects.filter(status='Pending').exclude(initial_sched__date_end__lt=date.today())
-
-    pre_req_count = 0
-    for kp in kdi:
-        date_1 = kp.initial_sched.date_start - relativedelta(days=5)
-        if date.today() >= date_1:
-            pre_req_count = pre_req_count+1
-
-    collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    food = Food.objects.filter(foodtype="Adult Dog Food").aggregate(sum=Sum('quantity'))['sum']
-    medicines = Medicine_Inventory.objects.filter(medicine__med_type="Vitamins").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-    ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
-
     item_list = []
-    if collar < 0:
-        a = abs(collar)
-        b = ['Collar',a]
-        item_list.append(b)
-    if vest < 0:
-        a = abs(vest)
-        b = ['Vest',a]
-        item_list.append(b)
-    if leash < 0:
-        a = abs(leash)
-        b = ['Leash',a]
-        item_list.append(b)
-    if shipping_crate < 0:
-        a = abs(shipping_crate)
-        b = ['Shipping Crate',a]
-        item_list.append(b)
-    if food < 0:
-        a = abs(food)
-        b = ['Food',a]
-        item_list.append(b)
-    if medicines < 0:
-        a = abs(medicines)
-        b = ['Vitamins',a]
-        item_list.append(b)
-    if grooming_kit < 0:
-        a = abs(grooming_kit)
-        b = ['Grooming Kit',a]
-        item_list.append(b)
-    if first_aid_kit < 0:
-        a = abs(first_aid_kit)
-        b = ['First Aid Kit',a]
-        item_list.append(b)
-    if oral_dextrose < 0:
-        a = abs(oral_dextrose)
-        b = ['Oral Dextrose',a]
-        item_list.append(b)
-    if ball < 0:
-        a = abs(ball)
-        b = ['Ball',a]
-        item_list.append(b)
+    pre_req_count = 0
+    try:
+        kdi = K9_Pre_Deployment_Items.objects.filter(status='Pending').exclude(initial_sched__date_end__lt=date.today())
+
+        for kp in kdi:
+            date_1 = kp.initial_sched.date_start - relativedelta(days=5)
+            if date.today() >= date_1:
+                pre_req_count = pre_req_count+1
+
+        try:
+            collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            food = Food.objects.filter(foodtype="Adult Dog Food").aggregate(sum=Sum('quantity'))['sum']
+            medicines = Medicine_Inventory.objects.filter(medicine__med_type="Vitamins").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+            ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").aggregate(sum=Sum('quantity'))['sum'] - pre_req_count
+
+            if collar < 0:
+                a = abs(collar)
+                b = ['Collar',a]
+                item_list.append(b)
+            if vest < 0:
+                a = abs(vest)
+                b = ['Vest',a]
+                item_list.append(b)
+            if leash < 0:
+                a = abs(leash)
+                b = ['Leash',a]
+                item_list.append(b)
+            if shipping_crate < 0:
+                a = abs(shipping_crate)
+                b = ['Shipping Crate',a]
+                item_list.append(b)
+            if food < 0:
+                a = abs(food)
+                b = ['Food',a]
+                item_list.append(b)
+            if medicines < 0:
+                a = abs(medicines)
+                b = ['Vitamins',a]
+                item_list.append(b)
+            if grooming_kit < 0:
+                a = abs(grooming_kit)
+                b = ['Grooming Kit',a]
+                item_list.append(b)
+            if first_aid_kit < 0:
+                a = abs(first_aid_kit)
+                b = ['First Aid Kit',a]
+                item_list.append(b)
+            if oral_dextrose < 0:
+                a = abs(oral_dextrose)
+                b = ['Oral Dextrose',a]
+                item_list.append(b)
+            if ball < 0:
+                a = abs(ball)
+                b = ['Ball',a]
+                item_list.append(b)
+        except:
+            pass
+
+    except kdi.ObjectDoesNotExist:
+        pass
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -802,6 +808,7 @@ def handler_dashboard(request):
     return render (request, 'profiles/handler_dashboard.html', context)
 
 def vet_dashboard(request):
+
     user = user_session(request)
     today = datetime.today()
 
@@ -849,7 +856,8 @@ def vet_dashboard(request):
 
     #health pending
     h_c = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
-    th_c = Transaction_Health.objects.filter(status='Pending').count()
+    hh =  K9_Incident.objects.filter(incident='Sick').filter(status='Pending')
+    th_c = Transaction_Health.objects.filter(status='Pending').exclude(follow_up__in=hh).count()
     health_pending = h_c +th_c
     # pending incidents
     incident =  K9_Incident.objects.filter(incident='Accident').filter(status='Pending').count()

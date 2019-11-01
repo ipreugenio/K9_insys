@@ -383,6 +383,23 @@ class K9_Litter(models.Model):
     litter_no = models.IntegerField('litter_no', blank=True, null=True)
     litter_died = models.IntegerField('litter_died', blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if self.litter_no == None:
+            self.litter_no = 0
+        if self.litter_died == None:
+            self.litter_died = 0
+
+        litter = int(self.litter_no) - int(self.litter_died)
+
+        if  self.mother.litter_no < litter:
+            self.mother.litter_no = litter
+            self.mother.save()
+
+        if  self.father.litter_no < litter:
+            self.father.litter_no = litter
+            self.father.save()
+        super(K9_Litter, self).save(*args, **kwargs)
+
 class K9_Past_Owner(models.Model):
     SEX = (
         ('Male', 'Male'),

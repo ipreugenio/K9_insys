@@ -23,9 +23,9 @@
                             <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">
                                 <i class="retweet icon"></i>Reallocate Assets
                             </a>
-                            <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">
-                                <i class="clipboard list icon"></i>On-Leave Request list
-                            </a>
+                            <!--<a href="{% url 'unitmanagement:on_leave_list'%}" class="item">-->
+                                <!--<i class="clipboard list icon"></i>On-Leave Request list-->
+                            <!--</a>-->
                             <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
                                 <i class="clipboard list icon"></i>K9 Incident List
                             </a>
@@ -105,9 +105,9 @@
                                 <i class="clipboard list icon"></i>Health Concern List
                             </a>
                             {% endif %}
-                            <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
-                                <i class="question icon"></i>On-Leave Request
-                            </a>
+                            <!--<a href="{% url 'unitmanagement:on_leave_request'%}" class="item">-->
+                                <!--<i class="question icon"></i>On-Leave Request-->
+                            <!--</a>-->
 
                             {% elif request.session.session_user_position == "Team Leader" %}
                             <a href="{% url 'unitmanagement:replenishment_form'%}" class="item">

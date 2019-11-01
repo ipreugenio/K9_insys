@@ -379,7 +379,7 @@ def vaccination_list(request):
             if k9.age_days >=84:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='2nd Tick and Flea Prevention')
                 dwd = [k9,vu]
-                k9_hw.append(dwd)
+                k9_tf.append(dwd)
         #12 weeks
         if vr.dhppil_cv_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -525,14 +525,15 @@ def vaccine_submit(request):
             disease = request.POST.get('disease')
 
             f = form.save(commit=False)
-            
+            print(disease)
             vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease=disease)
             vu.veterinary = user
             vu.vaccine = f.vaccine
             vu.date_vaccinated = f.date_vaccinated
             vu.veterinary = user
             vu.image = f.image
-            
+
+            print(vu.disease)
             if vu.disease == '1st Deworming':
                 vr.deworming_1 = True
             elif vu.disease == '2nd Deworming':
@@ -547,7 +548,7 @@ def vaccine_submit(request):
                 vr.bordetella_1 = True
             elif vu.disease == '1st Tick and Flea Prevention':
                 vr.tick_flea_1 = True
-            elif vu.disease == '2nd dose DHPPiL+CV Vaccination':
+            elif vu.disease == '2nd dose DHPPiL+CV':
                 vr.dhppil_cv_2 = True
             elif vu.disease == '4th Deworming':
                 vr.deworming_4 = True
@@ -555,7 +556,7 @@ def vaccine_submit(request):
                 vr.heartworm_2 = True
             elif vu.disease == '2nd dose Bordetella Bronchiseptica Bacterin':
                 vr.bordetella_2 = True
-            elif vu.disease == 'Anti-Rabies Vaccination	':
+            elif vu.disease == 'Anti-Rabies Vaccination':
                 vr.anti_rabies = True
             elif vu.disease == '2nd Tick and Flea Prevention':
                 vr.tick_flea_2 = True
@@ -592,10 +593,13 @@ def vaccine_submit(request):
             mi = Medicine_Inventory.objects.get(id=vu.vaccine.id)
             mi.quantity = mi.quantity - 1
 
+            print(vu.disease)
+            print(mi, mi.quantity,vr.anti_rabies)
             if mi.quantity > 0 :
                 vu.save()
                 vr.save()
                 mi.save()
+                k9.save()
 
             messages.success(request, str(k9) + ' has been given ' + str(f.vaccine))
             return HttpResponseRedirect('vaccination-list')
@@ -1773,11 +1777,11 @@ def k9_sick_form(request):
 
             style = "ui green message"
             messages.success(request, 'Health Concern has been successfully Reported!')
-
+            return redirect('profiles:handler_dashboard')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
-
+            return redirect('unitmanagement:k9_sick_form')
 
     #NOTIF SHOW
     notif_data = notif(request)
