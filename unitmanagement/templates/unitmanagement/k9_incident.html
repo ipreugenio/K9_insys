@@ -56,7 +56,7 @@
         </div>
 
         <div class="ui inverted right aligned segment" style="padding: 0px;">
-            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >{{ actiontype }}</button>
+            <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" name='incident'>{{ actiontype }}</button>
         </div>
     </form>
 </div>
@@ -75,6 +75,25 @@
                 $("input[name='clinic']").prop('disabled', true);
             }
         });
+
+
+        if($("#id_death_cert").val() != ''){
+            $("#dead").prop('disabled', false);
+            $("#recovered").prop('disabled', true);
+        }else{
+            $("#dead").prop('disabled', true);
+            $("#recovered").prop('disabled', false);
+        }
+
+        $("#id_death_cert").change(function(){
+            if($("#id_death_cert").val() != ''){
+                $("#dead").prop('disabled', false);
+                $("#recovered").prop('disabled', true);
+            }else{
+                $("#dead").prop('disabled', true);
+                $("#recovered").prop('disabled', false);
+            }
+        })
 
     });
     

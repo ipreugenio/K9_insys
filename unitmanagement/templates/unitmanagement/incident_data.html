@@ -8,10 +8,29 @@
   <div class="description">
     <p id = 'data_1'>{{data_load.description}}</p>
   </div>
+
 </div>
-<div class="actions">
-    <a href="{% url 'unitmanagement:confirm_death' data_load.id %}" class="ui approve green button">Confirm</a>
+
+<div class="ui segment">
+    <form method="POST" class="ui form">
+        <div class="field">
+          <label>Death Date</label>
+          {{form.death_date}}
+        </div>
+        <div class="field">
+          <label>Death Certificate</label>
+          {{form.death_cert}}
+        </div>
+      </form>
+      <div class="ui basic segment">
+          <center>
+              <button class="ui red button">Died</button>
+              <button class="ui green button">Recovered</button>
+            </center>
+      </div>
+    
 </div>
+
 {% endblock %}
 
 {% endif %}

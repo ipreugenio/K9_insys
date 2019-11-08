@@ -27,7 +27,7 @@ from planningandacquiring.models import K9, Actual_Budget
 
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous_Received_Trail, Food_Received_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, ItemReplenishmentForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, ItemReplenishmentForm, DeathCertK9
 
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
 
@@ -1637,7 +1637,9 @@ def k9_incident(request):
     num = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick').count()
     incident = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick')
 
-    if request.method == "POST":
+    # form1 = DeathCertK9(request.POST or None, instance=dog) 
+    
+    if request.method == "POST" and 'incident' in request.POST:
         if form.is_valid():
             f = form.save(commit=False)
             f.reported_by = user
@@ -1648,6 +1650,13 @@ def k9_incident(request):
 
             return redirect('unitmanagement:k9_incident')
 
+    # elif request.method=='POST' and 'dead' in request.POST:
+    #     if form1.is_valid():
+    #         dog.death_cert = form1.data['death_cert']
+    #         dog.death_date = form1.data['death_date']
+    # elif request.method=='POST' and 'recovered' in request.POST:
+    #     print('recovered')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1655,6 +1664,7 @@ def k9_incident(request):
         'title': "K9 Incident",
         'actiontype': "Submit",
         'form': form,
+        # 'form1': form1,
         'style': style,
         'notif_data':notif_data,
         'count':count,
@@ -1663,6 +1673,10 @@ def k9_incident(request):
         'incident':incident,
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
+
+#TODO
+def k9_accident_death_handler(request):
+    pass
 
 # TODO
 def k9_incident_list(request):
@@ -2617,22 +2631,6 @@ def choose_handler_list(request, id):
     return render (request, 'unitmanagement/choose_handler_list.html', context)
 
 # TODO
-# K9 Died
-def confirm_death(request, id):
-    i = K9_Incident.objects.get(id=id)
-    i.status = 'Done'
-    i.save()
-
-    k9 = K9.objects.get(id=i.k9.id)
-    k9.status = "Dead"
-    k9.training_status = "Dead"
-    k9.save()
-
-    messages.success(request, i.k9.name + 'has been confirmed dead...')
-
-    return redirect('unitmanagement:k9_incident_list')
-
-# TODO
 # choose_handler Cycle
 def choose_handler(request, id):
     k9_id_partnered = request.session["k9_id_partnered"]
@@ -3317,14 +3315,23 @@ def load_image(request):
 def load_incident(request):
 
     data_load = None
+    k9 = None
+    form = None
     try:
         id = request.GET.get('id')
         data_load = K9_Incident.objects.get(id=id)
+        k9 = data_load.k9
+        form = DeathCertK9(request.POST or None, instance=k9) 
+        form.fields['death_cert'].initial = k9.death_cert
     except:
         pass
 
+    if request.method == "POST":
+        print(k9)
+        
     context = {
         'data_load': data_load,
+        'form':form,
     }
 
     return render(request, 'unitmanagement/incident_data.html', context)

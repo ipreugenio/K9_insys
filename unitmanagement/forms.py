@@ -388,3 +388,8 @@ class ItemReplenishmentForm(forms.Form):
         self.fields['on_hand'].required = False
         self.fields['on_hand'].widget.attrs['readonly'] = True
     
+class DeathCertK9(forms.ModelForm):
+    death_date = forms.DateField(widget = DateInput(), label=None)
+    class Meta:
+        model = K9
+        fields = ('death_cert','death_date')
