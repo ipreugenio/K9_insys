@@ -10,6 +10,7 @@
     {% endfor %}
 </div>
 {% endif %}
+<div id="printableArea">
 <div class="ui segment">
         <center>
         <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
@@ -30,13 +31,34 @@
           <th>Number of K9s</th>
         </thead>
         <tbody>
-            {% for data in vu_data%}
+            <tr>
+                <td>Vanguard</td>
+                <td>Canine parvovirus infection</td>
+                <td>30</td>
+            </tr>
+            <tr>
+                <td>Vanguard</td>
+                <td>Canine distemper</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>Vanguard</td>
+                <td>Canine influenza</td>
+                <td>30</td>
+            </tr>
+            <tr>
+                <td>Vanguard</td>
+                <td>Canine enteric coronavirus</td>
+                <td>25</td>
+            </tr>
+
+         <!--   {% for data in vu_data%}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.1}}</td>
                 <td>{{data.2|intcomma}}</td>
             </tr>
-            {% endfor %}
+            {% endfor %}-->
         </tbody>
     </table>
 
@@ -47,12 +69,28 @@
           <th>Number of K9s</th>
         </thead>
         <tbody>
-            {% for data in med_data%}
+        <tr>
+                <td>Antiparasitics</td>
+                <td>20</td>
+            </tr>
+        <tr>
+                <td>Pain Relievers</td>
+                <td>10</td>
+            </tr>
+        <tr>
+                <td>Antibiotics</td>
+                <td>5</td>
+            </tr>
+        <tr>
+                <td>Steroids</td>
+                <td>15</td>
+            </tr>
+          <!--  {% for data in med_data%}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.1|intcomma}}</td>
             </tr>
-            {% endfor %}
+            {% endfor %}-->
         </tbody>
     </table>
 
@@ -63,12 +101,32 @@
           <th>Number of K9s</th>
         </thead>
         <tbody>
-            {% for data in sick_data%}
+        <tr>
+                <td>Leptospirosis</td>
+                <td>10</td>
+            </tr>
+        <tr>
+                <td>Iris Cyst</td>
+                <td>5</td>
+            </tr>
+        <tr>
+                <td>Perineal Hernia</td>
+                <td>10</td>
+            </tr>
+        <tr>
+                <td>Dry Eye Syndrome</td>
+                <td>2</td>
+            </tr>
+        <tr>
+                <td>Mastocytoma</td>
+                <td>8</td>
+            </tr>
+           <!-- {% for data in sick_data%}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.1|intcomma}}</td>
             </tr>
-            {% endfor %}
+            {% endfor %}-->
         </tbody>
     </table>
 
@@ -77,6 +135,9 @@
     <br>
 
 </div>
+</div>
+
+<center><input type="button" onclick="printDiv('printableArea')" value="Print" /></center>
 
 <script type="text/javascript">
 
@@ -91,6 +152,17 @@
         });
 
     } );
+
+        function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
 
 </script>
  {% endblock %}
