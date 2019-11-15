@@ -30,7 +30,7 @@
                 <td>{{data.date}}</td>
                 <td>{{data.handler}}</td>
                 <td>{{data.date_from}} - {{data.date_to}}</td>
-                <td>{{data.duration}}</td>
+                <td>{{data.duration}} days</td>
                 <td>
                     <a href="{% url 'unitmanagement:on_leave_decision' data.id %}?leave=approve" class="ui tiny green button">Approve<a>
                     <a href="{% url 'unitmanagement:on_leave_decision' data.id %}?leave=deny" class="ui tiny red button">Deny</a>

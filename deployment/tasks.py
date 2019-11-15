@@ -427,7 +427,6 @@ def check_arrival_to_ports_via_request(team_assignment):
 
     return None
 
-
 # @periodic_task(run_every=crontab(hour=8, minute=30))
 # @periodic_task(run_every=timedelta(seconds=30))
 def check_arrivals():
@@ -446,4 +445,6 @@ def check_arrivals():
 
     update_port_info(team_list)
 
-#     return None
+    return None
+
+

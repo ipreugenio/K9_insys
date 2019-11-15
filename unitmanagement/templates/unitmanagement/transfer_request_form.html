@@ -1,4 +1,5 @@
-{% extends "profiles/sidebar_um.html" %}  
+{% extends "profiles/sidebar_um.html" %}
+{% load um_tags %}
 
 {% block content %}
 <div class="ui basic segment" style="margin-bottom:0px;">
@@ -19,7 +20,7 @@
   </ul>
 </div>
 
-<div><button class = "ui blue button" id = "view_calendar">View Calendar</button></div>
+<div class = "ui segment"><button class = "ui blue button" id = "view_calendar">View Calendar</button></div>
 <div class="ui two column centered grid">
     <div class="fourteen wide column">
             <div class="ui inverted segment">
@@ -39,41 +40,62 @@
                                 <label for="">Date of Transfer</label>
                                 {{form.date_of_transfer}}
                            </div>
-                           <div class="field"></div>
+                           <div class="field"><label for="">From Location</label>
+                                    {{form.location_from}}</div>
                         </div>
                         <div class="two fields">
                             <div class="field">
-                                    <label for="">From Location</label>
-                                    {{form.location_from}}
+                            <label for="">To Location</label>
                             </div>
                             <div class="field">
-                                    <label for="">To Location</label>
-                                    {{form.location_to}}
                             </div>
                         </div>
+
+                        <table id="tabledata1" class="ui inverted three column celled table">
+                            <thead>
+                            <tr>
+                            <th></th>
+                                <th>Team</th>
+                                <th>Current No. of Units in Port</th>
+                            </tr>
+                            </thead>
+                            {% for choice in team_form.location_to %}
+                             <tr>
+                                 <td>{{ choice.tag }}</td>
+                                 <td>{{ choice.choice_label }}</td>
+                                 <td>{{ choice|get_number_of_units }}</td>
+                                 </tr>
+                            {% endfor %}
+
+                             </table>
+
+
                         <div class="ui inverted right aligned segment" style="padding: 0px;">
                             <button onclick="return confirm('Are you sure?')" class = "ui button green" type="submit" >Submit</button>
                         </div>
-                   
+
                     </form>
                 </div>
-            
+                </div>
+
     </div>
-</div>
 
 <div class="ui longer modal" id ="calendar_modal">
-  <div class="header">Current Appointments</div>
+  <div class="header">Current Deployment Requests</div>
   <div class="content">
                        <div id = "calendar"></div>
   </div>
 </div>
 
 <script type="text/javascript">
-        
-    $(document).ready(function() {
-        $('#tabledata').DataTable();
-    });
-    
+
+	$(document).ready(function() {
+		$('#tabledata1').DataTable( {
+        "order": [[ 2, "asc" ]]
+        } );
+		$('.menu .item').tab();
+	});
+
 </script>
 
 <script>
@@ -112,14 +134,19 @@ $( "#view_calendar" ).click(function() {
                     allDay: 'true',
                 },
                 {% endfor %}
-
             ],
-
-
+            dayClick: function(date, jsEvent, view, resourceObj) {
+                    var formatted = date.format("YYYY-MM-DD");
+                    $("input[name='date_of_transfer']").val(formatted);
+                    $("input[name='date_of_transfer']").trigger("change");
+                    $('#calendar_modal').modal('hide');
+                  }
           }); // end #calendar
 
 
 </script>
+
+
 
 
  {% endblock %}

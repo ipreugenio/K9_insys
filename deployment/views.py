@@ -19,7 +19,7 @@ import re
 import sys
 from datetime import date
 
-from unitmanagement.models import Notification, Request_Transfer
+from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account
@@ -62,6 +62,9 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
 import random
 
 from deployment.tasks import assign_TL
+
+from functools import partial, wraps
+
 
 class MyDictionary(dict):
 
@@ -724,13 +727,15 @@ def request_dog_list(request):
     # print(user.position)
 
     if user.position == "Commander":
-        areas = Area.objects.get(commander = user)
+        areas = Area.objects.filter(commander = user).last()
         data = data.filter(area=areas).filter(sector_type = "Small Event")
+        print("A COMMANDER")
     else:
         data = data.filter(sector_type="Big Event")
+        print("NOT A COMMANDER")
 
     data1 = data.filter(status='Pending').exclude(start_date__lt = datetime.date.today())
-    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed'))
+    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed')).exclude(end_date__lt = datetime.date.today())
     data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
 
     # latest_date = Dog_Request.objects.latest('end_date')
@@ -768,7 +773,7 @@ def request_dog_details(request, id):
 
     # get instance of user using personal_info.id
     # id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader")
+    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave")
 
     user_deploy = []  # append the user itself
     for u in user:
@@ -832,18 +837,29 @@ def request_dog_details(request, id):
     for k9 in can_deploy:
         #1 = true, 0 = false
         deployable = 1
-        schedules = K9_Schedule.objects.filter(k9=k9).filter(status ="Request")
-        transfer_requests = Request_Transfer.objects.filter(handler = k9.handler)
+        schedules = K9_Schedule.objects.filter(k9=k9).filter(status ="Request").filter(date_start__gte = data2.start_date)
+        transfer_requests = Request_Transfer.objects.filter(handler = k9.handler).filter(date_of_transfer__gte = data2.start_date)
+        leaves = Handler_On_Leave.objects.filter(handler = k9.handler).filter(date_from__gte = data2.start_date)
 
         #TODO obtain schedule of request then compare to start and end date of schedules (loop)
         for sched in schedules:
-            if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
+            if (sched.date_start >= data2.start_date and sched.date_start <= data2.end_date) \
+                    or (sched.date_end >= data2.start_date and sched.date_end <= data2.end_date) \
+                    or (data2.start_date >= sched.date_start and data2.start_date <= sched.date_end) \
+                    or (data2.end_date >= sched.date_start and data2.end_date <= sched.date_end):
                 deployable = 0
 
-            for transfer in transfer_requests: #Checks if may conflict with transfer requests
-                date_of_transfer = transfer.date_of_transfer
-                if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
-                    deployable = 0
+        for transfer in transfer_requests: #Checks if may conflict with transfer requests
+            date_of_transfer = transfer.date_of_transfer
+            if date_of_transfer >= data2.start_date and date_of_transfer <= data2.end_date:
+                deployable = 0
+
+        for leave in leaves:
+            if (leave.date_from >= data2.start_date and leave.date_from <= data2.end_date) \
+                    or (leave.date_to >= data2.start_date and leave.date_to <= data2.end_date) \
+                    or (data2.start_date >= leave.date_from and data2.start_date <= leave.date_to) \
+                    or (data2.end_date >= leave.date_from and data2.end_date <= leave.date_to):
+                deployable = 0
 
         if deployable == 1 and deployment_template_tags.current_location(k9, data2.id) != "PCGK9 Taguig Base": #checks if K9's current location is at a port
             can_deploy_filtered.append(k9.id)
@@ -1133,7 +1149,11 @@ def view_schedule(request, id):
 def deployment_area_details(request):
     user = user_session(request)
 
-    data = Team_Assignment.objects.get(team_leader=user)
+    data = None
+    try:
+        data = Team_Assignment.objects.get(team_leader=user)
+    except:
+         pass
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
 
@@ -1687,6 +1707,7 @@ def schedule_units(request):
     removal = TempDeployment.objects.all() #TODO add user field then only delete objects from said user
     removal.delete()
 
+    events = K9_Schedule.objects.filter(status="Initial Deployment").filter(date_start__gte = datetime.datetime.today())
 
     # #K9s estimated training duration
     # sar_done = K9.objects.filter(training_status = "Trained").filter(capability = "SAR").count()
@@ -1899,7 +1920,9 @@ def schedule_units(request):
 
     # END NEW CODE
 
-    schedFormset = formset_factory(DeploymentDateForm, extra=len(locations))
+    d = datetime.datetime.today() + timedelta(days=7)
+    # schedFormset = formset_factory(DeploymentDateForm, extra=len(locations))
+    schedFormset = formset_factory(wraps(DeploymentDateForm)(partial(DeploymentDateForm, init_date = d)), extra=len(locations))
     formset = schedFormset(request.POST or None)
 
     style = ""
@@ -1916,12 +1939,7 @@ def schedule_units(request):
                     try:
                         deployment_date = form['deployment_date'].value()
                         deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
-                        # print("Deployment Date")
-                        # print(deployment_date)
-
                         delta = deployment_date - datetime.date.today()
-                        # print("Delta")
-                        # print(delta.days)
 
                     except:pass
 
@@ -1940,12 +1958,8 @@ def schedule_units(request):
                     # try:
                     deployment_date = form['deployment_date'].value()
                     deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
-                    # print("Deployment Date")
-                    # print(deployment_date)
-
                     delta = deployment_date - datetime.date.today()
-                    # print("Delta")
-                    # print(delta.days)
+
                     if delta.days < 7:
                         style = "ui red message"
                         messages.warning(request, 'Dates should have atleast 1 week allowance')
@@ -1953,27 +1967,36 @@ def schedule_units(request):
                         team = team_list[idx]
                         temp = temp_list[idx]
 
-                        # print("Temp")
-                        # print(temp)
-
                         for item in temp:
-                            # print("Item")
-                            # print(item)
-
                             #TODO Issue when saving team_assingment (everyone is scheduled under one team)
                             #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
                             deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
-                            # print(deploy)
                             deploy.save()
+
+                            phex = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Checkup", date_start = deployment_date - timedelta(days=7))
+                            phex.save()
+
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()
 
-
-                    # except:
-                    #     style = "ui red message"
-                    #     messages.warning(request, 'Error!')
-                    #     print(form.errors)
                 idx += 1
+
+            #TODO Check how many k9s are scheduled on x date then adjust automatically based on vet appointment restrictions
+            current_phex = K9_Schedule.objects.filter(status="Checkup").filter(date_start__gt = datetime.datetime.today()).order_by('date_start')
+
+            ctr = 0
+            date_index = datetime.datetime.today() + timedelta(days=1)
+            for item in current_phex:
+                if ctr < 10:
+                    item.date_start = date_index
+                    item.save()
+                    ctr += 1
+                else:
+                    date_index += timedelta(days=1)
+                    item.date_start = date_index
+                    item.save()
+                    ctr = 0
+
 
             if invalid == False:
                 style = "ui green message"
@@ -2000,6 +2023,7 @@ def schedule_units(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'events':events,
         # 'sar_done': sar_done,
         # 'ndd_done' : ndd_done,
         # 'edd_done' : edd_done,
@@ -2007,8 +2031,6 @@ def schedule_units(request):
     }
 
     return render(request, 'deployment/schedule_units.html', context)
-
-
 
 def transfer_request(request, k9_id, team_assignment_id, location_id):
 

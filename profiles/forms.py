@@ -84,3 +84,9 @@ class CheckArrivalForm(forms.Form):
             print(for_arrival_list)
 
             self.fields['team_member'].choices = for_arrival_list
+
+
+
+
+
+

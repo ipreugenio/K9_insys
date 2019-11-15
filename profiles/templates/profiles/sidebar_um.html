@@ -23,15 +23,18 @@
                             <a href="{% url 'unitmanagement:k9_unpartnered_list'%}" class="item">
                                 <i class="retweet icon"></i>Reallocate Assets
                             </a>
-                            <!--<a href="{% url 'unitmanagement:on_leave_list'%}" class="item">-->
-                                <!--<i class="clipboard list icon"></i>On-Leave Request list-->
-                            <!--</a>-->
+                            <a href="{% url 'unitmanagement:on_leave_list'%}" class="item">
+                                <i class="clipboard list icon"></i>On-Leave Request list
+                            </a>
+                            <a href="{% url 'unitmanagement:transfer_request_list'%}" class="item">
+                                <i class="clipboard list icon"></i>Transfer Request list
+                            </a>
                             <a href="{% url 'unitmanagement:k9_incident_list'%}" class="item">
                                 <i class="clipboard list icon"></i>K9 Incident List
                             </a>
-                            <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
-                                <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
-                            </a>
+                            <!--<a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">-->
+                                <!--<i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment-->
+                            <!--</a>-->
                             <a href="{% url 'unitmanagement:due_retired_list'%}" class="item">
                                     <i class="clipboard list icon"></i>Due for
                                     Retirement List
@@ -39,6 +42,9 @@
                             <a href="{% url 'unitmanagement:k9_mia_list'%}" class="item">
                                     <i class="clipboard list icon"></i>Unconfirmed Arrivals
                                 </a>
+                            <a href="{% url 'unitmanagement:emergency_leave_list'%}" class="item">
+                                <i class="clipboard list icon"></i>Emergency Leave List
+                            </a>
 
 
                             {% elif request.session.session_user_position == "Veterinarian" %}
@@ -76,9 +82,9 @@
                             <a href="{% url 'unitmanagement:reproductive_list'%}" class="item">
                                 <i class="venus icon"></i>Reproductive Cycle
                             </a>
-                             <a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">
-                                <i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment
-                            </a>
+                             <!--<a href="{% url 'unitmanagement:k9_checkup_pending'%}" class="item">-->
+                                <!--<i class="calendar icon"></i>Schedule K9 Checkups for Initial Deployment-->
+                            <!--</a>-->
                             <a href="{% url 'unitmanagement:k9_checkup_list_today'%}" class="item">
                                 <i class="clipboard list icon"></i>K9s for Checkup
                             </a>
@@ -87,27 +93,31 @@
                             {% elif request.session.session_user_position == "Handler" %}
                             
                             {% if request.session.partnered == True %}
-                            <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
-                                <i class="sync alternate icon"></i>Daily Refresher Form
-                            </a>
-                            <a href="{% url 'unitmanagement:k9_sick_form'%}" class="item">
-                                <i class="medkit icon"></i>K9 Health Form
-                            </a>
-                            <a href="{% url 'unitmanagement:k9_incident'%}" class="item">
-                                <i class="exclamation icon"></i>
-                                <i class="paw icon"></i>K9-Incident Form
-                            </a>
-                            <a href="{% url 'unitmanagement:health_history_handler'%}" class="item">
-                                <i class="h square icon"></i>Health Records
-                            </a>
-                          
-                            <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">
-                                <i class="clipboard list icon"></i>Health Concern List
-                            </a>
+                                <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
+                                    <i class="sync alternate icon"></i>Daily Refresher Form
+                                </a>
+                                <a href="{% url 'unitmanagement:k9_sick_form'%}" class="item">
+                                    <i class="medkit icon"></i>K9 Health Form
+                                </a>
+                                <a href="{% url 'unitmanagement:k9_incident'%}" class="item">
+                                    <i class="exclamation icon"></i>
+                                    <i class="paw icon"></i>K9-Incident Form
+                                </a>
+                                <a href="{% url 'unitmanagement:health_history_handler'%}" class="item">
+                                    <i class="h square icon"></i>Health Records
+                                </a>
+
+                                <a href="{% url 'unitmanagement:health_list_handler'%}" class="item">
+                                    <i class="clipboard list icon"></i>Health Concern List
+                                </a>
                             {% endif %}
-                            <!--<a href="{% url 'unitmanagement:on_leave_request'%}" class="item">-->
-                                <!--<i class="question icon"></i>On-Leave Request-->
-                            <!--</a>-->
+                            <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
+                                <i class="share square icon"></i>Apply for Leave
+                            </a>
+                            <a href="{% url 'unitmanagement:transfer_request_form'%}" class="item">
+                                <i class="globe icon"></i>Request for Transfer
+                            </a>
+
 
                             {% elif request.session.session_user_position == "Team Leader" %}
                             <a href="{% url 'unitmanagement:replenishment_form'%}" class="item">
@@ -115,9 +125,16 @@
                             </a>
                             <a href="{% url 'unitmanagement:handler_incident_form'%}" class="item">
                                 <i class="id badge icon"></i>
-                                <i class="exclamation icon"></i>Handler Incident
-                                Form
+                                <i class="exclamation icon"></i>Handler Incident Form
                             </a>
+                            <a href="{% url 'unitmanagement:on_leave_request'%}" class="item">
+                                <i class="share square icon"></i>Apply for Leave
+                            </a>
+                            <a href="{% url 'unitmanagement:transfer_request_form'%}" class="item">
+                                <i class="globe icon"></i>Request for Transfer
+                            </a>
+
+                            {% elif request.session.session_user_position == "Operations" %}
 
                             {% else %}
                             <a href="{% url 'deployment:deployment_area_details'%}" class="item">

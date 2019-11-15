@@ -49,6 +49,7 @@ class User(models.Model):
     STATUS = (
         ('Working', 'Working'),
         ('On-Leave', 'On-Leave'),
+        ('Emergency Leave', 'Emergency Leave'),
         ('No Longer Employed', 'No Longer Employed'),
         ('Retired', 'Retired'),
         ('Died', 'Died'),

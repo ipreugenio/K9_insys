@@ -220,7 +220,7 @@
                         <li>You have reported your K9 Stolen.</li>
                         {%elif ki.incident == 'Accident'%}
                         <li>You have reported your K9 in an Accident.</li>
-                        <a href="#" class="ui tiny red button died_btn">Died</a>
+                        <a href="#" class="ui tiny red button died_btn">Deceased</a>
                         <a href="{% url 'unitmanagement:k9_accident' ki.id %}?accident=recovered" class="ui tiny blue button">Recovered</a>
                         {%endif%}
                       </ul>
@@ -238,16 +238,24 @@
 
                     <div id = "calendar" style="margin-top:0%;"></div>
                 </div>
+                   <a href="{% url 'unitmanagement:on_leave_request'%}" class="ui green button">Apply for Leave</a>
+                  {% if emergency_leave_count <= 0 %}
+                   <a class="ui red button" id="id_e_leave">Emergency Leave</a>
+                  {% else %}
+                  <a class="ui disabled red button" id="id_e_leave">Emergency Leave (Ongoing)</a>
+                  {% endif %}
               </div>
+
         </div>
       </div>
-
 
         {% if messages %}
         {% for message in messages %}
             <input class="msg" type='hidden' value="{{message}}">
         {% endfor %}
         {% endif %}
+
+
     </div>
 
 
@@ -304,6 +312,19 @@
   {% endif %}
  <!--End Pre Deployment Items Modal-->
 
+<div class="ui modal" id= "emergency_leave_modal">
+    <div class="header">Apply Emergency Leave</div>
+    <div class="content">
+      <form class = 'ui form' method="POST">
+          {% csrf_token %}
+        {{emergency_leave_form}}
+        <center>
+          <button class="ui green button" type="submit">Submit</button>
+        </center>
+      </form>
+    </div>
+  </div>
+
  <div id = "id_event_load"></div>
 
 <style>
@@ -325,6 +346,10 @@ $(document).ready(function() {
       // alert($('.msg').val());
       $( ".died_btn" ).click(function() {
           $('#died_modal').modal('show');
+        });
+
+        $( "#id_e_leave" ).click(function() {
+          $('#emergency_leave_modal').modal('show');
         });
       
       if($('.msg').val() == 'event'){

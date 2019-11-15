@@ -216,6 +216,11 @@
                   {% if reveal_arrival_dr == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
                   {% endif %}
+
+                   {% if check_arrival_emrgncy_leave is not None %}
+                  <input class = "ui green button" type="submit"  value="Confirm End of Emergency Leaves" id = "check_arrival_emrgncy_leave">
+                  {% endif %}
+
               {% else %}
               <div class = "ui segment">
                   You currently don't have a K9.
@@ -342,8 +347,6 @@
           <div class="header">Event Added</div>
         </div>
 
-
-
    <!--Port Arrival Items Modal-->
 <div class="ui mini modal" id = 'modal3'>
       <i class="close icon"></i>
@@ -384,6 +387,29 @@
 
     </div>
 </div>
+<!--End Request Arrival Modal-->
+
+<!-- Emergency Leave Modal -->
+<div class="ui mini modal" id = 'modal5'>
+      <i class="close icon"></i>
+    <div class="header"><h2>Confirm End of Emergency Leave</h2></div>
+    <div class="scrolling content">
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+
+            {% for field in check_arrival_emrgncy_leave %}
+            {{ field }}
+            {% endfor %}
+
+            <button class="ui green button" type="submit" name = "confirm_arrival_emrgncy_leave" value="Confirm End of Emergency Leave">Confirm End of Emergency Leave</button>
+        </form>
+
+    </div>
+</div>
+<!--End Emergency Leave Modal-->
+
 
 {% if ki %}
 <div class="ui modal" id= 'died_modal'>
@@ -407,7 +433,7 @@
     </div>
   </div>
   {% endif %}
-<!--End Request Arrival Modal-->
+
 
   <div id = "id_event_load"></div>
 
@@ -517,11 +543,6 @@ $(document).ready(function() {
         $('#calendar').fullCalendar('nextYear');
         });
 
-
-         //Add event modal
-        $( "#add_event_btn" ).click(function() {
-          $('#modal1').modal('show');
-        });
 
          //GeoMap
          $("#btn_search").click(function () {
@@ -714,14 +735,22 @@ $(document).ready(function() {
 
 
 <script>
+    //Add event modal
+        $( "#add_event_btn" ).click(function() {
+          $('#modal1').modal('show');
+        });
+
 
     $( "#reveal_confirm_arrival" ).click(function() {
   $('#modal3').modal('show');
 });
 
-
   $( "#reveal_confirm_arrival_dr" ).click(function() {
   $('#modal4').modal('show');
+});
+
+$( "#check_arrival_emrgncy_leave" ).click(function() {
+  $('#modal5').modal('show');
 });
 </script>
 

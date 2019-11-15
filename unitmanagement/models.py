@@ -270,6 +270,13 @@ class Food_Request(models.Model):
     unit = models.CharField('unit', max_length=200, null=True, blank=True)
     
 class Handler_On_Leave(models.Model):
+
+    STATUS = (
+        ('Approved', 'Approved'),
+        ('Denied', 'Denied'),
+        ('Pending', 'Pending')
+    )
+
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='handler_leave')
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
@@ -318,6 +325,7 @@ class Request_Transfer(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Denied', 'Denied'),
+        ('Approved', 'Approved'),
         ('Done', 'Done'),
     )
 
@@ -337,6 +345,26 @@ class Call_Back_K9(models.Model):
     date_created =  models.DateField('date_created', auto_now_add=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
+
+class Temporary_Handler(models.Model):
+    k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    original = models.ForeignKey(User, null=True, related_name='original', on_delete=models.CASCADE)
+    temp = models.ForeignKey(User, null=True, related_name='temp', on_delete=models.CASCADE)
+    date_given = models.DateField('date_given', null=True, blank=True)
+    date_returned = models.DateField('date_returned', null=True, blank=True)
+
+class Emergency_Leave(models.Model):
+    STATUS = (
+        ('Ongoing', 'Ongoing'),
+        ('Returned', 'Returned'),
+        ('MIA', 'MIA')
+    )
+
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    date_of_leave = models.DateField('date_given', null=True, blank=True)
+    date_of_return = models.DateField('date_returned', null=True, blank=True)
+    status = models.CharField('status', choices=STATUS, max_length=100, default='Ongoing')
+    reason = models.TextField('reason', max_length=200)
 
 class Notification(models.Model):
     POSITION = (

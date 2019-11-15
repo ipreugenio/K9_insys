@@ -170,6 +170,7 @@
            <th>Capability</th>
            <th>Personnel</th>
              <th>Position</th>
+             <th>Status</th>
          </tr>
      </thead>
      <tbody>
@@ -180,6 +181,7 @@
         <td>{{tl_dog.capability}}</td>
         <td>{{tl_dog.handler}}</td>
         <td>Team Leader</td>
+            <td>{{tl_dog.handler.status}}</td>
         </tr>
         {% endif %}
 
@@ -190,6 +192,7 @@
            <td>{{dogs_deployed.k9.capability}}</td>
            <td>{{dogs_deployed.k9.handler}}</td>
              <td>Handler</td>
+             <td>{{tl_dog.handler.status}}</td>
          </tr>
          	{% endfor %}
      </tbody>
@@ -207,8 +210,6 @@
   Below is the deployment history for this port.
 </ul>
 </div>
-
-
 
   <table id="tabledata3" class="ui five column celled table">
         <thead>

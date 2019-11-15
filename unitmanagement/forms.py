@@ -5,8 +5,9 @@ from datetime import date, datetime
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 from django.contrib.sessions.models import Session
 
+from deployment.models import Team_Assignment
 from unitmanagement.models import PhysicalExam , Health, HealthMedicine, VaccinceRecord, Miscellaneous_Request, VaccineUsed, Food_Request, Medicine_Request, Request_Transfer, Replenishment_Request
-from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident
+from unitmanagement.models import K9_Incident, Handler_On_Leave, Handler_Incident, Emergency_Leave
 from planningandacquiring.models import K9
 from inventory.models import Medicine, Miscellaneous, Medicine_Inventory, Food
 from profiles.models import Account, User
@@ -228,13 +229,35 @@ class RequestTransferForm(forms.ModelForm):
             'date_of_transfer': DateInput(),
         }
 
-
     def __init__(self, *args, **kwargs):
         super(RequestTransferForm, self).__init__(*args, **kwargs)
         self.fields['handler'].widget.attrs['disabled'] = True
         self.fields['location_from'].widget.attrs['disabled'] = True
         self.fields['location_from'].required = False
-        
+
+class ChooseTeamForm(forms.Form):
+    location_to = forms.ChoiceField(choices=[], widget=forms.RadioSelect)
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTeamForm, self).__init__(*args, **kwargs)
+        team = Team_Assignment.objects.exclude(total_dogs_deployed__lt = 1)
+        try:
+            location_from = kwargs.pop("location_from", None)
+            team = team.exclude(id = location_from.id)
+        except:
+            pass
+
+        team_list = []
+        for item in team:
+            team_list.append((item.id, item.team))
+        self.fields['location_to'].choices = team_list
+
+class EmergencyLeaveForm(forms.ModelForm):
+    class Meta:
+        model = Emergency_Leave
+        fields = ('reason', )
+
+
 class K9IncidentForm(forms.ModelForm):
     CONCERN = (
         ('Lost', 'Lost'),
@@ -282,7 +305,9 @@ class HandlerOnLeaveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(HandlerOnLeaveForm, self).__init__(*args, **kwargs)
         self.fields['incident'].initial = 'On-Leave'
+        self.fields['incident'].widget.attrs['readonly'] = "readonly"
         self.fields['handler'].widget.attrs['readonly'] = "readonly"
+
 
 class DateForm(forms.Form):
     date = forms.DateField(widget=DateInput)

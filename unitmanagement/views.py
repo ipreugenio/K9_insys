@@ -27,16 +27,20 @@ from planningandacquiring.models import K9, Actual_Budget
 
 from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Food, Miscellaneous_Received_Trail, Food_Received_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous
 
-from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, ItemReplenishmentForm
+from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, \
+    HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, \
+    VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, \
+    ItemReplenishmentForm, ChooseTeamForm
 
-from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request
+from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, \
+    PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, \
+    Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request, Temporary_Handler, Emergency_Leave
 
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
-
 
 # Create your views here.
 
@@ -1923,7 +1927,19 @@ def handler_incident_form(request):
 
 def on_leave_request(request):
     user = user_session(request)
-    form = HandlerOnLeaveForm(request.POST or None)
+
+    try:
+        last_deployment_date = Handler_On_Leave.objects.filter(handler=user).filter(status="Approved").filter(incident='On-Leave').last()
+        last_deployment_date = last_deployment_date.date_to
+    except:
+        try:
+            last_deployment_date = Team_Dog_Deployed.objects.filter(handler=user).get(date_pulled=None)
+            last_deployment_date = last_deployment_date.date_added
+        except:
+            last_deployment_date = datetime.today().date()
+
+    form = HandlerOnLeaveForm(request.POST or None, initial={'date_from': last_deployment_date+timedelta(days=90)})
+
     style=''
 
     form.fields['handler'].queryset = User.objects.filter(id=user.id)
@@ -1931,20 +1947,97 @@ def on_leave_request(request):
     data = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave')
     num = Handler_On_Leave.objects.filter(handler=user).filter(status='Pending').filter(incident='On-Leave').count()
 
+    events = []
+    try:
+        k9 = K9.objects.get(handler=user)
+        events = K9_Schedule.objects.filter(k9=k9).filter(status="Request")
+    except:
+        pass
+
+    orig_leave_window = None
+    temp_handler = Temporary_Handler.objects.filter(temp = user).filter(date_returned = None)
+    original_handlers = []
+    for item in temp_handler:
+        original_handlers.append(item.original)
+    try:
+        orig_leave_window = Handler_On_Leave.objects.filter(handler__in = original_handlers)
+
+        #Disallow filing of leave on original handler(s) leave window
+
+    except:
+        pass
 
     if request.method == "POST":
         if form.is_valid():
-            incident_save = form.save()
+            incident_save = form.save(commit=False)
+
+            start_date = incident_save.date_from
+            end_date = incident_save.date_to
+            # diff = end_date - start_date
+            # leave_duration = diff.days
+
+            prev_leaves = Handler_On_Leave.objects.filter(handler=user).filter(status="Approved").filter(incident='On-Leave')
+            work_duration = 0
+
+            #Identifies which leave is most recent based on date
+
+            # 1.) Check if there is an existing leave (either approved or pending only)
+            if prev_leaves:
+                # 2.) Use most recent leave as default
+                recent_leave = prev_leaves.last()
+                recent_leave_date = recent_leave.date_to
+                # 3.) Check which leave is most recent by comparing the dates
+                for leave in prev_leaves:
+                    if leave.date_to > recent_leave_date:
+                        recent_leave_date = leave.date_to
+                # 4a.) Compare the start date from form and the recent leave date. Count the number of days in between
+                work_duration = start_date - recent_leave_date
+            else:
+                try:
+                    # 4b.) If a preveious leave does not exist, count the number of days since the most recent
+                    recent_deployment = Team_Dog_Deployed.objects.filter(handler=user).filter(date_pulled = None).last()
+                    work_duration = start_date - recent_deployment.date_added
+                    work_duration = work_duration.days
+                except:
+                    pass
+
+            deployable = 1
+            for sched in events:
+                if (sched.date_start >= start_date and sched.date_start <= end_date) or (
+                        sched.date_end >= start_date and sched.date_end <= end_date) or (
+                        start_date >= sched.date_start and start_date <= sched.date_end) or (
+                        end_date >= sched.date_start and end_date <= sched.date_end):
+                    deployable = 0
+
+            for window in orig_leave_window:
+                messages.warning(request, 'You cannot file a leave from ' +
+                                 str(window.date_from) + " to " + str(window.date_to)
+                                 + ". Currently handling " + str(window.k9) + " while handler is on leave")
+                if (window.date_from >= start_date and window.date_from <= end_date) or (
+                        window.date_to >= start_date and window.date_to <= end_date) or (
+                        start_date >= window.date_from and start_date <= window.date_to) or (
+                        end_date >= window.date_from and end_date <= window.date_to):
+                    deployable = 0
+
+            if work_duration >= 90 and deployable == 1:
+               incident_save.save()
+            else:
+                style = "ui red message"
+                if work_duration < 90:
+                    messages.warning(request, 'You must render atleast 90 days of duty as of start date before applying for leave')
+                    return redirect('unitmanagement:on_leave_request')
+                if deployable == 0:
+                    messages.warning(request, 'Date must not be in conflict with any requests or leaves')
+                    return redirect('unitmanagement:on_leave_request')
 
             form = HandlerOnLeaveForm()
             style = "ui green message"
-            messages.success(request, 'Request has been successfully Submited!')
-
+            messages.success(request, 'Request has been successfully Submitted!')
             return redirect('unitmanagement:on_leave_request')
-
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1958,6 +2051,7 @@ def on_leave_request(request):
         'user':user,
         'data':data,
         'num':num,
+        'events': events
     }
     return render (request, 'unitmanagement/on_leave_form.html', context)
 
@@ -2150,15 +2244,36 @@ def transfer_request_list(request):
 
     #Code here for approval of transfer
     if request.method == 'POST':
-        date = request.POST.get('date_input')
-        match_id = request.POST.get('select')
+        date = request.POST.get('date')
+        match_id = request.POST.get('handler')
         requester_id = request.POST.get('requester')
         
         match = User.objects.get(id=match_id)
         requester = User.objects.get(id=requester_id)
 
+        match_request_id = request.POST.get('match_request_id')
+        original_request_id = request.POST.get('original_request_id')
+
+        print("Match Request ID")
+        print(match_request_id)
+        print("ORIGINAL REQUEST ID")
+        print(original_request_id)
+
         if 'approve' in request.POST:
             print('yes',date, match, requester)
+
+            request_match = Request_Transfer.objects.get(id = match_request_id)
+            original_request = Request_Transfer.objects.get(id = original_request_id)
+
+            request_match.status = "Approved"
+            original_request. status = "Approved"
+
+            request_match.save()
+            original_request.save()
+
+
+            #TODO bg task status = "Done" transfer request on transfer date
+
         else:
             print('no',date, match, requester)
 
@@ -2182,42 +2297,67 @@ def transfer_request_form(request):
     k9 = K9.objects.get(handler=user)
     schedules = K9_Schedule.objects.filter(k9 = k9)
 
+    team_form = ChooseTeamForm(request.POST or None)
+
     td = None
     loc = None
-    try:
-        td = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).exclude(team_requested = None).latest('date_added')
 
-        loc = Team_Assignment.objects.get(id=td.team_requested.id)
+    # Exception will never run unless handler has no prior deployments
+    try:
+        td = Team_Dog_Deployed.objects.filter(date_pulled=None).exclude(team_assignment = None).get(k9=k9)
+        loc = Team_Assignment.objects.get(id=td.team_assignment.id)
+
         form.initial['handler'] = User.objects.get(id=user.id)
         form.initial['location_from'] = loc
-        form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id)
+        form.initial['date_of_transfer'] = td.date_added + timedelta(days=730)
+        # team_form.fields['location_to'].queryset = Team_Assignment.objects.exclude(id=loc.id).exclude(total_dogs_deployed__lt = 2)
+
     except: pass
+
     style='ui green message'
 
     if request.method == 'POST':
         print(form.errors)
-        if form.is_valid():
+        if form.is_valid() and team_form.is_valid():
             f = form.save(commit=False)
             f.location_from = loc
             f.handler = user
-            f.save(commit = False)
+            location_to = team_form.cleaned_data['location_to']
+            location_to = Team_Assignment.objects.get(id = location_to)
+            f.location_to = location_to
 
             date_of_transfer = f.date_of_transfer
             today = datetime.today().date()
             deploy = True
-            for sched in schedules:
-                if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
-                    deploy = False
+            rendered_enough_days = True
+            existing_request = Request_Transfer.objects.filter(status = "Pending")
 
-                delta = date_of_transfer - td.date_added
-                if delta.days >= 730:
-                    deploy = False
+            for sched in schedules:
+                if sched.date_end is not None:
+                    if date_of_transfer >= sched.date_start and date_of_transfer <= sched.date_end:
+                        deploy = False
+                else:
+                    if date_of_transfer == sched.date_start:
+                        deploy = False
+
+            delta = date_of_transfer - td.date_added
+            if delta.days < 730:
+                deploy = False
+                rendered_enough_days = False
 
             if deploy == True:
+                f.save()
                 style='ui green message'
                 messages.success(request,'You have submitted a transfer request!')
             
                 return redirect('unitmanagement:transfer_request_form')
+            elif rendered_enough_days == False and deploy == False:
+                style = 'ui red message'
+                messages.success(request, 'You have not rendered enough days of port service to be eligible on date of transfer')
+            elif existing_request == None:
+                style = 'ui red message'
+                messages.success(request,
+                                 'You have already filed a request!')
             else:
                 style = 'ui red message'
                 messages.success(request, 'Date input has conflict with a request scheduled!')
@@ -2236,7 +2376,8 @@ def transfer_request_form(request):
         'count':count,
         'user':user,
         'form':form,
-        'events' : schedules
+        'team_form': team_form,
+        'events' : schedules,
     }
     return render (request, 'unitmanagement/transfer_request_form.html', context)
 
@@ -2431,8 +2572,6 @@ def on_leave_decision(request, id):
     data = Handler_On_Leave.objects.get(id=id)
     leave = request.GET.get('leave')
 
-
-
     if leave == 'approve':
         data.status = 'Approved'
         data.handler.status = 'On-Leave'
@@ -2507,6 +2646,7 @@ def k9_unpartnered_list(request):
     style=''
 
     data = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
+    # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2515,6 +2655,7 @@ def k9_unpartnered_list(request):
     context = {
         'title': "Unpartnered K9 List",
         'data':data,
+        # 'data_on_leave' :data_on_leave,
         'style':style,
         'notif_data':notif_data,
         'count':count,
@@ -2819,6 +2960,26 @@ def k9_sick_details(request, id):
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 
+def emeregency_leave_list(request):
+
+    data = []
+    emergency_leaves = Emergency_Leave.objects.all() #.filter(status = "Ongoing")
+    for leave in emergency_leaves:
+        pi = Personal_Info.objects.get(UserID = leave.handler)
+        days_lapsed = datetime.today().date() - leave.date_of_leave
+        data.append((leave, pi, days_lapsed.days))
+
+        if request.method == 'POST':
+            if 'approve' in request.POST:
+                emrgncy_leave_id = request.POST.get('mia_btn')
+                print("LEAVE")
+                print(emrgncy_leave_id)
+
+    context = {
+        'data' : data
+    }
+
+    return render (request, 'unitmanagement/emergency_leave_list.html', context)
 
 class TeamLeaderView(APIView):
     def get(self, request, format=None):
@@ -3200,14 +3361,18 @@ def load_stamp(request):
 
 def load_transfer(request):
 
-    #TODO 3 day gap between two handlers
     transfer = None
     k9 = None
     matches = None
     c_ac = None
     c_in = None
     incident = None
+    personal = None
+    date_object = None
+
     try:
+        date_object = datetime.strptime(request.GET.get('date'), '%B %d, %Y').date()
+
         transfer_id = request.GET.get('id')
         transfer = Request_Transfer.objects.get(id=transfer_id)
         k9= K9.objects.get(handler=transfer.handler)
@@ -3230,6 +3395,8 @@ def load_transfer(request):
     except:
         pass
 
+    date_form = DateForm(initial={'date' : date_object})
+
     context = {
         'transfer': transfer,
         'k9': k9,
@@ -3237,7 +3404,9 @@ def load_transfer(request):
         'incident':incident,
         'c_ac':c_ac,
         'c_in':c_in,
-        'personal' : personal
+        'personal' : personal,
+        'date_boject' : date_object,
+        'date_form' : date_form
     }
 
     return render(request, 'unitmanagement/transfer_data.html', context)
@@ -3490,8 +3659,49 @@ def k9_checkup_pending(request):
 
     pending_schedule = pending_schedule.exclude(k9__in = k9s_exclude2)
 
+    #note: pending schedule is status = Initial Deployment
+
+    # #1. Loop through K9_Schedules (Initial Deployment)
+    # for item in pending_schedule:
+    #     appointed_k9s = 0 #Number of k9s scheduled for phex days before Initial Deployment
+    #     init_days = 7 #days before initial deployment
+    #     adjusted_date = item.date_start #Date of PHEX for "item"
+    #
+    #     #2. Check how many k9s are appointed on (Initial Deployment - init_days)
+    #     while appointed_k9s <= 10:
+    #         adjusted_date = item.date_start - timedelta(days=init_days) #(Initial Deployment - init_days)
+    #         appointed_k9s = K9_Schedule.objects.filter(status="Checkup").filter(date_start = adjusted_date).count() #Appointed K9s (count)
+    #         try:
+    #             items_to_be_swapped = K9_Schedule.objects.filter(status="Checkup").filter(date_start = adjusted_date)#Appointed K9s
+    #             item_to_be_swapped = None #Check up to be swapped in case day is full
+    #
+    #             #3. Check which k9  can be swapped
+    #                 #Conditions for swapping:
+    #                     #a. K9 to be swapped has more than 1 week before deployment(unlikely to happen)
+    #                     #b. Adjusted date has >= 10 k9s already appointed
+    #             for item2 in items_to_be_swapped:
+    #                 initial_deployment = K9_Schedule.objects.filter(k9 = item2.k9).filter(status="Initial Deployment").filter(date_start__gt = item2.date_start).last()
+    #                 if initial_deployment is not None:
+    #                     delta = initial_deployment.date_start - item2.date_start
+    #                     if delta.days > 10:
+    #                         item_to_be_swapped = item2
+    #         except:
+    #             init_days -= 1
+
+    phex_preset = []
+    for item in pending_schedule:
+        adjusted_date = item.date_start - timedelta(days=7)
+        print("DEPLOYMENT DATE : " + str(adjusted_date))
+        weekno = adjusted_date.weekday()
+        while weekno > 5:
+            adjusted_date += timedelta(days=1)
+            weekno = adjusted_date.weekday()
+        print("PHEX DATE : " + str(adjusted_date))
+        phex_preset.append((item.k9, adjusted_date))
+
     context = {
         'k9_pending': pending_schedule,
+        'phex_preset' : phex_preset,
         'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
         'selected_list': [],

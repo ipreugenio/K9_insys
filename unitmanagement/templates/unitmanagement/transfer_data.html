@@ -21,7 +21,7 @@
                         </tr>
                         <tr>
                             <th>City</th>
-                            <td>Handler City</td>
+                            <td>{{personal.city}}</td>
                             <th>K9 Age</th>
                             <td>{{k9.age}}</td>
                         </tr>
@@ -90,6 +90,8 @@
                     </div>
                 </div>
         </div>
+
+            {% if matches %}
         <table class="ui celled small table center aligned">
                 <thead>
                     <th></th>
@@ -101,7 +103,7 @@
                     {% for data in matches%}
                     <tr>
                         <td>
-                            <input type="radio" name="select" value="{{data.handler.id}}">
+                            <input type="radio" name="select" value="{{data.handler.id}}" data-match-request="{{data.id}}">
                         </td>
                         <td>{{data.handler}}</td>
                         <td>{{data.date_of_transfer}}</td>
@@ -110,20 +112,26 @@
                     {%endfor%}
                 </tbody>
             </table>
+            {% endif %}
 
         <div class="five fields">
             <div class="field"></div>
             <div class="field"></div>
             <div class="field">
-                <label for="">Transfer Date</label>
-                <input type="date" name="date_input" id="">
+                <!--<label for="">Transfer Date</label>-->
+                <!--<input type="date" name="date_input" id="">-->
+                {{date_form}}
             </div>
             <div class="field"></div>
             <div class="field"></div>
         </div>
         <div class="ui basic segment">
                 <center>
+                    {% if matches is not None and transfer.location_from.total_dogs_deployed < 2 or matches is None and transfer.location_from.total_dogs_deployed >= 2 %}
                     <button class="ui green button" type='submit' value="approve" name='approve'>Approve</button>
+                    {% else %}
+                    <button class="ui disabled green button" data-content="Need another handler to swap with current handler to cover port unit requirement." type='submit' value="approve" name='approve'>Approve</button>
+                    {% endif %}
                     <button class="ui red button" type='submit' value="reject" name='reject'>Reject</button>
                 </center>
             </div>
@@ -145,14 +153,19 @@
 
         $("input[name='select']").change(function () {
         var url = 'transfer-request-list/ajax_load_handler'; 
-        var handlerId = $("input[name='select']:checked"). val();
+        var handlerId = $("input[name='select']:checked").val();
+
+        var match_request_id = $(this).attr('data-match-request');
+        var original_request_id = {{transfer.id}};
 
         $.ajax({                       
             url: url,                  
             data: {
             'handler': handlerId,
             'type_text': 'transfer',     
-            'requester':'{{transfer.handler.id}}',  
+            'requester':'{{transfer.handler.id}}',
+            'match_request_id' : match_request_id,
+            'original_request_id' : original_request_id
             },
             success: function (data) { 
             $("#id_handler_data").html(data);

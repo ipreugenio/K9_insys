@@ -12,6 +12,15 @@
     {% endif %}
 </div>
 
+<div class="ui longer modal" id ="calendar_modal">
+  <div class="header">Current Deployment Dates</div>
+  <div class="content">
+
+                       <div id = "calendar"></div>
+
+  </div>
+</div>
+
 {% if df_is_empty == False %}
  <div class="ui info message">
   <i class="close icon"></i>
@@ -27,6 +36,8 @@
 </div>
 
 
+<button class = "ui blue button" id = "view_calendar">View Current Deployment Dates</button>
+
 <form class = "ui form" method="POST">
     {% csrf_token %}
 <table id="tabledata" class="ui celled table">
@@ -34,9 +45,9 @@
           	<tr>
                 <th rowspan="2">Port</th>
 				<th rowspan="2">Area</th>
-                <!--<th rowspan="2">Maritime Count</th>-->
-                <!--<th rowspan="2">Incident Count</th>-->
-                <!--<th rowspan="2">Incident Order List</th>-->
+                <th rowspan="2">Maritime Count</th>
+                <th rowspan="2">Incident Count</th>
+                <th rowspan="2">Incident Priority Order List</th>
                 <th rowspan="2">K9s to be Deployed</th>
                 <th colspan="3">K9s Deployed / K9s Required</th>
                 <th rowspan="2">Deployment Date</th>
@@ -53,15 +64,15 @@
             <tr>
 		                <td> {{location.Location.place}} </td>
                         <td> {{location.Location.area}} </td>
-                         <!--<td> {{location.Maritime_count}}</td>-->
-                        <!--<td> {{location.Incident_count}}</td>-->
-                        <!--<td>-->
+                         <td> {{location.Maritime_count}}</td>
+                        <td> {{location.Incident_count}}</td>
+                        <td>
 
 
-                        <!--<ol class="ui list"> {% for item in location.Incident_Order_List %}-->
-                            <!--<li>{{item.0}}</li>-->
-                        <!--{%endfor%}</ol>-->
-                        <!--</td>-->
+                        <ol class="ui list"> {% for item in location.Incident_Order_List %}
+                            <li>{{item.0}}</li>
+                        {%endfor%}</ol>
+                        </td>
 
                         <td> <div class="ui bulleted list">{% for item in location.Temp_list %}
                             <div class="item">{{item.k9}} | {{item.k9.capability}}</div>
@@ -203,6 +214,70 @@ $('.message .close')
   })
 ;
 </script>
+
+
+<script>
+
+$( "#view_calendar" ).click(function() {
+   $('#calendar_modal').modal('show');
+   $('.fc-today-button.fc-button ').click();
+});
+
+
+     $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+          eventTextColor: "white",
+
+          events: [
+                {% for i in events %}
+                {
+                    id: '{{ i.id }}',
+                    title: '{{i.k9}}',
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                    color: '#FB1F1F',
+                },
+                {% endfor %}
+
+                {% for item in phex_preset %}
+                {
+                    id: '{{ item.0.id }}',
+                    title: '{{item.0}}',
+                    start: '{{item.1|date:"Y-m-d"}}',
+                    end: '{{item.1|date:"Y-m-d"}}',
+                    allDay: 'true',
+                    color: '#4468FA',
+                },
+                {% endfor %}
+
+            ],
+
+            dayClick: function(date, jsEvent, view, resourceObj) {
+                    var formatted = date.format("YYYY-MM-DD");
+                    $("input[name='date']").val(formatted);
+                    $("input[name='date']").trigger("change");
+
+                  }
+
+
+          }); // end #calendar
+
+
+</script>
+
+
 {% endblock %}
 
 

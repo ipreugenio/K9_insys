@@ -33,17 +33,21 @@ from profiles.serializers import NotificationSerializer, UserSerializer
 from deployment.views import load_map, load_locations
 
 from profiles.models import User, Personal_Info, Education, Account
-from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, Area, K9_Schedule, K9_Pre_Deployment_Items
+from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, \
+    Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
-from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health
+from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
+    K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 from deployment.tasks import subtract_inventory
 
 from deployment.views import team_location_details, request_dog_details
+from unitmanagement.forms import EmergencyLeaveForm
+from unitmanagement.tasks import check_leave_window
 
 # Create your views here.
 
@@ -138,7 +142,7 @@ def dashboard(request):
 
     #Counts
     c_count = K9.objects.filter(training_status='Classified').count()
-    item_req_count = 3 #change this
+    item_req_count = Replenishment_Request.objects.filter(status='Pending').count()
     up_count = K9.objects.filter(status='Working Dog').filter(handler=None).count()
     tq_count = Request_Transfer.objects.filter(status='Pending').count()
 
@@ -350,6 +354,18 @@ def team_leader_dashboard(request):
     check_arrival = CheckArrivalForm(request.POST or None, for_arrival=for_arrival)
     check_arrival_dr = CheckArrivalForm(request.POST or None, for_arrival=td_dr)
 
+    if ta is not None:
+        current_location = tdd.filter(handler__status = 'Emergency Leave')
+    elif dr is not None:
+        current_location = td_dr.filter(handler__status = 'Emergency Leave')
+    else:
+        current_location = None
+
+    if current_location is None:
+        check_arrival_emrgncy_leave = None
+    else:
+        check_arrival_emrgncy_leave = CheckArrivalForm(request.POST or None, for_arrival=current_location)
+
     events = Dog_Request.objects.filter(team_leader = user)
 
     year = datetime.now().year
@@ -414,6 +430,42 @@ def team_leader_dashboard(request):
             # print(check_arrival.errors)
             pass
 
+        if check_arrival_emrgncy_leave.is_valid():
+
+            handlers_arrived_id = check_arrival['team_member'].value()
+            # print("Handlers Arrived")
+            # print(handlers_arrived_id)
+
+            handlers_arrived = User.objects.filter(pk__in=handlers_arrived_id)
+
+            for handler in handlers_arrived:
+                try:
+                    temp_handlers = Temporary_Handler.objects.filter(original = handler).filter(date_returned = None)
+
+                    for temp_handler in temp_handlers:
+                        temp_handler.date_returned = datetime.today().date()
+                        temp_handler.save()
+
+                    emergency_leaves = Emergency_Leave.objects.filter(handler = handler).filter(date_of_return = None)
+
+                    for leave in emergency_leaves:
+                        leave.status = "Returned"
+                        leave.date_of_return =  datetime.today().date()
+                        leave.save()
+
+                    handler.status = "Working"
+                    handler.save()
+                except:
+                    pass
+
+            # Team Leader
+
+            messages.success(request, 'Arrival succesfully confirmed')
+            return redirect("profiles:team_leader_dashboard")
+        else:
+            # print(check_arrival.errors)
+            pass
+
     cb = None
     try:
         cb = Call_Back_K9.objects.get(k9__handler=user)
@@ -461,6 +513,7 @@ def team_leader_dashboard(request):
         'check_arrival_dr' : check_arrival_dr,
 
         'upcoming_request' : dr,
+        'check_arrival_emrgncy_leave' : check_arrival_emrgncy_leave,
 
         'ki' : ki
     }
@@ -614,6 +667,8 @@ def handler_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
 
+    emergency_leave_form = EmergencyLeaveForm(request.POST or None)
+
     dr = 0
     k9 = None
     training_sched = None
@@ -756,6 +811,17 @@ def handler_dashboard(request):
                 messages.success(request, 'event')
                 return redirect("profiles:handler_dashboard")
 
+            if emergency_leave_form.is_valid():
+                emergency_leave = emergency_leave_form.save(commit = False)
+                emergency_leave.handler = user
+                emergency_leave.date_of_leave = today.date()
+                emergency_leave.save()
+
+                user.status = "Emergency Leave"
+                user.save()
+
+                check_leave_window(True, user)
+
 
         k9_schedules = K9_Schedule.objects.filter(k9 = k9)
         # print("K9 Schedules")
@@ -784,6 +850,7 @@ def handler_dashboard(request):
     except ObjectDoesNotExist:
         pass
 
+    emergency_leave_count = Emergency_Leave.objects.filter(handler = user).filter(status = "Ongoing").count()
 
     # print("Show Start")
     # print(show_start)
@@ -818,7 +885,10 @@ def handler_dashboard(request):
         'current_request' : current_request,
         'upcoming_deployment' : upcoming_deployment,
 
-        'ki' : ki
+        'ki' : ki,
+
+        'emergency_leave_form' : emergency_leave_form,
+        'emergency_leave_count' : emergency_leave_count
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
@@ -1218,7 +1288,7 @@ def commander_dashboard(request):
     user = user_session(request)
 
     area_list = []
-    areas = Area.objects.get(commander = user)
+    areas = Area.objects.filter(commander = user).last()
     location = Location.objects.filter(area=areas)
 
     c_list = []
@@ -1233,7 +1303,7 @@ def commander_dashboard(request):
     data = Dog_Request.objects.all()
     data = data.filter(area=areas)
 
-    pending_sched = data.filter(status='Pending').count()
+    pending_sched = data.filter(status='Pending').exclude(start_date__lt = datetime.today().date()).count()
 
     # print(pending_sched)
     #NOTIF SHOW
@@ -1256,11 +1326,11 @@ def operations_dashboard(request):
 
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
-    width = 100
+    width = 650
 
     events = Dog_Request.objects.filter(sector_type = "Big Event")
 
-    rq = Dog_Request.objects.filter(sector_type = "Big Event").filter(end_date__lt=datetime.today()).count()
+    rq = Dog_Request.objects.filter(sector_type = "Big Event").exclude(end_date__lt=datetime.today().date()).count()
 
     if request.method == 'POST':
         # print(form.errors)

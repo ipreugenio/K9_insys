@@ -580,7 +580,7 @@ def add_K9_parents(request):
         birth = K9_Litter.objects.filter(mother=mm).aggregate(sum=Sum('litter_no'))['sum']
         death = K9_Litter.objects.filter(mother=mm).aggregate(sum=Sum('litter_died'))['sum']
 
-        if birth != None or death != None:
+        if (birth != None or death != None) and (birth != 0 or death != 0):
             total = (birth / (birth+death)) * 100
         else:
             total=100
@@ -1094,13 +1094,17 @@ def breeding_confirmed(request):
 #Listview format
 def K9_listview(request):
 
-    k9 = K9.objects.all()
-    style = 'ui green message'
+    k9 = K9.objects.all() #Sample Query
+    style = 'ui green message' #CSS values
+
+    #//Backend Code//
     
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+
+    #Variables to be used in templates
     context = {
         'Title' : 'K9 List',
         'k9' : k9,
@@ -1110,6 +1114,7 @@ def K9_listview(request):
         'style':style,
     }
 
+    #Access Template
     return render(request, 'planningandacquiring/K9_list.html', context)
 
 #Detailview format

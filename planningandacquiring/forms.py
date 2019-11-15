@@ -177,7 +177,6 @@ class add_K9_parents_form(forms.Form):
     father = forms.ChoiceField(choices=father_list,
                               widget=forms.RadioSelect)
 
-
     def __init__(self, *args, **kwargs):
         super(add_K9_parents_form, self).__init__(*args, **kwargs)
 

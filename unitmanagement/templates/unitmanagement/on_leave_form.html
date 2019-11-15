@@ -2,6 +2,7 @@
 
 {% block content %}
 {%if num > 0 %}
+
     {% for data in data %}
         <div class="ui info icon message">
             <i class="question icon"></i>
@@ -14,11 +15,12 @@
             </div>
         </div>
     {% endfor %}
+
 {%else%}
 <div class="ui basic segment" style="margin-bottom:0px;">
     <h2 class="ui header">
         {{title}}
-        <div class="sub header">Input data of On-Leave Here</div>
+        <div class="sub header">Apply for Leave Here</div>
     </h2>
     {% if messages %}
         {% for message in messages %}
@@ -26,6 +28,20 @@
         {% endfor %}
     {% endif %}
 </div>
+
+<div class="ui info message">
+  <i class="close icon"></i>
+  <div class="header">
+    Steps
+  </div>
+  <ol class="ui ordered list">
+    <li>You must render atleast 90 days of service after last leave before filing another leave.</li>
+    <li>You cannot apply for leave on when there is an ongoing deployment on the supposedly date of leave.</li>
+      <li>View calendar the select an empty date to select it as the start date for the leave.</li>
+  </ol>
+</div>
+
+<div><button class = "ui blue button" id = "view_calendar">View Calendar</button></div>
 <div class="ui inverted segment">
     <form class="ui inverted form" method="POST" id='myForm'>
         {% csrf_token %}
@@ -57,6 +73,14 @@
         </div>
     </form>    
 </div>
+
+<div class="ui longer modal" id ="calendar_modal">
+  <div class="header">Current Deployment Requests</div>
+  <div class="content">
+                       <div id = "calendar"></div>
+  </div>
+</div>
+
 {%endif%}
 <script type="text/javascript">
         
@@ -87,11 +111,63 @@
 
             if (a<=0){
                 e.preventDefault();
-                alert('Invalid Input. Please check again.');
+                alert('"Date From" must be before "Date To". ');
             }
         });
             
     });
     
 </script>
+
+<script>
+
+$( "#view_calendar" ).click(function() {
+   $('#calendar_modal').modal('show');
+   $('.fc-today-button.fc-button ').click();
+});
+
+
+
+     $('#calendar').fullCalendar({
+          header: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'month,agendaWeek,agendaDay'
+          },
+
+          defaultView: 'month',
+          weekNumbers: 'true',
+          editable: true,
+          selectable: true,
+          eventLimit: true,
+          showNonCurrentDates: true,
+
+          eventTextColor: "white",
+
+
+          events: [
+                {% for i in events %}
+                {
+                     id: '{{ i.id }}',
+                    title: '{{i.k9}}',
+                    start: '{{ i.date_start|date:"Y-m-d" }}',
+                    end: '{{ i.date_end|date:"Y-m-d" }}',
+                    allDay: 'true',
+                },
+                {% endfor %}
+
+            ],
+
+            dayClick: function(date, jsEvent, view, resourceObj) {
+                    var formatted = date.format("YYYY-MM-DD");
+                    $("input[name='date_from']").val(formatted);
+                    $("input[name='date_from']").trigger("change");
+                    $('#calendar_modal').modal('hide');
+                  }
+          }); // end #calendar
+
+
+</script>
+
+
  {% endblock %}

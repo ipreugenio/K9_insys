@@ -170,8 +170,15 @@ class DeploymentDateForm(forms.Form):
     deployment_date = forms.DateField( widget=DateInput())
 
     def __init__(self, *args, **kwargs):
+
+        try:
+            init_date = kwargs.pop("init_date", None)
+        except:
+            pass
+
         super(DeploymentDateForm, self).__init__(*args, **kwargs)
         self.fields['deployment_date'].required = True
+        self.fields['deployment_date'].initial = init_date
 
 class GeoSearch(forms.Form):
     search = forms.CharField()

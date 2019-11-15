@@ -2,6 +2,7 @@ from django import template
 # from planningandacquiring.models import Budget_allocation, Budget_medicine, Budget_equipment, Budget_food, Budget_vaccine, Budget_vet_supply
 from inventory.models import Medicine, Miscellaneous, Food
 from unitmanagement.forms import SelectUnitsForm
+from deployment.models import Location, Team_Assignment
 from datetime import date, datetime
 
 register = template.Library()
@@ -142,3 +143,13 @@ def get_team_name(k9_schedule):
 def get_event_name(k9_schedule):
 
     return k9_schedule.dog_request.event_name
+
+@register.filter
+def get_number_of_units(choice):
+
+    id = choice.data['value']
+    loc = Location.objects.get(id = choice.data['value'] )
+    team = Team_Assignment.objects.filter(location = loc).last()
+
+
+    return team.total_dogs_deployed
