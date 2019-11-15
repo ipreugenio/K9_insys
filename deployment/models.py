@@ -516,8 +516,15 @@ class Maritime(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     boat_type = models.CharField('boat_type', choices=BOAT_TYPE, max_length=100, default='Others')
-    datetime = models.DateTimeField('datetime', null=True, blank=True, auto_now_add = True)
+    datetime = models.DateField('datetime', null=True, blank=True)
     passenger_count = models.IntegerField('passenger_count', blank=True, null=True, default = 0)
+    
+    def save(self, *args, **kwargs):
+        self.datetime = timezone.now
+        super(Maritime, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return str(self.datetime)
 
 class Daily_Refresher(models.Model):
 

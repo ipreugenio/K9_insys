@@ -383,6 +383,11 @@ class K9_Litter(models.Model):
     father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
     litter_no = models.IntegerField('litter_no', blank=True, null=True)
     litter_died = models.IntegerField('litter_died', blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    def alive(self):
+        litter = int(self.litter_no) - int(self.litter_died)
+        return litter
 
     def save(self, *args, **kwargs):
         if self.litter_no == None:
@@ -399,6 +404,8 @@ class K9_Litter(models.Model):
         if  self.father.litter_no < litter:
             self.father.litter_no = litter
             self.father.save()
+
+        self.date = dt.now()
         super(K9_Litter, self).save(*args, **kwargs)
 
 class K9_Past_Owner(models.Model):
@@ -480,7 +487,7 @@ class Proposal_Budget(models.Model):
     k9_current = models.IntegerField('k9_current', default=0) #current k9
     k9_needed = models.IntegerField('k9_needed', default=0) #needed to procure k9
     k9_breeded = models.IntegerField('k9_breeded', default=0) # born k9
-    k9_current_train = models.IntegerField('k9_current_train', default=0) #current k9 that needs training
+    # k9_current_train = models.IntegerField('k9_current_train', default=0) #current k9 that needs training
     k9_total = models.DecimalField('k9_total', default=0, max_digits=50, decimal_places=2,)
     food_milk_total = models.DecimalField('food_milk_total', default=0, max_digits=50, decimal_places=2,)
     vac_prev_total = models.DecimalField('vac_prev_total', default=0, max_digits=50, decimal_places=2,)
@@ -505,7 +512,14 @@ class Proposal_K9(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
+
+class Proposal_Training(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=18000, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
+    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
 class Proposal_Milk_Food(models.Model):
     item = models.ForeignKey(Food, on_delete=models.CASCADE, blank=True, null=True)
@@ -514,7 +528,7 @@ class Proposal_Milk_Food(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Vac_Prev(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -523,7 +537,7 @@ class Proposal_Vac_Prev(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Medicine(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -532,7 +546,7 @@ class Proposal_Medicine(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Vet_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -541,7 +555,7 @@ class Proposal_Vet_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Proposal_Kennel_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -550,7 +564,7 @@ class Proposal_Kennel_Supply(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
     
 class Proposal_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
@@ -559,7 +573,7 @@ class Proposal_Others(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Proposal_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    k9_count = models.IntegerField('k9_count', default=0)
+    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Budget(models.Model):
     k9_current = models.IntegerField('k9_current', default=0)
@@ -584,7 +598,12 @@ class Actual_K9(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
+    proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
+    
+class Actual_Training(models.Model):
+    quantity = models.IntegerField('quantity', default=0)
+    price = models.DecimalField('price', default=18000, max_digits=50, decimal_places=2,)
+    total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
 
 class Actual_Milk_Food(models.Model):
@@ -592,9 +611,7 @@ class Actual_Milk_Food(models.Model):
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Vac_Prev(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -603,7 +620,6 @@ class Actual_Vac_Prev(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Medicine(models.Model):
     item = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE, blank=True, null=True)
@@ -612,31 +628,24 @@ class Actual_Medicine(models.Model):
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
     percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Vet_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default = 0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
 
 class Actual_Kennel_Supply(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)
     
 class Actual_Others(models.Model):
     item = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField('quantity', default=0)
     price = models.DecimalField('price', default=0, max_digits=50, decimal_places=2,)
     total = models.DecimalField('total', default=0, max_digits=50, decimal_places=2,)
-    percent = models.DecimalField('percent', default=0, max_digits=50, decimal_places=10,)
     proposal = models.ForeignKey(Actual_Budget, on_delete=models.CASCADE, blank=True, null=True)
-    # k9_count = models.IntegerField('k9_count', default=0)

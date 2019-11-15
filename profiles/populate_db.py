@@ -6,7 +6,7 @@ from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
     K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
-from training.models import Training, Training_Schedule
+from training.models import Training, Training_Schedule, Training_History
 
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -495,6 +495,11 @@ def generate_training():
     )
 
     for k9 in k9s:
+        #create training history
+        fake_date = fake.date_between(start_date='-5y', end_date='today')
+        Training_History.objects.create(k9=k9,handler=k9.handler,date=fake_date)
+
+
         birthdate = k9.birth_date
 
         training_start_alpha = datetime.combine(birthdate, datetime.min.time())
@@ -1232,36 +1237,59 @@ def fix_port_names():
 def create_predeployment_inventory():
 
     randomizer = random.randint(30, 100)
-    collar = Miscellaneous.objects.create(miscellaneous = "Collar", misc_type = "Kennel Supply", uom = "pc", quantity = randomizer)
+    collar = Miscellaneous.objects.create(miscellaneous = "Collar", misc_type = "Kennel Supply", uom = "pc", quantity = randomizer, price=199.12)
     randomizer = random.randint(30, 100)
     vest = Miscellaneous.objects.create(miscellaneous="Vest", misc_type="Kennel Supply", uom="pc",
-                                          quantity=randomizer)
+                                          quantity=randomizer, price=900.21)
     randomizer = random.randint(30, 100)
     leash = Miscellaneous.objects.create(miscellaneous="Leash", misc_type="Kennel Supply", uom="pc",
-                                        quantity=randomizer)
+                                        quantity=randomizer, price=230.41)
     randomizer = random.randint(30, 100)
     shipping_crate = Miscellaneous.objects.create(miscellaneous="Shipping Crate", misc_type="Kennel Supply", uom="pc",
-                                         quantity=randomizer)
+                                         quantity=randomizer, price=1500.24)
 
     randomizer = random.randint(100, 250)
-    food = Food.objects.create(food = "Pedigree", foodtype = "Adult Dog Food", unit = "kilograms", quantity=randomizer)
+    food = Food.objects.create(food = "Pedigree", foodtype = "Adult Dog Food", unit = "kilograms", quantity=randomizer, price=120)
 
     randomizer = random.randint(50, 150)
-    medicine = Medicine.objects.create(medicine = "Medicine Sample X", med_type = "Vitamins", uom = "mg")
-    med_inv = Medicine_Inventory.objects.create(medicine = medicine, quantity=randomizer)
-
+    medicine = Medicine.objects.create(medicine = "Medicine Sample X", med_type = "Vitamins", uom = "mg", price=32.12)
+    
     randomizer = random.randint(30, 100)
     grooming_kit = Miscellaneous.objects.create(miscellaneous="Grooming Kit", misc_type="Kennel Supply", uom="pc",
-                                          quantity=randomizer)
+                                          quantity=randomizer, price=321.12)
     randomizer = random.randint(30, 100)
     first_aid_kit = Miscellaneous.objects.create(miscellaneous="First Aid Kit", misc_type="Kennel Supply", uom="pc",
-                                                quantity=randomizer)
+                                                quantity=randomizer, price=211.12)
     randomizer = random.randint(30, 100)
     oral_dextrose = Miscellaneous.objects.create(miscellaneous="Oral Dextrose", misc_type="Kennel Supply", uom="pc",
-                                                quantity=randomizer)
+                                                quantity=randomizer, price=140.12)
     randomizer = random.randint(30, 100)
     ball = Miscellaneous.objects.create(miscellaneous="Ball", misc_type="Kennel Supply", uom="pc",
-                                                quantity=randomizer)
+                                                quantity=randomizer, price=260.33)
+
+    
+    #Create Mandatory Vaccine and Prevention
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Rabies Immune Globulin', med_type='Vaccine', immunization='Anti-Rabies', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Bronchicine CAe', med_type='Vaccine', immunization='Bordetella Bronchiseptica Bacterin', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='VANGUARD PLUS 5 L4 CV', med_type='Vaccine', immunization='DHPPiL+CV', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Versican Plus DHPPi/L4', med_type='Vaccine', immunization='DHPPiL4', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='PetArmor Sure Shot 2x', med_type='Preventive', immunization='Deworming', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Heartgard', med_type='Preventive', immunization='Heartworm', price=randomizer)
+    randomizer = random.randint(100, 1000)
+
+    randomizer = random.randint(100, 1000)
+    Medicine.objects.create(medicine='Frontline', med_type='Preventive', immunization='Tick and Flea', price=randomizer)
 
     return None
 

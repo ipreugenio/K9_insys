@@ -153,9 +153,9 @@ def index(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
-    d = dt.date.today() + relativedelta(days=63) 
+    d = dt.date.today() + relativedelta(days=63)
 
-    a = dt.date.today() + relativedelta(days=22) 
+    a = dt.date.today() + relativedelta(days=22)
 
     print(d)
     print(a)
@@ -227,12 +227,12 @@ def yearly_vaccine_list(request):
             if nxt_dh <= dt.date.today():
                 dhd = [k9,nxt_dh]
                 k9_dh.append(dhd)
-                
+
         if nxt_dw != None:
             if nxt_dw <= dt.date.today():
                 dwd = [k9,nxt_dw]
                 k9_dw.append(dwd)
-            
+
     form = VaccinationUsedForm(request.POST or None)
 
     if request.method == "POST":
@@ -339,7 +339,7 @@ def vaccination_list(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='1st Tick and Flea Prevention')
                 dwd = [k9,vu]
                 k9_tf.append(dwd)
-        
+
         #9 weeks
         if vr.dhppil_cv_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -391,7 +391,7 @@ def vaccination_list(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd dose DHPPiL+CV Vaccination')
                 dwd = [k9,vu]
                 k9_dh.append(dwd)
-        
+
         #14 weeks
         if vr.heartworm_3 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -414,7 +414,7 @@ def vaccination_list(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='3rd Tick and Flea Prevention')
                 dwd = [k9,vu]
                 k9_tf.append(dwd)
-        
+
         #18 weeks
         if vr.dhppil4_2 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -459,7 +459,7 @@ def vaccination_list(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='6th Heartworm Prevention')
                 dwd = [k9,vu]
                 k9_hw.append(dwd)
-        
+
         #28 weeks
         if vr.tick_flea_6 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -482,7 +482,7 @@ def vaccination_list(request):
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='7th Tick and Flea Prevention')
                 dwd = [k9,vu]
                 k9_tf.append(dwd)
-        
+
         #34 weeks
         if vr.heartworm_8 == False:
             k9 = K9.objects.get(id=vr.k9.id)
@@ -592,7 +592,7 @@ def vaccine_submit(request):
                 vr.tick_flea_7 = True
             elif vu.disease == '8th Heartworm Prevention':
                 vr.heartworm_8 = True
-         
+
             #minus
             mi = Medicine_Inventory.objects.get(id=vu.vaccine.id)
             mi.quantity = mi.quantity - 1
@@ -609,7 +609,7 @@ def vaccine_submit(request):
             return HttpResponseRedirect('vaccination-list')
         else:
             messages.warning(request, 'Insufficient Quantity')
-            return HttpResponseRedirect('vaccination-list')    
+            return HttpResponseRedirect('vaccination-list')
 
 
 
@@ -1641,7 +1641,9 @@ def k9_incident(request):
     num = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick').count()
     incident = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick')
 
-    if request.method == "POST":
+    # form1 = DeathCertK9(request.POST or None, instance=dog)
+
+    if request.method == "POST" and 'incident' in request.POST:
         if form.is_valid():
             f = form.save(commit=False)
             f.reported_by = user
@@ -1652,6 +1654,13 @@ def k9_incident(request):
 
             return redirect('unitmanagement:k9_incident')
 
+    # elif request.method=='POST' and 'dead' in request.POST:
+    #     if form1.is_valid():
+    #         dog.death_cert = form1.data['death_cert']
+    #         dog.death_date = form1.data['death_date']
+    # elif request.method=='POST' and 'recovered' in request.POST:
+    #     print('recovered')
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1659,6 +1668,7 @@ def k9_incident(request):
         'title': "K9 Incident",
         'actiontype': "Submit",
         'form': form,
+        # 'form1': form1,
         'style': style,
         'notif_data':notif_data,
         'count':count,
@@ -1667,6 +1677,10 @@ def k9_incident(request):
         'incident':incident,
     }
     return render (request, 'unitmanagement/k9_incident.html', context)
+
+#TODO
+def k9_accident_death_handler(request):
+    pass
 
 # TODO
 def k9_incident_list(request):
@@ -1687,24 +1701,56 @@ def k9_incident_list(request):
     else:
         data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
 
+    if request.method == "POST" and 'died' in request.POST:
+        dc = request.POST['death_cert']
+        dd = request.POST['death_date']
+        i = request.POST['id_val']
 
-    if request.method == "POST":
-        i = request.POST.get('input_id')
-        dc = request.POST.get('death_cert')
-        date = request.POST.get('date_died')
         ki = K9_Incident.objects.get(id=i)
 
         k9 = K9.objects.get(id=ki.k9.id)
         k9.status= 'Dead'
         k9.training_status = 'Dead'
         k9.death_cert = dc
-        k9.death_date = date
+        k9.death_date = dd
 
         ki.status = 'Done'
         ki.save()
         k9.save()
-        messages.success(request, 'K9 Died...')
+        messages.success(request,  str(k9) +' Died...')
+
+    elif request.method=='POST' and 'recovered' in request.POST:
+        i = request.POST['id_val']
+
+        ki = K9_Incident.objects.get(id=i)
+        k9 = K9.objects.get(id=ki.k9.id)
+        k9.status= 'Working Dog'
+
+        ki.status = 'Done'
+        ki.save()
+        k9.save()
+
+        messages.success(request,  str(k9) +' Recovered!')
         return redirect('unitmanagement:k9_incident_list')
+
+
+    # if request.method == "POST":
+    #     i = request.POST.get('input_id')
+    #     dc = request.POST.get('death_cert')
+    #     date = request.POST.get('date_died')
+    #     ki = K9_Incident.objects.get(id=i)
+
+    #     k9 = K9.objects.get(id=ki.k9.id)
+    #     k9.status= 'Dead'
+    #     k9.training_status = 'Dead'
+    #     k9.death_cert = dc
+    #     k9.death_date = date
+
+    #     ki.status = 'Done'
+    #     ki.save()
+    #     k9.save()
+    #     messages.success(request, 'K9 Died...')
+    #     return redirect('unitmanagement:k9_incident_list')
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1812,24 +1858,46 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list')
 
-# def k9_accident(request, id):
-#     accident = request.GET.get('accident')
-#     data = K9_Incident.objects.get(id=id)
-#     data.status = 'Done'
-#     data.save()
-#
-#     k9 = K9.objects.get(id=data.k9.id)
-#
-#     if accident == 'recovered':
-#         k9.status = 'Working Dog'
-#         messages.success(request, 'K9 has recovered!')
-#     else:
-#         k9.status = 'Died'
-#         k9.training_status = 'Died'
-#         messages.success(request, 'K9 died..')
-#
-#     k9.save()
-#     return redirect('unitmanagement:k9_incident_list')
+def k9_accident(request, id=None):
+    accident = request.GET.get('accident')
+    data = K9_Incident.objects.get(id=id)
+    data.status = 'Done'
+    data.save()
+
+    k9 = K9.objects.get(id=data.k9.id)
+
+    if accident == 'recovered':
+        k9.status = 'Working Dog'
+        messages.success(request, 'K9 has recovered!')
+        k9.save()
+    elif accident == 'Died':
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
+        messages.success(request, 'K9 died..')
+        k9.save()
+
+    if request.method == 'POST':
+        data2 = K9_Incident.objects.get(id=id)
+        data2.status = 'Done'
+        data2.save()
+
+        dc=request.POST['death_cert']
+        dd=request.POST['date_died']
+
+        k9 = K9.objects.get(id=data.k9.id)
+        k9.status = 'Dead'
+        k9.training_status = 'Dead'
+        k9.death_cert = dc
+        k9.death_date = dd
+
+        h = User.objects.get(id=k9.handler.id)
+        h.partnered = False
+        h.save()
+
+        k9.handler= None
+        k9.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 def health_list_handler(request):
     user = user_session(request)
@@ -2138,7 +2206,7 @@ def on_leave_list(request):
     }
     return render (request, 'unitmanagement/on_leave_list.html', context)
 
-# TODO 
+# TODO
 # Due Retired
 def due_retired_list(request):
     style='ui green message'
@@ -2147,8 +2215,8 @@ def due_retired_list(request):
     cb_list = []
     for c in cb:
         cb_list.append(c.k9.id)
-         
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list) 
+
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2167,7 +2235,7 @@ def due_retired_call(request, id):
     k9 = K9.objects.get(id=id)
     cb = Call_Back_K9.objects.create(k9=k9)
     Notification.objects.create(k9=k9,user=k9.handler,other_id=cb.id,notif_type='call_back', position='Handler', message=str(k9) + ' is due for retirement. Please return to PCGK9-Taguig Base.')
-    
+
     messages.success(request, 'You have called ' + str(k9) + ' back to base.')
     return redirect ('unitmanagement:due_retired_list')
 
@@ -2225,7 +2293,7 @@ def confirm_item_request(request,id):
     rr.delete()
     return redirect ('profiles:team_leader_dashboard')
 
-# TODO 
+# TODO
 # transfer request list
 def transfer_request_list(request):
     # for sched in schedules:
@@ -2247,7 +2315,7 @@ def transfer_request_list(request):
         date = request.POST.get('date')
         match_id = request.POST.get('handler')
         requester_id = request.POST.get('requester')
-        
+
         match = User.objects.get(id=match_id)
         requester = User.objects.get(id=requester_id)
 
@@ -2349,7 +2417,7 @@ def transfer_request_form(request):
                 f.save()
                 style='ui green message'
                 messages.success(request,'You have submitted a transfer request!')
-            
+
                 return redirect('unitmanagement:transfer_request_form')
             elif rendered_enough_days == False and deploy == False:
                 style = 'ui red message'
@@ -2364,7 +2432,7 @@ def transfer_request_form(request):
         else:
             style='ui red message'
             messages.success(request,'Invalid Input!')
-    
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -2381,54 +2449,54 @@ def transfer_request_form(request):
     }
     return render (request, 'unitmanagement/transfer_request_form.html', context)
 
-# def replenishment_form(request):
-#     user = user_session(request)
-#     style = 'ui green message'
-#     form = ReplenishmentForm(request.POST or None)
-#
-#     form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
-#     formset = form2()
-#     if request.method == 'POST':
-#         if form.is_valid:
-#             f1 = form.save()
-#             formset = form2(request.POST)
-#
-#             if formset.is_valid:
-#                 for forms in formset:
-#                    #TODO SAVE FORMS
-#                     if forms['item_type'].value() != '------------':
-#                         uom = forms['uom'].value()
-#                         quantity = forms['quantity'].value()
-#
-#                         if forms['item_type'].value() == 'Dog Food':
-#                             item_id = forms['item'].value()
-#                             item = Food.objects.get(id=item_id)
-#                             Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
-#                         elif forms['item_type'].value() == 'Medicine':
-#                             item_id = forms['item'].value()
-#                             item = Medicine_Inventory.objects.get(id=item_id)
-#                             Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
-#                         elif forms['item_type'].value() == 'Miscellaneous':
-#                             item_id = forms['item'].value()
-#                             item = Miscellaneous.objects.get(id=item_id)
-#                             Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
-#
-#                 return redirect('profiles:team_leader_dashboard')
-#     #NOTIF SHOW
-#     notif_data = notif(request)
-#     count = notif_data.filter(viewed=False).count()
-#     user = user_session(request)
-#
-#     context = {
-#         'title': "Item Replenishment Request Form",
-#         'style': style,
-#         'notif_data':notif_data,
-#         'count':count,
-#         'user':user,
-#         'form':form,
-#         'form2':formset,
-#     }
-#     return render (request, 'unitmanagement/replenishment_form.html', context)
+def replenishment_form(request):
+    user = user_session(request)
+    style = 'ui green message'
+    form = ReplenishmentForm(request.POST or None)
+    form.fields['handler'].queryset = User.objects.filter(id=user.id)
+    form2 = formset_factory(ItemReplenishmentForm, extra=10, can_delete=True)
+    formset = form2()
+    if request.method == 'POST':
+        if form.is_valid:
+            f1 = form.save()
+            formset = form2(request.POST)
+
+            if formset.is_valid:
+                for forms in formset:
+                   #TODO SAVE FORMS
+                    if forms['item_type'].value() != '------------':
+                        uom = forms['uom'].value()
+                        quantity = forms['quantity'].value()
+
+                        if forms['item_type'].value() == 'Dog Food':
+                            item_id = forms['item'].value()
+                            item = Food.objects.get(id=item_id)
+                            Food_Request.objects.create(request=f1, food=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Medicine':
+                            item_id = forms['item'].value()
+                            item = Medicine_Inventory.objects.get(id=item_id)
+                            Medicine_Request.objects.create(request=f1, medicine=item, unit=uom, quantity=quantity)
+                        elif forms['item_type'].value() == 'Miscellaneous':
+                            item_id = forms['item'].value()
+                            item = Miscellaneous.objects.get(id=item_id)
+                            Miscellaneous_Request.objects.create(request=f1, miscellaneous=item, unit=uom, quantity=quantity)
+
+                return redirect('profiles:team_leader_dashboard')
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
+    context = {
+        'title': "Item Replenishment Request Form",
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+        'form':form,
+        'form2':formset,
+    }
+    return render (request, 'unitmanagement/replenishment_form.html', context)
 
 def replenishment_confirm(request):
     user = user_session(request)
@@ -2500,9 +2568,9 @@ def replenishment_approval(request, id):
             while  i < len(items):
                 if i == (len(items) - 1):
                     msg2 = msg2 + items[i] + '.'
-                else:    
+                else:
                     msg2 = msg2 + items[i] + ' ,'
-            
+
                 i = i+1
 
             style = 'ui red message'
@@ -2709,7 +2777,7 @@ def choose_handler_list(request, id):
             h.partnered = True
             h.save()
 
-            
+
             Notification.objects.create(position='Handler', user=h, notif_type='k9_given', message= str(k9) + ' has been assigned to you.')
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
@@ -2734,22 +2802,6 @@ def choose_handler_list(request, id):
         'g':g,
     }
     return render (request, 'unitmanagement/choose_handler_list.html', context)
-
-# TODO
-# K9 Died
-def confirm_death(request, id):
-    i = K9_Incident.objects.get(id=id)
-    i.status = 'Done'
-    i.save()
-
-    k9 = K9.objects.get(id=i.k9.id)
-    k9.status = "Dead"
-    k9.training_status = "Dead"
-    k9.save()
-
-    messages.success(request, i.k9.name + 'has been confirmed dead...')
-
-    return redirect('unitmanagement:k9_incident_list')
 
 # TODO
 # choose_handler Cycle
@@ -3068,7 +3120,7 @@ class TeamLeaderView(APIView):
             k9_perf.append(perf_items)
 
             f = str(k.name) + ' - ' + str(k.handler.lastname)
-            
+
             fou.append(f)
 
         data = {
@@ -3196,14 +3248,14 @@ class CommanderView(APIView):
         list_city = []
         list_count = []
         for loc in loc_u:
-            count = Dog_Request.objects.filter(city=loc).count() 
+            count = Dog_Request.objects.filter(city=loc).count()
             list_city.append(loc)
             list_count.append(count)
-        
+
         # print(list_city)
 
         # team_items = []
-      
+
         data = {
             "list_city":list_city,
             "list_count":list_count,
@@ -3253,14 +3305,14 @@ class AdminView(APIView):
         list_month_name = []
         while ctr <= month:
             mr = Medicine_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
-            # .aggregate(sum=Sum('quantity'))['sum'] 
+            # .aggregate(sum=Sum('quantity'))['sum']
 
             mrt = 0
             for mr in mr:
                 mi = Medicine_Inventory.objects.get(id=mr.inventory.id)
                 t = mr.quantity * mi.medicine.price
                 mrt = mrt + t
-            
+
             fr = Food_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
 
             frt = 0
@@ -3269,8 +3321,8 @@ class AdminView(APIView):
                 t = fr.quantity * mi.price
                 frt = frt + t
 
-            mir = Miscellaneous_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr) 
-            
+            mir = Miscellaneous_Received_Trail.objects.filter(date_received__year=datetime.today().year).filter(date_received__month=ctr)
+
             mirt = 0
             for mir in mir:
                 mi = Miscellaneous.objects.get(id=mir.inventory.id)
@@ -3316,12 +3368,12 @@ def load_handler(request):
         requester = request.GET.get('requester')
         handler = User.objects.get(id=handler_id)
         k9 = K9.objects.get(handler=handler)
-        
+
         pi = Personal_Info.objects.get(UserID=handler)
         edd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='EDD').count()
         ndd = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='NDD').count()
         sar = Handler_K9_History.objects.filter(handler=handler).filter(k9__capability='SAR').count()
-        
+
         cc_ac = Handler_Incident.objects.filter(handler=handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
         cc_in = Handler_Incident.objects.filter(handler=handler).filter(incident='Poor Performance').filter(incident='Violation').count()
     except:
@@ -3391,7 +3443,7 @@ def load_transfer(request):
         incident = Handler_Incident.objects.filter(handler=transfer.handler)
         c_ac = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Rescued People').filter(incident='Made an Arrest').count()
         c_in = Handler_Incident.objects.filter(handler=transfer.handler).filter(incident='Poor Performance').filter(incident='Violation').count()
-        
+
     except:
         pass
 
@@ -3464,14 +3516,21 @@ def load_image(request):
 def load_incident(request):
 
     data_load = None
+    k9 = None
+    form = None
     try:
         id = request.GET.get('id')
         data_load = K9_Incident.objects.get(id=id)
+        k9 = data_load.k9
+        form = DeathCertK9(request.POST or None, instance=k9)
+        form.fields['death_cert'].initial = k9.death_cert
+        # form.fields['id_val'].initial = data_load.id
     except:
         pass
 
     context = {
         'data_load': data_load,
+        'form':form,
     }
 
     return render(request, 'unitmanagement/incident_data.html', context)
@@ -3798,12 +3857,12 @@ def load_checkups(request):
 
 def load_item(request):
     item_type = request.GET.get('type')
-    
+    print(item_type)
     if item_type == 'Dog Food':
-        item = Food.objects.filter(foodtype='Adult Dog Food')
+        item = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='Sack - 20kg')
     elif item_type == 'Medicine':
         item = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
-    elif item_type == 'Medicine':
+    elif item_type == 'Miscellaneous':
         item = Miscellaneous.objects.exclude(misc_type='Vet Supply')
     else:
         item = None
@@ -3811,7 +3870,7 @@ def load_item(request):
 
 def load_item_food(request):
     uom = None
-
+    quantity= None
     try:
         id = request.GET.get('id')
         item_type = request.GET.get('type')
@@ -3819,19 +3878,24 @@ def load_item_food(request):
         if item_type == 'Dog Food':
             item = Food.objects.get(id=id)
             uom = item.unit
+            quantity = item.quantity
         elif item_type == 'Medicine':
             item = Medicine_Inventory.objects.get(id=id)
             uom = item.medicine.uom
+            quantity = item.quantity
         elif item_type == 'Medicine':
             item = Miscellaneous.objects.get(id=id)
             uom = item.uom
+            quantity = item.quantity
         else:
             uom = None
+            quantity= None
     except:
         pass
 
     data = {
         'uom':uom,
+        'quantity':quantity,
     }
     return JsonResponse(data)
 
@@ -3918,7 +3982,7 @@ def k9_mia_list(request):
     k9_mia = K9.objects.filter(training_status = "MIA")
 
     k9_list = []
-    
+
     for km in k9_mia:
         tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).exclude(date_pulled=None).latest('date_pulled')
 
@@ -3927,13 +3991,13 @@ def k9_mia_list(request):
             loc = tdd.team_assignment
         else:
             loc = tdd.team_requested
-        
+
         a = [km,loc,tdd]
         k9_list.append(a)
 
     print(k9_mia)
     print(k9_list)
-    
+
     context = {
         'k9_list' : k9_list,
         'style' : style,
@@ -3944,7 +4008,7 @@ def k9_mia_list(request):
 
 def k9_mia_change(request,id):
     status =  request.GET.get('status')
-    
+
     k9 = K9.objects.get(id=id)
     if status == 'missing':
         k9.status = 'Missing'
@@ -3957,7 +4021,7 @@ def k9_mia_change(request,id):
         k9.save()
 
     style = "ui green message"
-    messages.success(request, 'You have updated K9 unit status.')    
+    messages.success(request, 'You have updated K9 unit status.')
     return redirect('unitmanagement:k9_mia_list')
 
 #unitmanagement views.py

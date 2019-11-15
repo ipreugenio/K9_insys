@@ -67,13 +67,14 @@ urlpatterns = [
     path('transfer-request-list/ajax_load_transfer', views.load_transfer, name='load_transfer'),
 
     path('reassign-assets/<int:id>', views.reassign_assets, name='reassign_assets'),
-    path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
+    # path('confirm-death/<int:id>', views.confirm_death, name='confirm_death'),
     path('trained-list', views.trained_list, name='trained_list'),
     path('classified-list', views.classified_list, name='classified_list'),
     #path('change-equipment/<int:id>', views.change_equipment, name='change_equipment'),
     path('transfer-request-list/ajax_load_handler', views.load_handler, name='ajax_load_handler'),
 
     path('replenishment_form', views.replenishment_form, name='replenishment_form'),
+    path('replenishment_form/ajax_load_item', views.load_item, name='load_item'),
     path('replenishment_form/ajax_load_item_food', views.load_item_food, name='load_item_food'),
     path('replenishment_form/ajax_load_item_med', views.load_item_med, name='load_item_med'),
     path('replenishment_form/ajax_load_item_misc', views.load_item_misc, name='load_item_misc'),
@@ -108,5 +109,8 @@ urlpatterns = [
     path('k9_accident/<int:id>', views.k9_accident, name ='k9_accident'),
     path('k9_accident', views.k9_accident, name ='k9_accident'),
     #path('/<int:id>/', views., name=''),
+
     path('emergency_leave_list', views.emeregency_leave_list, name ='emergency_leave_list'),
+    path('k9_accident_death_handler', views.k9_accident_death_handler, name ='k9_accident_death_handler'),
+
 ];

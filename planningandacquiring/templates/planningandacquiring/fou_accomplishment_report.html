@@ -1,4 +1,3 @@
-
 {% load static %}
 {% block content %} 
 
@@ -12,31 +11,29 @@
         <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
     <br>Coast Guard Base Taguig
     <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
-        <br>K9 Performance Report
+        <br>Field Officer Unit Accomplishment Summary Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
 
-    <table class="ui small celled table">
+    <table class="ui small celled seven column table">
         <thead>
-          <th>K9</th>
-          <th>Capability</th>
-          <th>Port find/plant</th>
-          <th>Building find/plant</th>
-          <th>Vehicle find/plant</th>
-          <th>Baggage find/plant</th>
-          <th>Others find/plant</th>
-          <th>Rating</th>
+            <th>Handler</th>
+            <th>Rescued People</th>
+            <th>Made an Arrest</th>
+            <th>Poor Performance</th>
+            <th>Violation</th>
+            <th>Negative</th>
+            <th>Positive</th>
         </thead>
         <tbody>
             {% for data in data%}
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.1}}</td>
-                <td>{{data.2}}/{{data.3}}</td>
-                <td>{{data.4}}/{{data.5}}</td>
-                <td>{{data.6}}/{{data.7}}</td>
-                <td>{{data.8}}/{{data.9}}</td>
-                <td>{{data.10}}/{{data.11}}</td>
-                <td style="font-weight: bold;">{{data.12}}</td>
+                <td>{{data.2}}</td>
+                <td>{{data.3}}</td>
+                <td>{{data.4}}</td>
+                <td style="font-weight: bold;">{{data.5}}</td>
+                <td style="font-weight: bold;">{{data.6}}</td>
             </tr>
             {%endfor%}
         </tbody>

@@ -13,6 +13,7 @@
         <thead>
         <tr>
             <th>Breed</th>
+            <th>Sex</th>
             <th>Skill Recommendation</th>
             <th>Value</th>
         </tr>
@@ -21,6 +22,7 @@
             {% for Breed in breed %}
                 <tr>
                     <td><a href="{% url 'planningandacquiring:breed_detail' Breed.id %}">{{Breed.breed}}</a></td>
+                    <td>{{ Breed.sex }}</td>
                     <td>{{ Breed.skill_recommendation }}</td>
                     <td>{{ Breed.value }}</td>
                 </tr>

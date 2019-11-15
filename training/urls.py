@@ -32,6 +32,7 @@ urlpatterns = [
     path('addoption/confirm-adoption/<int:id>', views.confirm_adoption, name='confirm_adoption'),
     path('addoption/adoption-confirmed', views.adoption_confirmed, name='adoption_confirmed'),
     path('addoption/adoption-details/<int:id>', views.adoption_details, name='adoption_details'),
+    path('addoption/k9_returned/<int:id>', views.k9_returned, name='k9_returned'),
 
     path('fail-dog/<int:id>', views.fail_dog, name='fail_dog'),
     path('view_graph/<int:id>', views.view_graphs, name='view_graph'),
@@ -40,4 +41,5 @@ urlpatterns = [
     # path('training/list-classify-k9/ajax_load_k9', views.load_k9, name='ajax_load_k9'),
     #path('/<int:id>/', views., name=''),
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
+    
 ];

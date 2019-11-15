@@ -1,43 +1,53 @@
 {% extends "profiles/sidebar_reports.html" %}
 
 {% block content %}
-<div class="ui inverted segment" style="padding:20px;">
-    <h3>Generate K9 Performance Report</h3>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="ui green message" > {{ message }}</div>
-        {% endfor %}
-    {% endif %}
-</div>
+<h2 id='title'>Generate K9 Performance Report</h2>
 
-    
-    <form class="ui form" action="" method="POST">
-        {% csrf_token %}
-        <div class="ui basic segment">
-            <div class="ui three column very relaxed stackable center aligned grid">
-                <div class="column">
-                    {{form.from_date}}
-                </div>
-                <div class="middle aligned column">
-                    {{form.to_date}} 
-                </div>
-                <div class="ui vertical divider">
-                    to
+    <div class="ui two column centered grid">
+        <div class="column">
+            <div class="ui form" >
+                <div class="ui basic segment">
+                    <div class="ui two column very relaxed grid">
+                        <div class="column">
+                            {{form.date_from}}
+                        </div>
+                        <div class="column">
+                            {{form.date_to}} 
+                        </div>
+                    </div>
+                    <div class="ui vertical divider">
+                    TO
+                    </div>
                 </div>
             </div>
         </div>
-        <center>
-            <button onclick="return confirm('Are you sure?')" id = "btn" class = "ui button green" type="submit" >Submit</button>  
-        </center>
-    </form>
+    </div>
+ 
+    <center>
+        <button onclick=submit_function() id = "btn" class = "ui button green">Submit</button>  
+    </center>
+    <div class="ui divider"></div>
+    <br>
+    <div id="div_data">
 
-<script type="text/javascript">
+    </div>
+<script>
 
-     $(document).ready(function() {a
-        $('#tabledata1');
-        $('#tabledata2');
-        $('.menu .item').tab();
-    });
-
+    function submit_function(){
+        var url = 'k9_performance_report';  
+        var date_from =  $('#id_date_from').val();
+        var date_to = $('#id_date_to').val();
+        $.ajax({                       
+            url: url,                    
+            data: {
+                'date_from': date_from, 
+                'date_to': date_to,      
+            },
+            success: function (data) {   
+                $("#div_data").html(data);  
+            }
+        });
+    }
+        
 </script>
 {% endblock %}

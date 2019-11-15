@@ -29,11 +29,15 @@
             <tbody>
                 {% for data in data1 %}
                 <tr>
-                    <td>{{data.0.date_requested | date:'Y-m-d'}}</td>
+                    <td>
+                        <a href="{% url 'unitmanagement:replenishment_approval' data.0.id %}" > 
+                            {{data.0.date_requested | date:'Y-m-d'}}</a>
+                            
+                    </td>
                     <td>{{data.0.handler}}</td>
                     <td>{{data.1}}</td>
                     <td class="center aligned">
-                        <a href="{% url 'unitmanagement:replenishment_approval' data.0.id %}" class="ui basic blue button">Select</a>
+                        <a href="#" class="ui orange button">Send Items</a>
                     </td>
                 </tr>
                 
@@ -54,7 +58,11 @@
             <tbody>
                 {% for data in data2 %}
                 <tr>
-                    <td>{{data.0.date_approved | date:'Y-m-d'}}</td>
+                    <td>
+                        <a href="{% url 'unitmanagement:replenishment_approval' data.0.id %}">
+                            {{data.0.date_approved | date:'Y-m-d'}}        
+                        </a>
+                    </td>
                     <td>{{data.0.handler}}</td>
                     <td>{{data.1}}</td>
                     <td>{{data.0.approved_by}}</td>

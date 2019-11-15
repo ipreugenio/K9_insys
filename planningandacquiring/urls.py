@@ -19,7 +19,6 @@ urlpatterns = [
     path('breeding_confirmed/', views.breeding_confirmed, name='breeding_confirmed'),
     path('K9_list/', views.K9_listview, name='K9_list'),
     path('K9_detail/<int:id>', views.K9_detailview, name='K9_detail'),
-    path('report/', views.report, name='report'),
     path('index/', views.index, name='index'),
 
     path('in_heat_change/', views.in_heat_change, name='in_heat_change'),
@@ -27,12 +26,6 @@ urlpatterns = [
     path('budgeting/', views.budgeting, name = 'budgeting'),
     path('budget_list/', views.budgeting_list, name='budget_list'),
     path('budgeting_detail/<int:id>', views.budgeting_detail, name='budgeting_detail'),
-
-    path('choose_date/', views.choose_date, name='choose_date'),
-    path('choose_date/detailed_budget/', views.detailed_budgeting, name='detailed_budget'),
-
-
-    path('budget_report/', views.budgeting_report, name='budget_report'),
 
     path('add_breed_form/', views.add_breed, name='add_breed_form'),
     path('view_breed/', views.breed_listview, name='view_breed'),
@@ -51,36 +44,50 @@ urlpatterns = [
 
     # path('procured_form_data/', views.procured_form_data, name='procured_form_data'),
 
-    path('accomplishment_date/', views.accomplishment_date, name='accomplishment_date'),
-    path('accomplishment_date/accomplishment_report/', views.accomplishment_report, name='accomplishment_report'),
-
-    path('vet_date/', views.vet_date, name='vet_date'),
-    path('vet_date/vet_report/', views.vet_report, name='vet_report'),
-
-    path('inventory_date/', views.inventory_date, name='inventory_date'),
-    path('inventory_date/inventory_report/', views.inventory_report, name='inventory_report'),
-
-    path('deployment_date/', views.deployment_date, name='deployment_date'),
-    path('deployment_date/deployment_report/', views.deployment_report, name='deployment_report'),
-
-    path('handler_date/', views.handler_date, name='handler_date'),
-    path('handler_date/handler_report/', views.handler_report, name='handler_report'),
-
-    path('k9_report/', views.k9_report, name='k9_report'),
-    path('training_report/', views.training_report, name='training_report'),
-
-    path('k9_performance_date/', views.k9_performance_date, name='k9_performance_date'),
-    path('k9_performance_date/k9_performance_report/', views.k9_performance_report, name='k9_performance_report'),
-
-    path('dog_request_date/', views.dog_request_date, name='dog_request_date'),
-    path('dog_request_date/dog_request_report/', views.dog_request_report, name='dog_request_report'),
-
     path('add_K9_parents_form/ajax_load_health', views.load_health, name='ajax_load_health'),
     path('add_K9_offspring/ajax_load_form', views.load_form, name='ajax_load_form'),
     path('add_procured_k9/ajax_load_form_procured', views.load_form_procured, name='ajax_load_form_procured'),
     
     path('budgeting/ajax_load_budget_data', views.load_budget_data, name='ajax_load_budget_data'),
     path('budgeting/ajax_load_budget', views.load_budget, name='ajax_load_budget'),
+    
+    #REPORTS
+    path('k9_performance_date/', views.k9_performance_date, name='k9_performance_date'),
+    path('k9_performance_date/k9_performance_report/', views.ajax_k9_performance_report, name='ajax_k9_performance_report'),
+    
+    path('fou_accomplishment_date/', views.fou_accomplishment_date, name='fou_accomplishment_date'),
+    path('fou_accomplishment_date/fou_accomplishment_report/', views.ajax_fou_accomplishment_report, name='ajax_fou_accomplishment_report'),
+
+    path('fou_acc_date/', views.fou_acc_date, name='fou_acc_date'),
+    path('fou_acc_date/fou_acc_report/', views.ajax_fou_acc_report, name='ajax_fou_acc_report'),
+
+    path('training_date/', views.training_date, name='training_date'),
+    path('training_date/training_report/', views.ajax_training_report, name='ajax_training_report'),
+
+    path('training_summary_date/', views.training_summary_date, name='training_summary_date'),
+    path('training_summary_date/training_summary_report/', views.ajax_training_summary_report, name='ajax_training_summary_report'),
+    
+    path('aor_summary_date/', views.aor_summary_date, name='aor_summary_date'),
+    path('aor_summary_date/aor_summary_report/', views.ajax_aor_summary_report, name='ajax_aor_summary_report'),
+    
+    path('port_date/', views.port_date, name='port_date'),
+    path('port_date/port_report/', views.ajax_port_report, name='ajax_port_report'),
+    
+    path('k9_request_date/', views.k9_request_date, name='k9_request_date'),
+    path('k9_request_date/k9_request_report/', views.ajax_k9_request_report, name='ajax_k9_request_report'),
+
+
+    path('k9_incident_summary_date/', views.k9_incident_summary_date, name='k9_incident_summary_date'),
+    path('k9_incident_summary_date/k9_incident_summary_report/', views.ajax_k9_incident_summary_report, name='ajax_k9_incident_summary_report'),
+    
+    path('k9_breeding_date/', views.k9_breeding_date, name='k9_breeding_date'),
+    path('k9_breeding_date/k9_breeding_report/', views.ajax_k9_breeding_report, name='ajax_k9_breeding_report'),
+    
+    path('health_date/', views.health_date, name='health_date'),
+    path('health_date/health_report/', views.ajax_health_report, name='ajax_health_report'),
+    
+    path('inventory_date/', views.inventory_date, name='inventory_date'),
+    path('inventory_date/inventory_report/', views.ajax_inventory_report, name='ajax_inventory_report'),
 
 ];
 

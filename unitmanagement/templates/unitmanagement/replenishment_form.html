@@ -46,6 +46,10 @@
                         <label>Quantity</label>
                         {{form.quantity}}
                     </div>
+                    <div class="field">
+                        <label>Inventory Quantity</label>
+                        {{form.on_hand}}
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -103,10 +107,24 @@
                 success: function (data) {
                 var res = id_val.split("-");
                 $('#id_form-'+res[1]+'-uom').val(data.uom);
+                $('#id_form-'+res[1]+'-on_hand').val(data.quantity);
                 }
             });
 
             });
+
+        $(".quantity" ).bind('keyup', function() {
+            var id = $(this).val();
+            var id_val = $(this).attr('id');
+
+            var res = id_val.split("-");
+            var on_hand =  $('#id_form-'+res[1]+'-on_hand').val()
+            console.log(on_hand, id)
+
+            if(id > on_hand){
+                alert('Inventory Item Insufficient.');
+            }
+        });
     });
 </script>
  {% endblock %}
