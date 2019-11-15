@@ -393,3 +393,8 @@ class DeathCertK9(forms.ModelForm):
     class Meta:
         model = K9
         fields = ('death_cert','death_date')
+
+    def __init__(self, *args, **kwargs):
+        super(DeathCertK9, self).__init__(*args, **kwargs)
+        self.fields['death_cert'].required = False
+        self.fields['death_date'].required = False

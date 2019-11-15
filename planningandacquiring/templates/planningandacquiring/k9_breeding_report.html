@@ -1,8 +1,7 @@
-
 {% load static %}
 {% block content %} 
 
-{% if data %}
+{% if data1 %}
 
 <div class="ui segment" id="printableArea">
     <center>
@@ -12,31 +11,54 @@
         <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
     <br>Coast Guard Base Taguig
     <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
-        <br>K9 Performance Report
+        <br>K9 Breeding Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
 
-    <table class="ui small celled table">
-        <thead>
-          <th>K9</th>
-          <th>Capability</th>
-          <th>Port find/plant</th>
-          <th>Building find/plant</th>
-          <th>Vehicle find/plant</th>
-          <th>Baggage find/plant</th>
-          <th>Others find/plant</th>
-          <th>Rating</th>
+
+    <table class="ui small celled structured column table" style="width: 70%;">
+        <thead class="center aligned">
+            <tr >
+                <th colspan="5">SUMMARY</th>
+            </tr>
+            <tr>
+                <th>Breed</th>
+                <th>K9 died Count</th>
+                <th>K9 born Count (Alive)</th>
+            </tr>
+           
+        </thead>
+        <tbody>
+            {% for data in data1 %}
+            <tr class="right aligned">
+                <td class="left aligned">{{data.0}}</td>
+                <td>{{data.1}}</td>
+                <td>{{data.2}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+
+    <table class="ui small celled column table">
+        <thead class="center aligned">
+            <th>Date</th>
+            <th>Dam</th>
+            <th>Sire</th>
+            <th>Breed</th>
+            <th>Litter Alive</th>
+            <th>Litter Died</th>
+            <th>Litter Count</th>
         </thead>
         <tbody>
             {% for data in data%}
             <tr>
-                <td>{{data.0}}</td>
-                <td>{{data.1}}</td>
-                <td>{{data.2}}/{{data.3}}</td>
-                <td>{{data.4}}/{{data.5}}</td>
-                <td>{{data.6}}/{{data.7}}</td>
-                <td>{{data.8}}/{{data.9}}</td>
-                <td>{{data.10}}/{{data.11}}</td>
-                <td style="font-weight: bold;">{{data.12}}</td>
+                <td>{{data.date}}</td>
+                <td>{{data.mother}}</td>
+                <td>{{data.father}}</td>
+                <td>{{data.mother.breed}}</td>
+                <td>{{data.alive}}</td>
+                <td>{{data.litter_died}}</td>
+                <td>{{data.litter_no}}</td>
             </tr>
             {%endfor%}
         </tbody>

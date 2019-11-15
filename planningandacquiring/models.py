@@ -383,6 +383,11 @@ class K9_Litter(models.Model):
     father = models.ForeignKey(K9, related_name='sire', on_delete=models.CASCADE, blank=True, null=True)
     litter_no = models.IntegerField('litter_no', blank=True, null=True)
     litter_died = models.IntegerField('litter_died', blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    def alive(self):
+        litter = int(self.litter_no) - int(self.litter_died)
+        return litter
 
     def save(self, *args, **kwargs):
         if self.litter_no == None:
@@ -399,6 +404,8 @@ class K9_Litter(models.Model):
         if  self.father.litter_no < litter:
             self.father.litter_no = litter
             self.father.save()
+
+        self.date = dt.now()
         super(K9_Litter, self).save(*args, **kwargs)
 
 class K9_Past_Owner(models.Model):

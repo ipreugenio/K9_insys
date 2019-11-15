@@ -1,7 +1,7 @@
 {% extends "profiles/sidebar_reports.html" %}
 
 {% block content %}
-<h2 id='title'>Generate Inventory Report</h2>
+<h2 id='title'>Generate Port Report</h2>
 
     <div class="ui two column centered grid">
         <div class="column">
@@ -34,7 +34,7 @@
 <script>
 
     function submit_function(){
-        var url = 'inventory_report';  
+        var url = 'port_report';  
         var date_from =  $('#id_date_from').val();
         var date_to = $('#id_date_to').val();
         $.ajax({                       

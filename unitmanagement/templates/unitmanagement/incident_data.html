@@ -13,23 +13,32 @@
 
 <div class="ui segment">
     <form method="POST" class="ui form">
-        <div class="field">
-          <label>Death Date</label>
-          {{form.death_date}}
-        </div>
-        <div class="field">
-          <label>Death Certificate</label>
-          {{form.death_cert}}
-        </div>
-      </form>
-      <div class="ui basic segment">
-          <center>
-              <button class="ui red button">Died</button>
-              <button class="ui green button">Recovered</button>
-            </center>
+        {% csrf_token %}
+      <div class="two fields">
+          <div class="field">
+              <label>Death Date</label>
+              {{form.death_date}}
+            </div>
+            <div class="field">
+              <label>Death Certificate</label>
+              {{form.death_cert}}
+            </div>
       </div>
-    
+      <input type="hidden" name="id_val" id="id_val" value="{{data_load.id}}">
+      <center>
+          <button class="ui red button" name="died" type="submit">Died</button>
+          <button class="ui green button" name="recovered" type="submit">Recovered</button>
+        </center>
+      </form>
 </div>
+
+<script>
+  $( document ).ready(function() {
+      // $("#id_death_date").;
+
+
+  });
+</script>
 
 {% endblock %}
 

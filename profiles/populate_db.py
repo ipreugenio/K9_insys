@@ -6,7 +6,7 @@ from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
     K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
-from training.models import Training, Training_Schedule
+from training.models import Training, Training_Schedule, Training_History
 
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -495,6 +495,11 @@ def generate_training():
     )
 
     for k9 in k9s:
+        #create training history
+        fake_date = fake.date_between(start_date='-5y', end_date='today')
+        Training_History.objects.create(k9=k9,handler=k9.handler,date=fake_date)
+
+
         birthdate = k9.birth_date
 
         training_start_alpha = datetime.combine(birthdate, datetime.min.time())

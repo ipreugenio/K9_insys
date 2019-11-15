@@ -5,16 +5,16 @@ from django.utils.dateparse import parse_date
 from dateutil.relativedelta import relativedelta
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, Dog_Breed, K9_Supplier, K9_Litter, K9_Mated
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, HistDateForm, DateForm,DateK9Form
-
+from django.db.models import F
 from .forms import add_donated_K9_form, add_donator_form, add_K9_parents_form, add_offspring_K9_form, select_breeder, K9SupplierForm, date_mated_form, add_breed_form
 from .models import K9, K9_Past_Owner, K9_Donated, K9_Parent, K9_Quantity, K9_Supplier, K9_Litter
 from .models import K9_Mated
 from .forms import DateForm
-from deployment.models import Incidents, Daily_Refresher, Team_Dog_Deployed
+from deployment.models import Incidents, Daily_Refresher, Team_Dog_Deployed, Maritime, Area, Location
 from planningandacquiring.models import Proposal_Budget, Proposal_K9,Proposal_Milk_Food, Proposal_Vac_Prev, Proposal_Medicine, Proposal_Vet_Supply, Proposal_Kennel_Supply, Proposal_Others, Actual_Budget, Actual_K9,Actual_Milk_Food, Actual_Vac_Prev, Actual_Medicine, Actual_Vet_Supply, Actual_Kennel_Supply, Actual_Others, Proposal_Training, Actual_Training
 
 from django.db.models import Sum
-from training.models import Training
+from training.models import Training, Training_History, Training_Schedule
 from profiles.models import Account, User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
@@ -28,7 +28,7 @@ from deployment.models import Dog_Request, Team_Assignment
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
 from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail, Food_Received_Trail, Medicine_Received_Trail, Miscellaneous_Received_Trail
 
-from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification, Handler_Incident
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification, Handler_Incident,K9_Incident
 from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
 
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
@@ -214,20 +214,6 @@ def budgeting_list(request):
     }
     return render(request, 'planningandacquiring/budget_list.html', context)
 
-def report(request):
-    form = ReportDateForm()
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'Title' : "REPORT",
-        'form': form,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-        }
-    return render (request, 'planningandacquiring/report.html', context)
 
 def add_procured_k9(request):
     form = SupplierForm(request.POST or None)
@@ -1165,9 +1151,6 @@ def K9_detailview(request, id):
 
     return render(request, 'planningandacquiring/K9_detail.html', context)
 
-
-
-
 def add_breed(request):
     form = add_breed_form(request.POST)
     style = ""
@@ -1217,37 +1200,6 @@ def breed_listview(request):
 
 
 ################# BUDGETING ###################
-
-def choose_date(request):
-    form = HistDateForm(request.POST or None)
-    success = 0
-    # if request.method == 'POST':
-    #     if form.is_valid():
-    #         year = request.POST.get('hist_date')
-    #         request.session["session_year"] = year
-
-
-    #         try:
-    #             budget_alloc = Budget_allocation.objects.filter(date_created__year=year).latest('id')
-    #             success = 1
-    #         except:
-    #             messages.success(request, 'Budget Estimate for this year does not exist!')
-
-    # if success == 1:
-    #     return HttpResponseRedirect('detailed_budget/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-
-    context = {
-        'notif_data':notif_data,
-        'count': count,
-        'title': "",
-        'form': form,
-    }
-
-    return render(request, 'planningandacquiring/choose_date.html', context)
-
 def budgeting_detail(request, id):
     pb = Proposal_Budget.objects.get(id=id)
     pk9 = Proposal_K9.objects.filter(proposal=pb)
@@ -1594,711 +1546,880 @@ def breed_detail(request, id):
     return render(request, 'planningandacquiring/breed_detail.html', context)
 
 
-def budgeting_report(request):
- 
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    context = {
-        'notif': notif,
-        'count': count,
-    }
-
-    return render(request, 'planningandacquiring/budgeting_report.html', context)
-    
-def detailed_budgeting(request):
- 
-
-    context = {
-    
-    }
-
-    return render(request, 'planningandacquiring/detailed_budgeting.html', context)
-
 ################# END BUDGETING ###################
 
-def accomplishment_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('accomplishment_report/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/accomplishment_date.html', context)
-
-def accomplishment_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-
-    explosives = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Explosives Related")
-    narcotics = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Narcotics Related")
-    sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type = "Search and Rescue Related")
-    others = Incidents.objects.filter(date__range=[from_date, to_date]).filter(type="Others")
-
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-
-    context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'explosives': explosives,
-        'narcotics': narcotics,
-        'sar': sar,
-        'others': others,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/accomplishment_report.html', context)
-
-def vet_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('vet_report/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/vet_date.html', context)
-
-def vet_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
-
-    # VACCINES USED
-
-    vaccineused = VaccineUsed.objects.filter(date_vaccinated__range=[from_date, to_date])
-
-    vu_data=[]
-
-    vu_disinct = vaccineused.values('vaccine').distinct()
-
-    for vu in vu_disinct:
-        for key,value in vu.items():
-            print(value)
-            v = vaccineused.filter(vaccine__id=value).count()
-            vac = vaccineused.filter(vaccine__id=value).latest('date')
-            arr = [vac.vaccine,vac.disease,v]
-            vu_data.append(arr)
-
-    print(vu_disinct)
-
-    # MEDICINES USED
-
-    health = Health.objects.filter(date_done__range=[from_date, to_date])
-    med_used = HealthMedicine.objects.filter(health__in=health)
-
-    med_data = []
-
-    med_distinct = med_used.values('medicine').distinct()
-
-    for med in med_distinct:
-        for key, value in med.items():
-            print(value)
-            k9_count = med_used.filter(medicine__id=value).count()
-            medi = med_used.filter(medicine__id=value).latest('id')
-            print(medi)
-            arr = [medi.medicine, k9_count]
-            med_data.append(arr)
-
-    # print(k9_count)
-    print(med_distinct)
-
-    # SICKNESS
-
-    health = Health.objects.filter(date__range=[from_date, to_date])
-    health_distinct = health.values('problem').distinct()
-    sick_data = []
-
-    for sick in health_distinct:
-        for key, value in sick.items():
-            print(value)
-            health_count = Health.objects.filter(problem=value).count()
-            sickness = Health.objects.filter(problem=value).latest('id')
-
-            arr = [sickness.problem, health_count]
-            sick_data.append(arr)
-
-
-            print(sick_data)
-            print(health_distinct)
-            print(health_count)
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-
-    context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'user': user,
-        'vu_data': vu_data,
-        'med_data': med_data,
-        'sick_data': sick_data,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/vet_report.html', context)
-
-def inventory_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('inventory_report/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/inventory_date.html', context)
-
-
-def inventory_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
-
-
-##### MEDICINES #####
-    medsused = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
-    mu_data = []
-    mu_disinct = medsused.values('inventory').distinct()
-
-    med_subtracted_quantity = 0
-    med_total_expenses = 0
-    med_received_quantity = 0
-
-    medsreceived = Medicine_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
-
-    for mu in mu_disinct:
-        for key, value in mu.items():
-
-            med = medsused.filter(inventory__id=value).latest('id')
-            received = medsreceived.filter(inventory__id=value).latest('id')
-            med_subtracted_quantity += med.quantity
-            med_total_expenses = med_subtracted_quantity * med.price
-            med_received_quantity += received.quantity
-            arr = [med.inventory, med_received_quantity, med_subtracted_quantity, med.price, med_total_expenses]
-            mu_data.append(arr)
-
-##### MISCELLANEOUS #####
-
-    miscused = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
-    misc_data = []
-    misc_disinct = miscused.values('inventory').distinct()
-
-    misc_subtracted_quantity = 0
-    misc_total_expenses = 0
-    misc_received_quantity = 0
-
-    miscreceived = Miscellaneous_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
-
-    miscellaneous = Miscellaneous.objects.all()
-
-    for misc in misc_disinct:
-        for key, value in misc.items():
-
-            mi = miscused.filter(inventory__id=value).latest('id')
-            received = miscreceived.filter(inventory__id=value).latest('id')
-           # print(miscellaneous)
-            m = miscellaneous.filter(id=value).latest('id')
-            misc_subtracted_quantity += mi.quantity
-            misc_total_expenses = misc_subtracted_quantity * m.price
-            misc_received_quantity += received.quantity
-            arr = [mi.inventory, misc_received_quantity, misc_subtracted_quantity, m.price, misc_total_expenses]
-            misc_data.append(arr)
-
-##### FOOD #####
-
-    foodused = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date])
-    food_data = []
-    food_disinct = foodused.values('inventory').distinct()
-
-    food_subtracted_quantity = 0
-    food_total_expenses = 0
-    food_received_quantity = 0
-
-    foodreceived = Food_Received_Trail.objects.filter(date_received__range=[from_date, to_date])
-
-    item = Food.objects.all()
-
-    for food in food_disinct:
-        for key, value in food.items():
-            fo = foodused.filter(inventory__id=value).latest('id')
-            received = foodreceived.filter(inventory__id=value).latest('id')
-            f = item.filter(id=value).latest('id')
-
-            food_subtracted_quantity += fo.quantity
-            food_total_expenses = food_subtracted_quantity * f.price
-            food_received_quantity += received.quantity
-
-            print(fo.quantity)
-            print(food_subtracted_quantity)
-            print(received.quantity)
-            print(food_received_quantity)
-
-            arr = [fo.inventory, food_received_quantity, food_subtracted_quantity, f.price, food_total_expenses]
-            food_data.append(arr)
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'user': user,
-        'mu_data': mu_data,
-        'misc_data': misc_data,
-        'food_data': food_data,
-
-    }
-
-    return render(request, 'planningandacquiring/inventory_report.html', context)
-
-def deployment_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('deployment_report/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/deployment_date.html', context)
-
-
-def deployment_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
-
-    locations = Incidents.objects.filter(date__range=[from_date, to_date])
-
-    incidents_data = []
-
-    incidents_distinct = locations.values('location').distinct()
-
-    for loc in incidents_distinct:
-        for key, value in loc.items():
-            print(value)
-            print(incidents_distinct)
-            explosives = locations.filter(location__id=value).filter(type="Explosives Related").count()
-            narcotics = locations.filter(location__id=value).filter(type="Narcotics Related").count()
-            sar = locations.filter(location__id=value).filter(type="Search and Rescue Related").count()
-            vac = locations.filter(location__id=value).latest('date')
-            arr = [vac.location, explosives, narcotics, sar]
-            incidents_data.append(arr)
-
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'user': user,
-        'incidents_data': incidents_data,
-
-    }
-
-    return render(request, 'planningandacquiring/deployment_report.html', context)
-
-def handler_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('handler_report/')
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'form': form,
-        'notif_data': notif_data,
-        'count': count,
-        'user': user,
-    }
-
-    return render(request, 'planningandacquiring/handler_date.html', context)
-
-
-def handler_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
-
-    handler = Handler_Incident.objects.filter(date__range=[from_date, to_date])
-
-    handler_data = []
-
-    handler_disinct = handler.values('handler').distinct()
-
-    for h in handler_disinct:
-        for key, value in h.items():
-            print(value)
-            positive = handler_disinct.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
-            negative = handler_disinct.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
-                incident="MIA") | Q(incident="Died")).count()
-            handler_name = handler.filter(handler=value).latest('date')
-            arr = [handler_name.handler, positive, negative]
-            handler_data.append(arr)
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'user': user,
-        'handler_data': handler_data,
-
-    }
-
-    return render(request, 'planningandacquiring/handler_report.html', context)
-
-def k9_report(request):
-    # from_date = request.session["from_date"]
-    # to_date = request.session["to_date"]
-    user = user_session(request)
-
-    puppy = K9.objects.filter(training_status="Puppy").count()
-    unclassified = K9.objects.filter(training_status="Unclassified").count()
-    classified = K9.objects.filter(training_status="Classified").count()
-    on_training = K9.objects.filter(training_status="On-Training").count()
-    trained = K9.objects.filter(training_status="Trained").count()
-    for_breeding = K9.objects.filter(training_status="For-Breeding").count()
-    for_deployment = K9.objects.filter(training_status="For-Deployment").count()
-    breeding = K9.objects.filter(training_status="Breeding").count()
-    for_adoption = K9.objects.filter(training_status="For-Adoption").count()
-    adopted = K9.objects.filter(training_status="adopted").count()
-    deployed = K9.objects.filter(training_status="Deployed").count()
-    light_duty = K9.objects.filter(training_status="Light Duty").count()
-    retired = K9.objects.filter(training_status="Retired").count()
-    dead = K9.objects.filter(training_status="Dead").count()
-
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'user': user,
-        'puppy': puppy,
-        'unclassified': unclassified,
-        'classified': classified,
-        'on_training': on_training,
-        'trained':trained,
-        'for_breeding': for_breeding,
-        'for_deployment': for_deployment,
-        'breeding': breeding,
-        'for_adoption': for_adoption,
-        'adopted': adopted,
-        'deployed': deployed,
-        'light_duty': light_duty,
-        'retired': retired,
-        'dead': dead,
-    }
-
-    return render(request, 'planningandacquiring/k9_report.html', context)
-
 def k9_performance_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('k9_performance_report/')
+    form = ReportDateForm(request.POST or None)
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'form': form,
         'notif_data': notif_data,
         'count': count,
         'user': user,
+        'form': form,
     }
 
     return render(request, 'planningandacquiring/k9_performance_date.html', context)
 
 
-def k9_performance_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
+def ajax_k9_performance_report(request):
+    data = []
+    to_date = None
+    from_date = None
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
 
-    dog = Handler_Incident.objects.filter(date__range=[from_date, to_date])
-    dog_data = []
-    dog_disinct = dog.values('k9').distinct()
+        dog = Daily_Refresher.objects.filter(date__range=[from_date, to_date]).values('k9').distinct().order_by("rating")
 
-    for d in dog_disinct:
-        for key, value in d.items():
-            print(value)
-            positive = dog.filter(Q(incident = "Made an Arrest") | Q(incident="Rescued People")).count()
-            negative = dog.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
-                incident="MIA") | Q(incident="Died")).count()
-            dog_name = dog.filter(k9=value).latest('date')
-            arr = [dog_name.k9, positive, negative]
-            dog_data.append(arr)
+        for d in dog:
+            for key, value in d.items(): 
+                if key == 'k9':
+                    pp = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('port_plant'))['sum']
+                    pf = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('port_find'))['sum']
+                    bp = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('building_plant'))['sum']
+                    bf = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('building_find'))['sum']
+                    vp = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('vehicle_plant'))['sum']
+                    vf = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('vehicle_find'))['sum']
+                    bgp = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('baggage_plant'))['sum']
+                    bgf = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('baggage_find'))['sum']
+                    op = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('others_plant'))['sum']
+                    of = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(sum=Sum('others_find'))['sum']
+                    r = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(avg=Avg('rating'))['avg']
+                    
+                    k9 = K9.objects.get(id=value)
+                    dt = [k9,k9.capability,pf,pp,bf,bp,vf,vp,bgf,bgp,of,op,r]
+                    data.append(dt)
+    except:
+        pass
 
-    refresher = Daily_Refresher.objects.filter(date__range=[from_date, to_date])
-    dog_data = []
-    dog_disinct = dog.values('k9').distinct()
-
-    for d in dog_disinct:
-        for key, value in d.items():
-            print(value)
-            positive = dog.filter(Q(incident="Made an Arrest") | Q(incident="Rescued People")).count()
-            negative = dog.filter(Q(incident="Poor Performance") | Q(incident="Violation") | Q(incident="Accident") | Q(
-                incident="MIA") | Q(incident="Died")).count()
-            dog_name = dog.filter(k9=value).latest('date')
-            arr = [dog_name.k9, positive, negative]
-            dog_data.append(arr)
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
-        'from_date': from_date,
-        'to_date': to_date,
-        'user': user,
-        'dog_data': dog_data,
-
+        'data':data,
+        'from_date':from_date,
+        'to_date':to_date,
     }
 
     return render(request, 'planningandacquiring/k9_performance_report.html', context)
 
-def dog_request_date(request):
-    form = DateForm(request.POST or None)
-
-    if request.method == 'POST':
-        from_date = request.POST['from_date']
-        to_date = request.POST['to_date']
-        request.session["from_date"] = from_date
-        request.session["to_date"] = to_date
-        return HttpResponseRedirect('dog_request_report/')
+def fou_accomplishment_date(request):
+    form = ReportDateForm(request.POST or None)
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'form': form,
         'notif_data': notif_data,
         'count': count,
         'user': user,
+        'form': form,
     }
 
-    return render(request, 'planningandacquiring/dog_request_date.html', context)
+    return render(request, 'planningandacquiring/fou_accomplishment_date.html', context)
+    
+def ajax_fou_accomplishment_report(request):
+    data = []
+    to_date = None
+    from_date = None
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
 
+        acc = Handler_Incident.objects.filter(date__range=[from_date, to_date]).values('handler').distinct().order_by("handler")
+        
+        for acc in acc:
+            for key, value in acc.items():
+                print(key,value)  
+                if key == 'handler':
+                    rp = Handler_Incident.objects.filter(handler__id=value).filter(date__range=[from_date, to_date]).filter(status='Done').filter(incident='Rescued People').count()
+                    ma = Handler_Incident.objects.filter(handler__id=value).filter(date__range=[from_date, to_date]).filter(status='Done').filter(incident='Made an Arrest').count()
+                    pp = Handler_Incident.objects.filter(handler__id=value).filter(date__range=[from_date, to_date]).filter(status='Done').filter(incident='Poor Performance').count()
+                    v = Handler_Incident.objects.filter(handler__id=value).filter(date__range=[from_date, to_date]).filter(status='Done').filter(incident='Violation').count()
+                    h = User.objects.get(id=value)
+                    pos = rp+ma
+                    neg = pp+v
+                    a = [h,rp,ma,pp,v,neg,pos]
+                    print(a)
+                    data.append(a)
+    except:
+        pass
 
-def dog_request_report(request):
-    from_date = request.session["from_date"]
-    to_date = request.session["to_date"]
-    user = user_session(request)
+    context = {
+        'data':data,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
 
-    events = Dog_Request.objects.filter(start_date__range=[from_date, to_date])
-    event_data = []
-    event_distinct = event.values('requester').distinct()
-
-    # deployed = Team_Dog_Deployed.objects.filter(date_added__range=[from_date, to_date])
-    # dog_distinct = deployed.values('request').distinct()
-    # dog_data = []
-    #
-    # for d in dog_distinct:
-    #     for key, value2 in d.items():
-    #         print(value2)
-    #         print(dog_distinct)
-    #         SAR = K9.objects.filter(k9__id=value2).filter(capability="SAR").count()
-    #         NDD = K9.objects.filter(k9__id=value2).filter(capability="NDD").count()
-    #         EDD = K9.objects.filter(k9__id=value2).filter(capability="EDD").count()
-    #         print("HELLO")
-
-    #for e in event_distinct:
-     #   for key, value in e.items():
-      #      print(value)
-       #     print(event_distinct)
-
-            #Team_Dog_Deployed.objects.filter(team_requested=event.requester)
-
-      #      event = event.filter(requester=value).latest('start_date')
-       #     arr = [event.event_name, event.k9s_needed, event.k9s_deployed]
-        #    event_data.append(arr)
-    #         print(SAR)
-    #         print(NDD)
-    #         print(EDD)
-    #         print("HELLO")
-    # for e in event_distinct:
-    #     for key, value in e.items():
-    #         # print(value)
-    #         # print(event_distinct)
-    #         print(event)
-    #         print("^^EVENT^^")
-    #
-    #         event = event.filter(requester=value).latest('start_date')
-    #         arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
-    #         event_data.append(arr)
-
-    for event in events:
-        SAR = 0
-        NDD = 0
-        EDD = 0
-        tdd = Team_Dog_Deployed.objects.filter(team_requested = event)
-        for item in tdd:
-            if item.k9.capability == "SAR":
-                SAR += 1
-            elif item.k9.capability == "NDD":
-                NDD += 1
-            else:
-                EDD += 1
-        arr = [event.event_name, event.k9s_needed, event.k9s_deployed, SAR, NDD, EDD]
-        event_data.append(arr)
-
+    return render(request, 'planningandacquiring/fou_accomplishment_report.html', context)
+    
+def training_date(request):
+    form = ReportDateForm(request.POST or None)
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-        'from_date': from_date,
-        'to_date': to_date,
+        'notif_data': notif_data,
+        'count': count,
         'user': user,
-        'event_data': event_data,
-
+        'form': form,
     }
 
-    return render(request, 'planningandacquiring/dog_request_report.html', context)
+    return render(request, 'planningandacquiring/training_date.html', context)
+    
+def ajax_training_report(request):
+    data = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+        t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('grade')
+        
+        print(t)
+        for t in t:
+            date_all = 0
+            for key, value in t.items():  
+                if key == 'k9':
+                    th = Training_History.objects.get(k9__id=value)
+                    ts = Training_Schedule.objects.filter(k9__id=value)
+                    t = Training.objects.filter(k9__id=value).get(stage='Finished Training')
+                    print(th.handler, th.date)
 
-def training_report(request):
-    # from_date = request.session["from_date"]
-    # to_date = request.session["to_date"]
-    user = user_session(request)
+                    for ts in ts:
+                        if ts.stage == 'Stage 0':
+                            pass
+                        else:
+                            print(ts.k9 ,ts.stage, ts.date_start.date(), ts.date_end.date())
 
-    belgian_NDD = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="NDD").count()
-    belgian_EDD = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="EDD").count()
-    belgian_SAR = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").filter(capability="SAR").count()
-    total_belgian = K9.objects.filter(trained="Trained").filter(breed="Belgian Malinois").count()
+                            result = ts.date_end.date() - ts.date_start.date()
+                            date_all = date_all + result.days
 
-    dutch_NDD = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="NDD").count()
-    dutch_EDD = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="EDD").count()
-    dutch_SAR = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").filter(capability="SAR").count()
-    total_dutch = K9.objects.filter(trained="Trained").filter(breed="Dutch Sheperd").count()
+            date_mon = int(date_all/30)
+            a = [th.k9, th.k9.breed, th.handler, date_all, date_mon, t.grade]
+            data.append(a)
+            print(a)
+                   
+                                
+    except:
+        pass
 
-    german_NDD = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="NDD").count()
-    german_EDD = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="EDD").count()
-    german_SAR = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").filter(capability="SAR").count()
-    total_german = K9.objects.filter(trained="Trained").filter(breed="German Sheperd").count()
-
-    golden_NDD = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="NDD").count()
-    golden_EDD = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="EDD").count()
-    golden_SAR = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").filter(capability="SAR").count()
-    total_golden = K9.objects.filter(trained="Trained").filter(breed="Golden Retriever").count()
-
-    jack_NDD = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="NDD").count()
-    jack_EDD = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="EDD").count()
-    jack_SAR = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").filter(capability="SAR").count()
-    total_jack = K9.objects.filter(trained="Trained").filter(breed="Jack Russel").count()
-
-    lab_NDD = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="NDD").count()
-    lab_EDD = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="EDD").count()
-    lab_SAR = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").filter(capability="SAR").count()
-    total_lab = K9.objects.filter(trained="Trained").filter(breed="Labrador Retriever").count()
-
-
-
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
     context = {
-        'user': user,
-        'belgian_NDD': belgian_NDD,
-        'belgian_EDD': belgian_EDD,
-        'belgian_SAR': belgian_SAR,
-
-        'dutch_NDD': dutch_NDD,
-        'dutch_EDD': dutch_EDD,
-        'dutch_SAR': dutch_SAR,
-
-        'german_NDD': german_NDD,
-        'german_EDD': german_EDD,
-        'german_SAR': german_SAR,
-
-        'golden_NDD': golden_NDD,
-        'golden_EDD': golden_EDD,
-        'golden_SAR': golden_SAR,
-
-        'jack_NDD': jack_NDD,
-        'jack_EDD': jack_EDD,
-        'jack_SAR': jack_SAR,
-
-        'lab_NDD': lab_NDD,
-        'lab_EDD': lab_EDD,
-        'lab_SAR': lab_SAR,
-
-        'total_belgian': total_belgian,
-        'total_dutch': total_dutch,
-        'total_german': total_german,
-        'total_golden': total_golden,
-        'total_jack': total_jack,
-        'total_lab': total_lab,
+        'data':data,
+        'from_date':from_date,
+        'to_date':to_date,
     }
 
     return render(request, 'planningandacquiring/training_report.html', context)
 
+def training_summary_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/training_summary_date.html', context)
+    
+def ajax_training_summary_report(request):
+    edd_data = []
+    ndd_data = []
+    sar_data = []
+    data = []
+
+    edd_total = 0
+    ndd_total = 0
+    sar_total = 0
+    to_date = None
+    from_date = None
+
+    passed=0
+    failed=0
+    total=0
+    user = user_session(request)
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        t = Training.objects.filter(Q(stage='Finished Training') | Q(stage__contains='Failed')).filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('grade')
+        
+        dog = []
+        print("training count", t)
+        for t in t:
+            for key, value in t.items():  
+                if key == 'k9':
+                    k9 = K9.objects.get(id=value)
+                    a = [k9,k9.breed,k9.capability, k9.trained]
+                    dog.append(a)
+        edd_=[]
+
+        db = Dog_Breed.objects.all().values('breed').distinct()
+        
+        edd_breed=[]
+        edd_passed= []
+        edd_failed = []
+
+        ndd_breed=[]
+        ndd_passed= []
+        ndd_failed = []
+
+        sar_breed=[]
+        sar_passed= []
+        sar_failed = []
+
+        for d in db:
+            for key, value in d.items(): 
+                if key=='breed':
+                    for (n, (item1,item2,item3,item4)) in enumerate(dog):
+                        # print(item1,item2,item3,item4)
+                        if item2 == value and item3 == 'EDD':
+                            if item2 in edd_breed:
+                                i = edd_breed.index(item2)
+                                if item4 == 'Trained':
+                                    edd_passed[i] = edd_passed[i]+1
+                                else:
+                                    edd_failed[i] = edd_failed[i]+1
+                                
+                            else:
+                                #add breed
+                                edd_breed.append(item2)
+                                edd_failed.append(0)
+                                edd_passed.append(0)
+                                
+                                i = edd_breed.index(item2)
+                                if item4 == 'Trained':
+                                    edd_passed[i] = edd_passed[i]+1
+                                else:
+                                    edd_failed[i] = edd_failed[i]+1
+
+                        elif item2 == value and item3 == 'NDD':
+                            if item2 in ndd_breed:
+                                i = ndd_breed.index(item2)
+                                if item4 == 'Trained':
+                                    ndd_passed[i] = ndd_passed[i]+1
+                                else:
+                                    ndd_failed[i] = ndd_failed[i]+1
+                                
+                            else:
+                                #add breed
+                                ndd_breed.append(item2)
+                                ndd_failed.append(0)
+                                ndd_passed.append(0)
+                                
+                                i = ndd_breed.index(item2)
+                                if item4 == 'Trained':
+                                    ndd_passed[i] = ndd_passed[i]+1
+                                else:
+                                    ndd_failed[i] = ndd_failed[i]+1
+
+                        elif item2 == value and item3 == 'SAR':
+                            if item2 in sar_breed:
+                                i = sar_breed.index(item2)
+                                if item4 == 'Trained':
+                                    sar_passed[i] = sar_passed[i]+1
+                                else:
+                                    sar_failed[i] = sar_failed[i]+1
+                                
+                            else:
+                                #add breed
+                                sar_breed.append(item2)
+                                sar_failed.append(0)
+                                sar_passed.append(0)
+                                
+                                i = sar_breed.index(item2)
+                                if item4 == 'Trained':
+                                    sar_passed[i] = sar_passed[i]+1
+                                else:
+                                    sar_failed[i] = sar_failed[i]+1
+
+
+        print('EDD', edd_breed, edd_passed, edd_failed)
+        print('NDD', ndd_breed, ndd_passed, ndd_failed)
+        print('SAR', sar_breed, sar_passed, sar_failed)
+
+        edd_data = []
+        edd_total = sum(edd_passed) + sum(edd_failed)
+        for breed in edd_breed:
+            i = edd_breed.index(breed)
+            t = edd_passed[i]+edd_failed[i]
+            a = [breed,edd_passed[i],edd_failed[i],t]
+            edd_data.append(a)
+        
+        ndd_data = []
+        ndd_total = sum(ndd_passed) + sum(ndd_failed)
+        for breed in ndd_breed:
+            i = ndd_breed.index(breed)
+            t = ndd_passed[i]+ndd_failed[i]
+            a = [breed,ndd_passed[i],ndd_failed[i],t]
+            ndd_data.append(a)
+
+        sar_data = []
+        sar_total = sum(sar_passed) + sum(sar_failed)
+        for breed in sar_breed:
+            i = sar_breed.index(breed)
+            t = sar_passed[i]+sar_failed[i]
+            a = [breed,sar_passed[i],sar_failed[i],t]
+            sar_data.append(a)
+
+        edd_f = Training.objects.filter(stage__contains='Failed').filter(k9__capability="EDD").filter(date_finished__range=[from_date, to_date]).count()
+
+        edd_p = Training.objects.filter(stage__contains='Finished Training').filter(k9__capability="EDD").filter(date_finished__range=[from_date, to_date]).count()
+
+        ndd_f = Training.objects.filter(stage__contains='Failed').filter(k9__capability="NDD").filter(date_finished__range=[from_date, to_date]).count()
+
+        ndd_p = Training.objects.filter(stage__contains='Finished Training').filter(k9__capability="NDD").filter(date_finished__range=[from_date, to_date]).count()       
+        
+        sar_f = Training.objects.filter(stage__contains='Failed').filter(k9__capability="SAR").filter(date_finished__range=[from_date, to_date]).count()
+
+        sar_p = Training.objects.filter(stage__contains='Finished Training').filter(k9__capability="SAR").filter(date_finished__range=[from_date, to_date]).count()       
+        
+        failed = edd_f + ndd_f + sar_f
+        passed = edd_p + ndd_p + sar_p
+        total = failed + passed
+
+        edd_t = ['EDD', edd_p, edd_f, edd_p+edd_f]
+        ndd_t = ['NDD', ndd_p, ndd_f, ndd_p+ndd_f]
+        sar_t = ['SAR', sar_p, sar_f, sar_p+sar_f]
+        total_t = ['TOTAL', passed, failed, total]
+        
+        data.append(edd_t)
+        data.append(ndd_t)
+        data.append(sar_t)
+    except:
+        pass
+
+    context = {
+        'edd_data':edd_data,
+        'ndd_data':ndd_data,
+        'sar_data':sar_data,
+        'edd_total':edd_total,
+        'ndd_total':ndd_total,
+        'sar_total':sar_total,
+        'data':data,
+        'from_date':from_date,
+        'to_date':to_date,
+        'passed':passed,
+        'failed':failed,
+        'total':total,
+        'user':user
+    }
+
+    return render(request, 'planningandacquiring/training_summary_report.html', context)
+
+def aor_summary_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/aor_summary_date.html', context)
+    
+def ajax_aor_summary_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+        area_val = []
+
+        dr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).values('area').distinct().order_by('area')
+        
+        for data in dr:
+            for key, value in data.items():
+                if key == 'area':
+                    area_val.append(value)
+
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+
+        for data in inc:
+            for key, value in data.items():
+                if key == 'location__area':
+                    area_val.append(value)
+
+        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+
+        for data in mar:
+            for key, value in data.items():
+                if key == 'location__area':
+                    area_val.append(value)
+
+        area_val= np.unique(area_val)
+        for id_area in area_val:
+            a = Area.objects.get(id=id_area)
+            b = Maritime.objects.filter(location__area=a).filter(datetime__range=[from_date, to_date]).aggregate(avg=Avg('passenger_count'))['avg']
+            c = Incidents.objects.filter(location__area=a).filter(date__range=[from_date, to_date]).count()
+            d = Dog_Request.objects.filter(area=a).filter(start_date__range=[from_date, to_date]).count()
+            
+            if b == None:
+                b = 0
+            x = [a,b,c,d]
+            data_arr.append(x)
+
+        print(data_arr)
+    
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/aor_summary_report.html', context)
+
+def port_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/port_date.html', context)
+    
+def ajax_port_report(request):
+    data_arr = []
+    area_arr = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+      
+        area_val = []
+        arr_val = []
+
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+
+        for data in inc:
+            for key, value in data.items():
+                if key == 'location__area':
+                    area_val.append(value)
+
+        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+
+        for data in mar:
+            for key, value in data.items():
+                if key == 'location__area':
+                    area_val.append(value)
+
+        area_val= np.unique(area_val)
+        # print(area_val)
+
+        for id_area in area_val:
+            a = Area.objects.get(id=id_area)
+            area_arr.append(a)
+            l= Location.objects.filter(area=a).values_list('id', flat=True)
+            l = list(l)
+            # print('LOCATION',l)
+            arr = []
+            b = Maritime.objects.filter(location__in=l).filter(datetime__range=[from_date, to_date])
+            # print('MARITIME LOC', b)
+            for b in b:
+                arr.append(b.location.id)
+            
+            c = Incidents.objects.filter(location__in=l).filter(date__range=[from_date, to_date])
+            for c in c:
+                arr.append(c.location.id)            
+
+            arr = np.unique(arr)
+            # print('ARR',arr)
+            for data in arr:
+                l = Location.objects.get(id=data)
+                m = Maritime.objects.filter(datetime__range=[from_date, to_date]).filter(location=l).aggregate(avg=Avg('passenger_count'))['avg']
+                edd = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Explosives Related').count()
+                ndd = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Narcotics Related').count()
+                sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Search and Rescue Related').count()
+                oth = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Others').count()
+
+                ta = Team_Assignment.objects.filter(location=l).last()
+                if m == None:
+                    m=0
+                
+                if ta == None:
+                    ta_team = "Not Assigned"
+                    ta_leader = "Not Assigned"
+                else:
+                    ta_team = ta.team
+                    ta_leader = ta.team_leader
+
+                if ta_team == None:
+                    ta_team = "Not Assigned"
+                if ta_leader == None:
+                    ta_leader = "Not Assigned"
+
+                    
+                x = [l,ta_team,ta_leader,m,edd,ndd,sar,oth,edd+ndd+sar+oth]
+                print('TEST',x)
+                data_arr.append(x)
+
+        print('Area', area_arr)
+        print('DATA',data_arr)
+    
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'area_arr':area_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/port_report.html', context)
+
+def k9_request_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/k9_request_date.html', context)
+    
+def ajax_k9_request_report(request):
+    data_arr = None
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+      
+        data_arr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).filter(status='Approved').order_by('event_name')
+
+        for data in data_arr:
+            print(data.event_name)
+
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/k9_request_report.html', context)
+
+def fou_acc_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/fou_acc_date.html', context)
+    
+def ajax_fou_acc_report(request):
+    data_arr = None
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        data_arr = Handler_Incident.objects.filter(date__range=[from_date, to_date]).filter(status='Done')
+        
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/fou_acc_report.html', context)
+
+def k9_incident_summary_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/k9_incident_summary_date.html', context)
+    
+def ajax_k9_incident_summary_report(request):
+    data_arr = None
+    arr_val = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        data_arr = K9_Incident.objects.filter(date__range=[from_date, to_date]).order_by('date')
+
+        b = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Sick').count()
+        c = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Accident').count()
+        d = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Missing').count()
+        e = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Lost').count()
+        f =  K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Stolen').count() 
+
+        arr_val.append(['Sick', b])      
+        arr_val.append(['Accident', c])      
+        arr_val.append(['Missing', d])   
+        arr_val.append(['Lost', e])      
+        arr_val.append(['Stolen', f])      
+         
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'data1':arr_val,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/k9_incident_summary_report.html', context)
+
+def k9_breeding_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/k9_breeding_date.html', context)
+    
+def ajax_k9_breeding_report(request):
+    data_arr = []
+    arr_val = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+ 
+        m =  K9_Litter.objects.filter(date__range=[from_date, to_date]).values('mother__breed').distinct().order_by('mother__breed')
+        
+        val = []
+        for data in m:
+            for key, value in data.items():
+                if key == 'mother__breed':
+                    val.append(value)
+
+        val = np.unique(val)
+        print(val)
+        for data in val:
+            birth = K9_Litter.objects.filter(date__range=[from_date, to_date]).filter(mother__breed=data).aggregate(sum=Sum('litter_no'))['sum']
+            
+            died = K9_Litter.objects.filter(date__range=[from_date, to_date]).filter(mother__breed=data).aggregate(sum=Sum('litter_died'))['sum']
+
+            if birth == None:
+                birth = 0
+            if died == None:
+                died = 0
+            
+            res = birth - died
+
+            a = [data,died,res]
+            arr_val.append(a)
+
+
+        data_arr = K9_Litter.objects.filter(date__range=[from_date, to_date]).order_by('date')
+                
+        print(arr_val)
+
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'data1':arr_val,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/k9_breeding_report.html', context)
+
+def health_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/health_date.html', context)
+    
+def ajax_health_report(request):
+    data_arr = []
+    arr_val = []
+    to_date = None
+    from_date = None
+    
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        arr_val = Health.objects.filter(date__range=[from_date, to_date]).filter(status='Done')
+        for data in arr_val:
+            hm = HealthMedicine.objects.filter(health=data)
+            data_arr.append([data,hm])
+
+        print(data_arr)
+
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'data1':arr_val,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/health_report.html', context)
+
+def inventory_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/inventory_date.html', context)
+    
+def ajax_inventory_report(request):
+    data_arr = []
+    arr_val = []
+    arr_val2 = []
+    arr_val3 = []
+    to_date = None
+    from_date = None
+    
+    mst_cost=0
+    fst_cost=0
+    misc_cost=0
+    total=0
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        mst = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        for data in mst:
+            for key,value in data.items():
+                if key == 'inventory':
+                    a = Medicine_Inventory.objects.get(id=value)
+                    b = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).filter(inventory=value).aggregate(sum=Sum('quantity'))['sum']
+                    c = a.medicine.price * b 
+
+                    x = [a, a.medicine.uom, a.medicine.price, b, c]
+                    arr_val.append(x)
+                    mst_cost = mst_cost+c
+
+        fst = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        
+        for data in fst:
+            for key,value in data.items():
+                if key == 'inventory':
+                    a = Food.objects.get(id=value)
+                    b = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).filter(inventory=value).aggregate(sum=Sum('quantity'))['sum']
+                    c = a.price * b 
+                    
+                    x = [a, a.unit, a.price, b, c]
+                    arr_val2.append(x)
+                    fst_cost=fst_cost+c
+
+        miscst = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        
+        for data in miscst:
+            for key,value in data.items():
+                if key == 'inventory':
+                    a = Miscellaneous.objects.get(id=value)
+                    b = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).filter(inventory=value).aggregate(sum=Sum('quantity'))['sum']
+                    c = a.price * b 
+                    
+                    x = [a, a.uom, a.price, b, c]
+                    arr_val3.append(x)
+                    misc_cost=misc_cost+c
+
+        total = mst_cost+fst_cost+misc_cost
+
+    except:
+        pass
+
+    context = {
+        'total':total,
+        'mst_cost':mst_cost,
+        'fst_cost':fst_cost,
+        'misc_cost':misc_cost,
+        'data':data_arr,
+        'data1':arr_val,
+        'data2':arr_val2,
+        'data3':arr_val3,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/inventory_report.html', context)
+################# END OF REPORT ##################
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):
 

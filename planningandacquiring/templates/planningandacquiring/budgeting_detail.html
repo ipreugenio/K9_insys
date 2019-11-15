@@ -1,4 +1,4 @@
-{% extends "profiles/sidebar_pa.html" %} {% block content %}
+{% extends "profiles/sidebar_reports.html" %} {% block content %}
 {% load humanize %}
 {% load um_tags %}
 <div>
@@ -8,7 +8,8 @@
     <a class="active item" data-tab="first">Actual Budget</a>
     <a class="item" data-tab="second">Proposed Budget</a>
   </div>
-  <div class="ui bottom attached active tab segment" data-tab="first">
+  <div class="ui bottom attached active tab segment" data-tab="first" >
+      <div id="printableArea1">
         <center>
                 <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
                 <br>Philippine Coast Guard
@@ -358,8 +359,15 @@
             {% endif %}
         </thead>
       </table>
+    </div>
+    <br>
+    <center><input type="button" class="ui primary button"
+    onclick="printDiv('printableArea1')" value="Print Actual Budget" /></center>
+    
   </div>
   <div class="ui bottom attached tab segment" data-tab="second">
+    <div id="printableArea1">
+
     <center>
             <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
             <br>Philippine Coast Guard
@@ -704,7 +712,8 @@
         {% endif %}
     </thead>
   </table>
-
+    
+   </div>
   <form action="" method="POST" class="ui form">
     {% csrf_token %}
     <div class="three fields">
@@ -718,9 +727,13 @@
         <button class="ui green button" type="submit" onclick="return confirm('Are you sure?')">Submit</button>
       </center>
   </form>
+  <br>
+  <center><input type="button" class="ui primary button"
+    onclick="printDiv('printableArea2')" value="Print Proposed Budget" /></center>
   </div>
 {% else %}
 
+<div id = 'printableArea3'>
 <center>
         <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
         <br>Philippine Coast Guard
@@ -1065,7 +1078,7 @@
         {% endif %}
     </thead>
   </table>
-
+    </div>
   <form action="" method="POST" class="ui form">
     {% csrf_token %}
     <div class="three fields">
@@ -1080,6 +1093,10 @@
       </center>
   </form>
 
+  <br>
+  <center><input type="button" class="ui primary button"
+  onclick="printDiv('printableArea3')" value="Print Actual Budget" /></center>
+
 {% endif %}
 
 </div>
@@ -1088,5 +1105,16 @@
     $(document).ready(function() {
         $('.menu .item').tab();
     });
+
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
 </script>
 {% endblock %}

@@ -45,9 +45,11 @@ class Training(models.Model):
     stage3_3 = models.CharField('stage3_3', blank=True, null=True, max_length=500, default="0")
     grade = models.CharField('grade', blank=True, null=True, max_length=500)
     remarks = models.CharField('remarks', max_length=500, blank=True, null=True)
+    date_finished = models.DateField('date_finished', null=True, blank=True)
 
     def __str__(self):
         return str(self.k9) +' - ' + str(self.training) +' : ' + str(self.stage)
+        
 
     def save(self, *args, **kwargs):
 

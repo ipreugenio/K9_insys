@@ -1697,24 +1697,56 @@ def k9_incident_list(request):
     else:
         data = K9_Incident.objects.filter(status='Pending').exclude(incident='Sick').exclude(incident='Accident')
 
+    if request.method == "POST" and 'died' in request.POST:
+        dc = request.POST['death_cert']
+        dd = request.POST['death_date']
+        i = request.POST['id_val']
 
-    if request.method == "POST":
-        i = request.POST.get('input_id')
-        dc = request.POST.get('death_cert')
-        date = request.POST.get('date_died')
         ki = K9_Incident.objects.get(id=i)
 
         k9 = K9.objects.get(id=ki.k9.id)
         k9.status= 'Dead'
         k9.training_status = 'Dead'
         k9.death_cert = dc
-        k9.death_date = date
+        k9.death_date = dd
 
         ki.status = 'Done'
         ki.save()
         k9.save()
-        messages.success(request, 'K9 Died...')
+        messages.success(request,  str(k9) +' Died...')
+
+    elif request.method=='POST' and 'recovered' in request.POST:
+        i = request.POST['id_val']
+
+        ki = K9_Incident.objects.get(id=i)
+        k9 = K9.objects.get(id=ki.k9.id)
+        k9.status= 'Working Dog'
+        
+        ki.status = 'Done'
+        ki.save()
+        k9.save()
+
+        messages.success(request,  str(k9) +' Recovered!')
         return redirect('unitmanagement:k9_incident_list')
+        
+
+    # if request.method == "POST":
+    #     i = request.POST.get('input_id')
+    #     dc = request.POST.get('death_cert')
+    #     date = request.POST.get('date_died')
+    #     ki = K9_Incident.objects.get(id=i)
+
+    #     k9 = K9.objects.get(id=ki.k9.id)
+    #     k9.status= 'Dead'
+    #     k9.training_status = 'Dead'
+    #     k9.death_cert = dc
+    #     k9.death_date = date
+
+    #     ki.status = 'Done'
+    #     ki.save()
+    #     k9.save()
+    #     messages.success(request, 'K9 Died...')
+    #     return redirect('unitmanagement:k9_incident_list')
 
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -3323,12 +3355,10 @@ def load_incident(request):
         k9 = data_load.k9
         form = DeathCertK9(request.POST or None, instance=k9) 
         form.fields['death_cert'].initial = k9.death_cert
+        # form.fields['id_val'].initial = data_load.id
     except:
         pass
 
-    if request.method == "POST":
-        print(k9)
-        
     context = {
         'data_load': data_load,
         'form':form,
