@@ -1,6 +1,6 @@
 {% load static %}
 {% block content %} 
-
+{% load humanize %}
 {% if data %}
 
 <div class="ui segment" id="printableArea">
@@ -40,12 +40,12 @@
                         <td class="left aligned">{{data.0}}</td>
                         <td class="left aligned">{{data.1}}</td>
                         <td class="left aligned">{{data.2}}</td>
-                        <td>{{data.3}}</td>
-                        <td>{{data.4}}</td>
-                        <td>{{data.5}}</td>
-                        <td>{{data.6}}</td>
-                        <td>{{data.7}}</td>
-                        <td>{{data.8}}</td>
+                        <td>{{data.3|intcomma}}</td>
+                        <td>{{data.4|intcomma}}</td>
+                        <td>{{data.5|intcomma}}</td>
+                        <td>{{data.6|intcomma}}</td>
+                        <td>{{data.7|intcomma}}</td>
+                        <td>{{data.8|intcomma}}</td>
                     </tr>   
                 {% endif %}         
             {%endfor%}

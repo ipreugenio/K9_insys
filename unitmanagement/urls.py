@@ -29,6 +29,7 @@ urlpatterns = [
     path('on-leave-request', views.on_leave_request, name='on_leave_request'),
     path('on-leave-list', views.on_leave_list, name='on_leave_list'),
     path('on-leave-decision/<int:id>', views.on_leave_decision, name='on_leave_decision'),
+    # path('on-leave-details/<int:id>', views.on_leave_details, name='on_leave_details'),
 
     path('transfer-request-form', views.transfer_request_form, name='transfer_request_form'),
     path('transfer-request-list', views.transfer_request_list, name='transfer_request_list'),

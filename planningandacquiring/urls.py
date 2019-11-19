@@ -89,5 +89,26 @@ urlpatterns = [
     path('inventory_date/', views.inventory_date, name='inventory_date'),
     path('inventory_date/inventory_report/', views.ajax_inventory_report, name='ajax_inventory_report'),
 
+    path('physical_count_med_date/', views.physical_count_med_date, name='physical_count_med_date'),
+    path('physical_count_med_date/physical_count_med_report/', views.ajax_physical_count_med_report, name='ajax_physical_count_med_report'),
+    
+    path('physical_count_misc_date/', views.physical_count_misc_date, name='physical_count_misc_date'),
+    path('physical_count_misc_date/physical_count_misc_report/', views.ajax_physical_count_misc_report, name='ajax_physical_count_misc_report'),
+    
+    path('physical_count_food_date/', views.physical_count_food_date, name='physical_count_food_date'),
+    path('physical_count_food_date/physical_count_food_report/', views.ajax_physical_count_food_report, name='ajax_physical_count_food_report'),
+    
+    path('received_med_date/', views.received_med_date, name='received_med_date'),
+    path('received_med_date/received_med_report/', views.ajax_received_med_report, name='ajax_received_med_report'),
+    
+    path('received_misc_date/', views.received_misc_date, name='received_misc_date'),
+    path('received_misc_date/received_misc_report/', views.ajax_received_misc_report, name='received_count_misc_report'),
+    
+    path('received_food_date/', views.received_food_date, name='received_food_date'),
+    path('received_food_date/received_food_report/', views.ajax_received_food_report, name='ajax_received_food_report'),
+    
+    path('on_leave_date/', views.on_leave_date, name='on_leave_date'),
+    path('on_leave_date/on_leave_report/', views.ajax_on_leave_report, name='ajax_on_leave_report')
+
 ];
 

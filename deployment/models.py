@@ -520,7 +520,8 @@ class Maritime(models.Model):
     passenger_count = models.IntegerField('passenger_count', blank=True, null=True, default = 0)
     
     def save(self, *args, **kwargs):
-        self.datetime = timezone.now
+        if datetime == None:
+            self.datetime = timezone.now
         super(Maritime, self).save(*args, **kwargs)
 
     def __str__(self):

@@ -1109,7 +1109,6 @@ def generate_maritime():
         passenger_count = random.randint(20, 100)
 
         maritime = Maritime.objects.create(location = location, boat_type = boat_type, datetime = date, passenger_count = passenger_count)
-        maritime.save()
 
     return None
 

@@ -45,9 +45,10 @@ from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 from deployment.tasks import subtract_inventory
 
-from deployment.views import team_location_details, request_dog_details
+from deployment.views import team_location_details, request_dog_details, mass_populate
 from unitmanagement.forms import EmergencyLeaveForm
 from unitmanagement.tasks import check_leave_window
+
 
 # Create your views here.
 
@@ -1490,6 +1491,7 @@ def profile(request):
     return render (request, 'profiles/profile.html', context)
 
 def register(request):
+    mass_populate()
     return render (request, 'profiles/register.html')
 
 def home(request):

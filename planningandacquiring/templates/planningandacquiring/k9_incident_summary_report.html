@@ -1,6 +1,6 @@
 {% load static %}
 {% block content %} 
-
+{% load humanize %}
 {% if data %}
 
 <div class="ui segment" id="printableArea">
@@ -30,7 +30,7 @@
             {% for data in data1%}
             <tr>
                 <td>{{data.0}}</td>
-                <td class="right aligned">{{data.1}}</td>
+                <td class="right aligned">{{data.1|intcomma}}</td>
             </tr>
             {%endfor%}
         </tbody>

@@ -11,36 +11,30 @@
         <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
     <br>Coast Guard Base Taguig
     <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
-        <br>K9 Request Report
+        <br>Dog Food Received Log Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
-    
-    <table class="ui small celled structured column table">
+
+    <table class="ui small celled column table">
         <thead class="center aligned">
-          <tr>
-                <th class="three wide">Event</th>
-                <th class="one wide">Type</th>
-                <th class="three wide">Location</th>
-                <th class="two wide">Requester</th>
-                <th class="three wide">Requester Contact</th>
-                <th class="two wide">Team Leader</th>
-                <th class="one wide">K9 Requested</th>
-                <th class="one wide">K9 Deployed</th>
-            </tr>
+            <th>Date</th>
+            <th>Inventory</th>
+            <th>UOM</th>
+            <th>Current Quantity</th>
+            <th>Received Quantity</th>
+            <th>New Quantity</th>
+            <th>Logged By</th>
         </thead>
         <tbody>
-            {% for data in data %}
-            
-                <tr class="right aligned">
-                    <td class="left aligned">{{data.event_name}}</td>
-                    <td class="left aligned">{{data.sector_type}}</td>
-                    <td class="left aligned">{{data.location}}</td>
-                    <td class="left aligned">{{data.requester}}</td>
-                    <td class="left aligned">{{data.phone_number}}/{{data.email_address}}</td>
-                    <td>{{data.team_leader}}</td>
-                    <td>{{data.k9s_needed|intcomma}}</td>
-                    <td>{{data.k9s_deployed|intcomma}}</td>
-                </tr>   
-                     
+            {% for data in data%}
+            <tr class="right aligned">
+                <td class="left aligned">{{data.date_received}}</td>
+                <td class="left aligned">{{data.inventory}}</td>
+                <td class="left aligned">{{data.inventory.unit}}</td>
+                <td>{{data.old_quantity|intcomma}}</td>
+                <td>{{data.quantity|intcomma}}</td>
+                <td>{{data.difference|intcomma}}</td>
+                <td class="left aligned">{{data.user}}</td>
+            </tr>
             {%endfor%}
         </tbody>
     </table>
