@@ -2671,7 +2671,7 @@ def on_leave_date(request):
 #TODO
 # how to get duration
 def ajax_on_leave_report(request):
-    data_arr = None
+    data_arr = []
     to_date = None
     from_date = None
  
@@ -2679,8 +2679,8 @@ def ajax_on_leave_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).values('handler').distinct()
-        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).values('handler').distinct()
+        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').distinct()
+        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').distinct()
        
         val_arr=[]
         for data in hl:
@@ -2694,11 +2694,20 @@ def ajax_on_leave_report(request):
                     val_arr.append(value)
 
         val_arr = np.unique(val_arr)
-
+        print(val_arr)
         for data in val_arr:
             handler = User.objects.get(id=data)
-            # hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).aggregate(sum=Sum('litter_no'))['sum']
-            # el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler)
+            print(handler)
+            hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
+            el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
+            if hl == None:
+                hl = 0
+            if el == None:
+                el = 0
+            x = [handler,hl,el, hl+el]
+            data_arr.append(x)
+
+        print(data_arr)
     except:
         # print(request.GET.get('date_from'))
         print('EXCEPT')

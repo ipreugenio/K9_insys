@@ -16,24 +16,20 @@
 
     <table class="ui small celled column table">
         <thead class="center aligned">
-            <th>Date</th>
-            <th>Inventory</th>
-            <th>UOM</th>
-            <th>Database Quantity</th>
-            <th>Counted Quantity</th>
-            <th>Difference (+/-)</th>
-            <th>Logged By</th>
+            <th>Handler</th>
+            <th>Rank</th>
+            <th>Regular Leave</th>
+            <th>Emergency Leave</th>
+            <th>Total Leave</th>
         </thead>
         <tbody>
             {% for data in data%}
             <tr class="right aligned">
-                <td class="left aligned">{{data.date_counted}}</td>
-                <td class="left aligned">{{data.inventory}}</td>
-                <td class="left aligned">{{data.inventory.unit}}</td>
-                <td>{{data.old_quantity|intcomma}}</td>
-                <td>{{data.quantity|intcomma}}</td>
-                <td>{{data.difference|intcomma}}</td>
-                <td class="left aligned">{{data.user}}</td>
+                <td class="left aligned">{{data.0}}</td>
+                <td class="left aligned">{{data.0.rank}}</td>
+                <td>{{data.1|intcomma}}</td>
+                <td>{{data.2|intcomma}}</td>
+                <td>{{data.3|intcomma}}</td>
             </tr>
             {%endfor%}
         </tbody>
