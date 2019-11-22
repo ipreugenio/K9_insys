@@ -364,8 +364,15 @@ class Emergency_Leave(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date_of_leave = models.DateField('date_given', null=True, blank=True)
     date_of_return = models.DateField('date_returned', null=True, blank=True)
+    duration = models.IntegerField('duration', null=True, blank=True, default=0)
     status = models.CharField('status', choices=STATUS, max_length=100, default='Ongoing')
     reason = models.TextField('reason', max_length=200)
+
+    def save(self, *args, **kwargs):
+        if self.date_to !=None and self.date_from != None:
+            days = self.date_to - self.date_from
+            self.duration = days.days
+        super(Emergency_Leave, self).save(*args, **kwargs)
 
 class Notification(models.Model):
     POSITION = (

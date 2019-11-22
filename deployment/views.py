@@ -285,7 +285,6 @@ def check_handlers_with_multiple_k9s():
 
     # for item in mult_k9:
     #     print(item)
-
     return None
 
 def add_area(request):

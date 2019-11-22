@@ -14,9 +14,10 @@
         <br>Field Officer Unit Accomplishment Summary Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
 
-    <table class="ui small celled seven column table">
+    <table class="ui small celled eight column table">
         <thead>
             <th>Handler</th>
+            <th>Rank</th>
             <th>Rescued People</th>
             <th>Made an Arrest</th>
             <th>Poor Performance</th>
@@ -28,12 +29,13 @@
             {% for data in data%}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.1}}</td>
-                <td>{{data.2}}</td>
-                <td>{{data.3}}</td>
-                <td>{{data.4}}</td>
-                <td style="font-weight: bold;">{{data.5}}</td>
-                <td style="font-weight: bold;">{{data.6}}</td>
+                <td>{{data.rank}}</td>
+                <td>{{data.1|intcomma}}</td>
+                <td>{{data.2|intcomma}}</td>
+                <td>{{data.3|intcomma}}</td>
+                <td>{{data.4|intcomma}}</td>
+                <td style="font-weight: bold;">{{data.5|intcomma}}</td>
+                <td style="font-weight: bold;">{{data.6|intcomma}}</td>
             </tr>
             {%endfor%}
         </tbody>

@@ -42,6 +42,7 @@ class MedicineCountForm(forms.ModelForm):
         super(MedicineCountForm, self).__init__(*args, **kwargs)
         self.fields['medicine'].required = False
         
+        
 #Food
 class FoodForm(forms.ModelForm):
     description = forms.CharField(widget = forms.Textarea(attrs={'rows':'3'}))

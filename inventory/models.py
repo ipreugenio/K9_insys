@@ -65,9 +65,14 @@ class Medicine_Inventory(models.Model):
 class Medicine_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def difference(self):
+        diff = self.quantity - self.old_quantity
+        return diff 
 
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
@@ -76,11 +81,16 @@ class Medicine_Inventory_Count(models.Model):
 class Medicine_Received_Trail(models.Model):
     inventory = models.ForeignKey(Medicine_Inventory, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
     expiration_date = models.DateField('expiration_date', null=True, blank=True)
     status = models.CharField(max_length=100, default='Pending')
+
+    def difference(self):
+        diff = self.quantity + self.old_quantity
+        return diff 
 
     def __str__(self):
         return self.inventory.medicine.medicine_fullname
@@ -90,6 +100,7 @@ class Medicine_Subtracted_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, default="", null=True, blank=True)
     price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -140,19 +151,29 @@ class Food(models.Model):
 class Food_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Food, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
+    def difference(self):
+        diff = self.quantity - self.old_quantity
+        return diff 
+        
     def __str__(self):
         return self.inventory.food
 
 class Food_Received_Trail(models.Model):
     inventory = models.ForeignKey(Food, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def difference(self):
+        diff = self.quantity + self.old_quantity
+        return diff 
 
     def __str__(self):
         return self.inventory.food
@@ -160,6 +181,7 @@ class Food_Received_Trail(models.Model):
 class Food_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Food, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
@@ -207,9 +229,14 @@ class Miscellaneous(models.Model):
 class Miscellaneous_Inventory_Count(models.Model):
     inventory = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_counted = models.DateField('date_counted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def difference(self):
+        diff = self.quantity - self.old_quantity
+        return diff 
 
     def __str__(self):
         return self.inventory.miscellaneous
@@ -217,9 +244,14 @@ class Miscellaneous_Inventory_Count(models.Model):
 class Miscellaneous_Received_Trail(models.Model):
     inventory = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_received = models.DateField('date_received', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)
+
+    def difference(self):
+        diff = self.quantity + self.old_quantity
+        return diff 
 
     def __str__(self):
         return self.inventory.miscellaneous
@@ -227,6 +259,7 @@ class Miscellaneous_Received_Trail(models.Model):
 class Miscellaneous_Subtracted_Trail(models.Model):
     inventory = models.ForeignKey(Miscellaneous, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
     date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
     time = models.TimeField('time', auto_now_add=True, blank=True)

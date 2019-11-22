@@ -1,6 +1,6 @@
 {% load static %}
 {% block content %} 
-
+{% load humanize %}
 {% if edd_data or ndd_data or sar_data %}
 
 <div class="ui segment" id="printableArea">
@@ -30,16 +30,16 @@
             {% for data in data%}
             <tr class="right aligned">
                 <td class="left aligned">{{data.0}}</td>
-                <td>{{data.1}}</td>
-                <td>{{data.2}}</td>
-                <td>{{data.3}}</td>
+                <td>{{data.1|intcomma}}</td>
+                <td>{{data.2|intcomma}}</td>
+                <td>{{data.3|intcomma}}</td>
             </tr>            
             {%endfor%}
             <tr class="right aligned" style="font-weight: bold;">
                 <td>TOTAL</td>
-                <td>{{passed}}</td>
-                <td>{{failed}}</td>
-                <td>{{total}}</td>
+                <td>{{passed|intcomma}}</td>
+                <td>{{failed|intcomma}}</td>
+                <td>{{total|intcomma}}</td>
             </tr>
 
         </tbody>
@@ -61,15 +61,15 @@
             {% for data in edd_data%}
             <tr class="right aligned">
             <td class="left aligned">{{data.0}}</td>
-            <td>{{data.1}}</td>
-            <td>{{data.2}}</td>
-            <td>{{data.3}}</td>
+            <td>{{data.1|intcomma}}</td>
+            <td>{{data.2|intcomma}}</td>
+            <td>{{data.3|intcomma}}</td>
             </tr>
            
             {%endfor%}
             <tr class="right aligned" style="font-weight: bold;">
                 <td colspan="3">Total K9 in EDD Training</td>
-                <td colspan="1" >{{edd_total}}</td>
+                <td colspan="1" >{{edd_total|intcomma}}</td>
             </tr>
         </tbody>
     </table>
@@ -90,15 +90,15 @@
             {% for data in ndd_data%}
             <tr class="right aligned">
             <td class="left aligned">{{data.0}}</td>
-            <td>{{data.1}}</td>
-            <td>{{data.2}}</td>
-            <td>{{data.3}}</td>
+            <td>{{data.1|intcomma}}</td>
+            <td>{{data.2|intcomma}}</td>
+            <td>{{data.3|intcomma}}</td>
             </tr>
             
             {%endfor%}
             <tr class="right aligned" style="font-weight: bold;">
                 <td colspan="3" >Total K9 in NDD Training </td>
-                <td colspan="1" >{{ndd_total}}</td>
+                <td colspan="1" >{{ndd_total|intcomma}}</td>
             </tr>
         </tbody>
     </table>
@@ -119,15 +119,15 @@
             {% for data in sar_data%}
             <tr class="right aligned">
             <td class="left aligned">{{data.0}}</td>
-            <td>{{data.1}}</td>
-            <td>{{data.2}}</td>
-            <td>{{data.3}}</td>
+            <td>{{data.1|intcomma}}</td>
+            <td>{{data.2|intcomma}}</td>
+            <td>{{data.3|intcomma}}</td>
             </tr>
             
             {%endfor%}
             <tr class="right aligned" style="font-weight: bold;">
                 <td colspan="3">Total K9 in SAR Training</td>
-                <td colspan="1" >{{sar_total}}</td>
+                <td colspan="1" >{{sar_total|intcomma}}</td>
             </tr>
         </tbody>
     </table>

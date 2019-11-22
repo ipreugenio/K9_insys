@@ -1,6 +1,6 @@
 {% load static %}
 {% block content %} 
-
+{% load humanize %}
 {% if data %}
 
 <div class="ui segment" id="printableArea">
@@ -29,9 +29,9 @@
             <tr class="right aligned">
                 <td class="left aligned">{{data.0}}</td>
                 <td>{{data.0.commander}}</td>
-                <td>{{data.1}}</td>
-                <td>{{data.2}}</td>
-                <td>{{data.3}}</td>
+                <td>{{data.1|intcomma}}</td>
+                <td>{{data.2|intcomma}}</td>
+                <td>{{data.3|intcomma}}</td>
             </tr>            
             {%endfor%}
         </tbody>

@@ -59,7 +59,7 @@
                             </a>
                             <a href="{% url 'unitmanagement:trained_list'%}" class="item">
                                 <i class="clipboard list icon"></i>Trained K9 List
-                            </a> 
+                            </a>
 
                             <a href="{% url 'unitmanagement:unfit_list'%}" class="item">
                                 <i class="clipboard list icon"></i>Unfit K9 List
@@ -88,7 +88,7 @@
 
 
                             {% elif request.session.session_user_position == "Handler" %}
-                            
+
                             {% if request.session.partnered == True %}
                                 <a href="{% url 'deployment:daily_refresher_form'%}" class="item">
                                     <i class="sync alternate icon"></i>Daily Refresher Form
@@ -152,7 +152,7 @@
                                 <i class="exclamation icon"></i>Handler Incident
                                 Form
                             </a>
-                           
+
                             {% endif %}
 
                         </div>

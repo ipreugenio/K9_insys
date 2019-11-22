@@ -25,11 +25,11 @@ from django.contrib import messages
 from .forms import ReportDateForm, k9_detail_form, SupplierForm, ProcuredK9Form,k9_acquisition_form
 from deployment.models import Dog_Request, Team_Assignment
 
-from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed
+from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Handler_On_Leave, Emergency_Leave
 from inventory.models import Food, Food_Subtracted_Trail, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail, Food_Received_Trail, Medicine_Received_Trail, Miscellaneous_Received_Trail
 
 from unitmanagement.models import Health, HealthMedicine, VaccinceRecord, VaccineUsed, Notification, Handler_Incident,K9_Incident
-from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail
+from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Miscellaneous, Medicine_Received_Trail, Food_Received_Trail, Miscellaneous_Received_Trail, Medicine_Inventory_Count, Medicine_Received_Trail, Food_Inventory_Count, Food_Received_Trail, Miscellaneous_Inventory_Count, Miscellaneous_Received_Trail
 
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
@@ -2425,6 +2425,302 @@ def ajax_inventory_report(request):
     }
 
     return render(request, 'planningandacquiring/inventory_report.html', context)
+
+def physical_count_med_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_med_date.html', context)
+    
+def ajax_physical_count_med_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_counted', 'time']
+        data_arr = Medicine_Inventory_Count.objects.filter(date_counted__range=[from_date, to_date]).order_by(*orderbyList)
+
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_med_report.html', context)
+
+def physical_count_misc_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_misc_date.html', context)
+    
+def ajax_physical_count_misc_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_counted', 'time']
+        data_arr = Miscellaneous_Inventory_Count.objects.filter(date_counted__range=[from_date, to_date]).order_by(*orderbyList)
+    
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_misc_report.html', context)
+    
+def physical_count_food_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_food_date.html', context)
+    
+def ajax_physical_count_food_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_counted', 'time']
+        data_arr = Food_Inventory_Count.objects.filter(date_counted__range=[from_date, to_date]).order_by(*orderbyList)
+        
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/physical_count_food_report.html', context)
+
+def received_med_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/received_med_date.html', context)
+    
+def ajax_received_med_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_received', 'time']
+        data_arr = Medicine_Received_Trail.objects.filter(date_received__range=[from_date, to_date]).order_by(*orderbyList)
+
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/received_med_report.html', context)
+
+def received_misc_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/received_misc_date.html', context)
+    
+def ajax_received_misc_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_received', 'time']
+        data_arr = Miscellaneous_Received_Trail.objects.filter(date_received__range=[from_date, to_date]).order_by(*orderbyList)
+    
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/received_misc_report.html', context)
+    
+def received_food_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/received_food_date.html', context)
+    
+def ajax_received_food_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        orderbyList = ['date_received', 'time']
+        data_arr = Food_Received_Trail.objects.filter(date_received__range=[from_date, to_date]).order_by(*orderbyList)
+        
+    except:
+        pass
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/received_food_report.html', context)
+
+def on_leave_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/on_leave_date.html', context)
+    
+#TODO
+# how to get duration
+def ajax_on_leave_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+ 
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').distinct()
+        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').distinct()
+       
+        val_arr=[]
+        for data in hl:
+            for key, value in data.items():
+                if key == 'handler':
+                    val_arr.append(value)
+
+        for data in el:
+            for key, value in data.items():
+                if key == 'handler':
+                    val_arr.append(value)
+
+        val_arr = np.unique(val_arr)
+        print(val_arr)
+        for data in val_arr:
+            handler = User.objects.get(id=data)
+            print(handler)
+            hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
+            el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
+            if hl == None:
+                hl = 0
+            if el == None:
+                el = 0
+            x = [handler,hl,el, hl+el]
+            data_arr.append(x)
+
+        print(data_arr)
+    except:
+        # print(request.GET.get('date_from'))
+        print('EXCEPT')
+
+
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+    }
+
+    return render(request, 'planningandacquiring/on_leave_report.html', context)
 ################# END OF REPORT ##################
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):
