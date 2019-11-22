@@ -2087,12 +2087,13 @@ def ajax_port_report(request):
     
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'area_arr':area_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/port_report.html', context)

@@ -53,6 +53,7 @@ class User(models.Model):
         ('No Longer Employed', 'No Longer Employed'),
         ('Retired', 'Retired'),
         ('Died', 'Died'),
+        ('MIA', 'MIA')
     )
 
     RANK = (

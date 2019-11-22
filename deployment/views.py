@@ -700,7 +700,7 @@ def dog_request(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
     context = {
-      'title':'Add Location Form',
+      'title':'K9 Request Form',
       'texthelp': 'Input Location Details Here',
       'form': form,
 

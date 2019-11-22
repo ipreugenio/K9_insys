@@ -3,7 +3,19 @@
 {% block sidebar_module %}
 <div class="ui fluid container">
     <div class="ui basic segment">
+
         <div class="ui grid">
+              {% if request.session.session_user_position == "Operations" %}
+            <div class="three wide column">
+                <div class="ui pointing vertical menu">
+                    <a class="item"> <b>Deployment Menu</b></a>
+                    <a href="{% url 'deployment:request_dog_list'%}" class="item">
+                            <i class="clipboard list icon"></i>Request List
+                        </a>
+                </div>
+            </div>
+            {% else %}
+
             <div class="three wide column">
                     <div class="ui pointing vertical menu">
                         <a class="item"> <b>Deployment Menu</b></a>
@@ -34,6 +46,8 @@
                         </a>
                     </div>
             </div>
+
+            {% endif %}
             <!>
             <div class="thirteen wide column">
                 {% block content %}

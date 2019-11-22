@@ -3015,7 +3015,7 @@ def k9_sick_details(request, id):
 def emeregency_leave_list(request):
 
     data = []
-    emergency_leaves = Emergency_Leave.objects.all() #.filter(status = "Ongoing")
+    emergency_leaves = Emergency_Leave.objects.filter(status = "Ongoing")
     for leave in emergency_leaves:
         pi = Personal_Info.objects.get(UserID = leave.handler)
         days_lapsed = datetime.today().date() - leave.date_of_leave
@@ -3032,6 +3032,21 @@ def emeregency_leave_list(request):
     }
 
     return render (request, 'unitmanagement/emergency_leave_list.html', context)
+
+def handler_status_mia(request, id):
+
+    e_leave = Emergency_Leave.objects.get(id = id)
+    print("Handler on E leave")
+    print(e_leave.handler)
+
+    handler = User.objects.get(id = e_leave.handler.id)
+    handler.status = "MIA"
+    handler.save()
+
+    e_leave.status = "MIA"
+    e_leave.save()
+
+    return redirect('unitmanagement:emergency_leave_list')
 
 class TeamLeaderView(APIView):
     def get(self, request, format=None):

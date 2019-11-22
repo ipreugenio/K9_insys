@@ -41,7 +41,7 @@
                 <td>{{x.2}} days</td>
                 <td>{{x.0.status}}</td>
                 <td>
-                    <input class = "ui red button" type="submit"  value={{x.0.id}} name = "mia_btn" id = "id_mia_btn">
+                    <a class = "ui red button" name = "mia_btn" id = "id_mia_btn" href="{% url 'unitmanagement:handler_status_mia' x.0.id %}" >MIA</a>
                 </td>
             </tr>
             {% endfor %}
