@@ -285,8 +285,13 @@ def current_team(K9, request_id):
     team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment = None).latest('id')
     team_assignment = None
 
-    if (team_dog_deployed.date_pulled is not None):
+    print("TEAM DOG DEPLOYED")
+    print(team_dog_deployed)
+
+    try:
         team_assignment_id = team_dog_deployed.team_assignment.id
         team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
+    except:
+        ...
 
     return team_assignment

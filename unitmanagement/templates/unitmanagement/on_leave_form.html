@@ -109,9 +109,9 @@
                 alert('Maximum Leave is 21 Days. Please Adjust Accordingly.');
             }
 
-            if (a<=0){
+            if (a<0){
                 e.preventDefault();
-                alert('"Date From" must be before "Date To". ');
+                alert('"Date From" must be on or before "Date To". ');
             }
         });
             

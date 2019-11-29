@@ -63,7 +63,6 @@ class Health(models.Model):
     follow_up_done = models.BooleanField(default=False)
 
     def __str__(self):
-
         return str(self.id) + ': ' + str(self.date) #+' - ' + str(self.dog.name)
 
     def expire(self):
@@ -74,14 +73,14 @@ class Health(models.Model):
     def expire_date(self):
         expired = self.date_done + timedelta(days=7)
         return expired
-
-    def save(self, *args, **kwargs):
-        if self.date != None:
-            self.date_done = self.date + timedelta(days=self.duration)
-
-        if date.today() == self.date_done:
-            self.dog.status = 'Working Dog'
-        super(Health, self).save(*args, **kwargs)
+    #
+    # def save(self, *args, **kwargs):
+    #     if self.date != None:
+    #         self.date_done = self.date + timedelta(days=self.duration)
+    #
+    #     if date.today() == self.date_done:
+    #         self.dog.status = 'Working Dog'
+    #     super(Health, self).save(*args, **kwargs)
 
 
 class HealthMedicine(models.Model):
@@ -212,9 +211,10 @@ class VaccinceRecord(models.Model):
         return str(self.k9)
 
     def save(self, *args, **kwargs):
-        if self.dhppil4_2 == True and self.bordetella_2 == True and self.dhppil_cv_3 == True and self.anti_rabies == True:
-            self.k9.training_status = 'Unclassified'
-            self.k9.save()
+        if self.dhppil4_1 == True and self.dhppil4_2 == True and self.bordetella_1 == True and self.bordetella_2 == True and self.dhppil_cv_1 == True and self.dhppil_cv_2 == True and self.dhppil_cv_3 == True and self.anti_rabies == True:
+            k9 = K9.objects.get(id=self.k9.id)
+            k9.training_status = 'Unclassified'
+            k9.save()
 
         if self.deworming_1 == True and self.deworming_2 == True and self.deworming_3 == True and self.deworming_4 == True and self.dhppil_cv_1 == True and self.dhppil_cv_2 == True and self.dhppil_cv_3 == True and self.heartworm_1 == True and self.heartworm_2 == True and self.heartworm_3 == True and self.heartworm_4 == True and self.heartworm_5 == True and self.heartworm_6 == True and self.heartworm_7 == True and self.heartworm_8 == True and self.anti_rabies == True and self.bordetella_1 == True and self.bordetella_2 == True and self.dhppil4_1 == True and self.dhppil4_2 == True and self.tick_flea_1 == True and self.tick_flea_2 == True and self.tick_flea_3 == True and self.tick_flea_4 == True and self.tick_flea_5 == True and self.tick_flea_6 == True and self.tick_flea_7 == True:
             self.status = 'Done'
@@ -369,8 +369,8 @@ class Emergency_Leave(models.Model):
     reason = models.TextField('reason', max_length=200)
 
     def save(self, *args, **kwargs):
-        if self.date_to !=None and self.date_from != None:
-            days = self.date_to - self.date_from
+        if self.date_of_return !=None and self.date_of_leave != None:
+            days = self.date_of_return- self.date_of_leave
             self.duration = days.days
         super(Emergency_Leave, self).save(*args, **kwargs)
 
@@ -505,7 +505,7 @@ def create_handler_incident_notif(sender, instance, **kwargs):
                             position = 'Administrator',
                             other_id = instance.id,
                             notif_type = 'handler_died',
-                            message= 'Reported Dead! ' + str(instance.handler))
+                            message= 'Reported Deceased! ' + str(instance.handler))
         else:
             Notification.objects.create(user = instance.handler,
                             position = 'Administrator',

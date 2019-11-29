@@ -1599,11 +1599,12 @@ def ajax_k9_performance_report(request):
                     data.append(dt)
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/k9_performance_report.html', context)
@@ -1649,11 +1650,12 @@ def ajax_fou_accomplishment_report(request):
                     data.append(a)
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data,
         'from_date':from_date,
         'to_date':to_date,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/fou_accomplishment_report.html', context)
@@ -1677,7 +1679,7 @@ def ajax_training_report(request):
     data = []
     to_date = None
     from_date = None
-    
+
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
@@ -1710,11 +1712,12 @@ def ajax_training_report(request):
                                 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data,
         'from_date':from_date,
         'to_date':to_date,
+        'user':user,
     }
 
     return render(request, 'planningandacquiring/training_report.html', context)
@@ -1981,11 +1984,12 @@ def ajax_aor_summary_report(request):
     
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/aor_summary_report.html', context)
@@ -2129,11 +2133,12 @@ def ajax_k9_request_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/k9_request_report.html', context)
@@ -2166,11 +2171,12 @@ def ajax_fou_acc_report(request):
         
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/fou_acc_report.html', context)
@@ -2216,12 +2222,13 @@ def ajax_k9_incident_summary_report(request):
          
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'data1':arr_val,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/k9_incident_summary_report.html', context)
@@ -2283,12 +2290,13 @@ def ajax_k9_breeding_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'data1':arr_val,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/k9_breeding_report.html', context)
@@ -2327,12 +2335,13 @@ def ajax_health_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'data1':arr_val,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/health_report.html', context)
@@ -2410,7 +2419,7 @@ def ajax_inventory_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'total':total,
         'mst_cost':mst_cost,
@@ -2422,6 +2431,7 @@ def ajax_inventory_report(request):
         'data3':arr_val3,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/inventory_report.html', context)
@@ -2455,11 +2465,12 @@ def ajax_physical_count_med_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/physical_count_med_report.html', context)
@@ -2493,11 +2504,12 @@ def ajax_physical_count_misc_report(request):
     
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/physical_count_misc_report.html', context)
@@ -2521,7 +2533,7 @@ def ajax_physical_count_food_report(request):
     data_arr = []
     to_date = None
     from_date = None
-  
+    user = user_session(request)
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
@@ -2536,6 +2548,7 @@ def ajax_physical_count_food_report(request):
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/physical_count_food_report.html', context)
@@ -2552,14 +2565,13 @@ def received_med_date(request):
         'user': user,
         'form': form,
     }
-
     return render(request, 'planningandacquiring/received_med_date.html', context)
     
 def ajax_received_med_report(request):
     data_arr = []
     to_date = None
     from_date = None
-  
+
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
@@ -2569,11 +2581,12 @@ def ajax_received_med_report(request):
 
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/received_med_report.html', context)
@@ -2607,11 +2620,12 @@ def ajax_received_misc_report(request):
     
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/received_misc_report.html', context)
@@ -2645,11 +2659,12 @@ def ajax_received_food_report(request):
         
     except:
         pass
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/received_food_report.html', context)
@@ -2675,14 +2690,14 @@ def ajax_on_leave_report(request):
     data_arr = []
     to_date = None
     from_date = None
- 
+
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
         hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').distinct()
         el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').distinct()
-       
+
         val_arr=[]
         for data in hl:
             for key, value in data.items():
@@ -2695,17 +2710,28 @@ def ajax_on_leave_report(request):
                     val_arr.append(value)
 
         val_arr = np.unique(val_arr)
-        print(val_arr)
+        print('VAL', val_arr)
         for data in val_arr:
             handler = User.objects.get(id=data)
             print(handler)
-            hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
-            el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
-            if hl == None:
-                hl = 0
-            if el == None:
-                el = 0
-            x = [handler,hl,el, hl+el]
+            # try:
+            #     hll = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
+            # except:
+            #     hll = 0
+            #
+            # try:
+            #     ell = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
+            # except:
+            #     ell = 0
+            hll = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
+            ell = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
+            if ell == None:
+                ell = 0
+            if hll == None:
+                hll=0
+
+            x = [handler,hll,ell, hll+ell]
+            print(hl,el)
             data_arr.append(x)
 
         print(data_arr)
@@ -2713,11 +2739,12 @@ def ajax_on_leave_report(request):
         # print(request.GET.get('date_from'))
         print('EXCEPT')
 
-
+    user = user_session(request)
     context = {
         'data':data_arr,
         'from_date':from_date,
         'to_date':to_date,
+        'user': user,
     }
 
     return render(request, 'planningandacquiring/on_leave_report.html', context)

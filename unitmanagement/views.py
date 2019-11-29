@@ -30,7 +30,7 @@ from inventory.models import Medicine_Received_Trail, Food_Subtracted_Trail, Foo
 from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineForm, VaccinationRecordForm, \
     HandlerOnLeaveForm, RequestMiscellaneous, RequestFood, RequestMedicine, K9IncidentForm, HandlerIncidentForm, \
     VaccinationUsedForm, ReassignAssetsForm, ReproductiveForm, DateForm, RequestTransferForm, ReplenishmentForm, \
-    ItemReplenishmentForm, ChooseTeamForm
+    ItemReplenishmentForm, ChooseTeamForm, DeathCertK9
 
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, \
     PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, \
@@ -41,6 +41,7 @@ from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_
 from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
+
 
 # Create your views here.
 
@@ -56,7 +57,7 @@ def notif(request):
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
     elif user_in_session.position == 'Handler' or user_in_session.position == 'Team Leader':
-        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime').exclude(notif_type='handler_on_leave').exclude(notif_type='handler_died')
+        notif = Notification.objects.filter(user=user_in_session).order_by('-datetime')#.exclude(notif_type='handler_on_leave').exclude(notif_type='handler_died')
     else:
         notif = Notification.objects.filter(position='Administrator').order_by('-datetime')
 
@@ -147,6 +148,46 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'admin_leave_request':
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:on_leave_list')
+    elif notif.notif_type == 'admin_leave_approval':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'admin_e_leave_request':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:dashboard')
+    elif notif.notif_type == 'TL_e_leave_request':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:team_leader_dashboard')
+    elif notif.notif_type == 'handler_e_leave_return':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'admin_transfer_request':
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:transfer_request_list')
+    elif notif.notif_type == 'handler_transfer_approved':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'admin_e_leave_lapsed':
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:emergency_leave_list')
+    elif notif.notif_type == 'TL_handler_is_now_on_leave':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:team_leader_dashboard')
+    elif notif.notif_type == 'TL_handler_leave_sched':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:team_leader_dashboard')
 
 
 def index(request):
@@ -253,6 +294,8 @@ def yearly_vaccine_list(request):
             if mi.quantity > 0 :
                 f.save()
                 mi.save()
+
+
                 messages.success(request, str(f.k9) + ' has been given ' + str(f.vaccine))
             else:
                 messages.warning(request, 'Insufficient Quantity')
@@ -605,6 +648,9 @@ def vaccine_submit(request):
                 mi.save()
                 k9.save()
 
+                if vr.anti_rabies == True and vr.bordetella_1 == True and vr.bordetella_2 == True and vr.dhppil4_1 == True and vr.dhppil4_2 == True and vr.dhppil_cv_1 == True and vr.dhppil_cv_2 == True and vr.dhppil_cv_3 == True:
+                    k9.training_status = 'Unclassified'
+                    k9.save()
             messages.success(request, str(k9) + ' has been given ' + str(f.vaccine))
             return HttpResponseRedirect('vaccination-list')
         else:
@@ -1642,9 +1688,10 @@ def k9_incident(request):
     incident = K9_Incident.objects.filter(reported_by=str(user)).filter(status='Pending').exclude(incident='Sick')
 
     # form1 = DeathCertK9(request.POST or None, instance=dog)
-
-    if request.method == "POST" and 'incident' in request.POST:
+    print("TEST")
+    if request.method == "POST" and 'incident_form' in request.POST:
         if form.is_valid():
+            print(form)
             f = form.save(commit=False)
             f.reported_by = user
             f.save()
@@ -1714,8 +1761,13 @@ def k9_incident_list(request):
         k9.death_cert = dc
         k9.death_date = dd
 
+        handler = User.objects.get(id=k9.handler.id)
+        handler.partnered = False
+
+        handler.save()
         ki.status = 'Done'
         ki.save()
+        k9.handler = None
         k9.save()
         messages.success(request,  str(k9) +' Died...')
 
@@ -1873,7 +1925,14 @@ def k9_accident(request, id=None):
     elif accident == 'Died':
         k9.status = 'Dead'
         k9.training_status = 'Dead'
-        messages.success(request, 'K9 died..')
+        messages.success(request, 'K9 is deceased..')
+
+
+        handler = User.objects.get(id=k9.handler.id)
+        handler.partnered = False
+
+        k9.handler = None
+        handler.save()
         k9.save()
 
     if request.method == 'POST':
@@ -1892,11 +1951,12 @@ def k9_accident(request, id=None):
 
         h = User.objects.get(id=k9.handler.id)
         h.partnered = False
-        h.save()
+
 
         k9.handler= None
-        k9.save()
 
+        k9.save()
+        h.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 def health_list_handler(request):
@@ -1953,22 +2013,36 @@ def handler_incident_form(request):
             f = form.save(commit=False)
             f.reported_by = user
             f.k9 = b
+            # handler = None
+
+            handler = User.objects.get(id = b.handler.id)
 
             if f.incident == 'Died':
-                user.status = 'Died'
-                user.partnered = False
-                user.assigned = False
+                handler.status = 'Died'
+                handler.partnered = False
+                handler.assigned = False
                 b.handler = None
-            elif f.incident == 'MIA':
-                user.status = 'MIA'
-                user.partnered = False
-                user.assigned = False
-                b.handler = None
-                #if MIA, kasama ba ang aso?
 
-            user.save()
+                if b.capability == "SAR":
+                    data.SAR_deployed -= 1
+                if b.capability == "NDD":
+                    data.NDD_deployed -= 1
+                else:
+                    data.EDD_deployed -= 1
+
+                data.total_dogs_deployed -= 1
+                data.save()
+            elif f.incident == 'MIA':
+                handler.status = 'MIA'
+                handler.partnered = False
+                handler.assigned = False
+                b.handler = None
+                # if MIA, kasama ba ang aso?
+
+            handler.save()
             b.save()
             f.save()
+
 
             style = "ui green message"
             messages.success(request, 'Incident has been successfully Reported!')
@@ -2006,7 +2080,7 @@ def on_leave_request(request):
         except:
             last_deployment_date = datetime.today().date()
 
-    form = HandlerOnLeaveForm(request.POST or None, initial={'date_from': last_deployment_date+timedelta(days=90)})
+    form = HandlerOnLeaveForm(request.POST or None, initial={'date_from': last_deployment_date+timedelta(days=90), 'date_to': last_deployment_date+timedelta(days=90)})
 
     style=''
 
@@ -2060,6 +2134,7 @@ def on_leave_request(request):
                         recent_leave_date = leave.date_to
                 # 4a.) Compare the start date from form and the recent leave date. Count the number of days in between
                 work_duration = start_date - recent_leave_date
+                work_duration = work_duration.days
             else:
                 try:
                     # 4b.) If a preveious leave does not exist, count the number of days since the most recent
@@ -2089,6 +2164,14 @@ def on_leave_request(request):
 
             if work_duration >= 90 and deployable == 1:
                incident_save.save()
+
+               Notification.objects.create(position='Administrator', user=None, notif_type='admin_leave_request',
+                                           message= str(user.fullname) + ' have requested a leave.')
+
+               form = HandlerOnLeaveForm()
+               style = "ui green message"
+               messages.success(request, 'Request has been successfully Submitted!')
+               return redirect('unitmanagement:on_leave_request')
             else:
                 style = "ui red message"
                 if work_duration < 90:
@@ -2098,10 +2181,6 @@ def on_leave_request(request):
                     messages.warning(request, 'Date must not be in conflict with any requests or leaves')
                     return redirect('unitmanagement:on_leave_request')
 
-            form = HandlerOnLeaveForm()
-            style = "ui green message"
-            messages.success(request, 'Request has been successfully Submitted!')
-            return redirect('unitmanagement:on_leave_request')
         else:
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
@@ -2313,11 +2392,11 @@ def transfer_request_list(request):
     #Code here for approval of transfer
     if request.method == 'POST':
         date = request.POST.get('date')
-        match_id = request.POST.get('handler')
-        requester_id = request.POST.get('requester')
+        # match_id = request.POST.get('handler')
+        # requester_id = request.POST.get('requester')
 
-        match = User.objects.get(id=match_id)
-        requester = User.objects.get(id=requester_id)
+        # match = User.objects.get(id=match_id)
+        # requester = User.objects.get(id=requester_id)
 
         match_request_id = request.POST.get('match_request_id')
         original_request_id = request.POST.get('original_request_id')
@@ -2328,22 +2407,30 @@ def transfer_request_list(request):
         print(original_request_id)
 
         if 'approve' in request.POST:
-            print('yes',date, match, requester)
 
-            request_match = Request_Transfer.objects.get(id = match_request_id)
-            original_request = Request_Transfer.objects.get(id = original_request_id)
+            try:
+                request_match = Request_Transfer.objects.get(id = match_request_id)
+                request_match.status = "Approved"
+                request_match.save()
+                Notification.objects.create(position='Handler', user=request_match.handler,
+                                            notif_type='handler_transfer_approved',
+                                            message='Your transfer to ' + str(request_match.location_to) + ' on ' + str(
+                                                request_match.date_of_transfer)
+                                                    + ' has been approved!')
+            except:
+                pass
 
-            request_match.status = "Approved"
-            original_request. status = "Approved"
-
-            request_match.save()
-            original_request.save()
-
-
+            try:
+                original_request = Request_Transfer.objects.get(id = original_request_id)
+                original_request.status = "Approved"
+                original_request.save()
+                Notification.objects.create(position='Handler', user=original_request.handler,
+                                            notif_type='handler_transfer_approved',
+                                            message='Your transfer to ' + str(
+                                                original_request.location_to) + ' on ' +  str(original_request.date_of_transfer) + 'has been approved')
+            except:
+                pass
             #TODO bg task status = "Done" transfer request on transfer date
-
-        else:
-            print('no',date, match, requester)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2429,6 +2516,9 @@ def transfer_request_form(request):
             else:
                 style = 'ui red message'
                 messages.success(request, 'Date input has conflict with a request scheduled!')
+
+                Notification.objects.create(position='Administrator', user=None, notif_type='admin_transfer_request',
+                                            message=str(user.fullname) + ' have requested a transfer.')
         else:
             style='ui red message'
             messages.success(request,'Invalid Input!')
@@ -2640,12 +2730,35 @@ def on_leave_decision(request, id):
     data = Handler_On_Leave.objects.get(id=id)
     leave = request.GET.get('leave')
 
+
+    k9 = None
+    try:
+        k9 = K9.objects.filter(handler = data.handler).last()
+    except:
+        ...
+    print(k9)
     if leave == 'approve':
         data.status = 'Approved'
         data.handler.status = 'On-Leave'
         data.approved_by = user
+
+        Notification.objects.create(position='handler', user=data.handler, notif_type='admin_leave_approval',
+                                    message='Your leave request from '+ str(data.date_from) + ' up to ' + str(data.date_to) + ' has been approved.')
+        if k9:
+            team = current_team(k9)
+            print("TEAM")
+            print(team)
+
+            if team:
+                Notification.objects.create(position='team leader', user=team.team_leader, notif_type='TL_handler_leave_sched',
+                                            message=str(data.handler) + ' has scheduled a leave from '+ str(data.date_from) + ' up to ' + str(data.date_to)+ '.')
+
     elif leave == 'deny':
         data.status = 'Denied'
+
+        Notification.objects.create(position='handler', user=data.handler, notif_type='admin_leave_approval',
+                                    message='Your leave request from ' + str(data.date_from) + ' up to ' + str(
+                                        data.date_to) + ' has been denied.')
 
     data.save()
 
@@ -2713,7 +2826,7 @@ def reproductive_edit(request, id):
 def k9_unpartnered_list(request):
     style=''
 
-    data = K9.objects.filter(training_status='For-Deployment').filter(handler=None)
+    data = K9.objects.filter(handler=None) #removed for deployment
     # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW
@@ -3027,8 +3140,15 @@ def emeregency_leave_list(request):
                 print("LEAVE")
                 print(emrgncy_leave_id)
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+
     context = {
-        'data' : data
+        'data' : data,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
     }
 
     return render (request, 'unitmanagement/emergency_leave_list.html', context)
@@ -3943,12 +4063,18 @@ def load_item_misc(request):
     return JsonResponse(data)
 
 def current_team(K9):
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).latest('id')
+
+    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment=None).latest('id')
     team_assignment = None
 
-    if (team_dog_deployed.date_pulled is not None):
+    print("TEAM DOG DEPLOYED")
+    print(team_dog_deployed)
+
+    try:
         team_assignment_id = team_dog_deployed.team_assignment.id
         team_assignment = Team_Assignment.objects.get(id=team_assignment_id)
+    except:
+        ...
 
     return team_assignment
 
@@ -3985,9 +4111,14 @@ def k9_checkup_list_today(request):
         else:
             checkup_list.append((checkup, False))
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'checkups' : checkup_list,
-        'deployment_list' : deployment_list
+        'deployment_list' : deployment_list,
+        'notif_data': notif_data,
+        'count': count
     }
 
     return render(request, 'unitmanagement/k9_checkup_list_today.html', context)
@@ -4013,9 +4144,14 @@ def k9_mia_list(request):
     print(k9_mia)
     print(k9_list)
 
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+
     context = {
         'k9_list' : k9_list,
         'style' : style,
+        'notif_data' : notif_data,
+        'count' : count
     }
 
     return render(request, 'unitmanagement/k9_mia_list.html', context)
@@ -4106,7 +4242,7 @@ def k9_accident(request, id=None):
     elif accident == 'Died':
         k9.status = 'Dead'
         k9.training_status = 'Dead'
-        messages.success(request, 'K9 died..')
+        messages.success(request, 'K9 is deceased..')
         k9.save()
 
     if request.method == 'POST':
@@ -4131,3 +4267,4 @@ def k9_accident(request, id=None):
         k9.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+

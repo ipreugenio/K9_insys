@@ -40,7 +40,7 @@ def auto_subtract():
     k9_labrador = K9.objects.filter(breed='Labrador Retriever').filter(age__gte=1).exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
     k9_jack_russel = K9.objects.filter(breed='Jack Russel').filter(age__gte=1).exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
     k9_others = K9.objects.filter(age__gte=1).exclude(breed='Labrador Retriever').exclude(breed='Jack Russel').exclude(training_status='Deployed').exclude(status='Adopted').exclude(status='Stolen').exclude(status='Lost').exclude(status='Dead').count()
-    food = Food.objects.filter(foodtype='Adult Dog Food').filter(unit=kilograms).exclude(quantity=0).order_by('quantity')
+    food = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='kilograms').exclude(quantity=0).order_by('quantity')
 
     # dog_count * food_per_day
     lab = k9_labrador * 0.5
@@ -100,7 +100,7 @@ def auto_subtract():
     food = fs_food + se_food + nt_food + et_food + four_food + five_food + six_food + seven_food + eight_food + nine_twelve_food
 
     query_milk = Food.objects.filter(foodtype='Milk').exclude(quantity=0).order_by('quantity')
-    query_food = Food.objects.filter(foodtype='Puppy Dog Food').filter(unit=kilograms).exclude(quantity=0).order_by('quantity')
+    query_food = Food.objects.filter(foodtype='Puppy Dog Food').filter(unit='kilograms').exclude(quantity=0).order_by('quantity')
 
     t_food = Decimal(food)
     t_milk = Decimal(milk)
@@ -159,9 +159,9 @@ def auto_subtract():
     except (stock.DoesNotExist):
         pass
 
-    adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').filter(unit=kilograms).aggregate(sum=Sum('quantity'))['sum']
-    puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').filter(unit=kilograms).aggregate(sum=Sum('quantity'))['sum']
-    milk_q = Food.objects.filter(foodtype='Milk').filter(unit=kilograms).aggregate(sum=Sum('quantity'))['sum']
+    adult_dfq = Food.objects.filter(foodtype='Adult Dog Food').filter(unit='kilograms').aggregate(sum=Sum('quantity'))['sum']
+    puppy_dfq = Food.objects.filter(foodtype='Puppy Dog Food').filter(unit='kilograms').aggregate(sum=Sum('quantity'))['sum']
+    milk_q = Food.objects.filter(foodtype='Milk').filter(unit='kilograms').aggregate(sum=Sum('quantity'))['sum']
 
     if adult_dfq <= day_adult:
         Notification.objects.create(message= 'Adult Dog Food is low. Its time to reorder!', notif_type='inventory_low')

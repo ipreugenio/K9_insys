@@ -36,7 +36,7 @@ from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, \
     Area, K9_Schedule, K9_Pre_Deployment_Items
 from deployment.forms import GeoForm, GeoSearch, RequestForm
-from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account, CheckArrivalForm
+from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account_form, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
     K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler
@@ -48,7 +48,6 @@ from deployment.tasks import subtract_inventory
 from deployment.views import team_location_details, request_dog_details, mass_populate
 from unitmanagement.forms import EmergencyLeaveForm
 from unitmanagement.tasks import check_leave_window
-
 
 # Create your views here.
 
@@ -457,6 +456,9 @@ def team_leader_dashboard(request):
 
                     handler.status = "Working"
                     handler.save()
+
+                    Notification.objects.create(position='Handler', user=handler, notif_type='handler_e_leave_return',
+                                                message=str(user.fullname) + ' has confirmed your return from emergency leave.')
                 except:
                     pass
 
@@ -733,7 +735,7 @@ def handler_dashboard(request):
             # print("Items List")
             # print(items_list)
 
-            pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+            pre_deployment_items = K9_Pre_Deployment_Items.objects.filter(k9=k9).last()
             initial_sched = pre_deployment_items.initial_sched
 
             delta = initial_sched.date_start - today.date()
@@ -824,6 +826,17 @@ def handler_dashboard(request):
                 user.save()
 
                 check_leave_window(True, user)
+
+                Notification.objects.create(position='Administrator', user=None, notif_type='admin_e_leave_request',
+                                            message=str(user.fullname) + ' went on an emergency leave.')
+
+                if current_port is not None:
+                    Notification.objects.create(position='Team Leader', user=current_port.team_leader, notif_type='TL_e_leave_request',
+                                            message=str(user.fullname) + ' went on an emergency leave.')
+                if current_request is not None:
+                    Notification.objects.create(position='Team Leader', user=current_request.team_leader, notif_type='TL_e_leave_request',
+                                                message=str(user.fullname) + ' went on an emergency leave.')
+
 
 
         k9_schedules = K9_Schedule.objects.filter(k9 = k9)
@@ -940,8 +953,6 @@ def vet_dashboard(request):
     # print('checkup', checkup_now,checkup_upcoming)
 
     #k9 to be scheduled for checkup
-
-
 
     #health pending
     h_c = K9_Incident.objects.filter(incident='Sick').filter(status='Pending').count()
@@ -1261,6 +1272,7 @@ def vet_dashboard(request):
         date_start__lt=datetime.today().date()).count()
 
     unfit_count = K9.objects.filter(fit=False).count()
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -1644,7 +1656,7 @@ def add_education(request):
             personal_info.save()
             '''style = "ui green message"
             messages.success(request, 'User has been successfully Added!')'''
-            form = add_User_form()
+
             return HttpResponseRedirect('add_user_account/')
 
         else:
@@ -1667,22 +1679,44 @@ def add_education(request):
     }
     return render(request, 'profiles/add_education.html', context)
 
-def add_account(request):
-    form = add_user_account(request.POST or None)
+
+def add_user_account(request):
+    form = add_user_account_form(request.POST or None)
+    form2 = UserCreationForm(request.POST or None)
     style = ""
 
     UserID = request.session["session_userid"]
-    data = User.objects.get(id = UserID)
+    data = User.objects.get(id=UserID)
 
     if request.method == 'POST':
         if form.is_valid():
             form = form.save(commit=False)
-            form.username = 'O-' + str(data.id)
-            form.first_name = data.firstname
-            form.last_name = data.lastname
+            form.UserID = data
+            form.serial_number = 'O-' + str(data.id)
             form.save()
 
-            return HttpResponseRedirect('../../../../user_list/')
+            AuthUser.objects.create_user(username=form.serial_number, email=form.email_address, password=form.password,
+                                         last_name=data.lastname, first_name=data.firstname)
+
+            return HttpResponseRedirect('../../../../user_add_confirmed/')
+
+        else:
+            style = "ui red message"
+            messages.warning(request, 'Invalid input data!')
+
+    # NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'Title': "Add Account Information for " + data.fullname,
+        'form': form,
+        'style': style,
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+    }
+    return render(request, 'profiles/add_user_account.html', context)
 
     #NOTIF SHOW
     notif_data = notif(request)

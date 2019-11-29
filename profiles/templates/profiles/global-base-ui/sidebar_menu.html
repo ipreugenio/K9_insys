@@ -19,12 +19,12 @@
             <a class="item" href="{% url 'profiles:profile'%}"><i class="user circle icon"></i>Profile</a>
             <a class="item" href="{% url 'planningandacquiring:K9_list'%}"><i class="clipboard list icon"></i>Planning and Acquiring</a>
             <a class="item" href="{% url 'inventory:medicine_inventory_list'%}"><i class="warehouse icon"></i>Inventory</a>
-            <a class="item" href="{% url 'profiles:user_list'%}"><i class="folder open icon"></i>Unit Management</a>
+            <a class="item" href="{% url 'unitmanagement:k9_sick_list'%}"><i class="folder open icon"></i>Unit Management</a>
             <a class="item" href="{% url 'training:adoption_list'%}"><i class="handshake icon"></i>Adoption</a>
 
             {% elif request.session.session_user_position == "Team Leader" %}
              <a class="item" href="{% url 'profiles:team_leader_dashboard'%}"><i class="chart line icon"></i>Homepage</a>
-            <a class="item" href="{% url 'profiles:user_list'%}"><i class="folder open icon"></i>Unit Management</a>
+            <a class="item" href="{% url 'unitmanagement:replenishment_form'%}"><i class="folder open icon"></i>Unit Management</a>
             
             {% elif request.session.session_user_position == "Handler"%}
             <a class="item" href="{% url 'profiles:handler_dashboard'%}"><i class="chart line icon"></i>Homepage</a>

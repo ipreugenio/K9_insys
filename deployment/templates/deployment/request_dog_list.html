@@ -12,7 +12,7 @@
     </h2>
 </div>
 
-{%if user.position == 'Operations'%}
+{%if user.position == 'Operations' or user.position == 'Administrator'%}
 <table class="ui small celled table" id="tabledata1">
         <thead>
             <th class="two wide">Start date</th>

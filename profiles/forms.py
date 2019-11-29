@@ -44,7 +44,7 @@ class add_education_form(forms.ModelForm):
         fields = ('primary_education', 'secondary_education', 'tertiary_education', 'pe_schoolyear', 'se_schoolyear',
                   'te_schoolyear', 'pe_degree', 'se_degree', 'te_degree')
 
-class add_user_account(UserCreationForm):
+class add_user_account_form(forms.ModelForm):
    
     class Meta:
         model = Account

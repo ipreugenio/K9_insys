@@ -127,11 +127,11 @@
             <td style="width:25%;" class="ui center aligned">
               {% if data_ontraining.training_count == 2%}
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
+              <!--<a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>-->
               {% else %}
 
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>
+              <!--<a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>-->
               {% endif %}
             </td>
         </tr>

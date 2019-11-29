@@ -241,7 +241,7 @@ def delete():
     notif_delete = Notification.objects.filter(datetime=datetime.today().date() - timedelta(days=60))
     notif_delete.delete()
 
-# @periodic_task(run_every=crontab(hour=6, minute=0))
+@periodic_task(run_every=crontab(hour=6, minute=0))
 def tri_monthly_checkup():
 
     k9s = K9.objects.all()
@@ -295,6 +295,9 @@ def check_leave_window(is_emergency = False, handler = None):
 
         Temporary_Handler.objects.create(k9 = k9, original = k9.handler, temp = TL, date_given = datetime.today().date())
 
+        Notification.objects.create(position='Team Leader', user=TL, notif_type='TL_handler_is_now_on_leave',
+                                    message=str(leave.handler.fullname) + ' is now on leave, ' + str(k9) + ' is temporarily under your care.')
+
         if is_emergency == False:
             handler.status = "On-Leave"
             handler.save()
@@ -332,14 +335,28 @@ def check_transfer():
     transfers = Request_Transfer.objects.filter(date_of_transfer = datetime.today().date()).filter(status = "Approved")
 
     for transfer in transfers:
-        ...
-        #TODO select units related to transfer
-        #TODO implement transfer
+        transfer.status = 'Done'
+        handler = transfer.handler
+
+        tdd = Team_Dog_Deployed.objects.exclude(team_assignment=None).filter(
+            date_pulled=None).last()
+        tdd.date_pulled = datetime.today().date()
+        tdd.save()
+
+        k9 = K9.objects.filter(handler = handler).last()
+        k9.assignment = str(transfer.location_to)
+
+        Team_Dog_Deployed.objects.create(team_assignment = transfer.location_to, handler = handler, k9 = k9, date_added = datetime.today().date())
+
+        k9.save()
+        transfer.save()
+
+        assign_TL(transfer.location_to)
 
 
     return None
 
-#@periodic_task(run_every=crontab(hour=12, minute=30))
+@periodic_task(run_every=crontab(hour=12, minute=30))
 def adjust_appointments():
     #1.) Get all checkups starting from 2 weeks in the past
     checkups = K9_Schedule.objects.filter(status="Checkup").exclude(
@@ -386,8 +403,6 @@ def adjust_appointments():
 #@periodic_task(run_every=crontab(hour=12, minute=30))
 def check_transfers():
 
-    #TODO unit confirmation after transfer
-
     today = datetime.today().date()
     transfers = Request_Transfer.objects.filter(date_of_transfer__lte = today).filter(status = "Approved")
     for transfer in transfers:
@@ -408,5 +423,15 @@ def check_transfers():
 
     return None
 
+#@periodic_task(run_every=crontab(hour=12, minute=30))
+def check_lapsed_emergency_leaves():
+    emergency_leaves = Emergency_Leave.objects.filter(status="Ongoing")
 
+    for leave in emergency_leaves:
+        delta = datetime.today().date() - leave.date_of_leave
+        if delta.days >= 3:
+            Notification.objects.create(position='Administrator', user=None, notif_type='admin_e_leave_lapsed',
+                                    message=str(leave.handler.fullname) + ' has not yet returned after ' + str(delta.days) + " days of emergency leave")
+
+    return None
 

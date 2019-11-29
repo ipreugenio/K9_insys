@@ -14,6 +14,21 @@
                         </a>
                 </div>
             </div>
+
+
+            {% elif request.session.session_user_position == "Commander" %}
+            <div class="three wide column">
+                <div class="ui pointing vertical menu">
+                    <a class="item"> <b>Deployment Menu</b></a>
+                    <a href="{% url 'deployment:assigned_location_list'%}" class="item">
+                            <i class="list alternate icon"></i>Team Location List
+                        </a>
+                    <a href="{% url 'deployment:request_dog_list'%}" class="item">
+                            <i class="clipboard list icon"></i>Request List
+                        </a>
+                </div>
+            </div>
+
             {% else %}
 
             <div class="three wide column">

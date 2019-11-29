@@ -247,7 +247,7 @@
   </ul>
 </div>
 
-  {% if data2.status == "Approved"%}
+  {% if data2.status == "Approved" and in_the_past == False %}
   <form class="ui form" method="POST">
     {% csrf_token %}
     <table id="tabledata3" class="ui nine column celled table">
@@ -298,20 +298,25 @@
         <button class = "ui button green" type="submit" onclick="return confirm('Are you sure?')">Schedule K9s</button>
     </div>
   </form>
-  {% elif data2.status == "Done" %}
-  <div class="ui visible message">
-      <div class="header">
-    This Request is already Finished.
-  </div>
-  <p>No further action can be taken. This information only serves as historical reference.</p>
-  </div>
-  {% else %}
-<div class="ui visible message">
-      <div class="header">
-    You must approve this request before you can deploy K9s!
-  </div>
-  <p>Go back to details tab to deny or approve request.</p>
-</div>
+
+             {% elif data2.status == "Done" or in_the_past == True %}
+
+          <div class="ui visible message">
+              <div class="header">
+            This Request is already Finished.
+          </div>
+          <p>No further action can be taken. This information only serves as historical reference.</p>
+          </div>
+
+        {% else %}
+
+        <div class="ui visible message">
+              <div class="header">
+            You must approve this request before you can deploy K9s!
+          </div>
+          <p>Go back to details tab to deny or approve request.</p>
+        </div>
+
     {% endif %}
 
 {% else %}

@@ -22,7 +22,7 @@ from datetime import date
 from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave
 from training.models import K9_Handler
 from planningandacquiring.models import K9
-from profiles.models import Personal_Info, User, Account
+from profiles.models import Personal_Info, User, Account, Education
 from inventory.models import Medicine, Miscellaneous, Food, Medicine_Inventory, Medicine_Received_Trail, Miscellaneous_Received_Trail, Food_Received_Trail
 
 from deployment.forms import AreaForm, LocationForm, AssignTeamForm, EditTeamForm, RequestForm, IncidentForm, GeoForm, MonthYearForm, GeoSearch, DateForm, DailyRefresherForm, ScheduleUnitsForm, DeploymentDateForm
@@ -33,6 +33,8 @@ from training.models import Training_Schedule, Training
 
 from pyproj import Proj, transform
 
+from faker import Faker
+import random
 
 #GeoDjango
 from math import sin, cos, radians, degrees, acos
@@ -295,6 +297,13 @@ def add_area(request):
     # for k9 in k9s:
     #     k9.save()
 
+    # users = User.objects.exclude(id = 1)
+    # for user in users:
+    #     print(user)
+    #     pi = Personal_Info.objects.get(UserID = user)
+    #     ed = Education.objects.get(UserID = user)
+    #     ac = Account.objects.get(UserID = user)
+
     form = AreaForm(request.POST or None)
     style = ""
     area = None
@@ -544,11 +553,12 @@ def team_location_details(request, id):
 
     user_deploy = []
     for h in handlers:
+       print(h)
        user_deploy.append(h.UserID)
 
     # #filter K9 where handler = person_info and k9 assignment = None
     can_deploy = K9.objects.filter(handler__in=user_deploy).filter(training_status='For-Deployment')
-    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed').filter(date_pulled = None)
+    dogs_deployed = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed').filter(date_pulled = None).exclude(k9__handler = None)
     dogs_pulled = Team_Dog_Deployed.objects.filter(team_assignment=data).exclude(date_pulled = None)#.filter(status='Pulled-Out')
 
     tl_dog = None
@@ -727,14 +737,15 @@ def request_dog_list(request):
 
     if user.position == "Commander":
         areas = Area.objects.filter(commander = user).last()
+        print(areas)
         data = data.filter(area=areas).filter(sector_type = "Small Event")
         print("A COMMANDER")
     else:
         data = data.filter(sector_type="Big Event")
         print("NOT A COMMANDER")
 
-    data1 = data.filter(status='Pending').exclude(start_date__lt = datetime.date.today())
-    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed')).exclude(end_date__lt = datetime.date.today())
+    data1 = data.filter(status='Pending').exclude(start_date__lte = datetime.date.today())
+    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed')).exclude(end_date = datetime.date.today())
     data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
 
     # latest_date = Dog_Request.objects.latest('end_date')
@@ -759,6 +770,12 @@ def request_dog_list(request):
 
 def request_dog_details(request, id):
     data2 = Dog_Request.objects.get(id=id)
+    in_the_past = False
+    if datetime.datetime.today().date() >= data2.start_date:
+        in_the_past = True
+
+    print("IN THE PAST")
+    print(in_the_past)
     '''data = Team_Assignment.objects.get(id=id)'''
     #k9 = Team_Dog_Deployed.objects.filter(team_requested=data2)
     style = ""
@@ -1069,7 +1086,8 @@ def request_dog_details(request, id):
         'ndd_deployed' : ndd_deployed,
         'edd_deployed' : edd_deployed,
 
-        'tl_dog' : tl_dog
+        'tl_dog' : tl_dog,
+        'in_the_past' : in_the_past
     }
 
     return render(request, 'deployment/request_dog_details.html', context)
