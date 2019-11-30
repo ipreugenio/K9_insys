@@ -108,7 +108,10 @@ urlpatterns = [
     path('received_food_date/received_food_report/', views.ajax_received_food_report, name='ajax_received_food_report'),
     
     path('on_leave_date/', views.on_leave_date, name='on_leave_date'),
-    path('on_leave_date/on_leave_report/', views.ajax_on_leave_report, name='ajax_on_leave_report')
+    path('on_leave_date/on_leave_report/', views.ajax_on_leave_report, name='ajax_on_leave_report'),
+    
+    path('demand_supply_date/', views.demand_supply_date, name='demand_supply_date'),
+    path('demand_supply_date/demand_supply_report/', views.ajax_demand_supply_report, name='ajax_demand_supply_report'),
 
 ];
 

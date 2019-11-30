@@ -58,6 +58,8 @@ class Training(models.Model):
         average = round(average, 1)
         self.grade = average
 
+        if date_finished != None:
+            stage = 'Finished Training'
         super(Training, self).save(*args, **kwargs)
 
 class Training_History(models.Model):
@@ -91,7 +93,10 @@ class K9_Adopted_Owner(models.Model):
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
     date_adopted = models.DateField('date_adopted', auto_now_add=True)
-
+    date_returned = models.DateField('date_returned', blank=True, null=True)
+    reason = models.TextField('remarks', max_length=500, blank=True, null=True)
+    file_adopt = models.FileField(upload_to='adoption_papers', blank=True, null=True)
+    
     def calculate_age(self):
         today = d.today()
         birthdate = self.birth_date

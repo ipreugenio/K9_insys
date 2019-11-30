@@ -14,14 +14,20 @@
         <br>Area of Responsibility Summary Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
     
-    <table class="ui small celled five column table">
+    <table class="ui small celled structured seven column table">
         <thead class="center aligned">
+          <tr> 
+              <th rowspan="2">Area</th>
+              <th rowspan="2">Commander</th>
+              <th colspan="2">K9 Request</th>
+              <th colspan="3">Incidents</th>
+          </tr>
           <tr>
-              <th>Area</th>
-              <th>Commander</th>
-              <th>Maritime Traffic</th>
-              <th>Incident Count</th>
-              <th>K9 Request</th>
+              <th class="one wide">Big Event</th>
+              <th class="one wide">Small Event</th>
+              <th class="one wide">Explosive</th>
+              <th class="one wide">Narcotics</th>
+              <th class="one wide">Search and Rescue</th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +38,8 @@
                 <td>{{data.1|intcomma}}</td>
                 <td>{{data.2|intcomma}}</td>
                 <td>{{data.3|intcomma}}</td>
+                <td>{{data.4|intcomma}}</td>
+                <td>{{data.5|intcomma}}</td>
             </tr>            
             {%endfor%}
         </tbody>

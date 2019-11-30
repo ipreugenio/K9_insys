@@ -1120,24 +1120,38 @@ def generate_maritime():
 #TODO Assign  a number of k9s to ports
 #TODO assign a number of k9s to events(take into account the restrictions)
 
-
 def generate_dogbreed():
    
     arr = ['Belgian Malinois','Dutch Sheperd','German Sheperd','Golden Retriever','Jack Russel','Labrador Retriever']
 
     temperament_list = ['Friendly', 'Skittish', 'Timid', 'Wild', 'Adventurous']
+    skill_list = ['EDD','NDD','SAR']
 
     for data in arr:
         randomizer = random.randint(0, 4)
+        randomizer2 = random.randint(0, 2)
         temperament = temperament_list[randomizer]
+        skill = skill_list[randomizer2]
 
-        Dog_Breed.objects.create(breed=data,sex='Male',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=15000)
+        random_val1 = random.randint(10000, 15000)
+        random_val2 = random.randint(15000, 20000)
+        litter_val = random.randint(4, 8)
+        
+        arr1 = ['EDD','NDD','SAR']
+        arr2 = []
+       
+        while len(arr1) !=  0:
+            randomizer2 = random.randint(0, 2)
+            skill1 = skill_list[randomizer2]
+            if skill1 in arr1:
+                arr1.remove(skill1)
+                arr2.append(skill1)
+                
+        print('ARRAY',arr2)
 
-    for data2 in arr:
-        randomizer = random.randint(0, 4)
-        temperament = temperament_list[randomizer]
+        Dog_Breed.objects.create(breed=data,sex='Male',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation=arr2[0],skill_recommendation2=arr2[1],skill_recommendation3=arr2[2],litter_number=litter_val,value=random_val1)
 
-        Dog_Breed.objects.create(breed=data2,sex='Female',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation='NDD',skill_recommendation2='EDD',skill_recommendation3='SAR',litter_number=7,value=17000)
+        Dog_Breed.objects.create(breed=data,sex='Female',life_span=10,temperament=temperament,colors=generate_skin_color(), weight=20,male_height=10,female_height=10,skill_recommendation=arr2[0],skill_recommendation2=arr2[1],skill_recommendation3=arr2[2],litter_number=litter_val,value=random_val2)
 
     return None
 

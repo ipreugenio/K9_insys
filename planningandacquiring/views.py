@@ -1683,7 +1683,7 @@ def ajax_training_report(request):
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
-        t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('grade')
+        t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('k9')
         
         print(t)
         for t in t:
@@ -1928,6 +1928,7 @@ def aor_summary_date(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+    
     context = {
         'notif_data': notif_data,
         'count': count,
@@ -1947,37 +1948,42 @@ def ajax_aor_summary_report(request):
         from_date = request.GET.get('date_from')
         area_val = []
 
-        dr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).values('area').distinct().order_by('area')
+        dr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).values('area').distinct().order_by('area__name')
         
         for data in dr:
             for key, value in data.items():
                 if key == 'area':
                     area_val.append(value)
 
-        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
 
         for data in inc:
             for key, value in data.items():
                 if key == 'location__area':
                     area_val.append(value)
 
-        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+        # mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
 
-        for data in mar:
-            for key, value in data.items():
-                if key == 'location__area':
-                    area_val.append(value)
+        # for data in mar:
+        #     for key, value in data.items():
+        #         if key == 'location__area':
+        #             area_val.append(value)
 
-        area_val= np.unique(area_val)
+        area_val= pd.unique(area_val)
+        print(area_val)
         for id_area in area_val:
             a = Area.objects.get(id=id_area)
-            b = Maritime.objects.filter(location__area=a).filter(datetime__range=[from_date, to_date]).aggregate(avg=Avg('passenger_count'))['avg']
-            c = Incidents.objects.filter(location__area=a).filter(date__range=[from_date, to_date]).count()
-            d = Dog_Request.objects.filter(area=a).filter(start_date__range=[from_date, to_date]).count()
+            # b = Maritime.objects.filter(location__area=a).filter(datetime__range=[from_date, to_date]).aggregate(avg=Avg('passenger_count'))['avg']
+            edd = Incidents.objects.filter(location__area=a).filter(date__range=[from_date, to_date]).filter(type='Explosives Related').count()
+            ndd = Incidents.objects.filter(location__area=a).filter(date__range=[from_date, to_date]).filter(type='Narcotics Related').count()
+            sar = Incidents.objects.filter(location__area=a).filter(date__range=[from_date, to_date]).filter(type='Search and Rescue Related').count()
+            big = Dog_Request.objects.filter(area=a).filter(start_date__range=[from_date, to_date]).filter(sector_type='Big Event').count()
+            small = Dog_Request.objects.filter(area=a).filter(start_date__range=[from_date, to_date]).filter(sector_type='Small Event').count()
             
-            if b == None:
-                b = 0
-            x = [a,b,c,d]
+            # if b == None:
+            #     b = 0
+            print('1 AREA', ndd)
+            x = [a,big,small,edd,ndd,sar]
             data_arr.append(x)
 
         print(data_arr)
@@ -2022,41 +2028,42 @@ def ajax_port_report(request):
         area_val = []
         arr_val = []
 
-        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
-
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
+        
         for data in inc:
             for key, value in data.items():
                 if key == 'location__area':
                     area_val.append(value)
 
-        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area')
+        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
 
         for data in mar:
             for key, value in data.items():
                 if key == 'location__area':
                     area_val.append(value)
 
-        area_val= np.unique(area_val)
+        area_val= pd.unique(area_val)
         # print(area_val)
-
+        print('AREA', area_val)
         for id_area in area_val:
             a = Area.objects.get(id=id_area)
             area_arr.append(a)
-            l= Location.objects.filter(area=a).values_list('id', flat=True)
+            l= Location.objects.filter(area=a).order_by('place').values_list('id', flat=True)
             l = list(l)
-            # print('LOCATION',l)
+            
             arr = []
-            b = Maritime.objects.filter(location__in=l).filter(datetime__range=[from_date, to_date])
+            b = Maritime.objects.filter(location__in=l).filter(datetime__range=[from_date, to_date]).order_by('location__place')
             # print('MARITIME LOC', b)
             for b in b:
                 arr.append(b.location.id)
             
-            c = Incidents.objects.filter(location__in=l).filter(date__range=[from_date, to_date])
+            c = Incidents.objects.filter(location__in=l).filter(date__range=[from_date, to_date]).order_by('location__place')
             for c in c:
-                arr.append(c.location.id)            
+                arr.append(c.location.id) 
 
-            arr = np.unique(arr)
-            # print('ARR',arr)
+            arr = pd.unique(arr)
+            print('Location',l)
+            print('ARR',arr)
             for data in arr:
                 l = Location.objects.get(id=data)
                 m = Maritime.objects.filter(datetime__range=[from_date, to_date]).filter(location=l).aggregate(avg=Avg('passenger_count'))['avg']
@@ -2066,9 +2073,11 @@ def ajax_port_report(request):
                 oth = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Others').count()
 
                 ta = Team_Assignment.objects.filter(location=l).last()
+                #Maritime
                 if m == None:
                     m=0
-                
+
+                #Team Assignment and Team Leader
                 if ta == None:
                     ta_team = "Not Assigned"
                     ta_leader = "Not Assigned"
@@ -2081,12 +2090,18 @@ def ajax_port_report(request):
                 if ta_leader == None:
                     ta_leader = "Not Assigned"
 
-                    
-                x = [l,ta_team,ta_leader,m,edd,ndd,sar,oth,edd+ndd+sar+oth]
-                print('TEST',x)
+                edd_dep = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_added__range=[from_date, to_date]).filter(k9__capability='EDD').count()
+
+                ndd_dep = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_added__range=[from_date, to_date]).filter(k9__capability='NDD').count()
+
+                sar_dep = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(date_added__range=[from_date, to_date]).filter(k9__capability='SAR').count()
+
+
+                x = [l,ta_team,int(np.ceil(m)),edd,ndd,sar,oth,edd_dep,ndd_dep,sar_dep]
+                print('TEST', x)
                 data_arr.append(x)
 
-        print('Area', area_arr)
+        # print('Area', area_arr)
         print('DATA',data_arr)
     
     except:
@@ -2683,9 +2698,7 @@ def on_leave_date(request):
     }
 
     return render(request, 'planningandacquiring/on_leave_date.html', context)
-    
-#TODO
-# how to get duration
+
 def ajax_on_leave_report(request):
     data_arr = []
     to_date = None
@@ -2714,15 +2727,7 @@ def ajax_on_leave_report(request):
         for data in val_arr:
             handler = User.objects.get(id=data)
             print(handler)
-            # try:
-            #     hll = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
-            # except:
-            #     hll = 0
-            #
-            # try:
-            #     ell = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
-            # except:
-            #     ell = 0
+         
             hll = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
             ell = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
             if ell == None:
@@ -2736,7 +2741,6 @@ def ajax_on_leave_report(request):
 
         print(data_arr)
     except:
-        # print(request.GET.get('date_from'))
         print('EXCEPT')
 
     user = user_session(request)
@@ -2748,6 +2752,72 @@ def ajax_on_leave_report(request):
     }
 
     return render(request, 'planningandacquiring/on_leave_report.html', context)
+
+def demand_supply_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/demand_supply_date.html', context)
+    
+def ajax_demand_supply_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        edd = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('EDD_demand'))['sum']
+        ndd = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('NDD_demand'))['sum']
+        sar = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('SAR_demand'))['sum']
+
+        edd_train = Training.objects.filter(date_finished__range=[from_date, to_date]).filter(k9__trained='Trained').filter(k9__capability='EDD').exclude(Q(k9__status='Material Dog') | Q(k9__status='Adopted') | Q(k9__status='Retired') | Q(k9__status='Dead') | Q(k9__status='Stolen') | Q(k9__status='Lost')).count()
+
+        ndd_train = Training.objects.filter(date_finished__range=[from_date, to_date]).filter(k9__trained='Trained').filter(k9__capability='NDD').exclude(Q(k9__status='Material Dog') | Q(k9__status='Adopted') | Q(k9__status='Retired') | Q(k9__status='Dead') | Q(k9__status='Stolen') | Q(k9__status='Lost')).count()
+
+        sar_train = Training.objects.filter(date_finished__range=[from_date, to_date]).filter(k9__trained='Trained').filter(k9__capability='SAR').exclude(Q(k9__status='Material Dog') | Q(k9__status='Adopted') | Q(k9__status='Retired') | Q(k9__status='Dead') | Q(k9__status='Stolen') | Q(k9__status='Lost')).count()
+        
+        dif_edd = edd_train - edd
+        dif_ndd = ndd_train - ndd
+        dif_sar = sar_train - sar
+
+        total_demand = edd + ndd + sar
+        total_supply = edd_train + ndd_train + sar_train
+        total_dif = total_supply - total_demand
+
+    except:
+        pass
+    user = user_session(request)
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+        'user': user,
+        'edd': edd,
+        'ndd': ndd,
+        'sar': sar,
+        'edd_train': edd_train,
+        'ndd_train': ndd_train,
+        'sar_train': sar_train,
+        'dif_edd': dif_edd,
+        'dif_ndd': dif_ndd,
+        'dif_sar': dif_sar,
+        'total_demand': total_demand,
+        'total_supply': total_supply,
+        'total_dif': total_dif,
+    }
+
+    return render(request, 'planningandacquiring/demand_supply_report.html', context)
 ################# END OF REPORT ##################
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):
