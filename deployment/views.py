@@ -1970,6 +1970,7 @@ def schedule_units(request):
                 messages.warning(request, 'Dates should have atleast 1 week allowance on Row ' + msg)
 
             idx = 0
+            k9_count = 0
             for form in formset:
                 if form.is_valid and invalid == False:
                     # try:
@@ -1990,34 +1991,39 @@ def schedule_units(request):
                             deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
                             deploy.save()
 
-                            phex = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Checkup", date_start = deployment_date - timedelta(days=7))
-                            phex.save()
+                            # phex = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Checkup", date_start = deployment_date - timedelta(days=7))
+                            # phex.save()
 
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()
 
+                            k9_count += 1
+
                 idx += 1
 
-            #TODO Check how many k9s are scheduled on x date then adjust automatically based on vet appointment restrictions
-            current_phex = K9_Schedule.objects.filter(status="Checkup").filter(date_start__gt = datetime.datetime.today()).order_by('date_start')
+            Notification.objects.create(position='Veterinarian', user=None, notif_type='vet_dep_phex_new',
+                                        message='There are ' + str(k9_count) + ' new k9s needed to be scheduled for physical exam.')
 
-            ctr = 0
-            date_index = datetime.datetime.today() + timedelta(days=1)
-            for item in current_phex:
-                if ctr < 10:
-                    item.date_start = date_index
-                    item.save()
-                    ctr += 1
-                else:
-                    date_index += timedelta(days=1)
-                    item.date_start = date_index
-                    item.save()
-                    ctr = 0
+            #TODO Check how many k9s are scheduled on x date then adjust automatically based on vet appointment restrictions
+            # current_phex = K9_Schedule.objects.filter(status="Checkup").filter(date_start__gt = datetime.datetime.today()).order_by('date_start')
+            #
+            # ctr = 0
+            # date_index = datetime.datetime.today() + timedelta(days=1)
+            # for item in current_phex:
+            #     if ctr < 10:
+            #         item.date_start = date_index
+            #         item.save()
+            #         ctr += 1
+            #     else:
+            #         date_index += timedelta(days=1)
+            #         item.date_start = date_index
+            #         item.save()
+            #         ctr = 0
 
 
             if invalid == False:
                 style = "ui green message"
-                messages.success(request, 'Units have been successfully scheduled for deployment!')
+                # messages.success(request, 'Units have been successfully scheduled for deployment!')
                 return redirect('profiles:dashboard')
 
     df_is_empty = False

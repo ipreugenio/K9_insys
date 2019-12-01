@@ -188,6 +188,10 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('profiles:team_leader_dashboard')
+    elif notif.notif_type == 'vet_dep_phex_new':
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:k9_checkup_pending')
 
 
 def index(request):
@@ -4088,7 +4092,7 @@ def k9_checkup_list_today(request):
     deployment_list = []
     for sched in checkups:
         k9_list.append(sched.k9)
-        deployment = K9_Schedule.objects.filter(status = "Initial Deployment").filter(k9 = sched.k9).exclude(date_start__lt=datetime.today().date()).first()
+        deployment = K9_Schedule.objects.filter(status = "Initial Deployment").filter(k9 = sched.k9).exclude(date_start__lt=datetime.today().date()).last()
         deployment_list.append(deployment.date_start)
 
     k9_exclude_list = [] #Does not need to be checkuped

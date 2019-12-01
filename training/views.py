@@ -1030,7 +1030,7 @@ def training_update_form(request, id):
                 if stage1_1 == '0':
                     data.training_status = "For-Adoption"
                     data.save()
-                    training.stage == "Stage 0 - Failed"
+                    training.stage = "Stage 0 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1060,7 +1060,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 1.1 - Failed"
+                    training.stage = "Stage 1.1 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1087,7 +1087,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 1.2 - Failed"
+                    training.stage = "Stage 1.2 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1114,7 +1114,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 1.3 - Failed"
+                    training.stage = "Stage 1.3 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1139,7 +1139,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 2.1 - Failed"
+                    training.stage = "Stage 2.1 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1164,7 +1164,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 2.2 - Failed"
+                    training.stage = "Stage 2.2 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1187,7 +1187,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 2.3 - Failed"
+                    training.stage = "Stage 2.3 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1212,7 +1212,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 3.1 - Failed"
+                    training.stage = "Stage 3.1 - Failed"
                     training.save()
 
                     style = "ui blue message"
@@ -1237,7 +1237,7 @@ def training_update_form(request, id):
                     data.training_status = "For-Adoption"
                     data.save()
 
-                    training.stage == "Stage 3.2 - Failed"
+                    training.stage = "Stage 3.2 - Failed"
                     training.save()
 
                     style = "ui blue message"
