@@ -198,7 +198,7 @@ class Team_Assignment(models.Model):
     date_added = models.DateField('date_added', auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return str(self.team) + ' - ' + str(self.location)
+        return str(self.team)
 
     def generate_team_name(self):
         team_name = ""

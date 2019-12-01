@@ -657,7 +657,7 @@ def check_pre_deployment_items(user):
 #Handler confirms items and will be part of the team officially deployed
 def confirm_pre_deployment_items(request, k9):
 
-    pre_deployment_items = K9_Pre_Deployment_Items.objects.get(k9=k9)
+    pre_deployment_items = K9_Pre_Deployment_Items.objects.filter(k9=k9).last()
     pre_deployment_items.status = "Confirmed"
     pre_deployment_items.save()
 

@@ -89,6 +89,7 @@ class PhysicalExamForm(forms.ModelForm):
         self.fields['cage_number'].required = False
         self.fields['remarks'].required = False
         self.fields['date_next_exam'].required = False
+        self.fields['cleared'].required = False
         # a = K9.objects.filter(id=request.session['phex_k9_id'])
         # self.fields['dog'].initial = a
 
