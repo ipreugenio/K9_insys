@@ -112,6 +112,11 @@ urlpatterns = [
     
     path('demand_supply_date/', views.demand_supply_date, name='demand_supply_date'),
     path('demand_supply_date/demand_supply_report/', views.ajax_demand_supply_report, name='ajax_demand_supply_report'),
-
+    
+    path('supplier_date/', views.supplier_date, name='supplier_date'),
+    path('supplier_date/supplier_report/', views.ajax_supplier_report, name='ajax_supplier_report'),
+    
+    path('adoption_date/', views.adoption_date, name='adoption_date'),
+    path('adoption_date/adoption_report/', views.ajax_adoption_report, name='ajax_adoption_report'),
 ];
 

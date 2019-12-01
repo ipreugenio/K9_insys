@@ -2818,6 +2818,83 @@ def ajax_demand_supply_report(request):
     }
 
     return render(request, 'planningandacquiring/demand_supply_report.html', context)
+
+def supplier_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/supplier_date.html', context)
+    
+def ajax_supplier_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        #SUPPLIER
+
+    except:
+        pass
+    user = user_session(request)
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/supplier_report.html', context)
+
+def adoption_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/adoption_date.html', context)
+    
+def ajax_adoption_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        #SUPPLIER
+
+    except:
+        pass
+    user = user_session(request)
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/adoption_report.html', context)
+
 ################# END OF REPORT ##################
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):
