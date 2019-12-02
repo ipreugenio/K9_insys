@@ -65,13 +65,32 @@
         </thead>
     </table>
 </div>
-<center>
-    <a class="ui primary button" href="{% url 'training:k9_returned' data.k9.id %}">Returned</a>
-</center>
+<div id = 'showthis'>
+    <div class="ui inverted segment">
+        <form class="ui inverted form" method="POST" action="{% url 'training:k9_returned' data.k9.id %}">
+            {% csrf_token %}
+            <div class="field">
+                <label>Reason</label>
+                <textarea placeholder="Reason" rows="4" cols="50" name='reason'></textarea>
+            </div>
+        
+            <button type="submit" class="ui green button">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="actions">
+    <center>
+        <a class="ui primary button r_btn">Returned</a>
+    </center>
+</div>
+
 <script type="text/javascript">
 
-    $(document).ready(function() {
-
+    $('#showthis').hide();
+    $( ".r_btn" ).bind('click', function() {
+        $('#showthis').show();   
+        $('.r_btn').hide();
     });
 
 </script>

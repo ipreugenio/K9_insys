@@ -122,7 +122,8 @@ def confirm_adoption(request, id):
 
 def adoption_list(request):
     for_adoption = K9.objects.filter(training_status='For-Adoption')
-    adopted = K9.objects.filter(training_status='Adopted')
+    adopted = K9_Adopted_Owner.objects.filter(k9__training_status='Adopted').filter(date_returned=None)
+    
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -139,8 +140,7 @@ def adoption_list(request):
     return render (request, 'training/for_adoption_list.html', context)
 
 def adoption_details(request, id):
-    k9 = K9.objects.get(id=id)
-    data = K9_Adopted_Owner.objects.filter(k9=k9).last()
+    data = K9_Adopted_Owner.objects.filter(id=id).last()
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -154,11 +154,35 @@ def adoption_details(request, id):
     }
     return render (request, 'training/adoption_details.html', context)
 
+def load_adoption(request):
+    data = None
+    try:
+        id = request.GET.get('id')
+        data = K9_Adopted_Owner.objects.filter(k9__id=id).latest('date_adopted')
+    except:
+        pass
+
+    context = {
+        'data': data,
+    }
+
+    return render(request, 'training/adoption_data.html', context)
+
 def k9_returned(request, id):
+    reason = request.POST.get('reason')
     k9 = K9.objects.get(id=id)
     k9.training_status='For-Adoption'
-    k9.save()
+
+    owner = K9_Adopted_Owner.objects.filter(k9=k9).latest('date_adopted')
+    owner.date_returned = datetime.datetime.now()
+    owner.reason = reason
     
+    owner.save()
+    k9.save()
+
+    style = "ui yellow message"
+    messages.success(request, str(k9.name) + ' has been returned by ' + str(owner))
+        
     return redirect('training:adoption_list')
 
 

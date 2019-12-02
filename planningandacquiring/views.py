@@ -34,6 +34,8 @@ from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtra
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
 import dateutil.parser
+
+from training.models import K9_Adopted_Owner
 #from faker import Faker
 
 #statistical imports
@@ -247,7 +249,7 @@ def add_procured_k9(request):
                     height = cd.get('height')
                     weight = cd.get('weight')
 
-                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, breed=breed,height=height,weight=weight,image=image)
+                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, breed=breed,height=height,weight=weight,image=image, supplier=supplier)
                     
                     VaccineUsed.objects.create(k9=k9,disease='DHPPiL4',date_vaccinated=dhpp,done=True)
                     
@@ -2818,6 +2820,129 @@ def ajax_demand_supply_report(request):
     }
 
     return render(request, 'planningandacquiring/demand_supply_report.html', context)
+
+def supplier_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/supplier_date.html', context)
+    
+def ajax_supplier_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        #SUPPLIER
+        sup = K9.objects.filter(date_created__range=[from_date, to_date]).values('supplier').distinct().order_by('supplier__name')
+        
+        val_arr =[]
+        for sup in sup:
+            for key,value in sup.items():
+                print(key, value)
+                if key == 'supplier':        
+                    val_arr.append(value)
+
+        val_arr =  pd.unique(val_arr)
+
+        for val in val_arr:
+            supplier = K9_Supplier.objects.get(id=val)
+
+            breed = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).values('breed').distinct().order_by('breed')
+            
+            arr1 =[]
+            for breed in breed:
+                for key,value in breed.items():
+                    if key == 'breed':
+                        arr1.append(value)
+
+            arr1 = pd.unique(arr1)
+            print('ARR1',arr1)
+
+            arr2 = []
+
+            for arr in arr1:
+                trained = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained='Trained').count()
+
+                failed = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained='Failed').count()
+
+                on_training = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained=None).count()
+                
+                total = trained + failed + on_training    
+                a = [arr,trained,failed,on_training,total,supplier]
+                arr2.append(a)
+
+            print('ARR2',arr2)
+            first = arr2[0]
+            arr2.remove(arr2[0])
+            print('FIRST',first)
+            x = (supplier, arr2, len(arr1),first)
+            data_arr.append(x)
+
+        print('DATA ARR', data_arr)
+    except:
+        pass
+    user = user_session(request)
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/supplier_report.html', context)
+
+def adoption_date(request):
+    form = ReportDateForm(request.POST or None)
+
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'notif_data': notif_data,
+        'count': count,
+        'user': user,
+        'form': form,
+    }
+
+    return render(request, 'planningandacquiring/adoption_date.html', context)
+    
+def ajax_adoption_report(request):
+    data_arr = []
+    to_date = None
+    from_date = None
+  
+    try:
+        to_date = request.GET.get('date_to')
+        from_date = request.GET.get('date_from')
+
+        data_arr = K9_Adopted_Owner.objects.filter(date_adopted__range=[from_date, to_date]).order_by('date_adopted')
+        print(data_arr)
+        
+    except:
+        pass
+    user = user_session(request)
+    context = {
+        'data':data_arr,
+        'from_date':from_date,
+        'to_date':to_date,
+        'user': user,
+    }
+
+    return render(request, 'planningandacquiring/adoption_report.html', context)
+
 ################# END OF REPORT ##################
 ###################################### AJAX LOAD FUNCTIONS ##################################################
 def load_supplier(request):

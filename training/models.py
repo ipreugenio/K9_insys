@@ -58,7 +58,7 @@ class Training(models.Model):
         average = round(average, 1)
         self.grade = average
 
-        if date_finished != None:
+        if self.date_finished:
             stage = 'Finished Training'
         super(Training, self).save(*args, **kwargs)
 

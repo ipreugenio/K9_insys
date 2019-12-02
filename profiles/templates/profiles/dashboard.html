@@ -42,6 +42,36 @@
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
                                     <div class="value">
+                                        <i class="compass blue icon">{{dept_count}}</i>
+                                    </div>
+                                    <div class="label">
+                                            <a href="{% url 'deployment:schedule_units' %}">K9's
+                                            FOR INITIAL DEPLOYMENT</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="exclamation paw teal icon">{{ab_k9}}</i>
+                                    </div>
+                                    <div class="label">
+                                            <a href="{% url 'planningandacquiring:add_procured_k9'%} ">K9 ACQUISITION COUNTDOWN</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+
+                <div class="sixteen wide column">
+                    <div class="ui equal width height grid">
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="ui small statistic">
+                                    <div class="value">
                                         <i class="question black icon"></i>
                                         <i class="paw black icon"></i>
                                         <i class="black icon">{{up_count}}</i>
@@ -53,7 +83,40 @@
                                 </div>
                             </div>
                         </div>
-                
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="tasks orange icon">{{pre_req_count}}</i>
+                                    </div>
+                                    <div class="label">
+                                        <strong>
+                                            <a href="{% url
+                                            'deployment:pre_req_unconfirmed'%}">K9
+                                            INCIDENT</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="ui raised center aligned segment">
+                                 <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="shopping basket olive icon"></i>
+                                        <i class="olive icon">{{item_req_count}}</i>
+                                    </div>
+                                    <div class="label">
+
+                                            <a href="{% url
+                                            'unitmanagement:replenishment_confirm'
+                                            %}">HANDLER INCIDENT</a>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div> 
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
@@ -67,24 +130,11 @@
                                 </div>
                             </div>
                         </div>  
-                    </div>
+                    </div>       
                 </div>
 
                 <div class="sixteen wide column">
                     <div class="ui equal width height grid">
-                        <div class="column">
-                            <div class="ui raised center aligned segment">
-                                <div class="ui small statistic">
-                                    <div class="value">
-                                        <i class="compass blue icon">{{dept_count}}</i>
-                                    </div>
-                                    <div class="label">
-                                            <a href="{% url 'deployment:schedule_units' %}">K9's
-                                            FOR INITIAL DEPLOYMENT</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
@@ -101,7 +151,7 @@
                         </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                                 <div class="ui small statistic">
+                                    <div class="ui small statistic">
                                     <div class="value">
                                         <i class="shopping basket olive icon"></i>
                                         <i class="olive icon">{{item_req_count}}</i>
@@ -115,19 +165,7 @@
 
                             </div>
                         </div> 
-                        <div class="column">
-                                <div class="ui raised center aligned segment">
-                                    <div class="ui small statistic">
-                                        <div class="value">
-                                            <i class="exclamation paw teal icon">{{ab_k9}}</i>
-                                        </div>
-                                        <div class="label">
-                                                <a href="{% url 'planningandacquiring:add_procured_k9'%} ">K9 ACQUISITION COUNTDOWN</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> 
-                    </div>       
+                    </div>
                 </div>
                
                 <div class="sixteen wide column">

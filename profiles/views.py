@@ -747,21 +747,23 @@ def handler_dashboard(request):
         # TODO try except for when k9s still don't have a skill
         # TODO try except when k9 has finished training
 
+        try:
+            training = Training.objects.get(k9=k9, training=k9.capability)
+            if training.stage != "Finished Training":
+                # print("TRAINING STAGE")
+                # print(training.stage)
+                training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
 
-        training = Training.objects.get(k9=k9, training=k9.capability)
-        if training.stage != "Finished Training":
-            # print("TRAINING STAGE")
-            # print(training.stage)
-            training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
+                # print("Training Sched")
+                # print(training_sched.date_start)
+                # print(training_sched.date_end)
 
-            # print("Training Sched")
-            # print(training_sched.date_start)
-            # print(training_sched.date_end)
-
-        # print("ALL CLEAR")
-        # print(all_clear)
-        # print("REVEAL ITEMS")
-        # print(reveal_items)
+            # print("ALL CLEAR")
+            # print(all_clear)
+            # print("REVEAL ITEMS")
+            # print(reveal_items)
+        except:
+            pass
 
         drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
 
@@ -1503,7 +1505,19 @@ def profile(request):
     return render (request, 'profiles/profile.html', context)
 
 def register(request):
-    mass_populate()
+    # mass_populate()
+
+    #MAKE USER
+    # for i in range(5):
+    #     #user,account, education, personal info
+    #     user = User.objects.create(position='Handler',rank='MCPO',firstname='Ron'+str(i),lastname='Last'+str(i),middlename='N'+str(i),birthdate=date.today(),gender='Male',civilstatus='Single', citizenship='FILIPINO' ,religion='Roman Catholic', bloodtype='A', status='Working', partnered=True)
+        
+    #     #k9
+    #     k9 = K9.objects.create(name='Lola'+str(i), handler=user, breed='Jack Russel',sex='Female',color='Cream', birth_date=date.today(),source='Procurement',status='Working Dog',training_status='For-Deployment',height=20,weight=20)
+
+    #     print(user, k9)
+        
+    #MAKE K9
     return render (request, 'profiles/register.html')
 
 def home(request):
@@ -1693,10 +1707,9 @@ def add_user_account(request):
             form = form.save(commit=False)
             form.UserID = data
             form.serial_number = 'O-' + str(data.id)
-            form.save()
+            # form.save()
 
-            AuthUser.objects.create_user(username=form.serial_number, email=form.email_address, password=form.password,
-                                         last_name=data.lastname, first_name=data.firstname)
+            AuthUser.objects.create_user(username=form.serial_number, email=form.email_address, password=form.password,last_name=data.lastname, first_name=data.firstname)
 
             return HttpResponseRedirect('../../../../user_add_confirmed/')
 
