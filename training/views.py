@@ -790,6 +790,7 @@ def classify_k9_select(request, id):
             'style': style,
             'recommended': recommended,
             'tree': tree,
+            'genes': genes,
             'edd': edd,
             'ndd': ndd,
             'sar': sar,
@@ -841,7 +842,8 @@ def classify_k9_select(request, id):
 
             'NDD_difference': NDD_difference,
             'EDD_difference': EDD_difference,
-            'SAR_difference': SAR_difference
+            'SAR_difference': SAR_difference,
+
         }
     else:
         parent_exist = 1
@@ -853,6 +855,7 @@ def classify_k9_select(request, id):
             'style': style,
             'recommended': recommended,
             'tree': tree,
+            'genes' : genes,
             'edd': edd,
             'ndd': ndd,
             'sar': sar,
@@ -904,7 +907,8 @@ def classify_k9_select(request, id):
 
             'NDD_difference' : NDD_difference ,
             'EDD_difference' :  EDD_difference,
-            'SAR_difference' : SAR_difference
+            'SAR_difference' : SAR_difference,
+
         }
 
     return render (request, 'training/classify_k9_select.html', context)

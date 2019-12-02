@@ -73,7 +73,7 @@
         <thead class="center aligned">
             <tr>
                 <th>Select</th>
-                <th ><a data-tooltip="View K9 ancestral data" href="{% url 'training:genealogy' data.id %}">Most Recurring Skill Among Ancestors</a></th>
+                <th ><a data-tooltip="View K9 ancestral data" class ="ui button" id = "gene_btn">Most Recurring Skill Among Ancestors</a></th>
                 <th>Highest Training Grade Average Among Trained K9s of the Same Breed</th>
                 <th><a  data-tooltip="View {{select_trait.breed}} Traits" class ="ui button" id = "trait" >Recommended Skill Based on K9 Breed and Traits</a></th>
 
@@ -233,7 +233,6 @@
 </center>
 
 
-
           <button class="ui green button" type="Submit">Assign Skill</button>
   </div>
 </form>
@@ -241,7 +240,7 @@
 
 
 
-<div class="ui modal">
+<div class="ui modal" id="breed">
   <i class="close icon"></i>
   <div class="header">
     {{select_trait.breed}} Details
@@ -297,18 +296,62 @@
             </thead>
     </table>
 
-
-
 </div>
 
 
 
+<div class="ui modal" id = "gene_mod">
+  <i class="close icon"></i>
+  <div class="header">
+    Ancestors of {{data.name}}
+  </div>
+
+    <div class= " ui segment">
+<table id="tabledata1" class="ui six column celled table">
+    <thead>
+    <tr>
+        <th>K9</th>
+        <th>Mother</th>
+        <th>Skill (Mother)</th>
+        <th>Father</th>
+        <th>Skill (Father)</th>
+        <th>Generation (Inverted)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for k9 in genes %}
+    <tr>
+    <td>{{k9.o}}</td>
+    <td>{{k9.m}}</td>
+        <td>{{k9.m.capability}}</td>
+    <td>{{k9.f}}</td>
+        <td>{{k9.f.capability}}</td>
+        <td>{{k9.depth|to_ordinal}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<button id = 'graph_btn' class="ui blue button" type = "button">Toggle Ancestral Tree</button>
+
+<div id = "graph">
+ {% if tree %}
+ {{ tree|safe }}
+{% endif %}
+</div>
+
+</div>
 
 
 <script type="text/javascript">
 
     $(document).ready(function() {
 
+    $('#tabledata1').DataTable({
+        "order": [[ 3, "asc" ]]
+    });
+        $('.menu .item').tab();
 
     $('.message .close')
   .on('click', function() {
@@ -320,9 +363,19 @@
 
 
 $( "#trait" ).click(function() {
-$('.ui.modal').modal('show');
+$('#breed').modal('show');
 });
 
+$( "#gene_btn" ).click(function() {
+$('#gene_mod').modal('show');
+});
+
+
+$('#graph').hide();
+
+        $('#graph_btn').on("click", function(e){
+               $('#graph').toggle();
+         });
 
   } );
 
