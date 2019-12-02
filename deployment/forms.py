@@ -24,6 +24,9 @@ from django.utils.safestring import mark_safe
 class TransferRequestForm(forms.Form):
     ...
 
+class TimeInput(forms.TimeInput):
+    input_type = "time"
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -300,11 +303,11 @@ class DailyRefresherForm(forms.ModelForm):
         fields = '__all__'
 
         widgets = {
-            'port_time': forms.TimeInput(format='%M:%S'),
-            'building_time': forms.TimeInput(format='%M:%S'),
-            'vehicle_time': forms.TimeInput(format='%M:%S'),
-            'baggage_time': forms.TimeInput(format='%M:%S'),
-            'others_time': forms.TimeInput(format='%M:%S'),
+            # 'port_time': forms.TimeInput(format='%M:%S'),
+            # 'building_time': forms.TimeInput(format='%M:%S'),
+            # 'vehicle_time': forms.TimeInput(format='%M:%S'),
+            # 'baggage_time': forms.TimeInput(format='%M:%S'),
+            # 'others_time': forms.TimeInput(format='%M:%S'),
             'mar': forms.RadioSelect(),
         }
 
@@ -318,3 +321,8 @@ class DailyRefresherForm(forms.ModelForm):
         self.fields['panelling'].required = False
         self.fields['k9'].required = False
         self.fields['handler'].required = False
+        self.fields["port_time"].widget = TimeInput()
+        self.fields["building_time"].widget = TimeInput()
+        self.fields["vehicle_time"].widget = TimeInput()
+        self.fields["baggage_time"].widget = TimeInput()
+        self.fields["others_time"].widget = TimeInput()
