@@ -247,7 +247,7 @@ def add_procured_k9(request):
                     height = cd.get('height')
                     weight = cd.get('weight')
 
-                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, breed=breed,height=height,weight=weight,image=image)
+                    k9 = K9.objects.create(name=name,birth_date=bday,source='Procurement',training_status='Unclassified',sex=sex,color=color, breed=breed,height=height,weight=weight,image=image, supplier=supplier)
                     
                     VaccineUsed.objects.create(k9=k9,disease='DHPPiL4',date_vaccinated=dhpp,done=True)
                     
@@ -2844,7 +2844,52 @@ def ajax_supplier_report(request):
         from_date = request.GET.get('date_from')
 
         #SUPPLIER
+        sup = K9.objects.filter(date_created__range=[from_date, to_date]).values('supplier').distinct().order_by('supplier__name')
+        
+        val_arr =[]
+        for sup in sup:
+            for key,value in sup.items():
+                print(key, value)
+                if key == 'supplier':        
+                    val_arr.append(value)
 
+        val_arr =  pd.unique(val_arr)
+
+        for val in val_arr:
+            supplier = K9_Supplier.objects.get(id=val)
+
+            breed = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).values('breed').distinct().order_by('breed')
+            
+            arr1 =[]
+            for breed in breed:
+                for key,value in breed.items():
+                    if key == 'breed':
+                        arr1.append(value)
+
+            arr1 = pd.unique(arr1)
+            print('ARR1',arr1)
+
+            arr2 = []
+
+            for arr in arr1:
+                trained = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained='Trained').count()
+
+                failed = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained='Failed').count()
+
+                on_training = K9.objects.filter(supplier=supplier).filter(breed=arr).filter(date_created__range=[from_date, to_date]).filter(trained=None).count()
+                
+                total = trained + failed + on_training    
+                a = [arr,trained,failed,on_training,total,supplier]
+                arr2.append(a)
+
+            print('ARR2',arr2)
+            first = arr2[0]
+            arr2.remove(arr2[0])
+            print('FIRST',first)
+            x = (supplier, arr2, len(arr1),first)
+            data_arr.append(x)
+
+        print('DATA ARR', data_arr)
     except:
         pass
     user = user_session(request)
