@@ -101,7 +101,7 @@ class AdoptionForms(forms.ModelForm):
 
     class Meta:
         model = K9_Adopted_Owner
-        fields = ('first_name', 'middle_name', 'last_name', 'sex', 'birth_date','email', 'contact_no', 'address')
+        fields = ('first_name', 'middle_name', 'last_name', 'sex', 'birth_date','email', 'contact_no', 'address','file_adopt')
         widgets = {
             'birth_date': DateInput(),
         }

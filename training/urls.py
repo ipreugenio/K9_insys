@@ -42,4 +42,6 @@ urlpatterns = [
     #path('/<int:id>/', views., name=''),
     path('training-finalization/<int:id>', views.serial_number_form, name='serial_number_form'),
     
+    path('addoption/adoption-list/ajax_load_adoption', views.load_adoption, name='ajax_load_adoption'),
+    
 ];

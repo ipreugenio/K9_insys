@@ -28,6 +28,10 @@
     {% endif %}
 <form class = "ui inverted form" action="" method="post">
     {% csrf_token %}
+    <div class="field">
+            <label>Adoption Files</label>
+            {{form.file_adopt}}
+        </div>
     <div class="fields">
         <div class="six wide field">
             <label>First Name</label>
