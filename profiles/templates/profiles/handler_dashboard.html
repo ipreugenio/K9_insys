@@ -238,12 +238,14 @@
 
                     <div id = "calendar" style="margin-top:0%;"></div>
                 </div>
-                   <a href="{% url 'unitmanagement:on_leave_request'%}" class="ui green button">Apply for Leave</a>
+                   <a href="{% url 'unitmanagement:on_leave_request'%}" class="ui small green button">Apply for Leave</a>
                   {% if emergency_leave_count <= 0 %}
-                   <a class="ui red button" id="id_e_leave">Emergency Leave</a>
+                   <a class="ui small red button" id="id_e_leave">Emergency Leave</a>
                   {% else %}
                   <a class="ui disabled red button" id="id_e_leave">Emergency Leave (Ongoing)</a>
                   {% endif %}
+                  <a href="{% url 'unitmanagement:k9_incident'%}" class="ui small yellow button">Report Incident</a>
+                  <a href="{% url 'unitmanagement:k9_sick_form'%}" class="ui small teal button">Health Concern</a>
               </div>
 
         </div>
