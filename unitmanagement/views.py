@@ -804,10 +804,15 @@ def physical_exam_form(request, id=None):
             bs = int(new_form.body_score)
             k9 = K9.objects.get(id=new_form.dog.id)
 
-            if bs == 1 | bs == 5:
-                k9.fit = False
-            else:
+            if new_form.cleared == True:
                 k9.fit = True
+            elif new_form.cleared == False:
+                k9.fit = False
+
+            # if bs == 1 | bs == 5:
+            #     k9.fit = False
+            # else:
+            #     k9.fit = True
 
             new_form.save()
             k9.save()

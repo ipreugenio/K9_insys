@@ -128,23 +128,23 @@ class PhysicalExam(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE)
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cage_number = models.IntegerField('cage_number', default=0)
-    general_appearance = models.CharField('general_appearance', choices=EXAMSTATUS, max_length=200)
-    integumentary = models.CharField('integumentary', choices=EXAMSTATUS, max_length=200)
-    musculo_skeletal = models.CharField('musculo_skeletal', choices=EXAMSTATUS, max_length=200)
-    respiratory = models.CharField('respiratory', choices=EXAMSTATUS, max_length=200)
-    genito_urinary = models.CharField('genito_urinary', choices=EXAMSTATUS, max_length=200)
-    nervous = models.CharField('nervous', choices=EXAMSTATUS, max_length=200)
-    circulatory = models.CharField('circulatory', choices=EXAMSTATUS, max_length=200)
-    digestive = models.CharField('digestive', choices=EXAMSTATUS, max_length=200)
-    mucous_membrances = models.CharField('mucous_membrances', choices=EXAMSTATUS, max_length=200)
-    lymph_nodes = models.CharField('lymph_nodes', choices=EXAMSTATUS, max_length=200)
-    eyes = models.CharField('eyes', choices=EXAMSTATUS, max_length=200)
-    ears = models.CharField('ears', choices=EXAMSTATUS, max_length=200)
+    general_appearance = models.CharField('general_appearance', choices=EXAMSTATUS, max_length=200, default='Normal')
+    integumentary = models.CharField('integumentary', choices=EXAMSTATUS, max_length=200, default='Normal')
+    musculo_skeletal = models.CharField('musculo_skeletal', choices=EXAMSTATUS, max_length=200, default='Normal')
+    respiratory = models.CharField('respiratory', choices=EXAMSTATUS, max_length=200, default='Normal')
+    genito_urinary = models.CharField('genito_urinary', choices=EXAMSTATUS, max_length=200, default='Normal')
+    nervous = models.CharField('nervous', choices=EXAMSTATUS, max_length=200, default='Normal')
+    circulatory = models.CharField('circulatory', choices=EXAMSTATUS, max_length=200, default='Normal')
+    digestive = models.CharField('digestive', choices=EXAMSTATUS, max_length=200, default='Normal')
+    mucous_membrances = models.CharField('mucous_membrances', choices=EXAMSTATUS, max_length=200, default='Normal')
+    lymph_nodes = models.CharField('lymph_nodes', choices=EXAMSTATUS, max_length=200, default='Normal')
+    eyes = models.CharField('eyes', choices=EXAMSTATUS, max_length=200, default='Normal')
+    ears = models.CharField('ears', choices=EXAMSTATUS, max_length=200, default='Normal')
     remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
     date = models.DateField('date', auto_now_add=True)
     date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
     status = models.CharField('status', max_length=200, default="Pending")
-    body_score = models.IntegerField('body_score', choices=BODY_SCORE)
+    body_score = models.IntegerField('body_score', choices=BODY_SCORE, default = 3)
     heart_rate = models.IntegerField('heart_rate', null=True, blank=True)
     respiratory_rate = models.IntegerField('respiratory_rate', null=True, blank=True)
     temperature = models.DecimalField('temperature',null=True, blank=True, max_digits=50, decimal_places=2)
@@ -157,10 +157,10 @@ class PhysicalExam(models.Model):
 
     def save(self, *args, **kwargs):
         # self.date_next_exam = self.date + timedelta(days=365)
-        if self.body_score == 1 or self.body_score == 5:
-            self.cleared == False
-        else:
-            self.cleared == True
+        # if self.body_score == 1 or self.body_score == 5:
+        #     self.cleared == False
+        # else:
+        #     self.cleared == True
         super(PhysicalExam, self).save(*args, **kwargs)
 
     def __str__(self):

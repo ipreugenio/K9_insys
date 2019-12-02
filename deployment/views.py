@@ -1958,12 +1958,13 @@ def schedule_units(request):
                         deployment_date = datetime.datetime.strptime(deployment_date, "%Y-%m-%d").date()
                         delta = deployment_date - datetime.date.today()
 
+                        if delta.days < 7:
+                            invalid = True
+                            ctr = ctr + 1
+                            msg = msg + str(ctr) + ', '
+
                     except:pass
 
-                if delta.days < 7:
-                    invalid = True
-                    ctr = ctr + 1
-                    msg = msg + str(ctr)+ ', '
 
             if invalid == True:
                 style = "ui red message"
@@ -1986,7 +1987,7 @@ def schedule_units(request):
                         temp = temp_list[idx]
 
                         for item in temp:
-                            #TODO Issue when saving team_assingment (everyone is scheduled under one team)
+
                             #deploy = Team_Dog_Deployed.objects.create(team_assignment = team, k9 = item.k9, status = "Scheduled", date_added = deployment_date)
                             deploy = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Initial Deployment", date_start = deployment_date)
                             deploy.save()
@@ -2004,7 +2005,7 @@ def schedule_units(request):
             Notification.objects.create(position='Veterinarian', user=None, notif_type='vet_dep_phex_new',
                                         message='There are ' + str(k9_count) + ' new k9s needed to be scheduled for physical exam.')
 
-            #TODO Check how many k9s are scheduled on x date then adjust automatically based on vet appointment restrictions
+
             # current_phex = K9_Schedule.objects.filter(status="Checkup").filter(date_start__gt = datetime.datetime.today()).order_by('date_start')
             #
             # ctr = 0

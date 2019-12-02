@@ -924,18 +924,12 @@ def generate_location():
         area_list.append(area)
 
     for item in CITY:
-        print("City : " + item[0])
-        print("Place : " + fake.address() + " port")
         place = fake.address() + " port"
 
         randomizer = random.randint(0, len(area_list) - 1)
-        print("Area : " + str(area_list[randomizer]))
         area = area_list[randomizer]
 
-
-        print("Coordinates : " + str(generate_coordinates_ph()))
         coordinates = generate_coordinates_ph()
-
 
         location = Location.objects.create(area = area, place = place, city = item[0], latitude = coordinates[0], longtitude = coordinates[1])
         location.save()
