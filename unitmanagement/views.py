@@ -232,7 +232,7 @@ def yearly_vaccine_list(request):
     k9_dh = []
     k9_br = []
     k9_dw = []
-
+    print(k9)
     for k9 in k9:
         try:
             ar = VaccineUsed.objects.filter(disease__contains='Anti-Rabies').filter(k9=k9).latest('date_vaccinated')
@@ -395,12 +395,12 @@ def vaccination_list(request):
                 dwd = [k9,vu]
                 k9_dh.append(dwd)
         #9 weeks
-        if vr.deworming_3 == False:
+        if vr.deworming_4 == False:
             k9 = K9.objects.get(id=vr.k9.id)
             if k9.age_days >=63:
                 vu = VaccineUsed.objects.filter(vaccine_record=vr).get(disease='4th Deworming')
                 dwd = [k9,vu]
-                k9_tf.append(dwd)
+                k9_dw.append(dwd)
 
         #10 weeks
         if vr.heartworm_2 == False:
@@ -3689,6 +3689,7 @@ def load_yearly_vac(request):
 
         data = K9.objects.get(id=id)
         form = VaccinationUsedForm(request.POST or None)
+        form.fields['date_vaccinated'].initial = datetime.today() 
 
         if type == 'Deworming':
             form.fields['vaccine'].queryset = Medicine_Inventory.objects.filter(medicine__immunization='Deworming').exclude(quantity=0)

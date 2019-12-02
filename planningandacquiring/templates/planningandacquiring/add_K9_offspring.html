@@ -4,16 +4,21 @@
   <div class="sub header">Input breeded K9 data here</div>
 </h2>
 <div class="ui horizontal segments">
+ 
     <div class="ui segment">
+        {% if data.mother.image.url %}
         <center>
             <img src="{{data.mother.image.url}}" alt="" width="200">
           </center>
+        {% endif %}
     </div>
 
     <div class="ui segment">
+        {% if data.mother.image.url %}
         <center>
             <img src="{{data.father.image.url}}" alt="" width="200">
           </center>
+        {% endif %}
     </div>
 
 </div>

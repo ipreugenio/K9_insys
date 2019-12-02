@@ -1693,10 +1693,9 @@ def add_user_account(request):
             form = form.save(commit=False)
             form.UserID = data
             form.serial_number = 'O-' + str(data.id)
-            form.save()
+            # form.save()
 
-            AuthUser.objects.create_user(username=form.serial_number, email=form.email_address, password=form.password,
-                                         last_name=data.lastname, first_name=data.firstname)
+            AuthUser.objects.create_user(username=form.serial_number, email=form.email_address, password=form.password,last_name=data.lastname, first_name=data.firstname)
 
             return HttpResponseRedirect('../../../../user_add_confirmed/')
 

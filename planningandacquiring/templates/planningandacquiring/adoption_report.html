@@ -14,22 +14,30 @@
         <br>Adoption Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
     
-    <table class="ui small celled  four column table">
+    <table class="ui small celled table">
         <thead class="center aligned">
             <tr>
-                <th>Capability</th>
-                <th>Passed</th>
-                <th>Failed</th>
-                <th>Total K9 by Capability</th>
+                <th>Date Adopted</th>
+                <th>Adopter</th>
+                <th>Contact Info</th>
+                <th>Adoptee K9</th>
+                <th>Breed</th>
+                <th>Date Returned</th>
             </tr>
         </thead>
         <tbody>
             {% for data in data%}
-            <tr class="right aligned">
-                <td class="left aligned">{{data.0}}</td>
-                <td>{{data.1|intcomma}}</td>
-                <td>{{data.2|intcomma}}</td>
-                <td>{{data.3|intcomma}}</td>
+            <tr>
+                <td>{{data.date_adopted}}</td>
+                <td>{{data.first_name}} {{data.last_name}}</td>
+                <td class="right aligned">{{data.contact_no}}</td>
+                <td>{{data.k9.name}}</td>
+                <td>{{data.k9.breed}}</td>
+                {% if data.k9.date_returned %}
+                <td>{{data.k9.date_returned}}</td>
+                {%else%}
+                <td>K9 NOT RETURNED</td>
+                {%endif%}
             </tr>            
             {%endfor%}
         </tbody>

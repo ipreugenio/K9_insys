@@ -34,6 +34,8 @@ from inventory.models import Food, Medicine, Medicine_Inventory, Medicine_Subtra
 from django.db.models.functions import Trunc, TruncMonth, TruncYear, TruncDay
 from django.db.models import aggregates, Avg, Count, Min, Sum, Q, Max
 import dateutil.parser
+
+from training.models import K9_Adopted_Owner
 #from faker import Faker
 
 #statistical imports
@@ -2926,8 +2928,9 @@ def ajax_adoption_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        #SUPPLIER
-
+        data_arr = K9_Adopted_Owner.objects.filter(date_adopted__range=[from_date, to_date]).order_by('date_adopted')
+        print(data_arr)
+        
     except:
         pass
     user = user_session(request)
