@@ -7,7 +7,7 @@
     {% if messages %}
         {% for message in messages %}
             {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-            <div class="ui green message" > {{ message }}</div>
+            <div class="{{style}}" > {{ message }}</div>
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -84,7 +84,7 @@
             <tr>
                 <td>{{data_unclassified}}</td>
                 <td class="three wide">{{data_unclassified.age}} years and {{data_unclassified.month_remainder}} months</td>
-                <td class="two wide">{{data_unclassified.age_days}}</td>
+                <td class="two wide" class="right aligned">{{data_unclassified.age_days}}</td>
                 <td style="text-align:center;" class="two wide">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
@@ -125,10 +125,33 @@
             <td>{{data_ontraining.handler}}</td>
             <td >{{data_ontraining.breed}}</td>
             <td>{{data_ontraining.age}} years and {{data_ontraining.month_remainder}} months</td>
-            <td>{{data_ontraining.age_days}}</td>
+            <td class="right aligned">{{data_ontraining.age_days}}</td>
             <td>{{data_ontraining.capability}}</td>
-            <td>{{data_ontraining.training_level}}</td>
-            <td style="width:25%;" class="ui center aligned">
+            
+            {% if data_ontraining.training_level == "Stage 0" %}
+            <td>Stage 1.1 </td>
+            {% elif data_ontraining.training_level == "Stage 1.1" %}
+            <td>Stage 1.2 </td>
+            {% elif data_ontraining.training_level == "Stage 1.2" %}
+            <td>Stage 1.3 </td>
+
+            {% elif data_ontraining.training_level == "Stage 1.3" %}
+            <td>Stage 2.1 </td>
+            {% elif data_ontraining.training_level == "Stage 2.1" %}
+            <td>Stage 2.2 </td>
+            {% elif data_ontraining.training_level == "Stage 2.2" %}
+            <td>Stage 2.3 </td>
+
+            {% elif data_ontraining.training_level == "Stage 2.3" %}
+            <td>Stage 3.1 </td>
+            {% elif data_ontraining.training_level == "Stage 3.1" %}
+            <td>Stage 3.2 </td>
+            {% elif data_ontraining.training_level == "Stage 3.2" %}
+            <td>Final Stage</td>
+            {% endif %}
+
+
+            <td class="ui center aligned" class="two wide">
               {% if data_ontraining.training_count == 2%}
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
               {% else %}

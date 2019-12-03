@@ -58,7 +58,7 @@ class Health(models.Model):
     treatment = models.TextField('treatment', max_length=800, null=True, blank=True)
     status = models.CharField('status', max_length=200, default="On-Going")
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    duration = models.IntegerField('duration', null=True, blank=True)
+    duration = models.IntegerField('duration', null=True, blank=True, default=0)
     date_done = models.DateField('date_done', null=True, blank=True)
     incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
     image = models.FileField(upload_to='prescription_image', blank=True, null=True,  default='prescription_image/no-image.jpg')

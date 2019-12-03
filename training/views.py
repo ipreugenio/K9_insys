@@ -323,7 +323,7 @@ def classify_k9_list(request):
         if item.k9.training_level == item.stage:
             k9s_for_grading.append(item.k9.id)
 
-    print(k9s_for_grading)
+    # print(k9s_for_grading)
 
     data_unclassified = K9.objects.filter(training_status="Unclassified").filter(status="Material Dog")
     data_classified = K9.objects.filter(training_status="Classified").filter(status="Material Dog").filter(handler = None)
@@ -350,6 +350,8 @@ def classify_k9_list(request):
     if type_text == None:
         type_text = 'unclassified'
 
+    style = 'ui blue message'
+
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -370,6 +372,7 @@ def classify_k9_list(request):
         'notif_data':notif_data,
         'count':count,
         'user':user,
+        'style':style,
     }
     return render (request, 'training/classify_k9_list.html', context)
 
@@ -1079,13 +1082,16 @@ def training_records(request):
 
 def training_update_form(request, id):
     data = K9.objects.get(id=id)  # get k9
+    handler = User.objects.get(id=data.handler.id)  
     training = Training.objects.filter(k9=data).get(training=data.capability)  #get training record
     form = TrainingUpdateForm(request.POST or None, instance=training)
     handlerID = K9_Handler.objects.filter(k9=data)
     #form2 = RecordForm(request.POST or None)
     average = 0
-
+    print(training.stage)
+    print(data.training_level)
     stage = ""
+    style = "ui blue message"
     # CHANGED stage = Failed
     if request.method == 'POST':
         if data.training_status == 'On-Training':
@@ -1094,19 +1100,25 @@ def training_update_form(request, id):
                 stage1_1 = request.POST.get('stage1_1')
                 if stage1_1 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
                     training.stage = "Stage 0 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = (Decimal(average) + Decimal(stage1_1))
                     stage = "Stage 1.1"
-                    print(stage1_1)
+                    # print(stage1_1)
 
-                    print(average)
+                    # print(average)
                     training.stage = stage
                     training.stage1_1 = stage1_1
                     data.training_level = stage
@@ -1119,23 +1131,29 @@ def training_update_form(request, id):
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 1.1":
                 stage1_2 = request.POST.get('stage1_2')
-                print("STAGE 1")
-                print(stage1_2)
+                # print("STAGE 1")
+                # print(stage1_2)
                 if stage1_2 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.1 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = (Decimal(average) + Decimal(stage1_2))
                     stage = "Stage 1.2"
-                    print(stage1_2)
-                    print(average)
+                    # print(stage1_2)
+                    # print(average)
                     training.stage = stage
                     training.stage1_2 = stage1_2
                     data.training_level = stage
@@ -1150,12 +1168,18 @@ def training_update_form(request, id):
                 stage1_3 = request.POST.get('stage1_3')
                 if stage1_3 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.2 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
@@ -1164,8 +1188,8 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage1_3 = stage1_3
                     data.training_level = stage
-                    print(stage1_3)
-                    print(average)
+                    # print(stage1_3)
+                    # print(average)
                     data.save()
                     training.save()
 
@@ -1177,12 +1201,18 @@ def training_update_form(request, id):
                 stage2_1 = request.POST.get('stage2_1')
                 if stage2_1 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.3 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
@@ -1191,6 +1221,7 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage2_1 = stage2_1
                     data.training_level = stage
+                    
                     data.save()
                     training.save()
 
@@ -1202,12 +1233,18 @@ def training_update_form(request, id):
                 stage2_2 = request.POST.get('stage2_2')
                 if stage2_2 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.1 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
@@ -1216,6 +1253,7 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage2_2 = stage2_2
                     data.training_level = stage
+                    
                     data.save()
                     training.save()
 
@@ -1227,12 +1265,18 @@ def training_update_form(request, id):
                 stage2_3 = request.POST.get('stage2_3')
                 if stage2_3 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.2 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
@@ -1241,22 +1285,30 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage2_3 = stage2_3
                     data.training_level = stage
+                    
                     data.save()
                     training.save()
 
                     train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
+                    messages.success(request, str(data) + " has been graded!")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 2.3":
                 stage3_1 = request.POST.get('stage3_1')
                 if stage3_1 == '0':
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.3 - Failed"
                     training.save()
 
-                    style = "ui blue message"
-                    messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
+                    style = "ui red message"
+                    messages.success(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage3_1)
@@ -1264,6 +1316,7 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage3_1 = stage3_1
                     data.training_level = stage
+                
                     data.save()
                     training.save()
 
@@ -1273,14 +1326,20 @@ def training_update_form(request, id):
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 3.1":
                 stage3_2 = request.POST.get('stage3_2')
-                if stage3_2 == 0:
+                if stage3_2 == "0":
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 3.1 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
@@ -1289,6 +1348,7 @@ def training_update_form(request, id):
                     training.stage = stage
                     training.stage3_2 = stage3_2
                     data.training_level = stage
+                    
                     data.save()
                     training.save()
 
@@ -1298,47 +1358,43 @@ def training_update_form(request, id):
                     return HttpResponseRedirect('../list-classify-k9?type=grading')
             elif training.stage == "Stage 3.2":
                 stage3_3 = request.POST.get('stage3_3')
-                if stage3_3 == 0:
+                if stage3_3 == "0":
                     data.training_status = "For-Adoption"
+                    data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 3.2 - Failed"
                     training.save()
 
-                    style = "ui blue message"
+                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
+                    
+                    style = "ui red message"
                     messages.warning(request, str(data) + " has failed a stage and is now up for adoption.")
-                    return redirect('training:training_update_form', id=id)
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
                 else:
                     average = Decimal(average) + Decimal(stage3_3)
                     stage = "Finished Training"
                     training.stage = stage
                     training.stage3_3 = stage3_3
+                    training.grade = (Decimal(average) / 9)
+                    training.remarks = request.POST.get('remarks')
+                    data.training_status = "Trained"
+                    training.date_finished = datetime.datetime.now()
                     data.training_level = stage
+                    data.trained = "Trained"
+                    
                     data.save()
                     training.save()
 
-                    train_sched = Training_Schedule.objects.create(k9=data, stage=stage, remarks = remarks)
                     style = "ui green message"
-                    messages.success(request, str(data) + " has been graded!")
-                    return redirect('training:training_update_form', id=id)
+                    messages.success(request, str(data) + " has finished training!")
 
-            if training.stage == "Finished Training":
-                training.grade = (Decimal(average) / 9)
-                training.remarks = request.POST.get('remarks')
-                data.training_status = "Trained"
-                training.date_finished = datetime.datetime.now()
-                data.training_level = stage
-                data.save()
-                training.save()
-
-                style = "ui green message"
-                messages.success(request, str(data) + " has finished training!")
-            else:
-                data.training_status = "On-Training"
-
-            # messages.success(request, 'Training Progress has been successfully Updated!')
-            messages.info(request, 'On-Training')
-            return HttpResponseRedirect('../list-classify-k9?type=grading')
+                    return HttpResponseRedirect('../list-classify-k9?type=grading')
 
     # NOTIF SHOW
     notif_data = notif(request)
@@ -1352,6 +1408,7 @@ def training_update_form(request, id):
         'count': count,
         'user': user,
         'training': training,
+        'style': style,
     }
 
     if data.capability == 'EDD':

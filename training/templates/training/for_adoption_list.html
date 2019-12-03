@@ -16,7 +16,7 @@
 <div class="ui tab segment active" data-tab="first">
     <table id="tabledata1" class="ui five column celled table">
         <thead>
-            <tr>
+            <tr class="center aligned">
                 <th>Name</th>
                 <th>Breed</th>
                 <th>Sex</th>
@@ -33,7 +33,7 @@
                 <td>{{data.breed}}</td>
                 <td>{{data.sex}}</td>
                 <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td class="right aligned">{{data.age_days}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -42,25 +42,26 @@
 <div class="ui tab segment" data-tab="second">
     <table id="tabledata2" class="ui celled table">
         <thead>
-            <tr>
-                <th>Name</th>
+            <tr class="center aligned">
+                <th>Date Adopted</th>
+                <th>K9 Adopted</th>
                 <th>Breed</th>
-                <th>Sex</th>
-                <th>Age (yrs & mon)</th>
-                <th>Age (days)</th>
+                <th>Adopter</th>
+                <th>Contact Info</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in adopted %}
             <tr>
-                <td>
-                    <a href="{% url 'training:adoption_details' data.id %}">{{data.k9.name}}</a>
+                <td class="two wide">
+                    <a href="{% url 'training:adoption_details' data.id %}"> {{data.date_adopted|date:'Y-m-d'}}</a>
                 </td>
+                <td>{{data.k9.name}}</td>
                 <td>{{data.k9.breed}}</td>
-                <td class="two wide">{{data.k9.sex}}</td>
-                <td class="right aligned three wide">{{data.k9.age}} years and {{data.month_remainder}} months</td>
-                <td class="right aligned two wide">{{data.k9.age_days}}</td>
+                
+                <td>{{data.first_name}} {{data.last_name}}</td>
+                <td class="right aligned two wide">{{data.contact_no}}</td>
                 <td class="two wide center aligned">
                     <i class="ui small primary button returned_btn" id={{data.k9.id}}>Returned</i>
                 </td>
@@ -73,12 +74,13 @@
 <div class="ui large modal" id = 'id_data'></div>
 
 <script type="text/javascript">
+    $(function() {
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('.menu .item').tab();
+        
+    });
 
-  
-    $('#tabledata1').DataTable();
-    $('#tabledata2').DataTable();
-    $('.menu .item').tab();
-  
     $( ".returned_btn" ).bind('click', function() {
         var url = 'adoption-list/ajax_load_adoption';  
         var id = $(this).attr('id')

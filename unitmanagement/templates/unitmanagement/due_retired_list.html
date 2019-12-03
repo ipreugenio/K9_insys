@@ -63,8 +63,11 @@
                 <td class="two wide">{{data.k9}}</td>
                 <td class="two wide">{{data.k9.age}} years and {{data.k9.month_remainder}} months</td>
                 <td>{{data.k9.assignment}}</td>
-                <td style="text-align:center;" class="two wide">
-                    <a href="{% url 'unitmanagement:confirm_arrive' data.id %}" class="ui tiny green button">Return Confirmed</a>
+                <td style="text-align:center;" class="four wide">
+                    <a href="{% url 'unitmanagement:confirm_arrive' data.id %}"
+                    class="ui tiny green button">Return Confirmed</a>
+                    
+                    <a href="{% url 'unitmanagement:mia_fou' data.id %}" class="ui tiny red button">MIA</a>
                 </td>
             </tr>
             {% endfor %}
@@ -81,6 +84,7 @@
                 <th class="three wide">K9</th>
                 <th class="three wide">Age (yrs & mons)</th>
                 <th>Port</th>
+                <th class="two wide"></th>
             </tr>
         </thead>
         <tbody>
@@ -91,6 +95,9 @@
                 <td class="two wide">{{data.k9}}</td>
                 <td class="two wide">{{data.k9.age}} years and {{data.k9.month_remainder}} months</td>
                 <td>{{data.k9.assignment}}</td>
+                <td class="center aligned">
+                    <a href="{% url 'unitmanagement:mia_fou' data.id %}" class="ui tiny red button">MIA</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

@@ -91,13 +91,13 @@
                 </thead>
                 <tbody>
                     {% if misc %}
-                    {% for misc in misc%}
-                    <tr>
-                        <td>{{misc.miscellaneous}}</td>
-                        <td>{{misc.unit}}</td>
-                        <td>{{misc.quantity}}</td>
-                    </tr>
-                    {%endfor%}
+                        {% for misc in misc%}
+                        <tr>
+                            <td>{{misc.miscellaneous}}</td>
+                            <td>{{misc.unit}}</td>
+                            <td>{{misc.quantity}}</td>
+                        </tr>
+                        {%endfor%}
                     {% else %}
                         <tr class="center aligned">
                             <td colspan='3'>No Item Request</td>

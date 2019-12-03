@@ -1565,7 +1565,7 @@ def trained_list(request):
     #finished training data
     ts =[]
     for d in data:
-        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
+        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.2')
         ts.append(a.date_end.date())
      
         
@@ -1983,34 +1983,11 @@ def k9_accident(request, id=None): #Line 1967
     data.save()
 
     k9 = K9.objects.get(id=data.k9.id)
+    handler = User.objects.filter(id=k9.handler.id).last()
 
     if accident == 'recovered':
         k9.status = 'Working Dog'
         messages.success(request, 'K9 has recovered!')
-        k9.save()
-    elif accident == 'Died':
-        k9.status = 'Dead'
-        k9.training_status = 'Dead'
-        messages.success(request, 'K9 is deceased..')
-
-
-        handler = User.objects.get(id=k9.handler.id)
-        handler.partnered = False
-        handler.assigned = False
-
-        k9.handler = None
-        handler.save()
-
-        tdd = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).last()
-        if tdd:
-            tdd.date_pulled = datetime.today().date()
-            tdd.save()
-            current_port = current_team(k9)
-            update_port_info([current_port.id])
-        # Call_Back_Handler.objects.create(handler=handler)
-        Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
-                                    message='Your K9 is now deceased. You are required to report back to main base.')
-
         k9.save()
 
     if request.method == 'POST':
@@ -2021,16 +1998,17 @@ def k9_accident(request, id=None): #Line 1967
         dc=request.POST['death_cert']
         dd=request.POST['date_died']
 
-        k9 = K9.objects.get(id=data.k9.id)
+        k9 = K9.objects.get(id=data2.k9.id)
+
+        h = User.objects.filter(id=k9.handler.id).last()
+        h.partnered = False
+        h.assigned = False
+        
+        k9.handler= None
         k9.status = 'Dead'
         k9.training_status = 'Dead'
         k9.death_cert = dc
         k9.death_date = dd
-
-        h = User.objects.get(id=k9.handler.id)
-        h.partnered = False
-        h.assigned = False
-        k9.handler= None
 
         tdd = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).last()
         if tdd:
@@ -2039,7 +2017,7 @@ def k9_accident(request, id=None): #Line 1967
             current_port = current_team(k9)
             update_port_info([current_port.id])
         # Call_Back_Handler.objects.create(handler=h)
-        Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
+        Notification.objects.create(position='Handler', user=h, notif_type='handler_k9_death',
                                     message='Your K9 is now deceased. You are required to report back to main base.')
 
         k9.save()
@@ -2413,7 +2391,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
 
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).exclude(id__in=cb_list).order_by('year_retired')
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
 
     cb_conf = Call_Back_K9.objects.filter(status='Confirmed')
     cb_pend = Call_Back_K9.objects.filter(status='Pending')
@@ -2421,6 +2399,9 @@ def due_retired_list(request):
     data_count = data.count()
     cb_conf_count = cb_conf.count()
     cb_pend_count = cb_pend.count()
+
+    print("COUNT")
+    print(data_count,cb_conf_count,cb_pend_count)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2506,6 +2487,7 @@ def confirm_arrive(request,id):
 
 def confirm_going_back(request,id):
     cb = Call_Back_K9.objects.get(id=id)
+    cb.date_confirmed = date.today()
     cb.status='Confirmed'
     cb.save()
     return redirect ('profiles:handler_dashboard')
@@ -3942,7 +3924,7 @@ def load_k9_data(request):
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
-        remarks = Training_Schedule.objects.filter(k9=k9).exclude(stage = "Stage 0")
+        remarks = Training_Schedule.objects.filter(k9=k9)
         h_count = Health.objects.filter(dog=k9).count()
         health = Health.objects.filter(dog=k9)
         train = Training.objects.filter(k9=k9).get(training=k9.capability)
@@ -4224,7 +4206,7 @@ def load_item_food(request):
             item = Medicine_Inventory.objects.get(id=id)
             uom = item.medicine.uom
             quantity = item.quantity
-        elif item_type == 'Medicine':
+        elif item_type == 'Miscellaneous':
             item = Miscellaneous.objects.get(id=id)
             uom = item.uom
             quantity = item.quantity
@@ -4335,6 +4317,9 @@ def k9_mia_list(request):
 
     k9_list = []
 
+    k9_mia_perma = K9.objects.filter(training_status = "Missing").filter(status = "Missing")
+    user_mia_perma = User.objects.filter(status = "MIA")
+
     for km in k9_mia:
         tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).filter(date_pulled=None).latest('date_pulled')
 
@@ -4357,7 +4342,9 @@ def k9_mia_list(request):
         'k9_list' : k9_list,
         'style' : style,
         'notif_data' : notif_data,
-        'count' : count
+        'count' : count,
+        'k9_mia_perma':k9_mia_perma,
+        'user_mia_perma':user_mia_perma,
     }
 
     return render(request, 'unitmanagement/k9_mia_list.html', context)
@@ -4407,6 +4394,24 @@ def k9_mia_change(request,id):
     messages.success(request, 'You have updated K9 unit status.')
     return redirect('unitmanagement:k9_mia_list')
 
+def mia_fou(request,id):
+    cb = Call_Back_K9.objects.filter(id=id).last()
+    k9  = K9.objects.get(id=cb.k9.id)
+    handler = User.objects.get(id=cb.handler.id)
+
+    handler.status = "MIA"
+    handler.assigned = False
+    k9.status = "Missing"
+    k9.training_status = "Missing"
+    k9.assignment = "None"
+    
+    k9.save()
+    handler.save()
+    cb.delete()
+    style = "ui red message"
+    messages.success(request, str(handler) + ' and ' + str(k9) + ' is Missing.')
+    return redirect ('unitmanagement:due_retired_list')
+    
 # #unitmanagement views.py
 # #CHANGE REPLENISHMENT FORM
 # def replenishment_form(request):

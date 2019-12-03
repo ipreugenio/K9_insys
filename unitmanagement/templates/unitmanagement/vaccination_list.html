@@ -40,8 +40,8 @@
             {% for data in k9_dw %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                <td class="right aligned">{{data.0.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}'
@@ -68,8 +68,8 @@
             {% if data.1.disease == '2nd dose DHPPiL+CV'%}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                <td>{{data.0.age_days}}</td>
                 <td>{{data.1.disease}} Vaccination</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPP'>Select</a></td>
@@ -78,7 +78,7 @@
             <tr>
                 <td>{{data.0}}</td>
                 <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td class="right aligned">{{data.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPP'>Select</a></td>
@@ -104,8 +104,8 @@
             {% for data in k9_ar %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                <td class="right aligned">{{data.0.age_days}}</td>
                 <td >{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Anti-Rabies'>Select</a></td>
@@ -130,9 +130,9 @@
             {% for data in k9_br %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
-                <td>{{data.1.disease}}</td>
+                <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                <td class="right aligned">{{data.0.age_days}}</td>
+                <td>{{data.0.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Bordertella'>Select</a></td>
             </tr>
@@ -156,8 +156,8 @@
             {% for data in k9_d4 %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                <td class="right aligned">{{data.0.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPPIL4'>Select</a></td>
@@ -184,7 +184,7 @@
                 <tr>
                     <td>{{data.0}}</td>
                     <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
-                    <td>{{data.0.age_days}}</td>    
+                    <td class="right aligned">{{data.0.age_days}}</td>    
                     <td>{{data.1.disease}}</td>
                     <td class="three wide column center aligned"><a href="#"
                     class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Heartworm'>Select</a></td>
@@ -211,7 +211,7 @@
                     <tr>
                         <td>{{data.0}}</td>
                         <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
-                        <td>{{data.0.age_days}}</td>    
+                        <td class="right aligned">{{data.0.age_days}}</td>    
                         <td>{{data.1.disease}}</td>
                         <td class="three wide column center aligned"><a href="#"
                         class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='TickFlee'>Select</a></td>

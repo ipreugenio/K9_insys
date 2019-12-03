@@ -136,6 +136,7 @@ class K9(models.Model):
         ('Stolen', 'Stolen'),
         ('Lost', 'Lost'),
         ('Accident', 'Accident'),
+        ('Missing', 'Missing'),
     )
 
     REPRODUCTIVE = (
@@ -164,6 +165,7 @@ class K9(models.Model):
         ('Light Duty', 'Light Duty'),
         ('Retired', 'Retired'),
         ('Dead', 'Dead'),
+        ('Missing', 'Missing'),
     )
 
     TRAINED = (
@@ -350,7 +352,7 @@ class K9(models.Model):
         if self.age == 9:
             if self.status == 'Working Dog' or self.status == 'Material Dog' or self.status == 'Sick' or self.status =='Accident':
                 self.status = 'Due-For-Retirement'
-                if self.training_status != 'Working Dog':
+                if self.assignment == 'None':
                     self.training_status = 'Light Duty'
             
         elif self.age == 10:
