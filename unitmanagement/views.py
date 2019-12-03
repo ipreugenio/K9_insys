@@ -3840,7 +3840,20 @@ def k9_checkup_pending(request):
         k9s_exclude.append(item.k9)
 
     pending_schedule = K9_Schedule.objects.filter(status = "Initial Deployment").exclude(k9__in = k9s_exclude).exclude(date_start__lt=datetime.today().date())
-    date_form = DateForm()
+
+    # START CHECK EARLIEST POSSIBLE DATE
+    earliest_scheduled_phex = current_appointments.first()
+    date_index = datetime.today() + timedelta(days=1)
+    if earliest_scheduled_phex:
+        while date_index < earliest_scheduled_phex:
+            if current_appointments.count() < 10:
+                break
+            else:
+                date_index += timedelta(days=1)
+
+    # END CHECK EARLIEST POSSIBLE DATE
+
+    date_form = DateForm(initial={'date': date_index})
 
     k9s_exclude2 = []
     for item in pending_schedule:

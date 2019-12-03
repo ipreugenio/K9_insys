@@ -58,6 +58,160 @@ USER-K9
     - Assigns TL
 '''
 
+def generate_city_ph():
+
+    CITY = (
+        ('Alaminos', 'Alaminos'),
+        ('Angeles', 'Angeles'),
+        ('Antipolo', 'Antipolo'),
+        ('Bacolod', 'Bacolod'),
+        ('Bacoor', 'Bacoor'),
+        ('Bago', 'Bago'),
+        ('Baguio', 'Baguio'),
+        ('Bais', 'Bais'),
+        ('Balanga', 'Balanga'),
+        ('Batac', 'Batac'),
+        ('Batangas', 'Batangas'),
+        ('Bayawan', 'Bayawan'),
+        ('Baybay', 'Baybay'),
+        ('Bayugan', 'Bayugan'),
+        ('Biñan', 'Biñan'),
+        ('Bislig', 'Bislig'),
+        ('Bogo', 'Bogo'),
+        ('Borongan', 'Borongan'),
+        ('Butuan', 'Butuan'),
+        ('Cabadbaran', 'Cabadbaran'),
+        ('Cabanatuan', 'Cabanatuan'),
+        ('Cabuyao', 'Cabuyao'),
+        ('Cadiz', 'Cadiz'),
+        ('Cagayan de Oro', 'Cagayan de Oro'),
+        ('Calamba', 'Calamba'),
+        ('Calapan', 'Calapan'),
+        ('Calbayog', 'Calbayog'),
+        ('Caloocan', 'Caloocan'),
+        ('Candon', 'Candon'),
+        ('Canlaon', 'Canlaon'),
+        ('Carcar', 'Carcar'),
+        ('Catbalogan', 'Catbalogan'),
+        ('Cauayan', 'Cauayan'),
+        ('Cavite', 'Cavite'),
+        ('Cebu', 'Cebu'),
+        ('Cotabato', 'Cotabato'),
+        ('Dagupan', 'Dagupan'),
+        ('Danao', 'Danao'),
+        ('Dapitan', 'Dapitan'),
+        ('Dasmariñas', 'Dasmariñas'),
+        ('Davao', 'Davao'),
+        ('Digos', 'Digos'),
+        ('Dipolog', 'Dipolog'),
+        ('Dumaguete', 'Dumaguete'),
+        ('El Salvador', 'El Salvador'),
+        ('Escalante', 'Escalante'),
+        ('Gapan', 'Gapan'),
+        ('General Santos', 'General Santos'),
+        ('General Trias', 'General Trias'),
+        ('Gingoog', 'Gingoog'),
+        ('Guihulngan', 'Guihulngan'),
+        ('Himamaylan', 'Himamaylan'),
+        ('Ilagan', 'Ilagan'),
+        ('Iligan', 'Iligan'),
+        ('Iloilo', 'Iloilo'),
+        ('Imus', 'Imus'),
+        ('Iriga', 'Iriga'),
+        ('Isabela', 'Isabela'),
+        ('Kabankalan', 'Kabankalan'),
+        ('Kidapawan', 'Kidapawan'),
+        ('Koronadal', 'Koronadal'),
+        ('La Carlota', 'La Carlota'),
+        ('Lamitan', 'Lamitan'),
+        ('Laoag', 'Laoag'),
+        ('Lapu‑Lapu', 'Lapu‑Lapu'),
+        ('Las Piñas', 'Las Piñas'),
+        ('Legazpi', 'Legazpi'),
+        ('Ligao', 'Ligao'),
+        ('Lipa', 'Lipa'),
+        ('Lucena', 'Lucena'),
+        ('Maasin', 'Maasin'),
+        ('Mabalacat', 'Mabalacat'),
+        ('Makati', 'Makati'),
+        ('Malabon', 'Malabon'),
+        ('Malaybalay', 'Malaybalay'),
+        ('Malolos', 'Malolos'),
+        ('Mandaluyong', 'Mandaluyong'),
+        ('Mandaue', 'Mandaue'),
+        ('Manila', 'Manila'),
+        ('Marawi', 'Marawi'),
+        ('Marikina', 'Marikina'),
+        ('Masbate', 'Masbate'),
+        ('Mati', 'Mati'),
+        ('Meycauayan', 'Meycauayan'),
+        ('Muñoz', 'Muñoz'),
+        ('Muntinlupa', 'Muntinlupa'),
+        ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
+        ('Naga - Cebu', 'Naga - Cebu'),
+        ('Navotas', 'Navotas'),
+        ('Olongapo', 'Olongapo'),
+        ('Ormoc', 'Ormoc'),
+        ('Oroquieta', 'Oroquieta'),
+        ('Ozamiz', 'Ozamiz'),
+        ('Pagadian', 'Pagadian'),
+        ('Palayan', 'Palayan'),
+        ('Panabo', 'Panabo'),
+        ('Parañaque', 'Parañaque'),
+        ('Pasay', 'Pasay'),
+        ('Pasig', 'Pasig'),
+        ('Passi', 'Passi'),
+        ('Puerto Princesa', 'Puerto Princesa'),
+        ('Quezon', 'Quezon'),
+        ('Roxas', 'Roxas'),
+        ('Sagay', 'Sagay'),
+        ('Samal', 'Samal'),
+        ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
+        ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
+        ('San Fernando - La Union', 'San Fernando - La Union'),
+        ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
+        ('San Jose', 'San Jose'),
+        ('San Jose del Monte', 'San Jose del Monte'),
+        ('San Juan', 'San Juan'),
+        ('San Pablo', 'San Pablo'),
+        ('San Pedro', 'San Pedro'),
+        ('Santa Rosa', 'Santa Rosa'),
+        ('Santiago', 'Santiago'),
+        ('Silay', 'Silay'),
+        ('Sipalay', 'Sipalay'),
+        ('Sorsogon', 'Sorsogon'),
+        ('Surigao', 'Surigao'),
+        ('Tabaco', 'Tabaco'),
+        ('Tabuk', 'Tabuk'),
+        ('Tacloban', 'Tacloban'),
+        ('Tacurong', 'Tacurong'),
+        ('Tagaytay', 'Tagaytay'),
+        ('Tagbilaran', 'Tagbilaran'),
+        ('Taguig', 'Taguig'),
+        ('Tagum', 'Tagum'),
+        ('Talisay - Cebu', 'Talisay - Cebu'),
+        ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
+        ('Tanauan', 'Tanauan'),
+        ('Tandag', 'Tandag'),
+        ('Tangub', 'Tangub'),
+        ('Tanjay', 'Tanjay'),
+        ('Tarlac', 'Tarlac'),
+        ('Tayabas', 'Tayabas'),
+        ('Toledo', 'Toledo'),
+        ('Trece Martires', 'Trece Martires'),
+        ('Tuguegarao', 'Tuguegarao'),
+        ('Urdaneta', 'Urdaneta'),
+        ('Valencia', 'Valencia'),
+        ('Valenzuela', 'Valenzuela'),
+        ('Victorias', 'Victorias'),
+        ('Vigan', 'Vigan'),
+        ('Zamboanga', 'Zamboanga')
+    )
+
+    randomizer = random.randint(0, len(CITY) - 1)
+
+    return CITY[randomizer][0]
+
 # START REPORT NECESSITIES
 def generate_dogbreed():
     COLOR = (
@@ -391,159 +545,12 @@ def create_teams():
         print("Generated " + str(team))
 
     return None
+
 # END DEPLOYMENT NECESSITIES
 
 # START USER CREATION
 def generate_user():
     fake = Faker()
-
-    CITY = (
-        ('Alaminos', 'Alaminos'),
-        ('Angeles', 'Angeles'),
-        ('Antipolo', 'Antipolo'),
-        ('Bacolod', 'Bacolod'),
-        ('Bacoor', 'Bacoor'),
-        ('Bago', 'Bago'),
-        ('Baguio', 'Baguio'),
-        ('Bais', 'Bais'),
-        ('Balanga', 'Balanga'),
-        ('Batac', 'Batac'),
-        ('Batangas', 'Batangas'),
-        ('Bayawan', 'Bayawan'),
-        ('Baybay', 'Baybay'),
-        ('Bayugan', 'Bayugan'),
-        ('Biñan', 'Biñan'),
-        ('Bislig', 'Bislig'),
-        ('Bogo', 'Bogo'),
-        ('Borongan', 'Borongan'),
-        ('Butuan', 'Butuan'),
-        ('Cabadbaran', 'Cabadbaran'),
-        ('Cabanatuan', 'Cabanatuan'),
-        ('Cabuyao', 'Cabuyao'),
-        ('Cadiz', 'Cadiz'),
-        ('Cagayan de Oro', 'Cagayan de Oro'),
-        ('Calamba', 'Calamba'),
-        ('Calapan', 'Calapan'),
-        ('Calbayog', 'Calbayog'),
-        ('Caloocan', 'Caloocan'),
-        ('Candon', 'Candon'),
-        ('Canlaon', 'Canlaon'),
-        ('Carcar', 'Carcar'),
-        ('Catbalogan', 'Catbalogan'),
-        ('Cauayan', 'Cauayan'),
-        ('Cavite', 'Cavite'),
-        ('Cebu', 'Cebu'),
-        ('Cotabato', 'Cotabato'),
-        ('Dagupan', 'Dagupan'),
-        ('Danao', 'Danao'),
-        ('Dapitan', 'Dapitan'),
-        ('Dasmariñas', 'Dasmariñas'),
-        ('Davao', 'Davao'),
-        ('Digos', 'Digos'),
-        ('Dipolog', 'Dipolog'),
-        ('Dumaguete', 'Dumaguete'),
-        ('El Salvador', 'El Salvador'),
-        ('Escalante', 'Escalante'),
-        ('Gapan', 'Gapan'),
-        ('General Santos', 'General Santos'),
-        ('General Trias', 'General Trias'),
-        ('Gingoog', 'Gingoog'),
-        ('Guihulngan', 'Guihulngan'),
-        ('Himamaylan', 'Himamaylan'),
-        ('Ilagan', 'Ilagan'),
-        ('Iligan', 'Iligan'),
-        ('Iloilo', 'Iloilo'),
-        ('Imus', 'Imus'),
-        ('Iriga', 'Iriga'),
-        ('Isabela', 'Isabela'),
-        ('Kabankalan', 'Kabankalan'),
-        ('Kidapawan', 'Kidapawan'),
-        ('Koronadal', 'Koronadal'),
-        ('La Carlota', 'La Carlota'),
-        ('Lamitan', 'Lamitan'),
-        ('Laoag', 'Laoag'),
-        ('Lapu‑Lapu', 'Lapu‑Lapu'),
-        ('Las Piñas', 'Las Piñas'),
-        ('Legazpi', 'Legazpi'),
-        ('Ligao', 'Ligao'),
-        ('Lipa', 'Lipa'),
-        ('Lucena', 'Lucena'),
-        ('Maasin', 'Maasin'),
-        ('Mabalacat', 'Mabalacat'),
-        ('Makati', 'Makati'),
-        ('Malabon', 'Malabon'),
-        ('Malaybalay', 'Malaybalay'),
-        ('Malolos', 'Malolos'),
-        ('Mandaluyong', 'Mandaluyong'),
-        ('Mandaue', 'Mandaue'),
-        ('Manila', 'Manila'),
-        ('Marawi', 'Marawi'),
-        ('Marikina', 'Marikina'),
-        ('Masbate', 'Masbate'),
-        ('Mati', 'Mati'),
-        ('Meycauayan', 'Meycauayan'),
-        ('Muñoz', 'Muñoz'),
-        ('Muntinlupa', 'Muntinlupa'),
-        ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
-        ('Naga - Cebu', 'Naga - Cebu'),
-        ('Navotas', 'Navotas'),
-        ('Olongapo', 'Olongapo'),
-        ('Ormoc', 'Ormoc'),
-        ('Oroquieta', 'Oroquieta'),
-        ('Ozamiz', 'Ozamiz'),
-        ('Pagadian', 'Pagadian'),
-        ('Palayan', 'Palayan'),
-        ('Panabo', 'Panabo'),
-        ('Parañaque', 'Parañaque'),
-        ('Pasay', 'Pasay'),
-        ('Pasig', 'Pasig'),
-        ('Passi', 'Passi'),
-        ('Puerto Princesa', 'Puerto Princesa'),
-        ('Quezon', 'Quezon'),
-        ('Roxas', 'Roxas'),
-        ('Sagay', 'Sagay'),
-        ('Samal', 'Samal'),
-        ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
-        ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
-        ('San Fernando - La Union', 'San Fernando - La Union'),
-        ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
-        ('San Jose', 'San Jose'),
-        ('San Jose del Monte', 'San Jose del Monte'),
-        ('San Juan', 'San Juan'),
-        ('San Pablo', 'San Pablo'),
-        ('San Pedro', 'San Pedro'),
-        ('Santa Rosa', 'Santa Rosa'),
-        ('Santiago', 'Santiago'),
-        ('Silay', 'Silay'),
-        ('Sipalay', 'Sipalay'),
-        ('Sorsogon', 'Sorsogon'),
-        ('Surigao', 'Surigao'),
-        ('Tabaco', 'Tabaco'),
-        ('Tabuk', 'Tabuk'),
-        ('Tacloban', 'Tacloban'),
-        ('Tacurong', 'Tacurong'),
-        ('Tagaytay', 'Tagaytay'),
-        ('Tagbilaran', 'Tagbilaran'),
-        ('Taguig', 'Taguig'),
-        ('Tagum', 'Tagum'),
-        ('Talisay - Cebu', 'Talisay - Cebu'),
-        ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
-        ('Tanauan', 'Tanauan'),
-        ('Tandag', 'Tandag'),
-        ('Tangub', 'Tangub'),
-        ('Tanjay', 'Tanjay'),
-        ('Tarlac', 'Tarlac'),
-        ('Tayabas', 'Tayabas'),
-        ('Toledo', 'Toledo'),
-        ('Trece Martires', 'Trece Martires'),
-        ('Tuguegarao', 'Tuguegarao'),
-        ('Urdaneta', 'Urdaneta'),
-        ('Valencia', 'Valencia'),
-        ('Valenzuela', 'Valenzuela'),
-        ('Victorias', 'Victorias'),
-        ('Vigan', 'Vigan'),
-        ('Zamboanga', 'Zamboanga')
-    )
 
     RANK = (
         ('MCPO', 'MCPO'),
@@ -655,8 +662,7 @@ def generate_user():
 
         street = fake.street_name() + " St."
         brngy = "Brngy. " + fake.street_name()
-        randomizer = random.randint(0, len(CITY) - 1)
-        city = CITY[randomizer][0]
+        city = generate_city_ph()
         province = "x province"
 
         tin = fake.msisdn()[:7]
@@ -986,6 +992,8 @@ def generate_k9():
                 elif k9.capability == "EDD":
                     team.EDD_deployed += 1
                 team.save()
+                k9.assignment = team.team
+                k9.save()
                 print(str(k9) + " is deployed to " + str(team))
 
             assign_TL(team)
@@ -999,15 +1007,80 @@ def generate_k9():
     return None
 # END K9 CREATION
 
+# START MISC
+
+def generate_requests():
+    fake = Faker()
+
+    location_list = []
+    for location in Location.objects.all():
+        location_list.append(location)
+
+    area_list = []
+    for area in Area.objects.all():
+        area_list.append(area)
+
+    for x in range(0, 150):
+        requester = fake.company()
+        cell = "+63" + fake.msisdn()[:10]
+
+        randomizer = random.randint(0, 1)
+
+        event_type = "?"
+        k9s_required = 0
+        if randomizer == 0:
+            event_type = "Big Event"
+            k9s_required = random.randint(5, 10)
+
+        else:
+            event_type = "Small Event"
+            k9s_required = random.randint(2, 4)
+
+        location = fake.address()
+        city = generate_city_ph()
+
+        lat = random.uniform(7.823, 18.579)
+        lng = random.uniform(118.975, 125.563)
+
+        start_date = fake.date_between(start_date="+10d", end_date="+60d")
+        end_date = start_date + timedelta(days=random.randint(1, 14))
+
+        remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        event_name = fake.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None)
+        email = requester.lower() + "@gmail.com"
+
+        randomizer = random.randint(0, len(area_list) - 1)
+        area = area_list[randomizer]
+
+        request = Dog_Request.objects.create(requester=requester, location=location, city=city, sector_type=event_type,
+                                             phone_number=cell, email_address=email, event_name=event_name,
+                                             remarks=remarks, area=area, k9s_needed=k9s_required, start_date=start_date,
+                                             end_date=end_date, latitude=lat, longtitude=lng)
+        request.save()
+
+        if request.sector_type == "Big Event":
+            request.status = "Approved"
+            request.save()
+
+    return None
+
+# END MISC
+
+
+
 '''
 TODO
 
 Create Incidents
 Create Maritimes
-Create Parents - Use deceased k9s as parents for new k9s (or just use for-breeding k9s as parents)
+Create Parents (Use For-Breeding K9s)
 Create Litter
 Create K9_mated
 Create Health (Specially for K9s that have reach deployment/breeding decision)
-Create K9 requests
+Create Daily Refreshers
+Create Budgeting Stuff
 
+Fix duplicate Names on k9s
+Add K9(s) on final stage of training
+Other Report stuff
 '''
