@@ -57,12 +57,16 @@ import json
 from deployment.templatetags import index as deployment_template_tags
 
 
-from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
-    generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
-    , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
+# from profiles.populate_db import generate_user, generate_k9, generate_event, generate_incident, generate_maritime, \
+#     generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
+#     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption, create_supplier, generate_grading, generate_item_request
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, \
+    generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, \
+    generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, \
+    generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding, \
+    generate_adoption, create_supplier, generate_grading, generate_item_request, generate_maritime, fix_dog_duplicates
 
 import random
 
@@ -255,28 +259,28 @@ def load_pre_req(request):
     return render(request, 'deployment/pre_req_data.html', context)
 
 
-def mass_populate():
-    # Generate all models related to a users, k9s and k9_requests (edit loop count in populate_db.py to change number of created objects
-    generate_user() #generates 400 objects
-    generate_k9() #generates 300 objects
-    generate_area() # generate all regions
-    generate_location() # generate a location per city
-    generate_event() #generates 150 objects
-    generate_incident() #generates 250 objects
-    generate_maritime() # generates 500 objects
-
-    # >>advanced
-    generate_training() #Classify k9s
-    generate_k9_posttraining_decision() # For-Breeding or For-Deployment
-    generate_k9_deployment() # Randomly assign to ports
-
-    # >>fixes
-    generate_dogbreed()
-    assign_commander_random() #Assign commanders to areas
-    fix_dog_duplicates() # fix duplicate names for dogs
-    create_predeployment_inventory() #Inventory items for pre deployment
-
-    return None
+# def mass_populate():
+#     # Generate all models related to a users, k9s and k9_requests (edit loop count in populate_db.py to change number of created objects
+#     generate_user() #generates 400 objects
+#     generate_k9() #generates 300 objects
+#     generate_area() # generate all regions
+#     generate_location() # generate a location per city
+#     generate_event() #generates 150 objects
+#     generate_incident() #generates 250 objects
+#     generate_maritime() # generates 500 objects
+#
+#     # >>advanced
+#     generate_training() #Classify k9s
+#     generate_k9_posttraining_decision() # For-Breeding or For-Deployment
+#     generate_k9_deployment() # Randomly assign to ports
+#
+#     # >>fixes
+#     generate_dogbreed()
+#     assign_commander_random() #Assign commanders to areas
+#     fix_dog_duplicates() # fix duplicate names for dogs
+#     create_predeployment_inventory() #Inventory items for pre deployment
+#
+#     return None
 
 # Find handlerss with multiple k9s
 def check_handlers_with_multiple_k9s():
@@ -294,18 +298,34 @@ def check_handlers_with_multiple_k9s():
 
 def mass_populate_revisited():
     # GENERAL & DEPLOYMENT
-    # create_supplier()
-    # generate_dogbreed()
+    create_supplier()
+    generate_dogbreed()
 
-    # generate_user()
-    # create_teams()
-    # generate_k9()
+    generate_user()
+    create_teams()
+    generate_maritime()
+    generate_k9()
 
-    # create_predeployment_inventory()
-    # generate_inventory_trail()
+    create_predeployment_inventory()
+    generate_inventory_trail()
 
-    # generate_k9_parents()
-    # generate_requests()
+    generate_k9_parents()
+    generate_requests()
+
+
+    # # UNIT MANAGEMENT
+    generate_location_incident()
+    generate_handler_leave()
+    generate_daily_refresher()
+    generate_k9_incident()
+    generate_health_record()
+    generate_handler_incident()
+
+    generate_sick_breeding()
+    generate_k9_due_retire()
+    generate_adoption()
+
+    fix_dog_duplicates()
 
     # UNIT MANAGEMENT
     # generate_user()
@@ -314,23 +334,8 @@ def mass_populate_revisited():
     # generate_dogbreed()
     # create_predeployment_inventory()
     # generate_k9_parents()
-    #
     # generate_requests()
     #
-    # # UNIT MANAGEMENT
-    # generate_location_incident()
-    # generate_handler_leave()
-    # generate_daily_refresher()
-    # generate_k9_incident()
-    # generate_health_record()
-    # generate_handler_incident()
-
-    # fix_dog_duplicates()
-
-    # generate_sick_breeding()
-    generate_k9_due_retire()
-    # generate_adoption()
-
 
     # # #FIX THIS
     # generate_grading()
@@ -340,15 +345,15 @@ def mass_populate_revisited():
     # k9_c = K9.objects.filter(Q(training_status='For-Breeding') |
     # Q(training_status='Breeding'))
 
-    cb = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
-
-    cb_list = []
-    for c in cb:
-        cb_list.append(c.k9.id)
-
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
-
-    print(data)
+    # cb = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
+    #
+    # cb_list = []
+    # for c in cb:
+    #     cb_list.append(c.k9.id)
+    #
+    # data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
+    #
+    # print(data)
 
 
     # k9_c = K9.objects.filter(status='Due-For-Retirement')
@@ -364,7 +369,7 @@ def mass_populate_revisited():
     # generate_adoption()
     #
     # generate_k9_due_retire()
-    generate_sick_breeding()
+    # generate_sick_breeding()
 
 
     # k9 = K9.objects.filter(status='Due-For-Retirement')
@@ -1873,6 +1878,7 @@ def schedule_units(request):
 
     location_incident_list_count = []
     location_maritime_list_count = []
+    sorter_col = []
     for location in locations:
         maritimes = Maritime.objects.filter(location=location)
         location_maritime_list.append(maritimes)
@@ -1883,6 +1889,14 @@ def schedule_units(request):
         location_maritime_list_count.append(incidents.count())
 
         team = Team_Assignment.objects.filter(location=location).last()
+
+        if team.total_dogs_deployed == 1:
+            sorter_col.append(1)
+        elif team.total_dogs_deployed == 0:
+            sorter_col.append(0)
+        else:
+            sorter_col.append(-1)
+
         location_list.append(location)
         team_list.append(team)
 
@@ -1935,10 +1949,11 @@ def schedule_units(request):
         'Incident_count': location_incident_list_count,
         'Incident_Order_List': incident_order_list,
         'Team': team_list,
-        'Dogs_deployed': total_dogs_deployed_list
+        'Dogs_deployed': total_dogs_deployed_list,
+        'Sorter': sorter_col
         }
     location_dataframe = df(data=df_data)
-    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[True, False, False], inplace=True)
+    location_dataframe.sort_values(by=['Sorter', 'Dogs_deployed', 'Maritime_count', 'Incident_count'], ascending=[False, True, False, False], inplace=True)
 
          #End Sort incidents
     #End Prioritize Location
@@ -2001,12 +2016,13 @@ def schedule_units(request):
     location_dataframe.drop(location_dataframe.index[delete_indexes], inplace=True) #Delete rows without any K9s assigned
     location_dataframe.reset_index(drop=True, inplace=True)
 
-    location_dataframe.sort_values(by=['Dogs_deployed', 'Maritime_count', 'Incident_count'],
-                                   ascending=[True, False, False], inplace=True)
+    location_dataframe.sort_values(by=['Sorter', 'Dogs_deployed', 'Maritime_count', 'Incident_count'],
+                                   ascending=[False, True, False, False], inplace=True)
 
 
     # NEW CODE
     location_dataframe.drop(columns='Temp_list', inplace=True)
+    location_dataframe.drop(columns='Sorter', inplace=True)
     assign_k9_to_initial_ports(location_dataframe, k9s_scheduled_list)
 
     team_list = list(location_dataframe['Team'])
