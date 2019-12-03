@@ -61,6 +61,8 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9
+
 import random
 
 from deployment.tasks import assign_TL
@@ -289,20 +291,17 @@ def check_handlers_with_multiple_k9s():
     #     print(item)
     return None
 
-def add_area(request):
-    # CAUTION : Only run this once
-    #Only uncomment this if you are populating db
-    # mass_populate()
-    # k9s = K9.objects.all()
-    # for k9 in k9s:
-    #     k9.save()
+def mass_populate_revisited():
+    create_predeployment_inventory()
+    generate_user()
+    create_teams()
+    generate_k9()
 
-    # users = User.objects.exclude(id = 1)
-    # for user in users:
-    #     print(user)
-    #     pi = Personal_Info.objects.get(UserID = user)
-    #     ed = Education.objects.get(UserID = user)
-    #     ac = Account.objects.get(UserID = user)
+    return None
+
+def add_area(request):
+
+    # mass_populate_revisited()
 
     form = AreaForm(request.POST or None)
     style = ""

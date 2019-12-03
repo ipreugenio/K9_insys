@@ -27,7 +27,7 @@ DEPLOYMENT
 1.)create_predeployment_inventory()
     a.) Creates Pre Deployment Inventory Items
     b.) Creates Mandatory Vaccines and Prevention
-2.)create_teams()
+2.)create_teams() - generate_user() first to assign commander
     a.) Creates Areas
     b.) Creates Locations
     c.) Creates Team_assignments
@@ -119,6 +119,7 @@ def generate_dogbreed():
                                  colors=color, weight=20, male_height=10, female_height=10,
                                  skill_recommendation=arr2[0], skill_recommendation2=arr2[1],
                                  skill_recommendation3=arr2[2], litter_number=litter_val, value=random_val2)
+        print("Generated Dog Breed : " + str(data))
 
     return None
 # END REPORT NECESSITIES
@@ -186,6 +187,7 @@ def create_predeployment_inventory():
     randomizer = random.randint(100, 1000)
     Medicine.objects.create(medicine='Frontline', med_type='Preventive', immunization='Tick and Flea', price=randomizer)
 
+    print("Generated inventory items")
     return None
 
 def create_teams():
@@ -349,6 +351,7 @@ def create_teams():
     for item in areas:
         area = Area.objects.create(name=item)
         area.save()
+        print("Area Generated : " + str(area))
 
     area_list = []
     for area in Area.objects.all():
@@ -368,6 +371,7 @@ def create_teams():
         area = item[1]
         area.commander = item[0]
         area.save()
+        print("Assigned " + str(item[0]) + " to " + str(item[1]))
 
     for item in CITY:
         place = fake.address() + " port"
@@ -384,6 +388,7 @@ def create_teams():
         # Create team
         team = Team_Assignment.objects.create(location = location)
         team.save()
+        print("Generated " + str(team))
 
     return None
 # END DEPLOYMENT NECESSITIES
@@ -601,11 +606,9 @@ def generate_user():
         first_name = "?"
         if randomizer == 0:
             first_name = fake.first_name_male()
-            print("First Name : " + first_name)
             gender = "Male"
         else:
             first_name = fake.first_name_female()
-            print("First Name : " + first_name)
             gender = "Female"
 
         last_name = fake.last_name()
@@ -678,8 +681,8 @@ def generate_user():
                                      email=email,
                                      password="zaq12wsx")
         #AuthUser.save()
-
         ctr += 1
+        print("Generated " + str(ctr) + " out of 500 users")
     return None
 
 # END USER CREATION
@@ -748,6 +751,7 @@ def generate_k9():
 
     # START CREATE PROCURED K9S
     # Initial K9 Count = 500
+    idx = 0
     for x in range (0, 500):
         randomizer = random.randint(0, 1)
         name = "?"
@@ -778,16 +782,18 @@ def generate_k9():
                 k9.supplier = supplier
                 k9.save()
             except: pass
+        idx += 1
+        print("Generated " + str(idx) + " out of 500 procured k9s")
     # END CREATE PROCURED K9S
 
     # START ASSIGN CAPABILITY
     k9s = K9.objects.all()
-    k9_id_list = []
+    k9_list = []
     for k9 in k9s:
-        k9_id_list.append(k9.id)
+        k9_list.append(k9)
 
     # 90% of k9s will be assigned a capability
-    classified_k9_sample = random.sample(k9_id_list, int(len(k9_id_list) * .95))
+    classified_k9_sample = random.sample(k9_list, int(len(k9_list) * .95))
 
     # Assign Capability
     for k9 in classified_k9_sample:
@@ -795,6 +801,7 @@ def generate_k9():
         k9.capability = SKILL[randomizer][0]
         k9.training_status = "Classified"
         k9.save()
+        print("Assigned capability " + str(SKILL[randomizer][0]) + " to " + str(k9))
     # END ASSIGN CAPABILITY
 
     # START ASSIGN HANDLER
@@ -805,20 +812,30 @@ def generate_k9():
         user_id_list.append(user.id)
 
     partnership_k9_sample = random.sample(classified_k9_sample, int(len(classified_k9_sample) * .80))
-    user_sample = random.sample(user_id_list, len(classified_k9_sample))  # user sample now have the same length as k9 sample
+    if len(partnership_k9_sample) < len(user_id_list):
+        user_sample = random.sample(user_id_list, len(partnership_k9_sample))  # user sample now have the same length as k9 sample (possible issue here if classified k9s are more than handlers)
+    else:
+        user_sample = user_id_list
+
     partnership = zip(partnership_k9_sample, user_sample)
 
     for item in partnership:
-        k9 = K9.objects.get(id=item[0])
+        k9 = K9.objects.get(id=item[0].id)
         user = User.objects.get(id=item[1])
 
         k9.handler = user
         k9.training_status = 'On-Training'
         k9.save()
+        print("Assigned Handler " + str(user) + " to " + str(k9))
     # END ASSIGN HANDLER
 
     # START CREATE TRAINING
-    training_k9_sample = random.sample(partnership_k9_sample, int(len(partnership_k9_sample) * .80))
+    training_k9 = K9.objects.filter(training_status = 'On-Training')
+    training_k9_list = []
+    for k9 in training_k9:
+        training_k9_list.append(k9)
+
+    training_k9_sample = random.sample(training_k9_list, int(len(training_k9_list) * .80))
 
     for k9 in training_k9_sample:
         #create training history
@@ -890,6 +907,7 @@ def generate_k9():
         k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
         k9.trained = "Trained"
         k9.save()
+        print("Created Training for " + str(k9))
 
     # END CREATE TRAINING
 
@@ -912,6 +930,7 @@ def generate_k9():
             k9.training_status = "For-Deployment"
             k9.status = "Working Dog"
             k9.save()
+            print(str(k9) + " is now For-Deployment")
         except:
             pass
 
@@ -921,6 +940,7 @@ def generate_k9():
             k9.training_status = "For-Breeding"
             k9.status = "Working Dog"
             k9.save()
+            print(str(k9) + " is now For-Breeding")
         except:
             pass
     # END BREEDING_or_DEPLOYMENT
@@ -930,7 +950,7 @@ def generate_k9():
     k9_list = []
     for k9 in  for_deployment_k9s:
         k9_list.append(k9)
-    for_deployment_k9_sample = random.sample(k9_id_list, int(len(k9_id_list) * .70))
+    for_deployment_k9_sample = random.sample(k9_list, int(len(k9_list) * .70))
 
     team_assign = Team_Assignment.objects.all()
 
@@ -942,31 +962,37 @@ def generate_k9():
 
     idx = 0
     for team in team_assign:
-        sublist = sublist_for_deployment_k9_sample[idx]
-        randomizer = random.randint(1, 45)
-        gen_birthdate = fake.date_between(start_date="-2y", end_date="-2y")
-        deployment_date = gen_birthdate + timedelta(days=495 + randomizer)
+        if idx < len(sublist_for_deployment_k9_sample) - 1:
+            sublist = sublist_for_deployment_k9_sample[idx]
+            randomizer = random.randint(1, 45)
+            gen_birthdate = fake.date_between(start_date="-2y", end_date="-2y")
+            deployment_date = gen_birthdate + timedelta(days=495 + randomizer)
 
-        for k9 in sublist:
-            deploy = K9_Schedule.objects.create(team=team, k9=k9, status="Initial Deployment",
-                                               date_start=deployment_date)
-            K9_Schedule.objects.create(team=team, k9=k9, status="Checkup",
-                                       date_start=deployment_date - timedelta(days=7))
-            K9_Pre_Deployment_Items.objects.create(k9=k9, initial_sched=deploy, status="Done")
-            Team_Dog_Deployed.objects.create(team_assignment=team, k9=k9,
-                                                      date_added=deployment_date + timedelta(days=random.randint(1, 6)))
-            randomizer = random.randint(0, len(vet_list) - 1)
-            PhysicalExam.objects.create(dog = k9, veterinary = vet_list[randomizer], heart_rate = 32, respiratory_rate = 32, temperature = 32, weight = 32, cleared = True)
+            for k9 in sublist:
+                deploy = K9_Schedule.objects.create(team=team, k9=k9, status="Initial Deployment",
+                                                   date_start=deployment_date)
+                K9_Schedule.objects.create(team=team, k9=k9, status="Checkup",
+                                           date_start=deployment_date - timedelta(days=7))
+                K9_Pre_Deployment_Items.objects.create(k9=k9, initial_sched=deploy, status="Done")
+                Team_Dog_Deployed.objects.create(team_assignment=team, k9=k9,
+                                                          date_added=deployment_date + timedelta(days=random.randint(1, 6)))
+                randomizer = random.randint(0, len(vet_list) - 1)
+                PhysicalExam.objects.create(dog = k9, veterinary = vet_list[randomizer], heart_rate = 32, respiratory_rate = 32, temperature = 32, weight = 32, cleared = True)
 
-            if k9.capability == "SAR":
-                team.SAR_deployed += 1
-            elif k9.capability == "NDD":
-                team.NDD_deployed += 1
-            elif k9.capability == "EDD":
-                team.EDD_deployed += 1
-            team.save()
+                if k9.capability == "SAR":
+                    team.SAR_deployed += 1
+                elif k9.capability == "NDD":
+                    team.NDD_deployed += 1
+                elif k9.capability == "EDD":
+                    team.EDD_deployed += 1
+                team.save()
+                print(str(k9) + " is deployed to " + str(team))
 
-        assign_TL(team)
+            assign_TL(team)
+            idx += 1
+        else:
+            break
+
 
     #END PRE DEPLOYMENT SCHEDULES
 
