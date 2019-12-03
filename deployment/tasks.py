@@ -14,6 +14,7 @@ from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule, Team_
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Food, Food_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
 from profiles.models import User
 
+from django.db.models import Q
 from pandas import DataFrame as df
 import pandas as pd
 
@@ -348,7 +349,8 @@ def update_request_info(dog_request):
 # @periodic_task(run_every=timedelta(seconds=30))
 def deploy_dog_request():
     # When Schedule is today, change training status to deployed
-    scheds = K9_Schedule.objects.filter(date_start__lte=date.today()).filter(status = "Request").exclude(dog_request = None)
+    # scheds = K9_Schedule.objects.filter(date_start__lte=date.today()).filter(status = "Request").exclude(dog_request = None)
+    scheds =  K9_Schedule.objects.filter(Q(date_start__lte=datetime.today().date()), Q(date_end__gte=datetime.today().date())).filter(status = "Request").exclude(dog_request = None)
 
     for sched in scheds: #per k9
         if sched.dog_request.status == "Approved":
@@ -457,7 +459,8 @@ def check_arrival_to_ports_via_request(team_assignment):
             k9.save()
         #creation of TDD is through pull_dog_request()
 
-    update_port_info([team_assignment.id])
+    if deployed:
+        update_port_info([team_assignment.id])
     return None
 
 # @periodic_task(run_every=crontab(hour=8, minute=30))
@@ -465,7 +468,8 @@ def check_arrival_to_ports_via_request(team_assignment):
 def check_arrivals():
 
     team_assignments = Team_Assignment.objects.all()
-    dog_requests = Dog_Request.objects.all() #TODO filter for currently ongoing dog requests
+    # dog_requests = Dog_Request.objects.exclude(start_date__gt = date.today()) #TODO filter for currently ongoing dog requests
+    dog_requests = Dog_Request.objects.filter(Q(start_date__lte = datetime.today().date()), Q(end_date__gte = datetime.today().date()))
 
     team_list = []
     for team_assignment in team_assignments:

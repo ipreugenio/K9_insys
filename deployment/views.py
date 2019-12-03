@@ -294,26 +294,26 @@ def check_handlers_with_multiple_k9s():
 
 def mass_populate_revisited():
     # GENERAL & DEPLOYMENT
-    generate_user()
-    create_teams()
-    generate_k9()
-    generate_dogbreed()
-    create_predeployment_inventory()
-    generate_k9_parents()
-
-    generate_requests()
-
-    # UNIT MANAGEMENT
-    generate_location_incident()
-    generate_handler_leave()
-    generate_daily_refresher()
-    generate_k9_incident()
-    generate_health_record()
-    generate_inventory_trail()
-    generate_handler_incident()
-    generate_adoption()
-
-    generate_k9_due_retire()
+    # generate_user()
+    # create_teams()
+    # generate_k9()
+    # generate_dogbreed()
+    # create_predeployment_inventory()
+    # generate_k9_parents()
+    #
+    # generate_requests()
+    #
+    # # UNIT MANAGEMENT
+    # generate_location_incident()
+    # generate_handler_leave()
+    # generate_daily_refresher()
+    # generate_k9_incident()
+    # generate_health_record()
+    # generate_inventory_trail()
+    # generate_handler_incident()
+    # generate_adoption()
+    #
+    # generate_k9_due_retire()
     generate_sick_breeding()
 
     fix_dog_duplicates()

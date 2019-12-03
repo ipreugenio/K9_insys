@@ -374,7 +374,8 @@ def team_leader_dashboard(request):
     dr = None
     dog_req = None
     try: #NOTE: TL won't see this anyway unless he's not a TL within date range of Dog_Request
-        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).exclude(end_date__gt=datetime.today().date()).last()
+        # dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).exclude(end_date__gt=datetime.today().date()).last()
+        dr = Dog_Request.objects.filter(team_leader=user).filter(Q(start_date__lte = datetime.today().date()), Q(end_date__gte = datetime.today().date())).last()
         dog_req = dr
         td_dr = Team_Dog_Deployed.objects.exclude(team_requested = None).filter(team_requested = dr).filter(status = "Pending").filter(handler__in = working_handlers)
 

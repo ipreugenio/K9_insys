@@ -395,38 +395,38 @@ def create_teams():
     fake = Faker()
     CITY = (
         ('Alaminos', 'Alaminos'),
-        ('Angeles', 'Angeles'),
+        # ('Angeles', 'Angeles'),
         ('Antipolo', 'Antipolo'),
         ('Bacolod', 'Bacolod'),
         ('Bacoor', 'Bacoor'),
-        ('Bago', 'Bago'),
+        # ('Bago', 'Bago'),
         ('Baguio', 'Baguio'),
-        ('Bais', 'Bais'),
-        ('Balanga', 'Balanga'),
+        # ('Bais', 'Bais'),
+        # ('Balanga', 'Balanga'),
         ('Batac', 'Batac'),
         ('Batangas', 'Batangas'),
-        ('Bayawan', 'Bayawan'),
-        ('Baybay', 'Baybay'),
-        ('Bayugan', 'Bayugan'),
+        # ('Bayawan', 'Bayawan'),
+        # ('Baybay', 'Baybay'),
+        # ('Bayugan', 'Bayugan'),
         ('Biñan', 'Biñan'),
         ('Bislig', 'Bislig'),
-        ('Bogo', 'Bogo'),
-        ('Borongan', 'Borongan'),
+        # ('Bogo', 'Bogo'),
+        # ('Borongan', 'Borongan'),
         ('Butuan', 'Butuan'),
-        ('Cabadbaran', 'Cabadbaran'),
+        # ('Cabadbaran', 'Cabadbaran'),
         ('Cabanatuan', 'Cabanatuan'),
         ('Cabuyao', 'Cabuyao'),
-        ('Cadiz', 'Cadiz'),
+        # ('Cadiz', 'Cadiz'),
         ('Cagayan de Oro', 'Cagayan de Oro'),
         ('Calamba', 'Calamba'),
         ('Calapan', 'Calapan'),
-        ('Calbayog', 'Calbayog'),
+        # ('Calbayog', 'Calbayog'),
         ('Caloocan', 'Caloocan'),
         ('Candon', 'Candon'),
         ('Canlaon', 'Canlaon'),
         ('Carcar', 'Carcar'),
         ('Catbalogan', 'Catbalogan'),
-        ('Cauayan', 'Cauayan'),
+        # ('Cauayan', 'Cauayan'),
         ('Cavite', 'Cavite'),
         ('Cebu', 'Cebu'),
         ('Cotabato', 'Cotabato'),
@@ -435,57 +435,56 @@ def create_teams():
         ('Dapitan', 'Dapitan'),
         ('Dasmariñas', 'Dasmariñas'),
         ('Davao', 'Davao'),
-        ('Digos', 'Digos'),
+        # ('Digos', 'Digos'),
         ('Dipolog', 'Dipolog'),
         ('Dumaguete', 'Dumaguete'),
-        ('El Salvador', 'El Salvador'),
-        ('Escalante', 'Escalante'),
-        ('Gapan', 'Gapan'),
+        # ('El Salvador', 'El Salvador'),
+        # ('Escalante', 'Escalante'),
+        # ('Gapan', 'Gapan'),
         ('General Santos', 'General Santos'),
         ('General Trias', 'General Trias'),
-        ('Gingoog', 'Gingoog'),
-        ('Guihulngan', 'Guihulngan'),
+        # ('Gingoog', 'Gingoog'),
+        # ('Guihulngan', 'Guihulngan'),
         ('Himamaylan', 'Himamaylan'),
-        ('Ilagan', 'Ilagan'),
         ('Iligan', 'Iligan'),
         ('Iloilo', 'Iloilo'),
         ('Imus', 'Imus'),
-        ('Iriga', 'Iriga'),
+        # ('Iriga', 'Iriga'),
         ('Isabela', 'Isabela'),
-        ('Kabankalan', 'Kabankalan'),
+        # ('Kabankalan', 'Kabankalan'),
         ('Kidapawan', 'Kidapawan'),
         ('Koronadal', 'Koronadal'),
         ('La Carlota', 'La Carlota'),
-        ('Lamitan', 'Lamitan'),
+        # ('Lamitan', 'Lamitan'),
         ('Laoag', 'Laoag'),
-        ('Lapu‑Lapu', 'Lapu‑Lapu'),
+        # ('Lapu‑Lapu', 'Lapu‑Lapu'),
         ('Las Piñas', 'Las Piñas'),
         ('Legazpi', 'Legazpi'),
-        ('Ligao', 'Ligao'),
+        # ('Ligao', 'Ligao'),
         ('Lipa', 'Lipa'),
         ('Lucena', 'Lucena'),
-        ('Maasin', 'Maasin'),
-        ('Mabalacat', 'Mabalacat'),
+        # ('Maasin', 'Maasin'),
+        # ('Mabalacat', 'Mabalacat'),
         ('Makati', 'Makati'),
         ('Malabon', 'Malabon'),
-        ('Malaybalay', 'Malaybalay'),
+        # ('Malaybalay', 'Malaybalay'),
         ('Malolos', 'Malolos'),
         ('Mandaluyong', 'Mandaluyong'),
-        ('Mandaue', 'Mandaue'),
+        # ('Mandaue', 'Mandaue'),
         ('Manila', 'Manila'),
         ('Marawi', 'Marawi'),
         ('Marikina', 'Marikina'),
         ('Masbate', 'Masbate'),
-        ('Mati', 'Mati'),
-        ('Meycauayan', 'Meycauayan'),
+        # ('Mati', 'Mati'),
+        # ('Meycauayan', 'Meycauayan'),
         ('Muñoz', 'Muñoz'),
         ('Muntinlupa', 'Muntinlupa'),
-        ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
-        ('Naga - Cebu', 'Naga - Cebu'),
+        # ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
+        # ('Naga - Cebu', 'Naga - Cebu'),
         ('Navotas', 'Navotas'),
         ('Olongapo', 'Olongapo'),
-        ('Ormoc', 'Ormoc'),
-        ('Oroquieta', 'Oroquieta'),
+        # ('Ormoc', 'Ormoc'),
+        # ('Oroquieta', 'Oroquieta'),
         ('Ozamiz', 'Ozamiz'),
         ('Pagadian', 'Pagadian'),
         ('Palayan', 'Palayan'),
@@ -493,41 +492,41 @@ def create_teams():
         ('Parañaque', 'Parañaque'),
         ('Pasay', 'Pasay'),
         ('Pasig', 'Pasig'),
-        ('Passi', 'Passi'),
+        # ('Passi', 'Passi'),
         ('Puerto Princesa', 'Puerto Princesa'),
         ('Quezon', 'Quezon'),
         ('Roxas', 'Roxas'),
-        ('Sagay', 'Sagay'),
-        ('Samal', 'Samal'),
-        ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
-        ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
-        ('San Fernando - La Union', 'San Fernando - La Union'),
-        ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
+        # ('Sagay', 'Sagay'),
+        # ('Samal', 'Samal'),
+        # ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
+        # ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
+        # ('San Fernando - La Union', 'San Fernando - La Union'),
+        # ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
         ('San Jose', 'San Jose'),
-        ('San Jose del Monte', 'San Jose del Monte'),
+        # ('San Jose del Monte', 'San Jose del Monte'),
         ('San Juan', 'San Juan'),
         ('San Pablo', 'San Pablo'),
         ('San Pedro', 'San Pedro'),
         ('Santa Rosa', 'Santa Rosa'),
         ('Santiago', 'Santiago'),
-        ('Silay', 'Silay'),
+        # ('Silay', 'Silay'),
         ('Sipalay', 'Sipalay'),
         ('Sorsogon', 'Sorsogon'),
         ('Surigao', 'Surigao'),
         ('Tabaco', 'Tabaco'),
-        ('Tabuk', 'Tabuk'),
+        # ('Tabuk', 'Tabuk'),
         ('Tacloban', 'Tacloban'),
-        ('Tacurong', 'Tacurong'),
+        # ('Tacurong', 'Tacurong'),
         ('Tagaytay', 'Tagaytay'),
-        ('Tagbilaran', 'Tagbilaran'),
+        # ('Tagbilaran', 'Tagbilaran'),
         ('Taguig', 'Taguig'),
         ('Tagum', 'Tagum'),
         ('Talisay - Cebu', 'Talisay - Cebu'),
-        ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
+        # ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
         ('Tanauan', 'Tanauan'),
-        ('Tandag', 'Tandag'),
-        ('Tangub', 'Tangub'),
-        ('Tanjay', 'Tanjay'),
+        # ('Tandag', 'Tandag'),
+        # ('Tangub', 'Tangub'),
+        # ('Tanjay', 'Tanjay'),
         ('Tarlac', 'Tarlac'),
         ('Tayabas', 'Tayabas'),
         ('Toledo', 'Toledo'),
@@ -893,12 +892,12 @@ def generate_k9():
         training_k9_list.append(k9)
 
     training_k9_sample = random.sample(training_k9_list, int(len(training_k9_list) * .80))
-    last_stage_k9_sample = random.sample(training_k9_sample, int(len(training_k9_sample) * .10))
+    # last_stage_k9_sample = random.sample(training_k9_sample, int(len(training_k9_sample) * .10))
 
     for k9 in training_k9_sample:
-        exclude_k9 = False
-        if k9 in last_stage_k9_sample:
-            exclude_k9 = True
+        # exclude_k9 = False
+        # if k9 in last_stage_k9_sample:
+        #     exclude_k9 = True
 
         #create training history
         fake_date = fake.date_between(start_date='-5y', end_date='today')
@@ -943,9 +942,9 @@ def generate_k9():
                 elif idx == 8:
                     stage = "Stage 3.3"
 
-                if exclude_k9 == False and idx != 8:
-                    sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-                    train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+                # if exclude_k9 == False and idx != 8:
+                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
                                                                     date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
                 # train_sched.save()
 
@@ -959,21 +958,24 @@ def generate_k9():
 
             training.stage3_1 = grade_list[6]
             training.stage3_2 = grade_list[7]
+            training.stage3_3 = grade_list[8]
 
             start_date = datetime(2019, 1, 1)
             end_date = datetime(2019, 12, 31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
 
-            if exclude_k9 == False:
-                training.stage3_3 = grade_list[8]
-                training.stage = "Finished Training"
-                training.date_finished = f_date
+            # if exclude_k9 == False:
 
-                k9.training_status = 'Trained'
-                k9.training_level = "Finished Training"
-                k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
-                k9.trained = "Trained"
-                k9.save()
+            training.stage = "Finished Training"
+            training.date_finished = f_date
+
+            k9.training_status = 'Trained'
+            k9.training_level = "Finished Training"
+            k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.trained = "Trained"
+            k9.save()
+            # else:
+            #     training.stage = "Stage 3.2"
 
             training.remarks = remark
             training.save()
@@ -1113,7 +1115,7 @@ def generate_requests():
     for area in Area.objects.all():
         area_list.append(area)
 
-    for x in range(0, 150):
+    for x in range(0, 80):
         requester = fake.company()
         cell = "+63" + fake.msisdn()[:10]
 
@@ -1745,15 +1747,16 @@ def generate_health_record():
         start_date = datetime(2019,1,1)
         end_date = datetime(2019,12,10)
 
-        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        f_date = fake.date_between_dates(date_start=start_date, date_end=end_date)
         k_desc = random.choice(sick)
         v = random.choice(vet_list)
         prob = random.choice(problem)
         treat = random.choice(treatment)
+        days = random.randint(1, 5)
         
         k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
         
-        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident, duration = days)
 
         randomint = random.randint(1, 5)
 
@@ -2495,10 +2498,11 @@ def generate_sick_breeding():
         v = random.choice(vet_list)
         prob = random.choice(problem)
         treat = random.choice(treatment)
+        days = random.randint(1, 5)
         
         k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
         
-        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident, duration = days)
 
         randomint = random.randint(1, 5)
 
