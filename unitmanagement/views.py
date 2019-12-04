@@ -678,6 +678,11 @@ def vaccine_submit(request):
                 if vr.anti_rabies == True and vr.bordetella_1 == True and vr.bordetella_2 == True and vr.dhppil4_1 == True and vr.dhppil4_2 == True and vr.dhppil_cv_1 == True and vr.dhppil_cv_2 == True and vr.dhppil_cv_3 == True:
                     k9.training_status = 'Unclassified'
                     k9.save()
+
+                if vr.anti_rabies == True and vr.bordetella_1 == True and vr.bordetella_2 == True and vr.dhppil4_1 == True and vr.dhppil4_2 == True and vr.dhppil_cv_1 == True and vr.dhppil_cv_2 == True and vr.dhppil_cv_3 == True and vr.deworming_1 == True and vr.deworming_2 == True and vr.deworming_3 == True and vr.deworming_4 == True and vr.heartworm_1 == True and vr.heartworm_2 == True and vr.heartworm_3 == True and vr.heartworm_4 == True and vr.heartworm_5 == True and vr.heartworm_6 == True and vr.heartworm_7 == True and vr.heartworm_8 == True and vr.tick_flea_1 == True and vr.tick_flea_2 == True and vr.tick_flea_3 == True and vr.tick_flea_4 == True and vr.tick_flea_5 == True and vr.tick_flea_6 == True and vr.tick_flea_7 == True:
+                    vr.status = 'Done'
+                    vr.save()
+
             messages.success(request, str(k9) + ' has been given ' + str(f.vaccine))
             return HttpResponseRedirect('vaccination-list')
         else:
@@ -1547,6 +1552,8 @@ def trained_list(request):
     for d in data:
         a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
         ts.append(a.date_end.date())
+     
+        
 
 
     #NOTIF SHOW
@@ -2028,15 +2035,17 @@ def handler_incident_form(request):
     user = user_session(request)
     form = HandlerIncidentForm(request.POST or None)
     style='ui green message'
+    try:
+        data = Team_Assignment.objects.get(team_leader=user)
 
-    data = Team_Assignment.objects.get(team_leader=user)
+        team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+        handler = []
+        for team in team:
+            handler.append(team.handler.id)
 
-    team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    handler = []
-    for team in team:
-        handler.append(team.handler.id)
-
-    form.fields['handler'].queryset = User.objects.filter(id__in=handler)
+        form.fields['handler'].queryset = User.objects.filter(id__in=handler)
+    except:
+        pass
     if request.method == "POST":
         if form.is_valid():
 
@@ -2251,7 +2260,7 @@ def reassign_assets(request, id):
         else:
             cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
 
-        s=[cap]
+        s=[cap, h.rank]
         g.append(s)
 
     if request.method == 'POST':
@@ -2327,7 +2336,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
 
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list)
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list).order_by('year_retired')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2904,7 +2913,7 @@ def choose_handler_list(request, id):
         if cap != 0:
             c = int((cap / ct) * 100)
 
-        s = [cap,ct,c]
+        s = [cap,ct,c,h.rank]
         g.append(s)
     if request.method == 'POST':
         print(form.errors)

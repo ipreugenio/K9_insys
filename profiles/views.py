@@ -40,13 +40,13 @@ from deployment.forms import GeoForm, GeoSearch, RequestForm, MaritimeForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account_form, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
-    K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler
+    K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler, Handler_On_Leave, Handler_Incident, K9_Incident
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
 from deployment.tasks import subtract_inventory, assign_TL
 
-from deployment.views import team_location_details, request_dog_details, mass_populate
+from deployment.views import team_location_details, request_dog_details, mass_populate_revisited
 from unitmanagement.forms import EmergencyLeaveForm
 from unitmanagement.tasks import check_leave_window
 
@@ -94,6 +94,14 @@ def user_session(request):
 
 def dashboard(request):
     user = user_session(request)
+
+    #Regular Leave & Emergency Leave
+    rl = Handler_On_Leave.objects.filter(status='Pending').count()
+    el = Emergency_Leave.objects.filter(status='Ongoing').count()
+
+    #Incident
+    hi = Handler_Incident.objects.filter(status='Pending').count()
+    k9i = K9_Incident.objects.filter(status='Pending').count()
 
     can_deploy = K9.objects.filter(training_status='For-Deployment').filter(assignment='None').count()
     NDD_count = K9.objects.filter(capability='NDD').count()
@@ -243,6 +251,7 @@ def dashboard(request):
                 a = abs(ball)
                 b = ['Ball',a]
                 item_list.append(b)
+
         except:
             pass
 
@@ -278,6 +287,11 @@ def dashboard(request):
         'pq_count': pq_count,
         'ua_count': ua_count,
         'pre_req_count':len(item_list),
+
+        'rl': rl,
+        'el':el,
+        'k9i':k9i,
+        'hi':hi,
 
         'notif_data':notif_data,
         'count':count,
@@ -1556,7 +1570,7 @@ def profile(request):
     return render (request, 'profiles/profile.html', context)
 
 def register(request):
-    # mass_populate()
+    mass_populate_revisited()
 
     #MAKE USER
     # for i in range(5):

@@ -14,7 +14,7 @@
                                 <div class="ui small statistic">
                                     <div class="value">
                                         <i class="user purple icon"></i>
-                                        <i class="paw purple icon"></i>
+                                        <!-- <i class="paw purple icon"></i> -->
                                         <i class="purple icon">{{c_count}}</i>
                                         
                                     </div>
@@ -28,12 +28,15 @@
                         </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
-                               <div class="ui small statistic">
+                                <div class="ui small statistic">
                                     <div class="value">
-                                        <i class="exclamation circle red icon">{{ua_count}}</i>
+                                        <i class="question black icon"></i>
+                                        <!-- <i class="paw black icon"></i> -->
+                                        <i class="black icon">{{up_count}}</i>
                                     </div>
                                     <div class="label">
-                                            <a href="{% url 'unitmanagement:k9_mia_list'%}">MIA COUNT</a>
+
+                                            <a href="{% url 'unitmanagement:k9_unpartnered_list'%}">REASSIGN UNPARTNERED K9's</a>
                                     </div>
                                 </div>
                             </div>
@@ -72,13 +75,10 @@
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
                                     <div class="value">
-                                        <i class="question black icon"></i>
-                                        <i class="paw black icon"></i>
-                                        <i class="black icon">{{up_count}}</i>
+                                        <i class="exclamation circle red icon">{{ua_count}}</i>
                                     </div>
                                     <div class="label">
-
-                                            <a href="{% url 'unitmanagement:k9_unpartnered_list' %}">UNPARTNERED K9's</a>
+                                            <a href="{% url 'unitmanagement:k9_mia_list'%}">MIA COUNT</a>
                                     </div>
                                 </div>
                             </div>
@@ -87,36 +87,18 @@
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
                                     <div class="value">
-                                        <i class="tasks orange icon">{{pre_req_count}}</i>
+                                        <i class="exclamation violet icon"></i>
+                                        <i class="paw violet icon">{{k9i}}</i>
                                     </div>
                                     <div class="label">
                                         <strong>
-                                            <a href="{% url
-                                            'deployment:pre_req_unconfirmed'%}">K9
+                                            <a href="{% url 'unitmanagement:k9_incident_list'%}">K9
                                             INCIDENT</a>
                                         </strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="column">
-                            <div class="ui raised center aligned segment">
-                                 <div class="ui small statistic">
-                                    <div class="value">
-                                        <i class="shopping basket olive icon"></i>
-                                        <i class="olive icon">{{item_req_count}}</i>
-                                    </div>
-                                    <div class="label">
-
-                                            <a href="{% url
-                                            'unitmanagement:replenishment_confirm'
-                                            %}">HANDLER INCIDENT</a>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div> 
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                 <div class="ui small statistic">
@@ -153,12 +135,12 @@
                             <div class="ui raised center aligned segment">
                                     <div class="ui small statistic">
                                     <div class="value">
-                                        <i class="shopping basket olive icon"></i>
-                                        <i class="olive icon">{{item_req_count}}</i>
+                                        <i class="shopping basket green icon"></i>
+                                        <i class="green icon">{{item_req_count}}</i>
                                     </div>
                                     <div class="label">
 
-                                            <a href="{% url 'unitmanagement:replenishment_confirm' %}">PENDING ITEM REPLENISHMENT REQUESTS</a>
+                                            <a href="{% url 'unitmanagement:replenishment_confirm' %}">ITEM REPLENISHMENT REQUESTS</a>
 
                                     </div>
                                 </div>

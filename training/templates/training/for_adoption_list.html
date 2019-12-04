@@ -20,8 +20,8 @@
                 <th>Name</th>
                 <th>Breed</th>
                 <th>Sex</th>
-                <th>Age (Years)</th>
-                <th>Age (Days)</th>
+                <th>Age (yrs & mon)</th>
+                <th>Age (days)</th>
             </tr>
         </thead>
         <tbody>
@@ -32,8 +32,8 @@
                 </td>
                 <td>{{data.breed}}</td>
                 <td>{{data.sex}}</td>
-                <td class="right aligned">{{data.age|intcomma}}</td>
-                <td class="right aligned">{{data.age_days|intcomma}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -46,8 +46,8 @@
                 <th>Name</th>
                 <th>Breed</th>
                 <th>Sex</th>
-                <th>Age (Years)</th>
-                <th>Age (Days)</th>
+                <th>Age (yrs & mon)</th>
+                <th>Age (days)</th>
                 <th></th>
             </tr>
         </thead>
@@ -59,8 +59,8 @@
                 </td>
                 <td>{{data.k9.breed}}</td>
                 <td class="two wide">{{data.k9.sex}}</td>
-                <td class="right aligned two wide">{{data.k9.age|intcomma}}</td>
-                <td class="right aligned two wide">{{data.k9.age_days|intcomma}}</td>
+                <td class="right aligned three wide">{{data.k9.age}} years and {{data.month_remainder}} months</td>
+                <td class="right aligned two wide">{{data.k9.age_days}}</td>
                 <td class="two wide center aligned">
                     <i class="ui small primary button returned_btn" id={{data.k9.id}}>Returned</i>
                 </td>

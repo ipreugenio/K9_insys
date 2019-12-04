@@ -15,23 +15,20 @@
     <table id="tabledata1" class="ui celled table">
         <thead class="center aligned">
             <tr>
-                <th class="two wide">Retired Date</th>
                 <th class="three wide">K9</th>
                 <th>Port</th>
-                <th class="two wide">Age (yrs & mons)</th>
-                <th class="two wide">Age (days)</th>
+                <th class="two wide"> Age</th>
+                <th class="two wide">Retired Date</th>
                 <th class="two wide"></th>
             </tr>
         </thead>
         <tbody>
             {% for data in data %}
             <tr>
-            </tr>
-                <td>{{data.year_retired|date:'Y-m-d'}}</td>
                 <td>{{data}}</td>
                 <td >{{data.assignment}}</td>
-                <td>{{data.age}} years and {{data.month_remainder}} months</td>
-                <td>{{data.age_days}}</td>
+                <td>{{data.age}} yrs and {{data.month_remainder}} mon</td>
+                <td>{{data.year_retired}}</td>
                 <td style="text-align:center;" class="two wide">
                     <a href="{% url 'unitmanagement:due_retired_call' data.id %}" class="ui tiny basic red button">Call Back</a>
                 </td>
@@ -45,10 +42,8 @@
 <script type="text/javascript">
 
     $('#tabledata1').DataTable({
-        "order": [[ 4, "asc" ],[ 3, "asc" ],[ 0, "asc" ]]
+        "order": [[ 3, "asc" ]]
     });
-    $('.menu .item').tab();
-
-
+      
 </script>
  {% endblock %}

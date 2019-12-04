@@ -26,11 +26,12 @@
 
 <div class="ui bottom attached active tab segment" data-tab="first">
     <h4>Deworming</h4>
-    <table id="tabledata1" class="ui three column celled table">
+    <table id="tabledata1" class="ui four column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
-                <th class="two wide">Age (Days)</th>
+                <th class="two wide">Age (yrs & mons)</th>
+                <th class="two wide">Age (days)</th>
                 <th>Vaccination</th>
                 <th class="two wide"></th>
             </tr>
@@ -39,7 +40,8 @@
             {% for data in k9_dw %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}'
@@ -51,11 +53,12 @@
 </div>
 <div class="ui bottom attached tab segment" data-tab="second">
     <h4>DHPPIL+CV</h4>
-    <table id="tabledata2" class="ui three column celled table">
+    <table id="tabledata2" class="ui four column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
-                <th class="two wide">Age (Days)</th>
+                <th class="two wide">Age (yrs & mons)</th>
+                <th class="two wide">Age (days)</th>
                 <th>Vaccination</th>
                 <th class="two wide"></th>
             </tr>
@@ -65,7 +68,8 @@
             {% if data.1.disease == '2nd dose DHPPiL+CV'%}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.1.disease}} Vaccination</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPP'>Select</a></td>
@@ -73,7 +77,8 @@
             {%else%}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPP'>Select</a></td>
@@ -85,11 +90,12 @@
 </div>
 <div class="ui bottom attached tab segment" data-tab="third">
     <h4>Anti Rabies</h4>
-    <table id="tabledata3" class="ui three column celled table">
+    <table id="tabledata3" class="ui four column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
-                <th class="two wide">Age (Days)</th>
+                <th class="two wide">Age (yrs & mons)</th>
+                <th class="two wide">Age (days)</th>
                 <th>Vaccination</th>
                 <th class="two wide"></th>
             </tr>
@@ -98,7 +104,8 @@
             {% for data in k9_ar %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td >{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Anti-Rabies'>Select</a></td>
@@ -109,11 +116,12 @@
 </div>
 <div class="ui bottom attached tab segment" data-tab="fourth">
     <h4>Bordertella</h4>
-    <table id="tabledata4" class="ui three column celled table">
+    <table id="tabledata4" class="ui four column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
-                <th class="two wide">Age (Days)</th>
+                <th class="two wide">Age (yrs & mons)</th>
+                <th class="two wide">Age (days)</th>
                 <th>Vaccination</th>
                 <th class="two wide"></th>
             </tr>
@@ -122,7 +130,8 @@
             {% for data in k9_br %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Bordertella'>Select</a></td>
@@ -133,11 +142,12 @@
 </div>
 <div class="ui bottom attached tab segment" data-tab="fifth">
     <h4>DHPPIL4</h4>
-    <table id="tabledata5" class="ui three column celled table">
+    <table id="tabledata5" class="ui four column celled table">
         <thead class="ui center aligned">
             <tr>
                 <th>K9</th>
-                <th class="two wide">Age (Days)</th>
+                <th class="two wide">Age (yrs & mons)</th>
+                <th class="two wide">Age (days)</th>
                 <th>Vaccination</th>
                 <th class="two wide"></th>
             </tr>
@@ -146,7 +156,8 @@
             {% for data in k9_d4 %}
             <tr>
                 <td>{{data.0}}</td>
-                <td>{{data.0.age_days}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.1.disease}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='DHPPIL4'>Select</a></td>
@@ -158,11 +169,12 @@
 
 <div class="ui bottom attached tab segment" data-tab="sixth">
         <h4>Heartworm</h4>
-        <table id="tabledata6" class="ui three column celled table">
+        <table id="tabledata6" class="ui four column celled table">
             <thead class="ui center aligned">
                 <tr>
                     <th>K9</th>
-                    <th class="two wide">Age (Days)</th>
+                    <th class="two wide">Age (yrs & mons)</th>
+                    <th class="two wide">Age (days)</th>
                     <th>Vaccination</th>
                     <th class="two wide"></th>
                 </tr>
@@ -171,7 +183,8 @@
                 {% for data in k9_hw %}
                 <tr>
                     <td>{{data.0}}</td>
-                    <td>{{data.0.age_days}}</td>
+                    <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                    <td>{{data.0.age_days}}</td>    
                     <td>{{data.1.disease}}</td>
                     <td class="three wide column center aligned"><a href="#"
                     class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='Heartworm'>Select</a></td>
@@ -183,11 +196,12 @@
 
     <div class="ui bottom attached tab segment" data-tab="seventh">
             <h4>Tick and Flee</h4>
-            <table id="tabledata7" class="ui three column celled table">
+            <table id="tabledata7" class="ui four column celled table">
                 <thead class="ui center aligned">
                     <tr>
                         <th>K9</th>
-                        <th class="two wide">Age (Days)</th>
+                        <th class="two wide">Age (yrs & mons)</th>
+                        <th class="two wide">Age (days)</th>
                         <th>Vaccination</th>
                         <th class="two wide"></th>
                     </tr>
@@ -196,7 +210,8 @@
                     {% for data in k9_tf %}
                     <tr>
                         <td>{{data.0}}</td>
-                        <td>{{data.0.age_days}}</td>
+                        <td>{{data.0.age}} years and {{data.0.month_remainder}} months</td>
+                        <td>{{data.0.age_days}}</td>    
                         <td>{{data.1.disease}}</td>
                         <td class="three wide column center aligned"><a href="#"
                         class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-vac='{{data.1.disease}}' data-type='TickFlee'>Select</a></td>
@@ -209,54 +224,52 @@
 <div class="ui modal" id='id_modal_data'></div>
 <script>
 
-    $(document).ready(function() {
 
-        $('.menu .item').tab();
-    
+
+    $('.menu .item').tab();
+
+    $('#tabledata1').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
     });
-
-        $('#tabledata1').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata2').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata3').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata4').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata5').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata6').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
-        $('#tabledata7').DataTable({
-            "order": [[ 1, "desc" ]]
-        });
+    $('#tabledata2').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata3').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata4').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata5').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata6').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata7').DataTable({
+        "order": [[ 2, "desc" ],[ 3, "asc" ]]
+    });
     $( ".btn_modal" ).bind( "click", function() {
-            var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
-            id = $(this).attr('id');
-            type = $(this).data('type');
-            disease = $(this).data('vac');
-            intial = 'True'
-           
-            $.ajax({                      
-                url: url,                    
-                data: {
-                'id': id,   
-                'type': type,
-                'intial': intial,  
-                'disease': disease      
-                },
-                success: function (data) {   
-                $("#id_modal_data").html(data); 
-                }
-            });
-            $('#id_modal_data').modal('show');
+        var url = 'yearly-vaccine-list/ajax_load_yearly_vac';  
+        id = $(this).attr('id');
+        type = $(this).data('type');
+        disease = $(this).data('vac');
+        intial = 'True'
+        
+        $.ajax({                      
+            url: url,                    
+            data: {
+            'id': id,   
+            'type': type,
+            'intial': intial,  
+            'disease': disease      
+            },
+            success: function (data) {   
+            $("#id_modal_data").html(data); 
+            }
         });
+        $('#id_modal_data').modal('show');
+    });
     
 </script>
 

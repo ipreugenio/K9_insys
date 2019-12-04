@@ -24,8 +24,12 @@
                 <td>{{data.name}}</td>
             </tr>
             <tr>
-                <th>Age (years)</th>
-                <td>{{data.age}}</td>
+                <th>Age (yrs & mons)</th>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+            </tr>
+            <tr>
+                <th>Age (days)</th>
+                <td>{{data.age_days}}</td>
             </tr>
             <tr>
                 <th>Breed</th>
@@ -34,6 +38,10 @@
             <tr>
                 <th>Sex</th>
                 <td>{{data.sex}}</td>
+            </tr>
+            <tr>
+                <th>Source</th>
+                <td>{{data.source}}</td>
             </tr>
             {% if parent_exist %}
             <tr>
@@ -230,10 +238,11 @@
 
 
 </div>
+
+<br>
+<button class="ui green button" type="Submit">Assign Skill</button>
 </center>
 
-
-          <button class="ui green button" type="Submit">Assign Skill</button>
   </div>
 </form>
 

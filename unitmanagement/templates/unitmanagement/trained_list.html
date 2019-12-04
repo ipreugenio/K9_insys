@@ -176,11 +176,11 @@
         <table id="tabledata1" class="ui celled table">
             <thead>
                 <tr>
+                    <th>Finished Training</th>
                     <th>Name</th>
                     <th>Breed</th>
                     <th>Capability</th>
                     <th>Sex</th>
-                    <th>Finished Training</th>
                     <th></th>
                 </tr>
             </thead>
@@ -188,12 +188,11 @@
                 {% for data in data %}
 
                 <tr>
+                    <td>{{ts|list_item_date:forloop.counter0}}</td>
                     <td>{{data}}</td>
                     <td >{{data.breed}}</td>
                     <td>{{data.capability}}</td>
                     <td>{{data.sex}}</td>
-
-                    <td>{{ts|list_item_date:forloop.counter0}}</td>
 
                     <td style="text-align:center;" class="two wide">
                         <!--<a href="#" class="ui tiny basic blue button btn_modal" id='{{data.id}}' >Select</a>-->
@@ -238,13 +237,12 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({
-         "order": [[ 4, "asc" ]]
-         });
-        $('.menu .item').tab();
+  
+    $('#tabledata1').DataTable({
+        "order": [[ 0, "asc" ]]
+        });
+    $('.menu .item').tab();
 
-    });
 
 </script>
  {% endblock %}

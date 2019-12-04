@@ -10,13 +10,14 @@
     {% endif %}
 </div>
 
-<table id="tabledata1" class="ui six column celled table">
+<table id="tabledata1" class="ui seven column celled table">
     <thead>
         <tr>
             <th>K9</th>
             <th>Serial Number</th>
             <th>Breed</th>
-            <th>Age</th>
+            <th>Age (yrs & mons)</th>
+            <th>Age (days)</th>
             <th>Capability</th>
             <th></th>
         </tr>
@@ -28,35 +29,25 @@
                 <td>{{data.name}}</td>
                 <td>{{data.serial_number}}</td>
                 <td>{{data.breed}}</td>
-                <td>{{data.age}}</td>
+                <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td>{{data.capability}}</td>
                 <td class="ui center aligned">
                     <a class = 'ui blue tiny basic button' href="{% url 'unitmanagement:reassign_assets' data.id %}">Select</a>
                 </td>
             </tr>
         {% endfor %}
-    <!--{% for data in data_on_leave %}-->
-            <!--<tr>-->
-                <!--<td>{{data.name}}</td>-->
-                <!--<td>{{data.serial_number}}</td>-->
-                <!--<td>{{data.breed}}</td>-->
-                <!--<td>{{data.age}}</td>-->
-                <!--<td>{{data.capability}}</td>-->
-                <!--<td><i class="green check icon"></i></td>-->
-                <!--<td class="ui center aligned">-->
-                    <!--<a class = 'ui blue tiny basic button' href="{% url 'unitmanagement:reassign_assets' data.id %}">Select</a>-->
-                <!--</td>-->
-            <!--</tr>-->
-        <!--{% endfor %}-->
     </tbody>
 </table>
          
 <script type="text/javascript">
         
-    $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('.menu .item').tab();
+   
+    $('#tabledata1').DataTable({
+        "order": [[ 0, "asc" ]]
     });
+    $('.menu .item').tab();
+  
     
 </script>
 

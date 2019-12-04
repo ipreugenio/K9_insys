@@ -22,10 +22,10 @@
     <table id="tabledata1" class="ui celled table">
         <thead>
             <tr>
+                <th>Leave Date</th>
                 <th>Name</th>
                 <th>Mobile Number</th>
                 <th>Tel Number</th>
-                <th>Leave Date</th>
                 <th>Days Lapsed</th>
                 <th>Status</th>
                 <th></th>
@@ -34,10 +34,10 @@
         <tbody>
             {% for x in data %}
             <tr>
+                <td>{{x.0.date_of_leave}}</td>
                 <td>{{x.0.handler.fullname}}</td>
                 <td>{{x.1.mobile_number}}</td>
                 <td>{{x.1.tel_number}}</td>
-                <td>{{x.0.date_of_leave}}</td>
                 <td>{{x.2}} days</td>
                 <td>{{x.0.status}}</td>
                 <td>
@@ -52,10 +52,9 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({ "order": [[ 4, "desc" ]]  });
-        $('.menu .item').tab();
-    });
+ 
+    $('#tabledata1').DataTable({ "order": [[ 0, "asc" ],[ 1, "asc" ]]  });
+    $('.menu .item').tab();
 
 </script>
 

@@ -20,20 +20,20 @@
     <table id="tabledata1" class="ui celled table">
         <thead>
             <tr>
+                <th>Date</th>
                 <th>K9</th>
                 <th>Handler</th>
                 <th>Port/Event</th>
-                <th>Date</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in k9_list %}
             <tr>
+                <td class="two wide">{{data.2.date_pulled|date:'Y-m-d'}}</td>
                 <td class="two wide">{{data.0}}</td>
                 <td class="two wide">{{data.0.handler}}</td>
                 <td>{{data.1}}</td>
-                <td class="two wide">{{data.2.date_pulled|date:'Y-m-d'}}</td>
                 <td style="text-align:center;" class="three wide">
                     <a href="{% url 'unitmanagement:k9_mia_change' data.0.id %}?status=late" class="ui tiny basic orange button">Late</a>
                     <a href="{% url 'unitmanagement:k9_mia_change' data.0.id %}?status=missing" class="ui tiny basic red button">Missing</a>
@@ -46,15 +46,10 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({
-             "order": [[ 0, "desc" ]]
-        });
-        $('.menu .item').tab();
-
-
-
+    $('#tabledata1').DataTable({
+            "order": [[ 0, "desc" ],[ 1, "asc" ],[ 2, "asc" ],[ 3, "asc" ]]
     });
+    $('.menu .item').tab();
 
 </script>
 

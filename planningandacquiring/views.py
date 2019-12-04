@@ -2910,6 +2910,10 @@ def adoption_date(request):
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
+
+     
+    #     # for i in range(10):
+    # K9.objects.create(name='Lola'+str(i), handler=user, breed='Jack Russel',sex='Female',color='Cream', birth_date=date.today(),source='Procurement',status='Working Dog',training_status='For-Deployment',height=20,weight=20)
     context = {
         'notif_data': notif_data,
         'count': count,
@@ -2927,10 +2931,9 @@ def ajax_adoption_report(request):
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
-
-        data_arr = K9_Adopted_Owner.objects.filter(date_adopted__range=[from_date, to_date]).order_by('date_adopted')
-        print(data_arr)
-        
+       
+        data_arr = K9_Adopted_Owner.objects.filter(date_adopted__range=[from_date, to_date]).order_by('date_adopted', 'last_name')
+      
     except:
         pass
     user = user_session(request)

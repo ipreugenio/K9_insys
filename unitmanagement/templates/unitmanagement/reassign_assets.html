@@ -50,9 +50,10 @@
             <div class="ui segment">
                 <table class="ui column celled inverted orange table" id = 'tabledata'>
                     <thead class="center aligned">
-                        <th class="four wide"></th>
-                        <th class="eight wide">Name</th>
-                        <th class="four wide">{{k9.capability}} Handled</th>
+                        <th class="two wide"></th>
+                        <th>Name</th>
+                        <th class="four wide">Rank</th>
+                        <th class="three wide">{{k9.capability}} Handled</th>
                     </thead>
                     <tbody>
                             {% for a in form.handler %}
@@ -60,6 +61,7 @@
                             <tr>
                                 <td class="center aligned">{{a.tag}}</td>
                                 <td>{{a.choice_label}}</td>
+                                <td  class="center aligned">{{g.1}}</td>
                                 <td  class="center aligned">{{g.0}}</td>
                             </tr>
                             {%endif%}{% endfor %}

@@ -25,12 +25,13 @@
     <a class="item" data-tab="fourth">Anestrus</a>
 </div>
 <div class="ui tab segment active" data-tab="first">
-    <table id="tabledata1" class="ui five column celled table">
+    <table id="tabledata1" class="ui six column celled table">
         <thead>
             <tr>
                 <th>K9</th>
                 <th>Breed</th>
-                <th>Age</th>
+                <th>Age (yrs & mons)</th>
+                <th>Age (days)</th>
                 <th>Last Proestrus Date</th>
                 <th>Next Proestrus Date</th>
             </tr>
@@ -40,7 +41,8 @@
                 <tr>
                     <td><a href="{% url 'unitmanagement:reproductive_edit' proestrus.id %}">{{ proestrus.name }}</a></td>
                     <td>{{ proestrus.breed }}</td>
-                    <td>{{ proestrus.age }}</td>
+                    <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                    <td>{{data.age_days}}</td>    
                         {% if proestrus.last_proestrus_date == None %} </td>
                         <td>No date yet</td>
                         {% else %}

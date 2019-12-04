@@ -8,32 +8,34 @@
     {% endif %}
 </div>
 <div class="ui segment">
-	<table id="tabledata1" class="ui nine column celled table">
+	<table id="tabledata1" class="ui nine column small celled table">
         <thead>
         <tr>
+            <th>Date Added</th>
             <th>Name</th>
             <th>Serial Number</th>
             <th>Breed</th>
             <th>Sex</th>
-            <th>Age</th>
+            <th>Age (yrs & mons)</th>
+            <th>Age (days)</th>
             <th>Skill</th>
             <th>Source</th>
             <th>Status</th>
-            <th>Date</th>
         </tr>
         </thead>
         <tbody>
             {% for K9 in k9 %}
                 <tr>
+                    <td>{{ K9.date_created|date:'Y-m-d'}}</td>
                     <td><a href="{% url 'planningandacquiring:K9_detail' K9.id %}">{{K9.name}}</a></td>
                     <td>{{ K9.serial_number }}</td>
                     <td>{{ K9.breed }}</td>
                     <td>{{ K9.sex }}</td>
-                    <td>{{ K9.age}}</td>
+                    <td>{{K9.age}} years and {{K9.month_remainder}} months</td>
+                    <td>{{K9.age_days}}</td>    
                     <td>{{ K9.capability}}</td>
                     <td>{{ K9.source}}</td>
                     <td>{{ K9.status}}</td>
-                    <td>{{ K9.date_created|date:'Y-m-d'}}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -43,13 +45,13 @@
 
 <script type="text/javascript">
 
-	$(document).ready(function() {
-		$('#tabledata1').DataTable( {
-        "order": [[ 8, "desc" ]]
-        });
-      
-		$('.menu .item').tab();
-	});
+
+    $('#tabledata1').DataTable( {
+    "order": [[ 0, "desc" ],[1,"asc"]]
+    });
+    
+    $('.menu .item').tab();
+
 
 </script>
 {% endblock %}
