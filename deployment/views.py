@@ -292,9 +292,9 @@ def check_handlers_with_multiple_k9s():
     return None
 
 def mass_populate_revisited():
-    create_predeployment_inventory()
-    generate_user()
-    create_teams()
+    # create_predeployment_inventory()
+    # generate_user()
+    # create_teams()
     generate_k9()
 
     return None

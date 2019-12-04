@@ -111,6 +111,7 @@ urlpatterns = [
     path('k9_accident', views.k9_accident, name ='k9_accident'),
     #path('/<int:id>/', views., name=''),
 
+    path('handler_incident_list', views.handler_incident_list, name ='handler_incident_list'),
     path('emergency_leave_list', views.emeregency_leave_list, name ='emergency_leave_list'),
     path('handler_status_mia/<int:id>', views.handler_status_mia, name ='handler_status_mia'),
     path('k9_accident_death_handler', views.k9_accident_death_handler, name ='k9_accident_death_handler'),

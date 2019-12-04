@@ -21,7 +21,8 @@
                 <th>Breed</th>
                 <th>Capability</th>
                 <!--<th>Sex</th>-->
-                <th>Age</th>
+                <th>Age (yrs & mon)</th>
+                <th>Age (days)</th>
                 <th></th>
             </tr>
         </thead>
@@ -33,6 +34,7 @@
                 <td>{{data.capability}}</td>
                 <!--<td >{{data.sex}}</td>-->
                 <td>{{data.age}} years and {{data.month_remainder}} months</td>
+                <td>{{data.age_days}}</td>
                 <td style="text-align:center;" class="two wide">
                     <a href="{% url 'unitmanagement:choose_handler_list' data.id %}" class="ui tiny basic blue button">Select</a>
                 </td>
@@ -45,10 +47,9 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
-        $('.menu .item').tab();
-    });
+  
+    $('#tabledata1').DataTable({ "order": [[ 4, "desc" ]]  });
+    $('.menu .item').tab();
 
 </script>
  {% endblock %}

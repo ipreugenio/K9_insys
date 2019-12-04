@@ -512,22 +512,47 @@ def classify_k9_select(request, id):
     NDD_count = K9.objects.filter(capability='NDD').count()
     EDD_count = K9.objects.filter(capability='EDD').count()
     SAR_count = K9.objects.filter(capability='SAR').count()
-
+    
     NDD_demand = list(Team_Assignment.objects.aggregate(Sum('NDD_demand')).values())[0]
     EDD_demand = list(Team_Assignment.objects.aggregate(Sum('EDD_demand')).values())[0]
     SAR_demand = list(Team_Assignment.objects.aggregate(Sum('SAR_demand')).values())[0]
 
+    if not NDD_demand:
+        NDD_demand = 0
+    if not EDD_demand:
+        EDD_demand = 0
+    if not SAR_demand:
+        SAR_demand = 0
+
     NDD_deployed = list(Team_Assignment.objects.aggregate(Sum('NDD_deployed')).values())[0]
     EDD_deployed = list(Team_Assignment.objects.aggregate(Sum('EDD_deployed')).values())[0]
     SAR_deployed = list(Team_Assignment.objects.aggregate(Sum('SAR_deployed')).values())[0]
+    
+    if not NDD_deployed:
+        NDD_deployed = 0
+    if not EDD_deployed:
+        EDD_deployed = 0
+    if not SAR_deployed:
+        SAR_deployed = 0
 
-    NDD_assigned = K9.objects.filter(training_status = "Classified").filter(capability='NDD').count()
-    EDD_assigned = K9.objects.filter(training_status = "Classified").filter(capability='EDD').count()
-    SAR_assigned = K9.objects.filter(training_status = "Classified").filter(capability='SAR').count()
+    NDD_assigned = K9.objects.filter(capability='NDD').exclude(assignment='None').count()
+    EDD_assigned = K9.objects.filter(capability='EDD').exclude(assignment='None').count()
+    SAR_assigned = K9.objects.filter(capability='SAR').exclude(assignment='None').count()
 
-    NDD_difference = NDD_demand - NDD_deployed
-    EDD_difference = EDD_demand - EDD_deployed
-    SAR_difference = SAR_demand - SAR_deployed
+    try:
+        NDD_difference = NDD_demand - NDD_deployed
+    except:
+        NDD_difference = 0
+
+    try:
+        EDD_difference = EDD_demand - EDD_deployed
+    except:
+        EDD_difference = 0
+
+    try:
+        SAR_difference = SAR_demand - SAR_deployed
+    except:
+        SAR_difference = 0
 
 
     # {{skill}} K9s assigned / {{skill}} K9s
@@ -734,9 +759,21 @@ def classify_k9_select(request, id):
     if recommended[2] == 1:
         edd_recommended = "Recommended!"
 
-    edd = Training.objects.filter(k9=data).get(training='EDD')
-    ndd = Training.objects.filter(k9=data).get(training='NDD')
-    sar = Training.objects.filter(k9=data).get(training='SAR')
+    try:
+        edd = Training.objects.filter(k9=data).get(training='EDD')
+    except:
+        edd = None
+    
+    try:
+        ndd = Training.objects.filter(k9=data).get(training='NDD')
+    except:
+        ndd = None
+
+    try:
+        sar = Training.objects.filter(k9=data).get(training='SAR')
+    except:
+        sar = None
+
     # TODO:
 	#if already has capability and on training from other records,
 	#previous record training will result to grade 0

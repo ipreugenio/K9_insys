@@ -70,11 +70,12 @@
 <div class="ui tab segment active" data-tab="first">
 {%endif%}  
 
-    <table id="tabledata1" class="ui seven column celled table">
+    <table id="tabledata1" class="ui four column celled table">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Age</th>
+                <th>Age (yrs & mons)</th>
+                <th>Age (days)</th>
                 <th></th>
             </tr>
         </thead>
@@ -82,8 +83,9 @@
             {% for data_unclassified in data_unclassified %}
             <tr>
                 <td>{{data_unclassified.name}}</td>
-                <td>{{data_unclassified.age}}</td>
-                <td style="text-align:center;">
+                <td class="three wide">{{data_unclassified.age}} years and {{data_unclassified.month_remainder}} months</td>
+                <td class="two wide">{{data_unclassified.age_days}}</td>
+                <td style="text-align:center;" class="two wide">
                     <a href="{% url 'training:classify_k9_select' data_unclassified.id %}" class = "tiny ui blue basic button">Select</a>
                 </td>
             </tr>
@@ -127,11 +129,9 @@
             <td style="width:25%;" class="ui center aligned">
               {% if data_ontraining.training_count == 2%}
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <!--<a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>-->
               {% else %}
 
               <a href="{% url 'training:training_update_form' data_ontraining.id %}" class = "tiny ui blue basic button">Select</a>
-              <!--<a href="{% url 'training:fail_dog' data_ontraining.id %}" class = "tiny ui red basic button">Drop</a>-->
               {% endif %}
             </td>
         </tr>
@@ -142,12 +142,9 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
-        $('#tabledata3').DataTable({ "order": [[ 3, "desc" ]]  });
-        $('.menu .item').tab();
-
-    });
+    $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
+    $('#tabledata3').DataTable({ "order": [[ 3, "desc" ]]  });
+    $('.menu .item').tab();
 
 </script>
  {% endblock %}

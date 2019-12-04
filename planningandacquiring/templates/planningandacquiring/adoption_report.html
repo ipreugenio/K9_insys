@@ -29,14 +29,14 @@
             {% for data in data%}
             <tr>
                 <td>{{data.date_adopted}}</td>
-                <td>{{data.first_name}} {{data.last_name}}</td>
+                <td>{{data.last_name}}, {{data.first_name}} </td>
                 <td class="right aligned">{{data.contact_no}}</td>
                 <td>{{data.k9.name}}</td>
                 <td>{{data.k9.breed}}</td>
-                {% if data.k9.date_returned %}
-                <td>{{data.k9.date_returned}}</td>
+                {% if data.date_returned %}
+                    <td>{{data.date_returned}}</td>
                 {%else%}
-                <td>K9 NOT RETURNED</td>
+                    <td>K9 ADOPTED</td>
                 {%endif%}
             </tr>            
             {%endfor%}

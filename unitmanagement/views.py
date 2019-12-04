@@ -655,6 +655,11 @@ def vaccine_submit(request):
                 if vr.anti_rabies == True and vr.bordetella_1 == True and vr.bordetella_2 == True and vr.dhppil4_1 == True and vr.dhppil4_2 == True and vr.dhppil_cv_1 == True and vr.dhppil_cv_2 == True and vr.dhppil_cv_3 == True:
                     k9.training_status = 'Unclassified'
                     k9.save()
+
+                if vr.anti_rabies == True and vr.bordetella_1 == True and vr.bordetella_2 == True and vr.dhppil4_1 == True and vr.dhppil4_2 == True and vr.dhppil_cv_1 == True and vr.dhppil_cv_2 == True and vr.dhppil_cv_3 == True and vr.deworming_1 == True and vr.deworming_2 == True and vr.deworming_3 == True and vr.deworming_4 == True and vr.heartworm_1 == True and vr.heartworm_2 == True and vr.heartworm_3 == True and vr.heartworm_4 == True and vr.heartworm_5 == True and vr.heartworm_6 == True and vr.heartworm_7 == True and vr.heartworm_8 == True and vr.tick_flea_1 == True and vr.tick_flea_2 == True and vr.tick_flea_3 == True and vr.tick_flea_4 == True and vr.tick_flea_5 == True and vr.tick_flea_6 == True and vr.tick_flea_7 == True:
+                    vr.status = 'Done'
+                    vr.save()
+
             messages.success(request, str(k9) + ' has been given ' + str(f.vaccine))
             return HttpResponseRedirect('vaccination-list')
         else:
@@ -2005,15 +2010,17 @@ def handler_incident_form(request):
     user = user_session(request)
     form = HandlerIncidentForm(request.POST or None)
     style='ui green message'
+    try:
+        data = Team_Assignment.objects.get(team_leader=user)
 
-    data = Team_Assignment.objects.get(team_leader=user)
+        team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+        handler = []
+        for team in team:
+            handler.append(team.handler.id)
 
-    team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
-    handler = []
-    for team in team:
-        handler.append(team.handler.id)
-
-    form.fields['handler'].queryset = User.objects.filter(id__in=handler)
+        form.fields['handler'].queryset = User.objects.filter(id__in=handler)
+    except:
+        pass
     if request.method == "POST":
         if form.is_valid():
 
@@ -2075,6 +2082,25 @@ def handler_incident_form(request):
         'user':user,
     }
     return render (request, 'unitmanagement/handler_incident_form.html', context)
+
+#TODO
+def handler_incident_list(request):
+    # Handler_Incident.objects.filter(incident='Died')
+    
+    #NOTIF SHOW
+    notif_data = notif(request)
+    count = notif_data.filter(viewed=False).count()
+    user = user_session(request)
+    context = {
+        'title': "Handler Incident List",
+        'actiontype': "Submit",
+        'form': form,
+        'style': style,
+        'notif_data':notif_data,
+        'count':count,
+        'user':user,
+    }
+    return render (request, 'unitmanagement/handler_incident_list.html', context)
 
 def on_leave_request(request):
     user = user_session(request)

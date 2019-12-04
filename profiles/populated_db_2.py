@@ -779,7 +779,7 @@ def generate_k9():
 
         # Create procured k9s
         k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement")
-        k9.save()
+        # k9.save()
 
         if k9.source == "Procurement":
             try:
@@ -852,68 +852,70 @@ def generate_k9():
 
         training_start_alpha = datetime.combine(birthdate, datetime.min.time())
         training_start_alpha = training_start_alpha + timedelta(days=365)
+        try:
+            training = Training.objects.filter(k9 = k9).get(training = k9.capability)
 
-        training = Training.objects.filter(k9 = k9).get(training = k9.capability)
+            remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
 
-        remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            train_sched = Training_Schedule.objects.get(k9 = k9) #Because we have 1 instance of this per k9 instance
+            train_sched.date_start = training_start_alpha
+            train_sched.date_end = training_start_alpha + timedelta(days=20)
 
-        train_sched = Training_Schedule.objects.get(k9 = k9) #Because we have 1 instance of this per k9 instance
-        train_sched.date_start = training_start_alpha
-        train_sched.date_end = training_start_alpha + timedelta(days=20)
+            grade_list = []
+            stage = "Stage 0"
+            for idx in range(9):
+                randomizer = random.randint(0, 5)
+                grade = GRADE[randomizer][0]
+                grade_list.append(grade)
 
-        grade_list = []
-        stage = "Stage 0"
-        for idx in range(9):
-            randomizer = random.randint(0, 5)
-            grade = GRADE[randomizer][0]
-            grade_list.append(grade)
+                if idx == 0:
+                    stage = "Stage 1.1"
+                elif idx == 1:
+                    stage = "Stage 1.2"
+                elif idx == 2:
+                    stage = "Stage 1.3"
+                elif idx == 3:
+                    stage = "Stage 2.1"
+                elif idx == 4:
+                    stage = "Stage 2.2"
+                elif idx == 5:
+                    stage = "Stage 2.3"
+                elif idx == 6:
+                    stage = "Stage 3.1"
+                elif idx == 7:
+                    stage = "Stage 3.2"
+                elif idx == 8:
+                    stage = "Stage 3.3"
 
-            if idx == 0:
-                stage = "Stage 1.1"
-            elif idx == 1:
-                stage = "Stage 1.2"
-            elif idx == 2:
-                stage = "Stage 1.3"
-            elif idx == 3:
-                stage = "Stage 2.1"
-            elif idx == 4:
-                stage = "Stage 2.2"
-            elif idx == 5:
-                stage = "Stage 2.3"
-            elif idx == 6:
-                stage = "Stage 3.1"
-            elif idx == 7:
-                stage = "Stage 3.2"
-            elif idx == 8:
-                stage = "Stage 3.3"
+                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+                                                                date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
+                train_sched.save()
 
-            sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-            train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
-                                                               date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
-            train_sched.save()
+            training.stage1_1 = grade_list[0]
+            training.stage1_2 = grade_list[1]
+            training.stage1_3 = grade_list[2]
 
-        training.stage1_1 = grade_list[0]
-        training.stage1_2 = grade_list[1]
-        training.stage1_3 = grade_list[2]
+            training.stage2_1 = grade_list[3]
+            training.stage2_2 = grade_list[4]
+            training.stage2_3 = grade_list[5]
 
-        training.stage2_1 = grade_list[3]
-        training.stage2_2 = grade_list[4]
-        training.stage2_3 = grade_list[5]
+            training.stage3_1 = grade_list[6]
+            training.stage3_2 = grade_list[7]
+            training.stage3_3 = grade_list[8]
 
-        training.stage3_1 = grade_list[6]
-        training.stage3_2 = grade_list[7]
-        training.stage3_3 = grade_list[8]
+            training.remarks = remark
+            training.stage = "Finished Training"
+            training.save()
 
-        training.remarks = remark
-        training.stage = "Finished Training"
-        training.save()
-
-        k9.training_status = 'Trained'
-        k9.training_level = "Finished Training"
-        k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
-        k9.trained = "Trained"
-        k9.save()
-        print("Created Training for " + str(k9))
+            k9.training_status = 'Trained'
+            k9.training_level = "Finished Training"
+            k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.trained = "Trained"
+            k9.save()
+            print("Created Training for " + str(k9))
+        except:
+            pass
 
     # END CREATE TRAINING
 
