@@ -111,7 +111,8 @@
             <th>K9</th>
             <th>Handler</th>
             <th>Breed</th>
-            <th>Age</th>
+            <th>Age (yrs & mons)</th>
+            <th>Age (days)</th>
             <th>Capability</th>
             <th>Current Stage</th>
             <th></th>
@@ -123,7 +124,8 @@
             <td>{{data_ontraining}}</td>
             <td>{{data_ontraining.handler}}</td>
             <td >{{data_ontraining.breed}}</td>
-            <td>{{data_ontraining.age}}</td>
+            <td>{{data_ontraining.age}} years and {{data_ontraining.month_remainder}} months</td>
+            <td>{{data_ontraining.age_days}}</td>
             <td>{{data_ontraining.capability}}</td>
             <td>{{data_ontraining.training_level}}</td>
             <td style="width:25%;" class="ui center aligned">
@@ -142,8 +144,8 @@
 
 <script type="text/javascript">
 
-    $('#tabledata1').DataTable({ "order": [[ 1, "desc" ]]  });
-    $('#tabledata3').DataTable({ "order": [[ 3, "desc" ]]  });
+    $('#tabledata1').DataTable({ "order": [[ 2, "desc" ],[ 0, "asc" ]]  });
+    $('#tabledata3').DataTable({ "order": [[ 4, "desc" ],[ 0, "asc" ]]  });
     $('.menu .item').tab();
 
 </script>

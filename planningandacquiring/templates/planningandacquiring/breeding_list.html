@@ -46,7 +46,7 @@
             <tr class="positive">
                 <td>{{ d.mother}}</td>
                 <td>{{ d.father}}</td>
-                <td class="center aligned">{{ d.date_mated}}</td>
+                <td class="center aligned">{{ d.date_mated|date:'Y-m-d'}}</td>
                 <td class="center aligned">
                     <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' d.id %}?decision=confirm" class="ui tiny blue button">Confirm</a>
                     <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' d.id %}?decision=failed" class="ui tiny red button">Failed</a>
@@ -58,7 +58,7 @@
                 <tr>
                     <td>{{ data.mother}}</td>
                     <td>{{ data.father}}</td>
-                    <td class="center aligned">{{ data.date_mated}}</td>
+                    <td class="center aligned">{{ data.date_mated|date:'Y-m-d'}}</td>
                     <td class="center aligned">
                         <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' data.id %}?decision=confirm" class="ui tiny blue button">Confirm</a>
                         <a href="{% url 'planningandacquiring:confirm_failed_pregnancy' data.id %}?decision=failed" class="ui tiny red button">Failed</a>
@@ -89,7 +89,7 @@
                 <tr>
                     <td>{{ data.mother}}</td>
                     <td>{{ data.father}}</td>
-                    <td class="center aligned">{{ data.date_mated}}</td>
+                    <td class="center aligned">{{ data.date_mated|date:'Y-m-d'}}</td>
                     <td class="center aligned">
                         <a href="{% url 'planningandacquiring:add_K9_offspring' data.id %}" class="ui tiny blue button">Add Litter</a>
                     </td>

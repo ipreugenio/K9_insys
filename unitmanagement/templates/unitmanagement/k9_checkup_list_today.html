@@ -70,13 +70,12 @@
 
 <script type="text/javascript">
 
-	$(document).ready(function() {
-		$('#tabledata').DataTable( {
-        "order": [[ 2, "asc" ]]
-    });
-		$('.menu .item').tab();
-	});
 
+    $('#tabledata').DataTable( {
+    "order": [[ 2, "asc" ],[ 3, "asc" ]]
+    });
+    
+	$('.menu .item').tab();
 
 	$('.message .close')
   .on('click', function() {

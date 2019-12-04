@@ -141,7 +141,6 @@
 <div class="ui modal" id='id_modal_data'></div>
 <script>
 
-$(document).ready(function() {
     $( ".btn_modal" ).bind( "click", function() {
         var url = 'vaccination-list/ajax_load_yearly_vac';  
         id = $(this).attr('id');
@@ -173,8 +172,6 @@ $(document).ready(function() {
         "order": [[ 1, "asc" ]]
     });
     $('.menu .item').tab();
-
-});
 
 </script>
 

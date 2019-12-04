@@ -20,7 +20,7 @@
             {% for Data in data %}
                 {% if Data.request_status == "Pending" %}
                     <tr class = "warning">
-                        <td>{{Data.date}}</td>
+                        <td>{{Data.date|date:'Y-m-d'}}</td>
                         <td>{{Data.handler}}</td>
                         <td>{{Data.equipment}}</td>
                         <td>{{Data.concern}}</td>
@@ -62,13 +62,9 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable();
-        $('#tabledata2').DataTable();
-        $('#tabledata3').DataTable();
-        $('#tabledata4').DataTable();
-        $('.menu .item').tab();
-    });
+    $('#tabledata1').DataTable();
+   
+
 
 </script>
  {% endblock %}

@@ -50,19 +50,19 @@
 
 <script type="text/javascript">
 
-	$(document).ready(function() {
-		$('#tabledata').DataTable();
-		$('.menu .item').tab();
+	
+	$('#tabledata').DataTable( {
+        "order": [[ 0, "asc" ]]
+    });
+	$('.menu .item').tab();
 
-		$( ".show_modal" ).bind('click', function() {
-            txt = $(this).text()
-			id = $(this).attr('id')
-			$('#status_input').val(txt)
-			$('#id_input').val(id)
-			$('.ui.tiny.modal').modal('show');	
-        });	
-
-	});
+	$( ".show_modal" ).bind('click', function() {
+		txt = $(this).text()
+		id = $(this).attr('id')
+		$('#status_input').val(txt)
+		$('#id_input').val(id)
+		$('.ui.tiny.modal').modal('show');	
+	});	
 
 </script>
 {% endblock %}

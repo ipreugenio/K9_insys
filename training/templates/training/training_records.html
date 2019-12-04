@@ -15,7 +15,8 @@
             <th>Name</th>
             <th>Breed</th>
             <th>Sex</th>
-            <th>Age</th>
+            <th>Age (yrs & mons)</th>
+            <th>Age (days)</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -27,7 +28,8 @@
             </td>
             <td>{{data.breed}}</td>
             <td>{{data.sex}}</td>
-            <td>{{data.age}}</td>
+            <td>{{data.age}} years and {{data.month_remainder}} months</td>
+            <td>{{data.age_days}}</td>
             <td>{{data.training_status}}</td>
 
         </tr>
@@ -36,9 +38,7 @@
 </table>
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata').DataTable();
-    });
-
+    $('#tabledata').DataTable({ "order": [[ 0, "asc" ]]  });
+  
 </script>
  {% endblock %}

@@ -2,7 +2,7 @@
 {% load index %}
 
 {% block content %}
-<div class="ui segment" style="padding:20px;">
+<div class="ui inverted segment" style="padding:20px;">
     <h1 class="ui header">{{ title }}</h1>
 
 </div>
@@ -21,7 +21,7 @@
     		<tbody>
 				{% for incident in incidents %}
     				<tr>
-                        <td>{{ incident.date }}</td>
+                        <td>{{ incident.date |date:'Y-m-d'}}</td>
                         <td>{{ incident.location }}</td>
                         <td>{{ incident.type }}</td>
 						<td><a href="{% url 'deployment:incident_detail' incident.id %}">View Details</a></td>
@@ -33,12 +33,11 @@
 
 <script type="text/javascript">
 
-	$(document).ready(function() {
-		$('#tabledata').DataTable( {
-        "order": [[ 0, "desc" ]]
+	$('#tabledata').DataTable( {
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
     });
-		$('.menu .item').tab();
-	});
+	$('.menu .item').tab();
+
 
 </script>
 {% endblock %}

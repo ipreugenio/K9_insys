@@ -1529,6 +1529,8 @@ def trained_list(request):
     for d in data:
         a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
         ts.append(a.date_end.date())
+     
+        
 
 
     #NOTIF SHOW
@@ -2083,25 +2085,6 @@ def handler_incident_form(request):
     }
     return render (request, 'unitmanagement/handler_incident_form.html', context)
 
-#TODO
-def handler_incident_list(request):
-    # Handler_Incident.objects.filter(incident='Died')
-    
-    #NOTIF SHOW
-    notif_data = notif(request)
-    count = notif_data.filter(viewed=False).count()
-    user = user_session(request)
-    context = {
-        'title': "Handler Incident List",
-        'actiontype': "Submit",
-        'form': form,
-        'style': style,
-        'notif_data':notif_data,
-        'count':count,
-        'user':user,
-    }
-    return render (request, 'unitmanagement/handler_incident_list.html', context)
-
 def on_leave_request(request):
     user = user_session(request)
 
@@ -2254,7 +2237,7 @@ def reassign_assets(request, id):
         else:
             cap = Handler_K9_History.objects.filter(handler=h).filter(k9__capability=k9.capability).count()
 
-        s=[cap]
+        s=[cap, h.rank]
         g.append(s)
 
     if request.method == 'POST':
@@ -2330,7 +2313,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
 
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list)
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").exclude(assignment=None).exclude(id__in=cb_list).order_by('year_retired')
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2906,7 +2889,7 @@ def choose_handler_list(request, id):
         if cap != 0:
             c = int((cap / ct) * 100)
 
-        s = [cap,ct,c]
+        s = [cap,ct,c,h.rank]
         g.append(s)
     if request.method == 'POST':
         print(form.errors)

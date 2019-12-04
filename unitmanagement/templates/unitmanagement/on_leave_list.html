@@ -27,7 +27,7 @@
         <tbody>
             {% for data in data1 %}
             <tr data-variation="wide" data-content="{{data.description}}" class="pop">
-                <td>{{data.date}}</td>
+                <td>{{data.date|date:'Y-m-d'}}</td>
                 <td>{{data.handler}}</td>
                 <td>{{data.date_from}} - {{data.date_to}}</td>
                 <td>{{data.duration}} days</td>
@@ -54,7 +54,7 @@
             <tbody>
                 {% for data in data2 %}
                 <tr data-variation="wide" data-content="{{data.description}}" class="pop">
-                    <td>{{data.date_from}} - {{data.date_to}}</td>
+                    <td>{{data.date_from|date:'Y-m-d'}} - {{data.date_to|date:'Y-m-d'}}</td>
                     <td>{{data.handler}}</td>
                     <td>{{data.duration}}</td>
                     <td>{{data.approved_by}}</td>
@@ -68,22 +68,22 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
 
-        $('#tabledata2').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
-
-        $('.menu .item').tab();
-
-        $('.pop').popup({
-            inline     : true,
-            hoverable  : true,
-        });
+    $('#tabledata1').DataTable({
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
     });
+
+    $('#tabledata2').DataTable({
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
+    });
+
+    $('.menu .item').tab();
+
+    $('.pop').popup({
+        inline     : true,
+        hoverable  : true,
+    });
+  
 
 </script>
  {% endblock %}

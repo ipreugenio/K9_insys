@@ -39,7 +39,7 @@
 </div>
 {% elif user.position == 'Administrator' %}
 <div class="ui segment" data-tab="first">
-        <table id="tabledata1" class="ui celled table">
+        <table id="tabledata2" class="ui celled table">
             <thead>
                 <tr>
                     <th>Date Reported</th>
@@ -53,7 +53,7 @@
             <tbody>
                 {% for data in data %}
                 <tr data-variation="wide" data-content="{{data.description}}" class="pop">
-                    <td>{{data.date}}</td>
+                    <td>{{data.date|date:'Y-m-d'}}</td>
                     <td>{{data.incident}}</td>
                     <td>{{data.k9}}</td>
                     <td>{{data.reported_by}}</td>
@@ -73,7 +73,7 @@
     </div>
 {% else %}
 <div class="ui segment" data-tab="first">
-        <table id="tabledata1" class="ui five column celled table">
+        <table id="tabledata3" class="ui five column celled table">
             <thead>
                 <tr>
                     <th>Date Reported</th>
@@ -87,7 +87,7 @@
             <tbody>
                 {% for data in data %}
                 <tr>
-                    <td>{{data.date}}</td>
+                    <td>{{data.date|date:'Y-m-d'}}</td>
                     <td>{{data.k9}}</td>
                     <td>{{data.reported_by}}</td>
                     {% if data.k9.assignment == 'None' %}
@@ -111,28 +111,34 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
-        $('.menu .item').tab();
-        
-        $( ".flip" ).bind('click', function() {
-            var url = 'k9-incident-list/ajax_load_incident';  
-            var id = $(this).attr('id')
-            $('.ui.modal').modal('show');
-            $.ajax({                         
-                url: url,                  
-                data: {
-                'id': id       
-                },
-                success: function (data) {  
-                    $("#id_data").html(data);
-                }
-            });
-         
-        });
+  
+    $('#tabledata1').DataTable({
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
     });
+    $('#tabledata2').DataTable({
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
+    });
+    $('#tabledata3').DataTable({
+        "order": [[ 0, "desc" ],[ 1, "asc" ]]
+    });
+    $('.menu .item').tab();
+    
+    $( ".flip" ).bind('click', function() {
+        var url = 'k9-incident-list/ajax_load_incident';  
+        var id = $(this).attr('id')
+        $('.ui.modal').modal('show');
+        $.ajax({                         
+            url: url,                  
+            data: {
+            'id': id       
+            },
+            success: function (data) {  
+                $("#id_data").html(data);
+            }
+        });
+        
+    });
+  
 
 </script>
  {% endblock %}

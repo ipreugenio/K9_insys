@@ -29,7 +29,7 @@
         <tbody>
             {% for data in data %}
             <tr>
-                <td>{{data.date}}</td>
+                <td>{{data.date|date:'Y-m-d'}}</td>
                 <td>{{data.k9}}</td>
                 <td>{{data.reported_by}}</td>
                 <td class="center aligned three wide">
@@ -59,7 +59,7 @@
                 {% if data.follow_up_date == None %}
                 <td>Requested Follow-up</td>
                 {% else%}
-                <td>{{data.follow_up_date}}</td>
+                <td>{{data.follow_up_date|date:'Y-m-d'}}</td>
                 {% endif %}
                 <td>{{data.dog}}</td>
                 <td>{{data.dog.handler}}</td>
@@ -76,15 +76,15 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('#tabledata1').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
-        $('#tabledata2').DataTable({
-            "order": [[ 0, "desc" ]]
-        });
-        $('.menu .item').tab();
+
+    $('#tabledata1').DataTable({
+        "order": [[ 0, "desc" ]]
     });
+    $('#tabledata2').DataTable({
+        "order": [[ 0, "desc" ]]
+    });
+    $('.menu .item').tab();
+
 
 </script>
  {% endblock %}
