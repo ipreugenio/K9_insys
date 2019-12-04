@@ -5,7 +5,7 @@ from datetime import date, datetime
 from django.core.validators import validate_integer
 from django.forms import fields
 
-from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher, TempDeployment
+from deployment.models import Area, Location, Team_Assignment, Team_Dog_Deployed, Dog_Request, Incidents, Daily_Refresher, TempDeployment, Maritime
 from planningandacquiring.models import K9
 from profiles.models import Account, User
 from django.contrib.sessions.models import Session
@@ -128,6 +128,7 @@ class RequestForm(forms.ModelForm):
         self.fields['location'].widget.attrs['readonly'] = 'readonly'
         self.fields['location'].widget.attrs['placeholder'] = 'Please search for the location' 
         self.fields['remarks'].required = False
+        self.fields['phone_number'].required = False
 
     def validate_date(self):
         date_start = self.cleaned_data['start_date']
@@ -295,6 +296,18 @@ class MonthYearForm(forms.Form):
         required=False,
         widget=MonthYearWidget(years=range(2017,2041))
     )
+
+class MaritimeForm(forms.ModelForm):
+
+    class Meta:
+        model = Maritime
+        # fields = '__all__'
+        exclude = ('location', )
+
+    def __init__(self, *args, **kwargs):
+        super(MaritimeForm, self).__init__(*args, **kwargs)
+        self.fields["date"].widget = DateInput()
+        self.fields["time"].widget = TimeInput()
 
 class DailyRefresherForm(forms.ModelForm):
 

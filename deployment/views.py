@@ -61,7 +61,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests
 
 import random
 
@@ -296,6 +296,7 @@ def mass_populate_revisited():
     generate_user()
     create_teams()
     generate_k9()
+    generate_requests()
 
     return None
 
@@ -1042,12 +1043,16 @@ def request_dog_details(request, id):
         checked_dogs = K9.objects.filter(id__in=checks)
         # print(checked_dogs)
 
-        for checked_dogs in checked_dogs:
+        for dog in checked_dogs:
             # TODO Only save k9.assignment when system datetime is same as request
             # TODO Don't create Team_Dog_Deployed if hindi pa officially "Deployed"
             # Team_Dog_Deployed.objects.create(team_requested=data2, k9=checked_dogs, status="Scheduled", handler = str(k9.handler.fullname))
 
-            K9_Schedule.objects.create(k9 = checked_dogs, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
+            K9_Schedule.objects.create(k9 = dog, dog_request = data2, date_start = data2.start_date, date_end = data2.end_date, status = "Request")
+
+            Notification.objects.create(position='Handler', user=dog.handler, notif_type='handler_request_scheduled',
+                                        message="Your have an upcoming K9 request on " + str(
+                                            data2.date_start) + ". Be there!")
 
             #
             # if checked_dogs.capability == 'EDD':

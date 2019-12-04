@@ -159,53 +159,53 @@ def update_port_info(team_list):
 def subtract_inventory(user):
     #TODO dapat get
     try:
-        collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").exclude(quantity = 0).first()
+        collar = Miscellaneous.objects.filter(miscellaneous__contains="Collar").exclude(quantity = 0).last()
         collar.quantity -= 1
         collar.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory = collar, quantity = 1, user = user)
 
-        vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").exclude(quantity = 0).first()
+        vest = Miscellaneous.objects.filter(miscellaneous__contains="Vest").exclude(quantity = 0).last()
         vest.quantity -= 1
         vest.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
 
-        leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").exclude(quantity = 0).first()
+        leash = Miscellaneous.objects.filter(miscellaneous__contains="Leash").exclude(quantity = 0).last()
         leash.quantity -= 1
         leash.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=vest, quantity=1, user=user)
 
-        shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").exclude(quantity = 0).first()
+        shipping_crate = Miscellaneous.objects.filter(miscellaneous__contains="Shipping Crate").exclude(quantity = 0).last()
         shipping_crate.quantity -= 1
         shipping_crate.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=shipping_crate, quantity=1, user=user)
 
-        food = Food.objects.filter(foodtype="Adult Dog Food").exclude(quantity = 0).first()
+        food = Food.objects.filter(foodtype="Adult Dog Food").exclude(quantity = 0).last()
         food.quantity -= 1
         food.save()
         Food_Subtracted_Trail.objects.create(inventory=food, quantity=1, user=user)
 
-        medicines = Medicine.objects.filter(med_type="Vitamins").exclude(quantity = 0).first()
+        medicines = Medicine.objects.filter(med_type="Vitamins").exclude(quantity = 0).last()
         medicine_inv = Medicine_Inventory.objects.filter(medicine__in=medicines)
         medicine_inv.quantity -= 1
         medicine_inv.save()
         Medicine_Subtracted_Trail.objects.create(inventory=medicine_inv, quantity=1, user=user)
 
-        grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").exclude(quantity = 0).first()
+        grooming_kit = Miscellaneous.objects.filter(miscellaneous__contains="Grooming Kit").exclude(quantity = 0).last()
         grooming_kit.quantity -= 1
         grooming_kit.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=grooming_kit, quantity=1, user=user)
 
-        first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").exclude(quantity = 0).first()
+        first_aid_kit = Miscellaneous.objects.filter(miscellaneous__contains="First Aid Kit").exclude(quantity = 0).last()
         first_aid_kit.quantity -= 1
         first_aid_kit.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=first_aid_kit, quantity=1, user=user)
 
-        oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").exclude(quantity = 0).first()
+        oral_dextrose = Miscellaneous.objects.filter(miscellaneous__contains="Oral Dextrose").exclude(quantity = 0).last()
         oral_dextrose.quantity -= 1
         oral_dextrose.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=oral_dextrose, quantity=1, user=user)
 
-        ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").exclude(quantity = 0).first()
+        ball = Miscellaneous.objects.filter(miscellaneous__contains="Ball").exclude(quantity = 0).last()
         ball.quantity -= 1
         ball.save()
         Miscellaneous_Subtracted_Trail.objects.create(inventory=ball, quantity=1, user=user)
@@ -219,7 +219,7 @@ def subtract_inventory(user):
 #Step 3
 #Deploy Team (only the ones who have confirmed) once deployment date hits
 # @periodic_task(run_every=crontab(hour=6, minute=30))
-@periodic_task(run_every=timedelta(seconds=25))
+# @periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
     print('check_initial_deployment_dates code is running')
     schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
@@ -281,7 +281,7 @@ def check_initial_deployment_dates():
 # Step 6
 # Check if TL has confirmed arrival. If not, escalate to admin
 # @periodic_task(run_every=crontab(hour=8, minute=30))
-@periodic_task(run_every=timedelta(seconds=30))
+# @periodic_task(run_every=timedelta(seconds=30))
 def check_initial_dep_arrival():
 
     deployed = Team_Dog_Deployed.objects.filter(date_pulled=None).filter(status = "Pending").exclude(team_assignment = None)
@@ -399,7 +399,7 @@ def check_arrival_to_request(dog_request):
     deployed = Team_Dog_Deployed.objects.filter(team_requested = dog_request).filter(date_pulled = None)
 
     for item in deployed:
-        if item.status == "Pending" and dog_request.start_date == date.today():
+        if item.status == "Pending" and dog_request.start_date >= date.today():
             deployed.date_pulled = date.today()
             deployed.save()
             k9 = item.k9
@@ -417,7 +417,7 @@ def check_arrival_to_ports_via_request(team_assignment):
     today = datetime.today().date()
     for item in deployed:
         delta = today - recent_request_deployment.date
-        if item.status == "Pending" and delta.days >= 5:
+        if item.status == "Pending" and delta.days > 5:
             deployed.date_pulled = date.today()
             deployed.save()
             k9 = item.k9
@@ -425,6 +425,7 @@ def check_arrival_to_ports_via_request(team_assignment):
             k9.save()
         #creation of TDD is through pull_dog_request()
 
+    update_port_info([team_assignment.id])
     return None
 
 # @periodic_task(run_every=crontab(hour=8, minute=30))
@@ -447,4 +448,46 @@ def check_arrivals():
 
     return None
 
+def notify_if_port_has_only_one_unit():
 
+    teams = Team_Assignment.objects.filter(total_dogs_deployed = 1)
+
+    for team in teams:
+        if Notification.objects.filter(position='Administrator', user=None, notif_type='admin_port_has_one_unit',
+                                    message=str(team) + " has only one unit deployed, consider deploying more units as soon as possible.", datetime = datetime.now()).count == 0:
+            Notification.objects.create(position='Administrator', user=None, notif_type='admin_port_has_one_unit',
+                                    message=str(team) + " has only one unit deployed, consider deploying more units as soon as possible.")
+
+    return None
+
+def task_to_dash_dep():
+    # START INITIAL DEPLOYMENT
+    # Steps 1 and 2 is in Handler Dashboard (Confirmation of Pre Deploment Items)
+    # Step 3 Deploy Team (only the ones who have confirmed) once deployment date hits
+    # Step 4 (done withing the function) Update port info (TLs and the like)
+    check_initial_deployment_dates()
+    # Step 5 is in TL Dashboard (Confirm Arrival)
+    # Step 6
+    # Check if TL has confirmed arrival. If not, escalate to admin
+    check_initial_dep_arrival()
+    # END INITIAL DEPLOYMENT
+
+    # Request Deployment
+    # 1.) Create a Team_Dog_Deployed for every sched happening today (exclude K9_schedules with existing Team_Dog_Deployed) (status is pending and date pulled is none) exclude team_requested = None
+    # 2.) Every K9 in Team_Dog_Deployed have their training_statuses temporarily set to #Deployed
+    # 3.) Update dog_request info (k9s deployed)
+    deploy_dog_request()
+
+    # pull out units from a request
+    pull_dog_request()
+
+    # Check if arrivals have been confirmed (going to request and back to port)
+    # To request, same day
+    # To port, after 5 days
+    #  Otherwise, MIA
+    check_arrivals()
+
+    # Notify admin to schedule initial deployment if ports only has one unit
+    notify_if_port_has_only_one_unit()
+
+    return None

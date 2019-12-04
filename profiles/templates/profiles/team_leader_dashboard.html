@@ -209,6 +209,8 @@
 
                   </table>
 
+                    <input class = "ui blue button" type="submit"  value="Record Maritime" id = "maritime_btn">
+
                   {% if reveal_arrival == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
                   {% endif %}
@@ -218,8 +220,9 @@
                   {% endif %}
 
                    {% if check_arrival_emrgncy_leave is not None %}
-                  <input class = "ui green button" type="submit"  value="Confirm End of Emergency Leaves" id = "check_arrival_emrgncy_leave">
+                  <input class = "ui red button" type="submit"  value="Confirm End of Emergency Leaves" id = "check_arrival_emrgncy_leave">
                   {% endif %}
+
 
               {% else %}
               <div class = "ui segment">
@@ -231,8 +234,6 @@
       </div>
     </div>
 </div>
-
-
 
 
     <!--Event Modal-->
@@ -296,6 +297,12 @@
                                     </div>
                                     <div class="fields">
                                         <div class="ten wide field">
+                                                <label>Remarks</label>
+                                                {{form.remarks}}
+                                            </div>
+                                    </div>
+                                    <div class="fields">
+                                        <div class="ten wide field">
                                                 <label>Address</label>
                                                 {{form.location}}
                                             </div>
@@ -321,7 +328,6 @@
                                                 <button id = "btn_search" class="ui blue button" type="button">Search</button>
 
                                                 <div  id ="id_location_cards"></div>
-
 
                                             </div>
                                             <div class="column">
@@ -403,13 +409,50 @@
             {{ field }}
             {% endfor %}
 
-            <button class="ui green button" type="submit" name = "confirm_arrival_emrgncy_leave" value="Confirm End of Emergency Leave">Confirm End of Emergency Leave</button>
+            <button class="ui green button" type="submit" name = "confirm_arrival_emrgncy_leave" value="Confirm Return From Emergency Leave">Confirm Return from Emergency Leave</button>
         </form>
 
     </div>
 </div>
 <!--End Emergency Leave Modal-->
 
+<!-- Emergency Leave Modal -->
+<div class="ui mini modal" id = 'maritime_modal'>
+      <i class="close icon"></i>
+    <div class="header"><h2>Save Maritime Record for this Port</h2></div>
+    <div class="scrolling content">
+
+
+        <form  class="ui form" method="POST">
+             {% csrf_token %}
+
+            <div class="field">
+                                <label>Boat Type</label>
+                                    {{maritime_form.boat_type}}
+                            </div>
+            <div class="field">
+                                <label>Passenger Count</label>
+                                    {{maritime_form.passenger_count}}
+                            </div>
+            <div class="fields">
+                <div class="field">
+                  <label>Date</label>
+                                    {{maritime_form.date}}
+                </div>
+                <div class="field">
+                  <label>Time</label>
+                                    {{maritime_form.time}}
+                </div>
+            </div>
+
+
+
+            <button class="ui green button" type="submit" name = "maritime_form" value="Submit">Submit</button>
+        </form>
+
+    </div>
+</div>
+<!--End Emergency Leave Modal-->
 
 {% if ki %}
 <div class="ui modal" id= 'died_modal'>
@@ -751,6 +794,10 @@ $(document).ready(function() {
 
 $( "#check_arrival_emrgncy_leave" ).click(function() {
   $('#modal5').modal('show');
+});
+
+$( "#maritime_btn" ).click(function() {
+  $('#maritime_modal').modal('show');
 });
 </script>
 

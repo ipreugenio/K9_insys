@@ -778,7 +778,7 @@ def generate_k9():
         # date_time = generated_date.strftime("%m/%d/%Y")
 
         # Create procured k9s
-        k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement")
+        k9 = K9.objects.create(name = name, breed = breed, sex = gender, color = color, birth_date = generated_date, source = "Procurement", training_status = "Unclassified")
         k9.save()
 
         if k9.source == "Procurement":

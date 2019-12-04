@@ -516,7 +516,8 @@ class Maritime(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     boat_type = models.CharField('boat_type', choices=BOAT_TYPE, max_length=100, default='Others')
-    datetime = models.DateField('datetime', null=True, blank=True)
+    date = models.DateField('date', null=True, blank=True)
+    time = models.TimeField('time', null=True, blank=True)
     passenger_count = models.IntegerField('passenger_count', blank=True, null=True, default = 0)
     
     def save(self, *args, **kwargs):

@@ -38,8 +38,6 @@
 
               <div class="ui list" id="legends">
                   <div class="item"> <i class="red stop icon"> </i>Existing Appointments</div>
-
-                  <div class="item"> <i class="blue stop icon"> </i>Recommended Phex</div>
                   </div>
 
               <!--<button class = "ui blue button" id = "view_calendar">View Calendar</button>-->
@@ -64,8 +62,8 @@
                 <th></th>
 				<th>K9</th>
                 <th>Handler</th>
+                <th>Recommended Phex Schedule</th>
                 <th>Deployment Date</th>
-
           	</tr>
 
     		</thead>
@@ -76,6 +74,7 @@
                 <td>{{item.k9|render_k9_checkbox:selected_list}}</td>
                 <td>{{item.k9}}</td>
                 <td>{{item.k9.handler}}</td>
+                <td>{{item.date_start | recommended_checkup_date | date:"Y-m-d"}}</td>
                 <td>{{item.date_start | date:"Y-m-d"}}</td>
             </tr>
             {% endfor %}

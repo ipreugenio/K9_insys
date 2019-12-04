@@ -14,6 +14,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.db.models import Q
 from django.core.exceptions import MultipleObjectsReturned
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
@@ -35,7 +36,7 @@ from deployment.views import load_map, load_locations
 from profiles.models import User, Personal_Info, Education, Account
 from deployment.models import Location, Team_Assignment, Dog_Request, Incidents, Team_Dog_Deployed, Daily_Refresher, \
     Area, K9_Schedule, K9_Pre_Deployment_Items
-from deployment.forms import GeoForm, GeoSearch, RequestForm
+from deployment.forms import GeoForm, GeoSearch, RequestForm, MaritimeForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account_form, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
@@ -43,7 +44,7 @@ from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,C
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
-from deployment.tasks import subtract_inventory
+from deployment.tasks import subtract_inventory, assign_TL
 
 from deployment.views import team_location_details, request_dog_details, mass_populate
 from unitmanagement.forms import EmergencyLeaveForm
@@ -298,6 +299,9 @@ def team_leader_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
 
+    maritime_form = MaritimeForm(request.POST or None, initial = {'date' : datetime.today().date(), 'time' : timezone.now()})
+    working_handlers = User.objects.filter(status = "Working")
+
     k9 = None
     for_arrival = None
     check_arrival = None
@@ -314,13 +318,16 @@ def team_leader_dashboard(request):
     ta = None
     try:
         ta = Team_Assignment.objects.get(team_leader=user)
+    except: pass
+
+    try:
         incident_count = Incidents.objects.filter(location=ta.location).count()
         tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(
             date_pulled=None)  # only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
         tdd_count = tdd.count()
 
         # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
-        for_arrival = tdd.filter(status="Pending")
+        for_arrival = tdd.filter(status="Pending").filter(handler__in = working_handlers)
     except: pass
 
 
@@ -335,8 +342,8 @@ def team_leader_dashboard(request):
     td_dr = None
     dr = None
     try: #NOTE: TL won't see this anyway unless he's not a TL within date range of Dog_Request
-        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).earliest()
-        td_dr = Team_Dog_Deployed.objects.exclude(team_requested = None).filter(team_requested = dr).filter(status = "Pending")
+        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).last()
+        td_dr = Team_Dog_Deployed.objects.exclude(team_requested = None).filter(team_requested = dr).filter(status = "Pending").filter(handler__in = working_handlers)
 
         #TODO add filter to td_dr for requests that start today. Celery na bahala sa pag pull out if hindi na confirm
         #TODO if td_dr is today, reveal for_arrival_request
@@ -375,11 +382,20 @@ def team_leader_dashboard(request):
     count = notif_data.filter(viewed=False).count()
 
     if request.method == 'POST':
+        if maritime_form.is_valid():
+            maritime = maritime_form.save(commit = False)
+            if ta:
+                maritime.location = ta.location
+            maritime.save()
+
         if form.is_valid():
             checks = geoform['point'].value()
             checked = ast.literal_eval(checks)
 
             toList = list(checked['coordinates'])
+
+            print("Coordinates")
+            print(toList)
 
             lon = Decimal(toList[0])
             lat = Decimal(toList[1])
@@ -416,14 +432,46 @@ def team_leader_dashboard(request):
 
             handlers_arrived = User.objects.filter(pk__in = handlers_arrived_id)
 
+            # NOTE: if this came from leave, transfer or init_dep:
             for handler in handlers_arrived:
                 try:
-                    deploy = Team_Dog_Deployed.objects.get(handler = handler)
+                    deploy = Team_Dog_Deployed.objects.get(handler = handler).filter(status = "Pending").last()
                     deploy.status = "Deployed"
                     deploy.save()
+
+                    Notification.objects.create(position='Handler', user=handler, notif_type='handler_arrival_to_port',
+                                                message="Your arrival to port has been confirmed by your Team Leader.")
                 except: pass
 
             #Team Leader
+            if ta:
+                assign_TL(ta)
+            messages.success(request, 'Arrival succesfully confirmed')
+            return redirect("profiles:team_leader_dashboard")
+        else:
+            # print(check_arrival.errors)
+            pass
+
+        if check_arrival_dr.is_valid():
+
+            handlers_arrived_id = check_arrival_dr['team_member'].value()
+            # print("Handlers Arrived")
+            # print(handlers_arrived_id)
+
+            handlers_arrived = User.objects.filter(pk__in=handlers_arrived_id)
+
+            for handler in handlers_arrived:
+                try:
+                    deploy = Team_Dog_Deployed.objects.filter(handler=handler).filter(status = "Pending").last()
+                    deploy.status = "Deployed"
+                    deploy.save()
+
+                    Notification.objects.create(position='Handler', user=handler, notif_type='handler_arrival_to_request',
+                                                message="Your arrival to the location of request has been confirmed by your Team Leader.")
+                except:
+                    pass
+
+            # Team Leader
 
             messages.success(request, 'Arrival succesfully confirmed')
             return redirect("profiles:team_leader_dashboard")
@@ -519,8 +567,8 @@ def team_leader_dashboard(request):
 
         'upcoming_request' : dr,
         'check_arrival_emrgncy_leave' : check_arrival_emrgncy_leave,
+        'maritime_form' : maritime_form
 
-        'ki' : ki
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
 
@@ -1338,6 +1386,7 @@ def commander_dashboard(request):
     return render (request, 'profiles/commander_dashboard.html', context)
 
 def operations_dashboard(request):
+    style = ""
     user = user_session(request)
 
     form = RequestForm(request.POST or None)
@@ -1352,7 +1401,7 @@ def operations_dashboard(request):
 
     if request.method == 'POST':
         # print(form.errors)
-        form.validate_date()
+        # form.validate_date()
         if form.is_valid():
 
             cd = form.cleaned_data['phone_number']
@@ -1394,6 +1443,7 @@ def operations_dashboard(request):
             messages.success(request, 'Request has been successfully Added!')
             return redirect('profiles:operations_dashboard')
         else:
+            print(form.errors)
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
@@ -1412,6 +1462,7 @@ def operations_dashboard(request):
 
         'events' : events,
         'rq' : rq,
+        'style' : style
     }
     return render (request, 'profiles/operations_dashboard.html', context)
 

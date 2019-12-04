@@ -3,7 +3,7 @@ from django import template
 from inventory.models import Medicine, Miscellaneous, Food
 from unitmanagement.forms import SelectUnitsForm
 from deployment.models import Location, Team_Assignment
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 register = template.Library()
 
@@ -153,3 +153,14 @@ def get_number_of_units(choice):
 
 
     return team.total_dogs_deployed
+
+
+@register.filter
+def recommended_checkup_date(deployment_date):
+    adjusted_date = deployment_date - timedelta(days=7)
+    weekno = adjusted_date.weekday()
+    while weekno > 5:
+        adjusted_date += timedelta(days=1)
+        weekno = adjusted_date.weekday()
+
+    return adjusted_date

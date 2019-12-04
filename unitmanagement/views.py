@@ -42,6 +42,8 @@ from profiles.models import User, Account, Personal_Info
 from training.models import K9_Handler, Training_History,Training_Schedule, Training
 from training.forms import assign_handler_form
 
+from deployment.tasks import update_port_info
+from deployment.templatetags.index import current_team
 
 # Create your views here.
 
@@ -192,6 +194,27 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('unitmanagement:k9_checkup_pending')
+    elif notif.notif_type == 'handler_phex_scheduled':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'handler_request_scheduled':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'admin_port_has_one_unit':
+        notif.viewed = True
+        notif.save()
+        return redirect('deployment:schedule_units')
+    elif notif.notif_type == 'handler_arrival_to_port':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'handler_arrival_to_request':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+
 
 
 def index(request):
@@ -2835,7 +2858,8 @@ def reproductive_edit(request, id):
 def k9_unpartnered_list(request):
     style=''
 
-    data = K9.objects.filter(handler=None) #removed for deployment
+    # data = K9.objects.filter(handler=None) #removed for deployment
+    data = K9.objects.filter(status='Working Dog').filter(handler=None).count()
     # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW
@@ -3134,6 +3158,7 @@ def k9_sick_details(request, id):
     }
     return render (request, 'unitmanagement/k9_sick_details.html', context)
 
+# Deprecated
 def emeregency_leave_list(request):
 
     data = []
@@ -3807,6 +3832,10 @@ def k9_checkup_pending(request):
         for item in removal:
             sched = K9_Schedule.objects.create(k9 = item.k9, status = "Checkup", date_start = item.date)
             sched.save()
+
+            Notification.objects.create(position='Handler', user=item.k9.handler, notif_type='handler_phex_scheduled',
+                                        message="Your K9 have an upcoming physical exam on " + str(item.date) + ". Be there!")
+
             style = "ui green message"
             name.append(item.k9.name)
 
@@ -3905,20 +3934,22 @@ def k9_checkup_pending(request):
     #         except:
     #             init_days -= 1
 
-    phex_preset = []
-    for item in pending_schedule:
-        adjusted_date = item.date_start - timedelta(days=7)
-        print("DEPLOYMENT DATE : " + str(adjusted_date))
-        weekno = adjusted_date.weekday()
-        while weekno > 5:
-            adjusted_date += timedelta(days=1)
-            weekno = adjusted_date.weekday()
-        print("PHEX DATE : " + str(adjusted_date))
-        phex_preset.append((item.k9, adjusted_date))
+
+
+    # phex_preset = []
+    # for item in pending_schedule:
+    #     adjusted_date = item.date_start - timedelta(days=7)
+    #     # print("DEPLOYMENT DATE : " + str(adjusted_date))
+    #     weekno = adjusted_date.weekday()
+    #     while weekno > 5:
+    #         adjusted_date += timedelta(days=1)
+    #         weekno = adjusted_date.weekday()
+    #     # print("PHEX DATE : " + str(adjusted_date))
+    #     phex_preset.append((item.k9, adjusted_date))
 
     context = {
         'k9_pending': pending_schedule,
-        'phex_preset' : phex_preset,
+        # 'phex_preset' : phex_preset,
         'events' : current_appointments,
         'date_form': date_form['date'].as_widget(),
         'selected_list': [],
@@ -4193,6 +4224,19 @@ def k9_mia_change(request,id):
         k9.status = 'Working Dog'
         k9.training_status = 'Deployed'
         k9.save()
+        deployed = Team_Dog_Deployed.objects.filter(k9 = k9).exclude(date_pulled=None).filter(status="Pending").exclude(
+            team_assignment=None).last()
+        deployed.status = "Deployed"
+        deployed.save()
+        Team_Dog_Deployed.objects.create(k9 = k9, handler = k9.handler, team_assignment = deployed.team_assignment, status = "Deployed", date_added = datetime.today().date(), date_pulled = None)
+        update_port_info([deployed.team_assignment.id])
+
+        Notification.objects.create(position='Handler', user=k9.handler, notif_type='handler_mia_to_port',
+                                    message="Your have been deployed back to your most recent port.")
+
+        team = current_team(k9, None)
+        Notification.objects.create(position='Team Leader', user=team.team_leader, notif_type='TL_mia_to_port',
+                                    message="Your team member(" + str(k9.handler) + "), has been deployed back to your port.")
 
     style = "ui green message"
     messages.success(request, 'You have updated K9 unit status.')
