@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_received_trail
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail
 
 import random
 
@@ -299,8 +299,9 @@ def mass_populate_revisited():
     # generate_requests()
     # generate_dogbreed()
 
-    create_predeployment_inventory()
-    generate_received_trail()
+    # create_predeployment_inventory()
+    # generate_inventory_trail()
+
 
     return None
 
@@ -2002,6 +2003,9 @@ def schedule_units(request):
 
                             # phex = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Checkup", date_start = deployment_date - timedelta(days=7))
                             # phex.save()
+
+                            current_pre_reqs =  K9_Pre_Deployment_Items.objects.filter(k9 = item.k9)
+                            current_pre_reqs.delete()
 
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()
