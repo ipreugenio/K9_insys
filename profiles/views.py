@@ -314,7 +314,7 @@ def team_leader_dashboard(request):
     geosearch = GeoSearch(request.POST or None)
 
     maritime_form = MaritimeForm(request.POST or None, initial = {'date' : datetime.today().date(), 'time' : datetime.now().time()})
-    working_handlers = User.objects.filter(status = "Working")
+    working_handlers = User.objects.exclude(status = "Died").exclude(status = "MIA").exclude(status = "Retired").exclude(status = "No Longer Employed")
 
     k9 = None
     for_arrival = None
