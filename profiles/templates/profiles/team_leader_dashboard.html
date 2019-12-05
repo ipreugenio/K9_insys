@@ -197,6 +197,26 @@
                   <h4>Port</h4>
                   <p>{{ta.location}}</p>
                  <strong>K9 : {{k9}}</strong>
+
+            <div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="dropdown icon"></i>
+     K9s Temporarily in your Care
+  </div>
+  <div class="content">
+      {% if temporary_care_k9s %}
+      <div class="ui list">
+      {% for temp_k9 in temporary_care_k9s %}
+        <div class="item">{{temp_k9}}</div>
+          {% endfor %}
+      </div>
+      {% else %}
+    <p>There are no other K9s in your care.</p>
+      {% endif %}
+  </div>
+
+</div>
+
                   <table class="ui very basic four column table">
                   <thead>
 
@@ -799,7 +819,11 @@ $( "#check_arrival_emrgncy_leave" ).click(function() {
 $( "#maritime_btn" ).click(function() {
   $('#maritime_modal').modal('show');
 });
+
+
+$('.ui.accordion').accordion();
 </script>
+
 
 
 {% endblock%}
