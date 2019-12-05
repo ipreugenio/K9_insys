@@ -1,13 +1,13 @@
 from faker import Faker
 import random
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from profiles.models import User, Account, Personal_Info, Education
 from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
     K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule, Training_History
-from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
+from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
 from unitmanagement.models import PhysicalExam
 from itertools import groupby
 
@@ -294,11 +294,33 @@ def create_predeployment_inventory():
                                                   quantity=randomizer, price=1500.24)
 
     randomizer = random.randint(100, 250)
-    food = Food.objects.create(food="Pedigree", foodtype="Adult Dog Food", unit="kilograms", quantity=randomizer,
-                               price=120)
+    food = Food.objects.create(food="Pedigree Sack", foodtype="Adult Dog Food", unit="Sack - 20kg", quantity=randomizer,price=1500)
+    
+    randomizer = random.randint(100, 250)
+    Food.objects.create(food="Pedigree Puppy", foodtype="Puppy Dog Food", unit="kilograms", quantity=randomizer,price=120)
+    
+    randomizer = random.randint(100, 250)
+    Food.objects.create(food="Pedigree", foodtype="Adult Dog Food", unit="kilograms", quantity=randomizer,price=120)
+    
+    randomizer = random.randint(100, 250)
+    Food.objects.create(food="Pedigree Puppy Sack", foodtype="Puppy Dog Food", unit="Sack - 20kg", quantity=randomizer,price=1500)
+    
+    Food.objects.create(food="Cosi Milk", foodtype="Milk", unit="Box - 1L", quantity=randomizer,price=130)
 
     randomizer = random.randint(50, 150)
-    medicine = Medicine.objects.create(medicine="Medicine Sample X", med_type="Vitamins", uom="mg", price=32.12)
+    medicine = Medicine.objects.create(medicine="LC Vit Multivitamins Syrup", med_type="Vitamins", uom="mL", price=149, dose=60)
+
+    randomizer = random.randint(50, 150)
+    Medicine.objects.create(medicine="Broncure", med_type="Bottle", uom="mL", price=220, dose=90)
+    
+    randomizer = random.randint(50, 150)
+    Medicine.objects.create(medicine="Refamol", med_type="Capsule", uom="mg", price=32.05,dose=50)
+    
+    randomizer = random.randint(50, 150)
+    Medicine.objects.create(medicine="Parvo Aid", med_type="Tablet", uom="mg", price=25.66, dose=25)
+    
+    randomizer = random.randint(50, 150)
+    Medicine.objects.create(medicine="Papi Doxy", med_type="Bottle", uom="mL", price=173, dose=80)
 
     randomizer = random.randint(30, 100)
     grooming_kit = Miscellaneous.objects.create(miscellaneous="Grooming Kit", misc_type="Kennel Supply", uom="pc",
@@ -340,6 +362,28 @@ def create_predeployment_inventory():
 
     randomizer = random.randint(100, 1000)
     Medicine.objects.create(medicine='Frontline', med_type='Preventive', immunization='Tick and Flea', price=randomizer)
+
+    #VET SUPPLY
+    randomizer = random.randint(100, 1000)
+    Miscellaneous.objects.create(miscellaneous='Adhesive Bandage',uom='pack', misc_type='Vet Supply', price=randomizer)
+    
+    randomizer = random.randint(100, 1000)
+    Miscellaneous.objects.create(miscellaneous='Face Mask',uom='pack', misc_type='Vet Supply', price=randomizer)
+    
+    randomizer = random.randint(500, 800)
+    Miscellaneous.objects.create(miscellaneous='Cotton Gauze Dressing',uom='pack', misc_type='Vet Supply',price=randomizer)
+    
+    randomizer = random.randint(300, 600)
+    Miscellaneous.objects.create(miscellaneous='Medical Gloves',uom='box', misc_type='Vet Supply', price=randomizer)
+    
+    randomizer = random.randint(800, 1200)
+    Miscellaneous.objects.create(miscellaneous='Surgical Suture',uom='box', misc_type='Vet Supply', price=randomizer)
+
+    randomizer = random.randint(300, 800)
+    Miscellaneous.objects.create(miscellaneous='Injection Syringe',uom='pc', misc_type='Vet Supply', price=randomizer)
+    
+    randomizer = random.randint(500, 1200)
+    Miscellaneous.objects.create(miscellaneous='EDTA K2 K3 Blood Tube',uom='tube', misc_type='Vet Supply',price=randomizer)
 
     print("Generated inventory items")
     return None
@@ -1068,6 +1112,149 @@ def generate_requests():
 
 # END MISC
 
+
+#GENERATE PHYSICAL COUNT, RECEIVED, SUBTRACTED
+def generate_received_trail():
+    fake = Faker()
+    admin = User.objects.filter(position='Administrator')
+    admin = list(admin) #food received & count by admin
+    
+    vet = User.objects.filter(position='Veterinarian')
+    vet = list(vet)
+    # DATE OF LAST YEAR - 2018
+    # FOOD
+    food = Food.objects.all()
+    #food = Food.objects.filter(foodtype='Milk')
+    for data in food:
+        #FOOD RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Food_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #FOOD SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Food_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #FOOD PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Food_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
+            
+    # MISC
+    misc = Miscellaneous.objects.all()
+    for data in misc:
+        #MISCELLANEOUS RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Miscellaneous_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MISCELLANEOUS SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Miscellaneous_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MISCELLANEOUS PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Miscellaneous_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
+
+    # MED
+    med = Medicine_Inventory.objects.all()
+    for data in med:
+        #MEDICINE RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            exp_date = datetime(2023,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Medicine_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date,expiration_date=exp_date,status='Done')
+            data.quantity = new_q
+            data.save()
+
+        #MEDICINE SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Medicine_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MEDICINE PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Medicine_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
+
+    # DATE OF THIS YEAR - 2019
+    
 
 
 '''
