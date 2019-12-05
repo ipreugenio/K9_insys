@@ -316,6 +316,8 @@ def team_leader_dashboard(request):
     maritime_form = MaritimeForm(request.POST or None, initial = {'date' : datetime.today().date(), 'time' : datetime.now().time()})
     working_handlers = User.objects.exclude(status = "Died").exclude(status = "MIA").exclude(status = "Retired").exclude(status = "No Longer Employed")
 
+    temporary_care_k9s = Temporary_Handler.objects.filter(temp = user).filter(date_returned = None)
+
     k9 = None
     for_arrival = None
     check_arrival = None
@@ -485,6 +487,14 @@ def team_leader_dashboard(request):
                 except:
                     pass
 
+                try:
+                    temp_handlers = Temporary_Handler.objects.filter(original = handler).filter(date_returned = None)
+
+                    for temp_handler in temp_handlers:
+                        temp_handler.date_returned = datetime.today().date()
+                        temp_handler.save()
+                except: pass
+
             # Team Leader
 
             messages.success(request, 'Arrival succesfully confirmed')
@@ -581,7 +591,8 @@ def team_leader_dashboard(request):
 
         'upcoming_request' : dr,
         'check_arrival_emrgncy_leave' : check_arrival_emrgncy_leave,
-        'maritime_form' : maritime_form
+        'maritime_form' : maritime_form,
+        'temporary_care_k9s' : temporary_care_k9s
 
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)

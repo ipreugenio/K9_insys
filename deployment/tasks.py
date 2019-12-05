@@ -8,7 +8,7 @@ from datetime import timedelta, date, datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 
-from unitmanagement.models import Notification
+from unitmanagement.models import Notification, Temporary_Handler
 from planningandacquiring.models import K9
 from deployment.models import Dog_Request, Team_Dog_Deployed, K9_Schedule, Team_Assignment, K9_Pre_Deployment_Items
 from inventory.models import Medicine, Medicine_Inventory, Medicine_Subtracted_Trail, Food, Food_Subtracted_Trail, Miscellaneous, Miscellaneous_Subtracted_Trail
@@ -125,6 +125,9 @@ def assign_TL(team, handler_list_arg = None):
 
     try:
         team_leader =  handler_rank_dataframe.iloc[0]['Handler']
+        if team_leader.position == "Handler":
+            Notification.objects.create(position='Team Leader', user=team_leader, notif_type='TL_handler_into_TL',
+                                        message='You are the new Team Leader of the team! You can now access new functionalities.')
         team_leader.position = "Team Leader"
         team_leader.save()
     except:
@@ -137,6 +140,14 @@ def assign_TL(team, handler_list_arg = None):
     for item in deployment:
         if item.handler != team_leader:
             handler = item.handler
+            if handler.position == "Team Leader":
+                Notification.objects.create(position='Handler', user=handler, notif_type='handler_TL_into_handler',
+                                            message= str(team_leader) + ' is the new Team Leader of the team.')
+
+                temporary_care_k9s = Temporary_Handler.objects.filter(temp=handler).filter(date_returned=None)
+                for temp_k9 in temporary_care_k9s:
+                    temp_k9.temp = team_leader
+                    temp_k9.save()
             handler.position = "Handler"
             handler.save()
 

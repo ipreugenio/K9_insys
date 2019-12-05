@@ -214,6 +214,14 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'handler_TL_into_handler':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
+    elif notif.notif_type == 'TL_handler_into_TL':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:team_leader_dashboard')
 
 
 
