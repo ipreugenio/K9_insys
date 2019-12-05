@@ -21,8 +21,9 @@
     <table id="tabledata1" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
-                <th>K9</th>
                 <th>Date Due</th>
+                <th>K9</th>
+                <th>Breed</th>
                 <th></th>
             </tr>
         </thead>
@@ -30,15 +31,17 @@
             {% for data in k9_dw %}
             {% if data.1 == today%}
             <tr class="positive">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
             {% elif today > data.1%}
             <tr class="negative">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
@@ -51,8 +54,9 @@
     <table id="tabledata2" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
-                <th>K9</th>
                 <th>Date Due</th>
+                <th>K9</th>
+                <th>Breed</th>
                 <th></th>
             </tr>
         </thead>
@@ -60,15 +64,17 @@
             {% for data in k9_dh %}
             {% if data.1 == today%}
             <tr class="positive">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
             {% elif today > data.1%}
             <tr class="negative">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
@@ -81,8 +87,9 @@
     <table id="tabledata3" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
-                <th>K9</th>
                 <th>Date Due</th>
+                <th>K9</th>
+                <th>Breed</th>
                 <th></th>
             </tr>
         </thead>
@@ -90,15 +97,17 @@
             {% for data in k9_ar %}
             {% if data.1 == today%}
             <tr class="positive">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
             {% elif today > data.1%}
             <tr class="negative">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
@@ -111,8 +120,9 @@
     <table id="tabledata4" class="ui three column celled table">
         <thead class="ui center aligned">
             <tr>
-                <th>K9</th>
                 <th>Date Due</th>
+                <th>K9</th>
+                <th>Breed</th>
                 <th></th>
             </tr>
         </thead>
@@ -120,15 +130,17 @@
             {% for data in k9_br %}
             {% if data.1 == today%}
             <tr class="positive">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
             {% elif today > data.1%}
             <tr class="negative">
-                <td>{{data.0}}</td>
                 <td class="center aligned">{{data.1|date:'Y-m-d'}}</td>
+                <td>{{data.0}}</td>
+                <td>{{data.0.breed}}</td>                
                 <td class="three wide column center aligned"><a href="#"
                 class="ui tiny basic blue button btn_modal" id='{{data.0.id}}' data-type='Deworming'>Select</a></td>
             </tr>
@@ -160,16 +172,16 @@
     });
 
     $('#tabledata1').DataTable({
-        "order": [[ 1, "asc" ]]
+        "order": [[ 0, "asc" ]]
     });
     $('#tabledata2').DataTable({
-        "order": [[ 1, "asc" ]]
+        "order": [[ 0, "asc" ]]
     });
     $('#tabledata3').DataTable({
-        "order": [[ 1, "asc" ]]
+        "order": [[ 0, "asc" ]]
     });
     $('#tabledata4').DataTable({
-        "order": [[ 1, "asc" ]]
+        "order": [[ 0, "asc" ]]
     });
     $('.menu .item').tab();
 
