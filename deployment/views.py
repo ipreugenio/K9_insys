@@ -295,7 +295,7 @@ def mass_populate_revisited():
     # create_predeployment_inventory()
     # generate_user()
     # create_teams()
-    generate_k9()
+    # generate_k9()
     generate_requests()
 
     return None
@@ -1998,6 +1998,9 @@ def schedule_units(request):
 
                             # phex = K9_Schedule.objects.create(team = team, k9 = item.k9, status = "Checkup", date_start = deployment_date - timedelta(days=7))
                             # phex.save()
+
+                            current_pre_reqs =  K9_Pre_Deployment_Items.objects.filter(k9 = item.k9)
+                            current_pre_reqs.delete()
 
                             pre_req_item = K9_Pre_Deployment_Items.objects.create(k9 = item.k9, initial_sched = deploy)
                             pre_req_item.save()

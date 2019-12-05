@@ -4227,6 +4227,9 @@ def k9_mia_change(request,id):
     if status == 'missing':
         k9.status = 'Missing'
         k9.training_status = 'Missing'
+        handler = k9.handler
+        handler.status = "Missing"
+        handler.save()
         k9.save()
 
     elif status == 'late':

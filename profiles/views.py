@@ -313,7 +313,7 @@ def team_leader_dashboard(request):
     geoform = GeoForm(request.POST or None)
     geosearch = GeoSearch(request.POST or None)
 
-    maritime_form = MaritimeForm(request.POST or None, initial = {'date' : datetime.today().date(), 'time' : timezone.now()})
+    maritime_form = MaritimeForm(request.POST or None, initial = {'date' : datetime.today().date(), 'time' : datetime.now().time()})
     working_handlers = User.objects.filter(status = "Working")
 
     k9 = None
@@ -595,7 +595,6 @@ def check_pre_deployment_items(user):
 
     all_clear = True
     k9 = K9.objects.get(handler = user)
-
 
     items_list = []
 

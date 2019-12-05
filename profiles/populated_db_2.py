@@ -832,6 +832,9 @@ def generate_k9():
         k9.handler = user
         k9.training_status = 'On-Training'
         k9.save()
+
+        user.partnered = True
+        user.save()
         print("Assigned Handler " + str(user) + " to " + str(k9))
     # END ASSIGN HANDLER
 
@@ -890,7 +893,7 @@ def generate_k9():
                 sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
                 train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
                                                                 date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
-                train_sched.save()
+                # train_sched.save()
 
             training.stage1_1 = grade_list[0]
             training.stage1_2 = grade_list[1]
@@ -937,6 +940,7 @@ def generate_k9():
             k9 = K9.objects.get(id=id)
             k9.training_status = "For-Deployment"
             k9.status = "Working Dog"
+            k9.birth_date = k9.birth_date - timedelta(days = 2190)
             k9.save()
             print(str(k9) + " is now For-Deployment")
         except:
@@ -947,6 +951,9 @@ def generate_k9():
             k9 = K9.objects.get(id=id)
             k9.training_status = "For-Breeding"
             k9.status = "Working Dog"
+            handler = k9.handler
+            k9.handler = None
+            handler.partnered = False
             k9.save()
             print(str(k9) + " is now For-Breeding")
         except:
@@ -1014,6 +1021,15 @@ def generate_k9():
 def generate_requests():
     fake = Faker()
 
+    pre_titles = ['An Evening of ', 'A Night to Celebrate ', 'A Celebration of Life and ', 'The Wonders of '
+                  , 'In Observance of ', 'In Recognition of ', 'In Commemoration of ', 'Meetup for '
+                  , 'The Future of ', 'The Technology of ', 'A Date with ']
+    post_titles = [' Conference', ' Con', ' Competition', ' Hackathon', ' Fundraiser', ' Charity', ' Party'
+                   , ' Bash', ' Ball', ' Gala', ' Shindig', 'athon', ' Celebration', ' Affair'
+                   , ' Ceremony', ' Awards', ' Event of the Year!', ' Jubilee', ' Performance', ' Blast'
+                   , ' Blowout', ' Rite', ' Show', ' Meetup', ' for Health', ' Workshop', ' Research Event'
+                   , ' Summit', ' Course', ' Symposium', ' Town Hall Meeting', ' Games', ' Expo', ': The Event']
+
     location_list = []
     for location in Location.objects.all():
         location_list.append(location)
@@ -1048,7 +1064,17 @@ def generate_requests():
         end_date = start_date + timedelta(days=random.randint(1, 14))
 
         remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-        event_name = fake.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None)
+        event_name = fake.word()
+
+        randomizer = random.randint(0, 1)
+
+        if randomizer == 0:
+            randomizer = random.randint(0, len(pre_titles) - 1)
+            event_name = str(pre_titles[randomizer]) + event_name.capitalize()
+        else:
+            randomizer = random.randint(0, len(post_titles) - 1)
+            event_name = event_name.capitalize() + str(post_titles[randomizer])
+
         email = requester.lower() + "@gmail.com"
 
         randomizer = random.randint(0, len(area_list) - 1)
@@ -1059,6 +1085,7 @@ def generate_requests():
                                              remarks=remarks, area=area, k9s_needed=k9s_required, start_date=start_date,
                                              end_date=end_date, latitude=lat, longtitude=lng)
         request.save()
+        print("Event: " + event_name + ". " + str(x) + "/150 events")
 
         if request.sector_type == "Big Event":
             request.status = "Approved"
@@ -1066,15 +1093,51 @@ def generate_requests():
 
     return None
 
-# END MISC
+def generate_maritime():
+    fake = Faker()
+    for x in range(0, 500):
+        BOAT_TYPE = (
+            ('Domestice Passenger Vessels', 'Domestice Passenger Vessels'),
+            ('Motorbancas', 'Motorbancas'),
+            ('Fastcrafts', 'Fastcrafts'),
+            ('Cruise Ships', 'Cruise Ships'),
+            ('Tugboat', 'Tugboat'),
+            ('Barge', 'Barge'),
+            ('Tanker', 'Tanker')
+        )
 
+        location_list = []
+        for location in Location.objects.all():
+            location_list.append(location)
+
+        randomizer = random.randint(0, len(location_list) - 1)
+        location = location_list[randomizer]
+        print("Location : " + str(location))
+
+        randomizer = random.randint(0, len(BOAT_TYPE) - 1)
+        boat_type = BOAT_TYPE[randomizer][0]
+        print("Boat type : " + boat_type)
+
+        date = fake.date_between(start_date="-10y", end_date="-5y")
+
+        time = fake.time_object(end_datetime=None)
+
+        # TODO Generate Time
+
+        passenger_count = random.randint(20, 100)
+
+        maritime = Maritime.objects.create(location = location, boat_type = boat_type, date = date, time = time, passenger_count = passenger_count)
+
+    return None
+
+
+# END MISC
 
 
 '''
 TODO
 
 Create Incidents
-Create Maritimes
 Create Parents (Use For-Breeding K9s)
 Create Litter
 Create K9_mated
@@ -1082,7 +1145,10 @@ Create Health (Specially for K9s that have reach deployment/breeding decision)
 Create Daily Refreshers
 Create Budgeting Stuff
 
+VaccineUsed Record for Procured K9s (Date of vaccination lang kailangan + Name of Diseases)4 diseases
+Remove handlers on For-Breeding K9s, then status is unpartnered
 Fix duplicate Names on k9s
 Add K9(s) on final stage of training
+Schedule K9s to request
 Other Report stuff
 '''
