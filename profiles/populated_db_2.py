@@ -955,6 +955,11 @@ def generate_k9():
 
             training.remarks = remark
             training.stage = "Finished Training"
+            
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            training.date_finished = f_date
             training.save()
 
             k9.training_status = 'Trained'

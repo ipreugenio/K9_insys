@@ -2143,7 +2143,7 @@ def ajax_k9_request_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
       
-        data_arr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).filter(status='Approved').order_by('event_name')
+        data_arr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).filter(status='Done').order_by('event_name')
 
         # for data in data_arr:
         #     print(data.event_name)
