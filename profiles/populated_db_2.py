@@ -1178,14 +1178,14 @@ def generate_maritime():
 # END MISC
 
 #GENERATE PHYSICAL COUNT, RECEIVED, SUBTRACTED
-def generate_received_trail():
+def generate_inventory_trail():
     fake = Faker()
     admin = User.objects.filter(position='Administrator')
     admin = list(admin) #food received & count by admin
     
     vet = User.objects.filter(position='Veterinarian')
     vet = list(vet)
-    # DATE OF LAST YEAR - 2018
+    # DATE OF THIS YEAR - 2019
     # FOOD
     food = Food.objects.all()
     #food = Food.objects.filter(foodtype='Milk')
@@ -1317,9 +1317,136 @@ def generate_received_trail():
             data.quantity = new_q
             data.save()
 
-    # DATE OF THIS YEAR - 2019
-    
+    # DATE OF LAST YEAR - 2018
+    # FOOD
+    food = Food.objects.all()
+    for data in food:
+        #FOOD RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Food_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date)
+            data.quantity = new_q
+            data.save()
 
+        #FOOD SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Food_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #FOOD PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Food_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
+            
+    # MISC
+    misc = Miscellaneous.objects.all()
+    for data in misc:
+        #MISCELLANEOUS RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Miscellaneous_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MISCELLANEOUS SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Miscellaneous_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MISCELLANEOUS PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Miscellaneous_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
+
+    # MED
+    med = Medicine_Inventory.objects.all()
+    for data in med:
+        #MEDICINE RECEIVED TRAIL
+        for i in range(10):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            exp_date = datetime(2023,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            choice = random.choice(admin)
+            randomizer = random.randint(50, 150)
+            new_q = data.quantity+randomizer
+            print(data,data.quantity,new_q)
+            Medicine_Received_Trail.objects.create(inventory=data, user=choice,old_quantity=data.quantity, quantity=new_q, date_received=f_date,expiration_date=exp_date,status='Done')
+            data.quantity = new_q
+            data.save()
+
+        #MEDICINE SUBTRACT TRAIL
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(0, 50)
+            new_q = data.quantity-randomizer
+            if new_q < 0:
+                new_q = 0
+            print(data,data.quantity,new_q)
+            Medicine_Subtracted_Trail.objects.create(inventory=data, old_quantity=data.quantity, quantity=new_q,date_subtracted=f_date)
+            data.quantity = new_q
+            data.save()
+
+        #MEDICINE PHYSICAL COUNT
+        for i in range(5):
+            start_date = datetime(2018,1,1)
+            end_date = datetime(2018,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            randomizer = random.randint(100, 800)
+            choice = random.choice(admin)
+            new_q = randomizer
+            print(data,data.quantity,new_q)
+            Medicine_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
+            data.quantity = new_q
+            data.save()
 
 '''
 TODO
