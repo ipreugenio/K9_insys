@@ -28,15 +28,15 @@
         </thead>
         <tbody>
             {% for data in data%}
-            <tr>
-                <td>{{data.0}}</td>
-                <td>{{data.1}}</td>
+            <tr class="right aligned">
+                <td class="left aligned">{{data.0}}</td>
+                <td class="left aligned">{{data.1}}</td>
                 <td>{{data.2|intcomma}}/{{data.3|intcomma}}</td>
                 <td>{{data.4|intcomma}}/{{data.5|intcomma}}</td>
                 <td>{{data.6|intcomma}}/{{data.7|intcomma}}</td>
                 <td>{{data.8|intcomma}}/{{data.9|intcomma}}</td>
                 <td>{{data.10|intcomma}}/{{data.11|intcomma}}</td>
-                <td style="font-weight: bold;">{{data.12}}</td>
+                <td style="font-weight: bold;">{{data.12|intcomma}}</td>
             </tr>
             {%endfor%}
         </tbody>

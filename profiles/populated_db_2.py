@@ -8,11 +8,13 @@ from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, 
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule, Training_History
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
+from deployment.models import Daily_Refresher
+
 from unitmanagement.models import PhysicalExam
 from itertools import groupby
 
 from deployment.tasks import assign_TL
-
+from django.db.models import Q
 import re
 '''
 For more info on faker.Faker, view https://faker.readthedocs.io/en/latest/index.html
@@ -1191,7 +1193,7 @@ def generate_inventory_trail():
     #food = Food.objects.filter(foodtype='Milk')
     for data in food:
         #FOOD RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1204,7 +1206,7 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1218,11 +1220,11 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1234,7 +1236,7 @@ def generate_inventory_trail():
     misc = Miscellaneous.objects.all()
     for data in misc:
         #MISCELLANEOUS RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1247,7 +1249,7 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1261,11 +1263,11 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1277,7 +1279,7 @@ def generate_inventory_trail():
     med = Medicine_Inventory.objects.all()
     for data in med:
         #MEDICINE RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             exp_date = datetime(2023,12,31)
@@ -1291,7 +1293,7 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1305,11 +1307,11 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1322,7 +1324,7 @@ def generate_inventory_trail():
     food = Food.objects.all()
     for data in food:
         #FOOD RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1335,7 +1337,7 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1349,11 +1351,11 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1365,7 +1367,7 @@ def generate_inventory_trail():
     misc = Miscellaneous.objects.all()
     for data in misc:
         #MISCELLANEOUS RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1378,7 +1380,7 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1392,11 +1394,11 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1408,7 +1410,7 @@ def generate_inventory_trail():
     med = Medicine_Inventory.objects.all()
     for data in med:
         #MEDICINE RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             exp_date = datetime(2023,12,31)
@@ -1422,7 +1424,7 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1436,17 +1438,79 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
             Medicine_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
             data.quantity = new_q
             data.save()
+
+def generate_daily_refresher():
+    fake = Faker()
+ 
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9) 
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
+    for data in k9_sample:
+        for i in range(2):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            
+            choice = random.choice(k9_list)
+
+            mar = ['MARSEC','MARLEN','MARSAR','MAREP']
+            mar = random.choice(mar)
+
+            port_plant = random.randint(1, 3)
+            port_find = random.randint(0, port_plant)
+            building_plant = random.randint(1, 3)
+            building_find = random.randint(0, building_plant)
+            vehicle_plant = random.randint(1, 3)
+            vehicle_find = random.randint(0, vehicle_plant)
+            baggage_plant = random.randint(1, 3)
+            baggage_find = random.randint(0, baggage_plant)
+            others_plant = random.randint(1, 3)
+            others_find = random.randint(0, others_plant)
+            
+            port_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            port_hour = int(port_date.time().hour)
+            port_date = port_date - timedelta(hours=port_hour)
+
+            port_time = port_date.time()
+
+            building_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            building_hour = int(building_date.time().hour)
+            building_date = building_date - timedelta(hours=building_hour)
+
+            building_time = building_date.time()
+
+            vehicle_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            vehicle_hour = int(vehicle_date.time().hour)
+            vehicle_date = vehicle_date - timedelta(hours=vehicle_hour)
+
+            vehicle_time = vehicle_date.time()
+
+            baggage_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            baggage_hour = int(baggage_date.time().hour)
+            baggage_date = baggage_date - timedelta(hours=baggage_hour)
+
+            baggage_time = baggage_date.time()
+
+            others_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            others_hour = int(others_date.time().hour)
+            others_date = others_date - timedelta(hours=others_hour)
+
+            others_time = others_date.time()
+
+            dr = Daily_Refresher.objects.create(k9=choice,handler=choice.handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
+
+            print('DR'+str(i), dr.k9, dr.rating)
+    
 
 '''
 TODO

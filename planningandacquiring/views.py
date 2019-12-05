@@ -1579,7 +1579,7 @@ def ajax_k9_performance_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        dog = Daily_Refresher.objects.filter(date__range=[from_date, to_date]).values('k9').distinct().order_by("rating")
+        dog = Daily_Refresher.objects.filter(date__range=[from_date, to_date]).values('k9').order_by("k9__name").distinct()
 
         for d in dog:
             for key, value in d.items(): 
@@ -1597,7 +1597,7 @@ def ajax_k9_performance_report(request):
                     r = Daily_Refresher.objects.filter(k9__id=value).filter(date__range=[from_date, to_date]).aggregate(avg=Avg('rating'))['avg']
                     
                     k9 = K9.objects.get(id=value)
-                    dt = [k9,k9.capability,pf,pp,bf,bp,vf,vp,bgf,bgp,of,op,r]
+                    dt = [k9,k9.capability,pf,pp,bf,bp,vf,vp,bgf,bgp,of,op,round(r,2)]
                     data.append(dt)
     except:
         pass
@@ -1950,14 +1950,14 @@ def ajax_aor_summary_report(request):
         from_date = request.GET.get('date_from')
         area_val = []
 
-        dr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).values('area').distinct().order_by('area__name')
+        dr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).values('area').order_by('area__name').distinct()
         
         for data in dr:
             for key, value in data.items():
                 if key == 'area':
                     area_val.append(value)
 
-        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').order_by('location__area__name').distinct()
 
         for data in inc:
             for key, value in data.items():
@@ -2394,7 +2394,7 @@ def ajax_inventory_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        mst = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        mst = Medicine_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').order_by('inventory').distinct()
         for data in mst:
             for key,value in data.items():
                 if key == 'inventory':
@@ -2406,7 +2406,7 @@ def ajax_inventory_report(request):
                     arr_val.append(x)
                     mst_cost = mst_cost+c
 
-        fst = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        fst = Food_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').order_by('inventory').distinct()
         
         for data in fst:
             for key,value in data.items():
@@ -2419,7 +2419,7 @@ def ajax_inventory_report(request):
                     arr_val2.append(x)
                     fst_cost=fst_cost+c
 
-        miscst = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').distinct().order_by('inventory')
+        miscst = Miscellaneous_Subtracted_Trail.objects.filter(date_subtracted__range=[from_date, to_date]).values('inventory').order_by('inventory').distinct()
         
         for data in miscst:
             for key,value in data.items():
@@ -2433,7 +2433,7 @@ def ajax_inventory_report(request):
                     misc_cost=misc_cost+c
 
         total = mst_cost+fst_cost+misc_cost
-
+        print(total)
     except:
         pass
     user = user_session(request)
@@ -2857,6 +2857,7 @@ def supplier_date(request):
     
 def ajax_supplier_report(request):
     data_arr = []
+    grand_arr = []
     to_date = None
     from_date = None
   
@@ -2905,9 +2906,19 @@ def ajax_supplier_report(request):
                 arr2.append(a)
 
             # print('ARR2',arr2)
+            
+            g_trained = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).filter(trained='Trained').count()
+
+            g_failed = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).filter(trained='Failed').count()
+
+            g_on_training = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).filter(trained=None).count()
+
+            grand_total = g_trained + g_failed + g_on_training
+            y = [supplier,g_trained,g_failed,g_on_training,grand_total]
+            grand_arr.append(y)
+
             first = arr2[0]
             arr2.remove(arr2[0])
-            print('FIRST',first)
             x = (supplier, arr2, len(arr1),first)
             data_arr.append(x)
 
@@ -2917,6 +2928,7 @@ def ajax_supplier_report(request):
     user = user_session(request)
     context = {
         'data':data_arr,
+        'grand_arr':grand_arr,
         'from_date':from_date,
         'to_date':to_date,
         'user': user,

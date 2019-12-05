@@ -27,7 +27,7 @@
         <tbody>
             {% for data in data%}
             <tr class="right aligned">
-                <td class="left aligned">{{data.date_received}}</td>
+                <td class="left aligned">{{data.date_received|date:'Y-m-d'}}</td>
                 <td class="left aligned">{{data.inventory}}</td>
                 <td class="left aligned">{{data.inventory.unit}}</td>
                 <td>{{data.old_quantity|intcomma}}</td>
