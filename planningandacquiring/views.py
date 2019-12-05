@@ -1687,7 +1687,7 @@ def ajax_training_report(request):
         from_date = request.GET.get('date_from')
         t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('k9')
         
-        print(t)
+        # print(t)
         for t in t:
             date_all = 0
             for key, value in t.items():  
@@ -1695,7 +1695,7 @@ def ajax_training_report(request):
                     th = Training_History.objects.get(k9__id=value)
                     ts = Training_Schedule.objects.filter(k9__id=value)
                     t = Training.objects.filter(k9__id=value).get(stage='Finished Training')
-                    print(th.handler, th.date)
+                    # print(th.handler, th.date)
 
                     for ts in ts:
                         if ts.stage == 'Stage 0':
@@ -1709,7 +1709,7 @@ def ajax_training_report(request):
             date_mon = int(date_all/30)
             a = [th.k9, th.k9.breed, th.handler, date_all, date_mon, t.grade]
             data.append(a)
-            print(a)
+            # print(a)
                    
                                 
     except:
@@ -1762,7 +1762,7 @@ def ajax_training_summary_report(request):
         t = Training.objects.filter(Q(stage='Finished Training') | Q(stage__contains='Failed')).filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('grade')
         
         dog = []
-        print("training count", t)
+        # print("training count", t)
         for t in t:
             for key, value in t.items():  
                 if key == 'k9':
@@ -1851,9 +1851,9 @@ def ajax_training_summary_report(request):
                                     sar_failed[i] = sar_failed[i]+1
 
 
-        print('EDD', edd_breed, edd_passed, edd_failed)
-        print('NDD', ndd_breed, ndd_passed, ndd_failed)
-        print('SAR', sar_breed, sar_passed, sar_failed)
+        # print('EDD', edd_breed, edd_passed, edd_failed)
+        # print('NDD', ndd_breed, ndd_passed, ndd_failed)
+        # print('SAR', sar_breed, sar_passed, sar_failed)
 
         edd_data = []
         edd_total = sum(edd_passed) + sum(edd_failed)
@@ -2046,7 +2046,7 @@ def ajax_port_report(request):
 
         area_val= pd.unique(area_val)
         # print(area_val)
-        print('AREA', area_val)
+        # print('AREA', area_val)
         for id_area in area_val:
             a = Area.objects.get(id=id_area)
             area_arr.append(a)
@@ -2064,8 +2064,8 @@ def ajax_port_report(request):
                 arr.append(c.location.id) 
 
             arr = pd.unique(arr)
-            print('Location',l)
-            print('ARR',arr)
+            # print('Location',l)
+            # print('ARR',arr)
             for data in arr:
                 l = Location.objects.get(id=data)
                 m = Maritime.objects.filter(datetime__range=[from_date, to_date]).filter(location=l).aggregate(avg=Avg('passenger_count'))['avg']
@@ -2100,11 +2100,11 @@ def ajax_port_report(request):
 
 
                 x = [l,ta_team,int(np.ceil(m)),edd,ndd,sar,oth,edd_dep,ndd_dep,sar_dep]
-                print('TEST', x)
+                # print('TEST', x)
                 data_arr.append(x)
 
         # print('Area', area_arr)
-        print('DATA',data_arr)
+        # print('DATA',data_arr)
     
     except:
         pass
@@ -2145,8 +2145,8 @@ def ajax_k9_request_report(request):
       
         data_arr = Dog_Request.objects.filter(start_date__range=[from_date, to_date]).filter(status='Approved').order_by('event_name')
 
-        for data in data_arr:
-            print(data.event_name)
+        # for data in data_arr:
+        #     print(data.event_name)
 
     except:
         pass
@@ -2184,7 +2184,7 @@ def ajax_fou_acc_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        data_arr = Handler_Incident.objects.filter(date__range=[from_date, to_date]).filter(status='Done')
+        data_arr = Handler_Incident.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('handler')
         
     except:
         pass
@@ -2223,7 +2223,7 @@ def ajax_k9_incident_summary_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        data_arr = K9_Incident.objects.filter(date__range=[from_date, to_date]).order_by('date')
+        data_arr = K9_Incident.objects.filter(date__range=[from_date, to_date]).order_by('date').order_by('k9')
 
         b = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Sick').count()
         c = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Accident').count()
@@ -2284,7 +2284,7 @@ def ajax_k9_breeding_report(request):
                     val.append(value)
 
         val = np.unique(val)
-        print(val)
+        # print(val)
         for data in val:
             birth = K9_Litter.objects.filter(date__range=[from_date, to_date]).filter(mother__breed=data).aggregate(sum=Sum('litter_no'))['sum']
             
@@ -2343,12 +2343,12 @@ def ajax_health_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        arr_val = Health.objects.filter(date__range=[from_date, to_date]).filter(status='Done')
+        arr_val = Health.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('date')
         for data in arr_val:
             hm = HealthMedicine.objects.filter(health=data)
             data_arr.append([data,hm])
 
-        print(data_arr)
+        # print(data_arr)
 
     except:
         pass
@@ -2710,8 +2710,8 @@ def ajax_on_leave_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').distinct()
-        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').distinct()
+        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').order_by('date').distinct()
+        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').order_by('date').distinct()
 
         val_arr=[]
         for data in hl:
@@ -2724,11 +2724,11 @@ def ajax_on_leave_report(request):
                 if key == 'handler':
                     val_arr.append(value)
 
-        val_arr = np.unique(val_arr)
-        print('VAL', val_arr)
+        val_arr = pd.unique(val_arr)
+        # print('VAL', val_arr)
         for data in val_arr:
             handler = User.objects.get(id=data)
-            print(handler)
+            # print(handler)
          
             hll = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(handler=handler).filter(status='Approved').aggregate(sum=Sum('duration'))['sum']
             ell = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(handler=handler).filter(status='Returned').aggregate(sum=Sum('duration'))['sum']
@@ -2738,10 +2738,10 @@ def ajax_on_leave_report(request):
                 hll=0
 
             x = [handler,hll,ell, hll+ell]
-            print(hl,el)
+            # print(hl,el)
             data_arr.append(x)
 
-        print(data_arr)
+        # print(data_arr)
     except:
         print('EXCEPT')
 
@@ -2774,7 +2774,18 @@ def ajax_demand_supply_report(request):
     data_arr = []
     to_date = None
     from_date = None
-  
+    edd= None
+    ndd= None
+    sar= None
+    edd_train= None
+    ndd_train= None
+    sar_train= None
+    dif_edd= None
+    dif_ndd= None
+    dif_sar= None
+    total_demand= None
+    total_supply= None
+    total_dif= None
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
@@ -2782,6 +2793,14 @@ def ajax_demand_supply_report(request):
         edd = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('EDD_demand'))['sum']
         ndd = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('NDD_demand'))['sum']
         sar = Team_Assignment.objects.filter(date_added__range=[from_date, to_date]).aggregate(sum=Sum('SAR_demand'))['sum']
+        
+        if not edd:
+            edd = 0
+        if not ndd:
+            ndd = 0
+        if not sar:
+            sar = 0
+      
 
         edd_train = Training.objects.filter(date_finished__range=[from_date, to_date]).filter(k9__trained='Trained').filter(k9__capability='EDD').exclude(Q(k9__status='Material Dog') | Q(k9__status='Adopted') | Q(k9__status='Retired') | Q(k9__status='Dead') | Q(k9__status='Stolen') | Q(k9__status='Lost')).count()
 
@@ -2846,20 +2865,21 @@ def ajax_supplier_report(request):
         from_date = request.GET.get('date_from')
 
         #SUPPLIER
-        sup = K9.objects.filter(date_created__range=[from_date, to_date]).values('supplier').distinct().order_by('supplier__name')
+        sup = K9.objects.filter(date_created__range=[from_date, to_date]).filter(source='Procurement').exclude(supplier=None).values('supplier').distinct().order_by('supplier__name')
+        
         
         val_arr =[]
         for sup in sup:
             for key,value in sup.items():
-                print(key, value)
+                # print(key, value)
                 if key == 'supplier':        
                     val_arr.append(value)
 
         val_arr =  pd.unique(val_arr)
-
+        # print('SUPPLIER', val_arr)
         for val in val_arr:
             supplier = K9_Supplier.objects.get(id=val)
-
+            # print('sup', supplier)
             breed = K9.objects.filter(supplier=supplier).filter(date_created__range=[from_date, to_date]).values('breed').distinct().order_by('breed')
             
             arr1 =[]
@@ -2869,7 +2889,7 @@ def ajax_supplier_report(request):
                         arr1.append(value)
 
             arr1 = pd.unique(arr1)
-            print('ARR1',arr1)
+            # print('ARR1',arr1)
 
             arr2 = []
 
@@ -2884,14 +2904,14 @@ def ajax_supplier_report(request):
                 a = [arr,trained,failed,on_training,total,supplier]
                 arr2.append(a)
 
-            print('ARR2',arr2)
+            # print('ARR2',arr2)
             first = arr2[0]
             arr2.remove(arr2[0])
             print('FIRST',first)
             x = (supplier, arr2, len(arr1),first)
             data_arr.append(x)
 
-        print('DATA ARR', data_arr)
+        # print('DATA ARR', data_arr)
     except:
         pass
     user = user_session(request)
@@ -2992,14 +3012,14 @@ def load_k9_reco(request):
         except ObjectDoesNotExist:
             kp_id = None
 
-        print(kp_id)
+        # print(kp_id)
 
         if kp_id != None:
             k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte= 1).exclude(id__in=kp_id).order_by('-litter_no')
         else:
             k9_data = K9.objects.filter(sex="Male").filter(training_status = "For-Breeding").filter(breed=k9.breed).filter(capability=k9.capability).filter(age__gte= 1).order_by('-litter_no')
         
-        print(k9_data)
+        # print(k9_data)
         for k in k9_data:
             h_count = Health.objects.filter(dog=k).count()
             h_count_arr.append(h_count)   
@@ -3049,7 +3069,7 @@ def load_form(request):
     formset = None
     try:
         num = request.GET.get('num')
-        print(num)
+        # print(num)
         k9_formset = formset_factory(add_offspring_K9_form, extra=int(num), can_delete=False)
         formset = k9_formset(request.POST, request.FILES)
     except:
@@ -3143,7 +3163,7 @@ def budgeting(request):
     elif k9_puppy <= 0 and pdf_st <= 0 or fm_st <= 0:
         dfood = False
 
-    print(dfood, breed_st, misc_st, ar_st, bbb_st, dw_st, dh4_st, dhc_st, hw_st, tt_st, fm_st, pdf_st, adf_st)
+    # print(dfood, breed_st, misc_st, ar_st, bbb_st, dw_st, dh4_st, dhc_st, hw_st, tt_st, fm_st, pdf_st, adf_st)
     generate = False
     if breed_st == True and dfood == True and misc_st > 0 and ar_st > 0 and bbb_st > 0 and dw_st > 0 and dh4_st > 0 and dhc_st > 0 and hw_st > 0 and tt_st > 0 and fm_st > 0 and pdf_st > 0 and adf_st > 0:
         generate = True
@@ -3155,8 +3175,8 @@ def budgeting(request):
     # print('Miscellaous Subtract Trail', misc_st)
     # print('Medicine', ar_st, bbb_st, dw_st, dh4_st, dhc_st, hw_st, tt_st)
 
-    print('Food', dfood)
-    print('Generate', generate)
+    # print('Food', dfood)
+    # print('Generate', generate)
 
     #INITIALIZE
     k9_formset = formset_factory(k9_acquisition_form, extra=1, can_delete=True)
@@ -3178,14 +3198,25 @@ def budgeting(request):
     sar = 0
     ndd = 0
     edd = 0
-
+    #??
+    puppy_current = 0
+    adult_current = 0
+    total_milk_needed = 0
+    total_puppy_food  = 0
+    total_adult_food  = 0
+    milk_quantity = 0
+    milk_quantity_total = 0
+    puppy_quantity = 0
+    puppy_quantity_total = 0
+    adult_quantity = 0
+    adult_quantity_total = 0
     #SHOW BUDGET FORM
     if generate == True:
         all_k9 = K9.objects.exclude(status="Adopted").exclude(status="Dead").exclude(status="Stolen").exclude(status="Lost")
         
         #K9 to be born and die
         k9_breeded = K9_Mated.objects.filter(status='Pregnant')
-        print(k9_breeded)
+        # print(k9_breeded)
         ny_breeding = [] 
         ny_data = []
         for kb in k9_breeded:
@@ -3227,10 +3258,10 @@ def budgeting(request):
         d_values = kd_index.value_counts().keys().tolist()
         d_counts = kd_index.value_counts().tolist()
 
-        # print(d_values)
-        # print(d_counts)
-        dead_list = zip(d_values,d_counts)
-
+        if d_values:
+            dead_list = zip(d_values,d_counts)
+        else:
+            dead_list=None
 
         all_k = all_k9.values_list('breed', flat=True).order_by()
 
@@ -3280,7 +3311,7 @@ def budgeting(request):
             procured_total =  Decimal(request.POST.get('id_need_total'))
             total_k9_next_year = need_procure_ny + k9_ny + born_ny
 
-            print('TOTAL K9', total_k9_next_year)
+            # print('TOTAL K9', total_k9_next_year)
 
             ###### START OF LOAD BUDGET ######
             # GET NEEDED DOG FOOD
@@ -3332,28 +3363,32 @@ def budgeting(request):
                 a_item = Food.objects.get(id=a_item)
             
             food_arr = []
-            if m_item:
+            if total_milk_needed>0:
+                if m_item:  
                 # CALCULATE PRICE AND TOTAL OF DOG FOOD
-                # milk needed = total_milk_needed , current = current_milk 
-                # needed - current * price
-                milk_quantity = total_milk_needed - current_milk
-                milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
-                print('POST MILK', m_item, milk_quantity, milk_quantity_total)
-                food_arr.append([m_item,int(milk_quantity),milk_quantity_total])
+                    # milk needed = total_milk_needed , current = current_milk 
+                    # needed - current * price
+                    milk_quantity = total_milk_needed - current_milk
+                    print('M ITEM',total_milk_needed,current_milk)
+                    milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
+                    # print('MILK', m_item, milk_quantity, milk_quantity_total)
+                    food_arr.append([m_item,milk_quantity,milk_quantity_total])
 
-            if p_item:
-                #puppy food needed = total_puppy_food , current = current_puppy_food 
-                puppy_quantity = total_puppy_food - current_puppy_food
-                puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
-                print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
-                food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
+            if total_puppy_food>0:
+                if p_item:
+                    #puppy food needed = total_puppy_food , current = current_puppy_food 
+                    puppy_quantity = total_puppy_food - current_puppy_food
+                    puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
+                    # print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
+                    food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
 
-            if a_item:
-                #adult food needed = total_adult_food , current = current_adult_food 
-                adult_quantity = total_adult_food - current_adult_food
-                adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
-                print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
-                food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
+            if total_adult_food > 0:
+                if a_item:
+                    #adult food needed = total_adult_food , current = current_adult_food 
+                    adult_quantity = total_adult_food - current_adult_food
+                    adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
+                    # print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
+                    food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
 
             mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 
@@ -3433,10 +3468,6 @@ def budgeting(request):
                     b_ny_med.append(b)
                     total_medicine = total_medicine+ss
 
-            print('MEDICINE', b_ny_med, total_medicine)
-
-            # print('MEDICINE', b_ny_med, total_medicine)
-            
             vac_arr = []
 
             # CALCULATE Vaccine 
@@ -3464,12 +3495,11 @@ def budgeting(request):
                 ar_quantity = 0
             ar_total = round(int(np.ceil(ar_quantity)) * ar_item.price,2)
             # print(ar_item, ar_quantity, ar_total)
-            if ar_item:
+            if ar_total>0:
                 vac_arr.append([ar_item,ar_quantity,ar_total])
 
             #BORDERTELLA CALCULATION
             bbb_item = Medicine_Subtracted_Trail.objects.filter(date_subtracted__year=current_year).filter(inventory__medicine__immunization='Bordetella Bronchiseptica Bacterin').values('inventory').annotate(quantity=Sum('quantity')).order_by('-quantity').first()
-
             if bbb_item == None:
                 bbb_item = Medicine_Received_Trail.objects.filter(date_received__year=current_year).filter(inventory__medicine__immunization='Bordetella Bronchiseptica Bacterin').values('inventory').annotate(quantity=Sum('quantity')).order_by('-quantity').first()
             
@@ -3495,7 +3525,7 @@ def budgeting(request):
                 bbb_quantity = 0
             bbb_total = round(int(np.ceil(bbb_quantity)) * bbb_item.price,2)
             # print(bbb_item, bbb_quantity, bbb_total)
-            if bbb_item:
+            if bbb_total>0:
                 vac_arr.append([bbb_item,bbb_quantity,bbb_total])
 
             #DHPPIL+CV CALCULATION
@@ -3504,13 +3534,13 @@ def budgeting(request):
             if dhcv_item == None:
                 dhcv_item = Medicine_Received_Trail.objects.filter(date_received__year=current_year).filter(inventory__medicine__immunization='DHPPiL+CV').values('inventory').annotate(quantity=Sum('quantity')).order_by('-quantity').first()
 
-                if type(dhcv_item).__name__ == 'dict':
-                    for key, value in dhcv_item.items():
-                        if key == 'inventory':
-                            dhcv_item = value
+            if type(dhcv_item).__name__ == 'dict':
+                for key, value in dhcv_item.items():
+                    if key == 'inventory':
+                        dhcv_item = value
 
-                    dhcv_item = Medicine_Inventory.objects.get(id=dhcv_item).medicine.id
-                    dhcv_item = Medicine.objects.get(id=dhcv_item) 
+                dhcv_item = Medicine_Inventory.objects.get(id=dhcv_item).medicine.id
+                dhcv_item = Medicine.objects.get(id=dhcv_item) 
 
             
             if dhcv_item == None:
@@ -3557,7 +3587,7 @@ def budgeting(request):
                 dh4_quantity = 0
             dh4_total = round(int(np.ceil(dh4_quantity)) * dh4_item.price,2)
             # print(dh4_item, dh4_quantity, dh4_total)
-            if dh4_item:
+            if dh4_total>0:
                 vac_arr.append([dh4_item,dh4_quantity,dh4_total])
 
             #DEWORM CALCULATION
@@ -3590,7 +3620,7 @@ def budgeting(request):
                 dw_quantity = 0
             dw_total = round(int(np.ceil(dw_quantity)) * dw_item.price,2)
             # print(dw_item, dw_quantity, dw_total)
-            if dw_item:
+            if dw_total>0:
                 vac_arr.append([dw_item,dw_quantity,dw_total])
 
             #HEARTWORM CALCULATION
@@ -3625,7 +3655,7 @@ def budgeting(request):
                 hw_quantity = 0
             hw_total = round(int(np.ceil(hw_quantity)) * hw_item.price, 2)
             # print(hw_item, hw_quantity, hw_total)
-            if hw_item:
+            if hw_total>0:
                 vac_arr.append([hw_item,hw_quantity,hw_total])
 
             #TICK AND FLEE CALCULATION
@@ -3672,7 +3702,7 @@ def budgeting(request):
             tft_total = round(int(np.ceil(tft_quantity)) * tft_item.price, 2)
 
             # print("TFT", tft_item)
-            if tft_item:
+            if tft_total>0:
                 vac_arr.append([tft_item,tft_quantity,tft_total])
 
             #MISCELLANOUS VET SUPPLY CALCULATION
@@ -3903,6 +3933,18 @@ def budgeting(request):
     return render (request, 'planningandacquiring/budgeting.html', context)
 
 def load_budget(request):
+    puppy_current = 0
+    adult_current = 0
+    total_milk_needed = 0
+    total_puppy_food  = 0
+    total_adult_food  = 0
+    milk_quantity = 0
+    milk_quantity_total = 0
+    puppy_quantity = 0
+    puppy_quantity_total = 0
+    adult_quantity = 0
+    adult_quantity_total = 0
+
     procured_total = round(Decimal(request.GET.get('p_amount')),2)
     need_procure_ny =  int(request.GET.get('p_count'))
     k9_ny =  int(request.GET.get('k9_ny'))
@@ -3940,10 +3982,10 @@ def load_budget(request):
     # GET NEEDED DOG FOOD
     puppy_current = all_k9.filter(age__lt=1).count()
     adult_current = all_k9.filter(age__gte=1).count()
-    total_milk_needed = (born_ny + puppy_current) * 21
+    total_milk_need = (born_ny + puppy_current) * 21
     total_puppy_food  = (((born_ny + puppy_current) * 15) * 9) / 20
     total_adult_food  = (adult_current + need_procure_ny) * 12
-
+   
     # print('NEEDED DOG FOOD',total_milk_needed,total_puppy_food,total_adult_food)
 
     #GET CURRENT DOG FOOD
@@ -3987,28 +4029,32 @@ def load_budget(request):
         
     food_arr = []
 
-    if m_item:  
-        # CALCULATE PRICE AND TOTAL OF DOG FOOD
-        # milk needed = total_milk_needed , current = current_milk 
-        # needed - current * price
-        milk_quantity = total_milk_needed - current_milk
-        milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
-        # print('MILK', m_item, milk_quantity, milk_quantity_total)
-        food_arr.append([m_item,milk_quantity,milk_quantity_total])
+    if total_milk_needed>0:
+        if m_item:  
+            # CALCULATE PRICE AND TOTAL OF DOG FOOD
+            # milk needed = total_milk_needed , current = current_milk 
+            # needed - current * price
+            milk_quantity = total_milk_needed - current_milk
+            print('M ITEM',total_milk_needed,current_milk)
+            milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
+            # print('MILK', m_item, milk_quantity, milk_quantity_total)
+            food_arr.append([m_item,milk_quantity,milk_quantity_total])
 
-    if p_item:
-        #puppy food needed = total_puppy_food , current = current_puppy_food 
-        puppy_quantity = total_puppy_food - current_puppy_food
-        puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
-        # print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
-        food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
+    if total_puppy_food>0:
+        if p_item:
+            #puppy food needed = total_puppy_food , current = current_puppy_food 
+            puppy_quantity = total_puppy_food - current_puppy_food
+            puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
+            # print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
+            food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
 
-    if a_item:
-        #adult food needed = total_adult_food , current = current_adult_food 
-        adult_quantity = total_adult_food - current_adult_food
-        adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
-        # print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
-        food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
+    if total_adult_food > 0:
+        if a_item:
+            #adult food needed = total_adult_food , current = current_adult_food 
+            adult_quantity = total_adult_food - current_adult_food
+            adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
+            # print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
+            food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
 
     mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 
@@ -4148,26 +4194,27 @@ def load_budget(request):
     if bbb_quantity < 0:
         bbb_quantity = 0
     bbb_total = round(int(np.ceil(bbb_quantity)) * bbb_item.price,2)
+    print('BB',bbb_total)
     # print(bbb_item, bbb_quantity, bbb_total)
-    if bbb_item:
+
+    if bbb_total > 0:
         vac_arr.append([bbb_item,bbb_quantity,bbb_total])
 
-
+    print('BBB',bbb_item,bbb_quantity,bbb_total)
     #DHPPIL+CV CALCULATION
     dhcv_item = Medicine_Subtracted_Trail.objects.filter(date_subtracted__year=current_year).filter(inventory__medicine__immunization='DHPPiL+CV').values('inventory').annotate(quantity=Sum('quantity')).order_by('-quantity').first()
-
+  
     if dhcv_item == None:
         dhcv_item = Medicine_Received_Trail.objects.filter(date_received__year=current_year).filter(inventory__medicine__immunization='DHPPiL+CV').values('inventory').annotate(quantity=Sum('quantity')).order_by('-quantity').first()
 
-        if type(dhcv_item).__name__ == 'dict':
-            for key, value in dhcv_item.items():
-                if key == 'inventory':
-                    dhcv_item = value
+    if type(dhcv_item).__name__ == 'dict':
+        for key, value in dhcv_item.items():
+            if key == 'inventory':
+                dhcv_item = value
 
-            dhcv_item = Medicine_Inventory.objects.get(id=dhcv_item).medicine.id
-            dhcv_item = Medicine.objects.get(id=dhcv_item) 
+        dhcv_item = Medicine_Inventory.objects.get(id=dhcv_item).medicine.id
+        dhcv_item = Medicine.objects.get(id=dhcv_item) 
 
-    
     if dhcv_item == None:
         dhcv_item = Medicine.objects.filter(immunization='DHPPiL+CV').last()
 
@@ -4182,7 +4229,7 @@ def load_budget(request):
         dhcv_quantity = 0
     dhcv_total = round(int(np.ceil(dhcv_quantity)) * dhcv_item.price,2)
     # print(dhcv_item, dhcv_quantity, dhcv_total)
-    if dhcv_item:
+    if dhcv_total>0:
         vac_arr.append([dhcv_item,dhcv_quantity,dhcv_total])
 
     #DHPPiL4 CALCULATION
@@ -4212,7 +4259,7 @@ def load_budget(request):
         dh4_quantity = 0
     dh4_total = round(int(np.ceil(dh4_quantity)) * dh4_item.price,2)
     # print(dh4_item, dh4_quantity, dh4_total)
-    if dh4_item:
+    if dh4_total >0:
         vac_arr.append([dh4_item,dh4_quantity,dh4_total])
 
     #DEWORM CALCULATION
@@ -4245,7 +4292,7 @@ def load_budget(request):
         dw_quantity = 0
     dw_total = round(int(np.ceil(dw_quantity)) * dw_item.price,2)
     # print(dw_item, dw_quantity, dw_total)
-    if dw_item:
+    if dw_total>0:
         vac_arr.append([dw_item,dw_quantity,dw_total])
 
     #HEARTWORM CALCULATION
@@ -4280,7 +4327,7 @@ def load_budget(request):
         hw_quantity = 0
     hw_total = round(int(np.ceil(hw_quantity)) * hw_item.price, 2)
     # print(hw_item, hw_quantity, hw_total)
-    if hw_item:
+    if hw_total>0:
         vac_arr.append([hw_item,hw_quantity,hw_total])
 
     #TICK AND FLEE CALCULATION
@@ -4326,7 +4373,7 @@ def load_budget(request):
         tft_quantity = 0
     tft_total = round(int(np.ceil(tft_quantity)) * tft_item.price, 2)
     # print("TFT", tft_item)
-    if tft_item:
+    if tft_total>0:
         vac_arr.append([tft_item,tft_quantity,tft_total])
 
     #MISCELLANOUS VET SUPPLY CALCULATION
@@ -4396,6 +4443,7 @@ def load_budget(request):
 
     total_food = milk_quantity_total + puppy_quantity_total + adult_quantity_total
     vac_total = ar_total + bbb_total + dhcv_total + dh4_total + dw_total + hw_total + tft_total
+    print('VAC',ar_total,bbb_total,dhcv_total,dh4_total,dw_total,hw_total,tft_total)
     if vac_total == 0:
         vac_total = None
 

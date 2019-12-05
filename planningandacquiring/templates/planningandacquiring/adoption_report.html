@@ -23,6 +23,7 @@
                 <th>Adoptee K9</th>
                 <th>Breed</th>
                 <th>Date Returned</th>
+                <th>Reason</th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +39,12 @@
                 {%else%}
                     <td>K9 ADOPTED</td>
                 {%endif%}
+                {% if data.reason %}
+                <td>{{data.reason}}</td>
+                {%else%}
+                <td></td>
+                {%endif%}
+               
             </tr>            
             {%endfor%}
         </tbody>

@@ -61,7 +61,8 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     generate_area, generate_location, generate_training, assign_commander_random, fix_dog_duplicates, generate_dogbreed\
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests
+#GENERATE DB 2
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail
 
 import random
 
@@ -292,11 +293,15 @@ def check_handlers_with_multiple_k9s():
     return None
 
 def mass_populate_revisited():
-    # create_predeployment_inventory()
     # generate_user()
     # create_teams()
     # generate_k9()
-    generate_requests()
+    # generate_requests()
+    # generate_dogbreed()
+
+    # create_predeployment_inventory()
+    # generate_inventory_trail()
+
 
     return None
 
