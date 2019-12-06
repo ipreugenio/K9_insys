@@ -10,7 +10,7 @@ from training.models import Training, Training_Schedule, Training_History
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
 from deployment.models import Daily_Refresher
 
-from unitmanagement.models import PhysicalExam
+from unitmanagement.models import PhysicalExam, Handler_Incident, K9_Incident, Health, HealthMedicine, Handler_On_Leave, Emergency_Leave
 from itertools import groupby
 
 from deployment.tasks import assign_TL
@@ -1516,6 +1516,7 @@ def generate_daily_refresher():
 
             print('DR'+str(i), dr.k9, dr.rating)
     
+#LOCATION INCIDENT, MARITIME, DOG REQUEST
 def generate_location_incident():
     fake = Faker()
     ta = Team_Assignment.objects.exclude(team_leader=None)
@@ -1535,7 +1536,6 @@ def generate_location_incident():
     
     pre_titles = ['An Evening of ', 'A Night to Celebrate ', 'A Celebration of Life and ', 'The Wonders of ', 'In Observance of ', 'In Recognition of ', 'In Commemoration of ', 'Meetup for ', 'The Future of ', 'The Technology of ', 'A Date with ']
     post_titles = [' Conference', ' Con', ' Competition', ' Hackathon', ' Fundraiser', ' Charity', ' Party', ' Bash', ' Ball', ' Gala', ' Shindig', 'athon', ' Celebration', ' Affair', ' Ceremony', ' Awards', ' Event of the Year!', ' Jubilee', ' Performance', ' Blast', ' Blowout', ' Rite', ' Show', ' Meetup', ' for Health', ' Workshop', ' Research Event', ' Summit', ' Course', ' Symposium', ' Town Hall Meeting', ' Games', ' Expo', ': The Event']
-
 
     loc = []
     tl = []
@@ -1567,12 +1567,12 @@ def generate_location_incident():
                 i_inc = random.choice(others)
                 i_rem = 'Other Remarks Here'
             
-            # Incidents.objects.create(user=i_tl,date=f_date.date(),incident=i_inc,location=i_loc,type=i_type,remarks=i_rem)
+            Incidents.objects.create(user=i_tl,date=f_date.date(),incident=i_inc,location=i_loc,type=i_type,remarks=i_rem)
             
             m_boat = random.choice(boat)
             p_count = random.randint(50, 150)
 
-            # Maritime.objects.create(location=i_loc, boat_type=m_boat, date=f_date.date(), time=f_date.time(), passenger_count=p_count)
+            Maritime.objects.create(location=i_loc, boat_type=m_boat, date=f_date.date(), time=f_date.time(), passenger_count=p_count)
             # print(f_date,i_type,i_tl,i_loc,i_inc)
 
             city = generate_city_ph()
@@ -1600,8 +1600,125 @@ def generate_location_incident():
             place = s_loc.replace('port', '')
             Dog_Request.objects.create(requester=str(u),event_name=pre_t+post_t,location=place,city=city,sector_type=e,phone_number=cellnum,email_address=email,area=i_loc.area,k9s_needed=needed,k9s_deployed=deployed,status='Done',longtitude=lng,latitude=lat,team_leader=i_tl, start_date=sf_date, end_date=ef_date,remarks='No remarks')
             
+def generate_handler_incident():
+    fake = Faker()
+    incident = ['Rescued People','Made an Arrest','Poor Performance','Violation']
+    ta = Team_Assignment.objects.exclude(team_leader=None)
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
+    
+    for data in k9_sample:
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
 
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
 
+            inc = random.choice(incident)
+            ta_list = random.choice(ta)
+            dog = random.choice(k9_sample)
+
+            Handler_Incident.objects.create(handler=dog.handler, k9=dog, incident=inc, date = f_date, description='Description Here', status='Done', reported_by=ta_list.team_leader)
+
+def generate_handler_leave():
+    fake = Faker()
+    admin = User.objects.filter(position='Administrator')
+    admin = list(admin)
+
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
+    
+    for data in k9_sample:
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,11,1)
+
+        el = random.randint(1, 8)
+        rl = random.randint(1, 8)
+
+        sf_date = fake.date_between(start_date=start_date, end_date=end_date)
+        ef_date = sf_date + timedelta(days=rl)
+        dog = data
+        approver = random.choice(admin)
+        
+        # Handler_On_Leave
+        Handler_On_Leave.objects.create(handler=dog.handler,approved_by=approver,k9=dog,description='Sick Leave',reply='Okay',status='Approved',date_from=sf_date,date_to=ef_date)
+
+        ssf_date = fake.date_between(start_date=start_date, end_date=end_date)
+        eef_date = ssf_date + timedelta(days=el)
+
+        # Emergency_Leave
+        Emergency_Leave.objects.create(handler=dog.handler,date_of_leave=ssf_date,date_of_return=eef_date,status='Returned',reason='Family Emergency')
+
+def generate_k9_incident():
+    fake = Faker()
+    inc = ['Stolen','Lost','Sick','Accident']
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
+    
+    lost = ['Collar not properly put on', 'Leashed on a pole', 'Suddenly disappeared']
+    stolen = ['Dognapped', 'Left with a stranger', 'Snatched']
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat']
+    accident = ['Hit by Car', 'Caught in Bomb Explosion', 'Building Fell Down', 'Stab by Unknown Subject','Caught by Gun Fired on Premises']
+    
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+    
+    for data in k9_sample:
+        k_inc = random.choice(inc)
+
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,12,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+
+        if k_inc == 'Stolen':
+            k_desc = random.choice(stolen)
+        elif k_inc == 'Lost':
+            k_desc = random.choice(lost)
+        if k_inc == 'Sick':
+            k_desc = random.choice(sick)
+        elif k_inc == 'Accident':
+            k_desc = random.choice(accident)
+        if k_inc == 'Stolen' or k_inc == 'Lost':
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+        else:
+            k_clinic = random.choice(clinic)
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler,clinic=k_clinic)
+    
+def generate_health_record():
+    fake = Faker()
+    time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
+
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+
+    
+    # # Health
+    # dog
+    # date
+    # problem
+    # treatment
+    # status
+    # veterinary
+    # duration
+    # date_done
+    # incident_id
+    # image
+    # follow_up
+    # follow_up_date
+    # follow_up_done
+
+    # # HealthMedicine
+
+    # health 
+    # medicine
+    # quantity 
+    # time_of_day
+    # duration
+
+def generate_k9_parents():
+    pass
        
 
 '''

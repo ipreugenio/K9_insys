@@ -1634,7 +1634,7 @@ def ajax_fou_accomplishment_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        acc = Handler_Incident.objects.filter(date__range=[from_date, to_date]).values('handler').distinct().order_by("handler")
+        acc = Handler_Incident.objects.filter(date__range=[from_date, to_date]).values('handler').order_by("handler__fullname").distinct()
         
         for acc in acc:
             for key, value in acc.items():
@@ -2186,7 +2186,7 @@ def ajax_fou_acc_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        data_arr = Handler_Incident.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('handler')
+        data_arr = Handler_Incident.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('handler__fullname')
         
     except:
         pass
@@ -2225,7 +2225,7 @@ def ajax_k9_incident_summary_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        data_arr = K9_Incident.objects.filter(date__range=[from_date, to_date]).order_by('date').order_by('k9')
+        data_arr = K9_Incident.objects.filter(date__range=[from_date, to_date]).order_by('k9__name')
 
         b = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Sick').count()
         c = K9_Incident.objects.filter(date__range=[from_date, to_date]).filter(incident='Accident').count()
@@ -2235,7 +2235,7 @@ def ajax_k9_incident_summary_report(request):
 
         arr_val.append(['Sick', b])      
         arr_val.append(['Accident', c])      
-        arr_val.append(['Missing', d])   
+        # arr_val.append(['Missing', d])   
         arr_val.append(['Lost', e])      
         arr_val.append(['Stolen', f])      
          
@@ -2711,10 +2711,10 @@ def ajax_on_leave_report(request):
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
-
-        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').order_by('date').distinct()
-        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').order_by('date').distinct()
-
+      
+        hl = Handler_On_Leave.objects.filter(date_from__range=[from_date, to_date]).filter(status='Approved').values('handler').order_by('handler__fullname').distinct()
+        el = Emergency_Leave.objects.filter(date_of_leave__range=[from_date, to_date]).filter(status='Returned').values('handler').order_by('handler__fullname').distinct()
+      
         val_arr=[]
         for data in hl:
             for key, value in data.items():
@@ -2727,7 +2727,7 @@ def ajax_on_leave_report(request):
                     val_arr.append(value)
 
         val_arr = pd.unique(val_arr)
-        # print('VAL', val_arr)
+    
         for data in val_arr:
             handler = User.objects.get(id=data)
             # print(handler)
