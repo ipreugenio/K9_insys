@@ -1516,6 +1516,93 @@ def generate_daily_refresher():
 
             print('DR'+str(i), dr.k9, dr.rating)
     
+def generate_location_incident():
+    fake = Faker()
+    ta = Team_Assignment.objects.exclude(team_leader=None)
+    ta_list = list(ta) 
+    ta_sample = random.sample(ta_list, int(len(ta_list) * .25))
+    user = User.objects.all()
+    user_list = list(user) 
+
+    incident_type = ['Explosives Related', 'Narcotics Related', 'Search and Rescue Related', 'Others']
+
+    explosive = ['Bombing in Mall', 'Bombing in Airport', 'Bombing at Road', 'Terrorist Bombing']
+    narcotics = ['Drug Bust', 'Airport Drug Traffic', 'Drug Trade', 'Drug Use at Mall']
+    search = ['Landslide', 'Typhoon', 'Hurricane', 'Kidnapping', 'Arson', 'Earthquake']
+    others = ['Attack', 'Bodyguard Duty', 'Security Duty']
+    boat = ['Domestice Passenger Vessels', 'Motorbancas', 'Fastcrafts', 'Cruise Ships', 'Tugboat', 'Barge','Tanker']
+    event = ['Big Event', 'Small Event']
+    
+    pre_titles = ['An Evening of ', 'A Night to Celebrate ', 'A Celebration of Life and ', 'The Wonders of ', 'In Observance of ', 'In Recognition of ', 'In Commemoration of ', 'Meetup for ', 'The Future of ', 'The Technology of ', 'A Date with ']
+    post_titles = [' Conference', ' Con', ' Competition', ' Hackathon', ' Fundraiser', ' Charity', ' Party', ' Bash', ' Ball', ' Gala', ' Shindig', 'athon', ' Celebration', ' Affair', ' Ceremony', ' Awards', ' Event of the Year!', ' Jubilee', ' Performance', ' Blast', ' Blowout', ' Rite', ' Show', ' Meetup', ' for Health', ' Workshop', ' Research Event', ' Summit', ' Course', ' Symposium', ' Town Hall Meeting', ' Games', ' Expo', ': The Event']
+
+
+    loc = []
+    tl = []
+    for ta in ta:
+        if ta.location:
+            loc.append(ta.location)
+        if ta.team_leader:
+            tl.append(ta.team_leader)
+
+    start_date = datetime(2019,1,1)
+    end_date = datetime(2019,12,31)
+
+    for data in ta_sample:
+        for i in range(10):
+            f_date = fake.date_time_between(start_date=start_date, end_date=end_date, tzinfo=None)
+            i_type = random.choice(incident_type)
+            i_loc = random.choice(loc)
+            i_tl = random.choice(tl)
+            if i_type == 'Explosives Related':
+                i_inc = random.choice(explosive) 
+                i_rem = 'Explosive Remarks Here'
+            elif i_type == 'Narcotics Related':
+                i_inc = random.choice(narcotics)
+                i_rem = 'Narcotics Remarks Here'
+            elif i_type == 'Search and Rescue Related':
+                i_inc = random.choice(search)
+                i_rem = 'Search and Rescue Remarks Here'
+            elif i_type == 'Others':
+                i_inc = random.choice(others)
+                i_rem = 'Other Remarks Here'
+            
+            # Incidents.objects.create(user=i_tl,date=f_date.date(),incident=i_inc,location=i_loc,type=i_type,remarks=i_rem)
+            
+            m_boat = random.choice(boat)
+            p_count = random.randint(50, 150)
+
+            # Maritime.objects.create(location=i_loc, boat_type=m_boat, date=f_date.date(), time=f_date.time(), passenger_count=p_count)
+            # print(f_date,i_type,i_tl,i_loc,i_inc)
+
+            city = generate_city_ph()
+            pre_t = random.choice(pre_titles)
+            post_t = random.choice(post_titles)
+            e = random.choice(event)
+            cellnum = fake.msisdn()[:10]
+            u = random.choice(user_list)
+            email = u.lastname.lower() + "@gmail.com"
+            lat = random.uniform(7.823, 18.579)
+            lng = random.uniform(118.975, 125.563)
+            needed = random.randint(3, 10)
+            deployed = random.randint(1, needed)
+
+            s_date = datetime(2019,1,1)
+            e_date = datetime(2019,6,30)
+
+            ss_date = datetime(2019,7,1)
+            ee_date = datetime(2019,12,10)
+
+            sf_date = fake.date_between(start_date=start_date, end_date=end_date)
+            ef_date = fake.date_between(start_date=start_date, end_date=end_date)
+            
+            s_loc = str(i_loc)
+            place = s_loc.replace('port', '')
+            Dog_Request.objects.create(requester=str(u),event_name=pre_t+post_t,location=place,city=city,sector_type=e,phone_number=cellnum,email_address=email,area=i_loc.area,k9s_needed=needed,k9s_deployed=deployed,status='Done',longtitude=lng,latitude=lat,team_leader=i_tl, start_date=sf_date, end_date=ef_date,remarks='No remarks')
+            
+
+
+       
 
 '''
 TODO

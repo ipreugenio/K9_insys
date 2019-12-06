@@ -232,8 +232,8 @@ class Team_Assignment(models.Model):
 
 class Dog_Request(models.Model):
     TYPE = (
-        ('Disaster', 'Disaster'),
-        ('Annual Event', 'Annual Event'),
+        # ('Disaster', 'Disaster'),
+        # ('Annual Event', 'Annual Event'),
         ('Big Event', 'Big Event'),
         ('Small Event', 'Small Event'),
     )
@@ -491,6 +491,7 @@ class Incidents(models.Model):
         ('Explosives Related', 'Explosives Related'),
         ('Narcotics Related', 'Narcotics Related'),
         ('Search and Rescue Related', 'Search and Rescue Related'),
+        ('Others', 'Others'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -501,7 +502,7 @@ class Incidents(models.Model):
     remarks = models.TextField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return str(self.type) + " : " + str(date)
+        return str(self.type) + " : " + str(self.date)
 
 class Maritime(models.Model):
     BOAT_TYPE = (
@@ -521,12 +522,12 @@ class Maritime(models.Model):
     passenger_count = models.IntegerField('passenger_count', blank=True, null=True, default = 0)
     
     def save(self, *args, **kwargs):
-        if self.datetime == None:
-            self.datetime = date.today()
+        if self.date == None:
+            self.date = date.today()
         super(Maritime, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.datetime)
+        return str(self.date)
 
 class Daily_Refresher(models.Model):
 

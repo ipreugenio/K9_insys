@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident
 
 import random
 
@@ -275,7 +275,7 @@ def mass_populate():
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
     create_predeployment_inventory() #Inventory items for pre deployment
-
+    
     return None
 
 # Find handlerss with multiple k9s
@@ -302,7 +302,8 @@ def mass_populate_revisited():
     # create_predeployment_inventory()
     # generate_inventory_trail()
 
-    generate_daily_refresher()
+    # generate_daily_refresher()
+    generate_location_incident()
 
     return None
 

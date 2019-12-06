@@ -1685,7 +1685,7 @@ def ajax_training_report(request):
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
-        t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').distinct().order_by('k9')
+        t = Training.objects.filter(stage='Finished Training').filter(date_finished__range=[from_date, to_date]).values('k9').order_by('k9__name').distinct()
         
         # print(t)
         for t in t:
@@ -1701,8 +1701,7 @@ def ajax_training_report(request):
                         if ts.stage == 'Stage 0':
                             pass
                         else:
-                            print(ts.k9 ,ts.stage, ts.date_start.date(), ts.date_end.date())
-
+                            # print(ts.k9 ,ts.stage, ts.date_start.date(), ts.date_end.date())
                             result = ts.date_end.date() - ts.date_start.date()
                             date_all = date_all + result.days
 
@@ -2026,27 +2025,30 @@ def ajax_port_report(request):
     try:
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
-      
+        print("DATE",to_date,from_date)
         area_val = []
         arr_val = []
 
-        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
+        inc = Incidents.objects.filter(date__range=[from_date, to_date]).values('location__area').order_by('location__area__name').distinct()
+
+        # print('INC', inc)
         
         for data in inc:
             for key, value in data.items():
                 if key == 'location__area':
                     area_val.append(value)
 
-        mar = Maritime.objects.filter(datetime__range=[from_date, to_date]).values('location__area').distinct().order_by('location__area__name')
+        mar = Maritime.objects.filter(date__range=[from_date, to_date]).values('location__area').order_by('location__area__name').distinct()
 
+        # print('MAR', mar)
         for data in mar:
             for key, value in data.items():
                 if key == 'location__area':
                     area_val.append(value)
 
         area_val= pd.unique(area_val)
-        # print(area_val)
-        # print('AREA', area_val)
+       
+        print('AREA', area_val)
         for id_area in area_val:
             a = Area.objects.get(id=id_area)
             area_arr.append(a)
@@ -2054,7 +2056,7 @@ def ajax_port_report(request):
             l = list(l)
             
             arr = []
-            b = Maritime.objects.filter(location__in=l).filter(datetime__range=[from_date, to_date]).order_by('location__place')
+            b = Maritime.objects.filter(location__in=l).filter(date__range=[from_date, to_date]).order_by('location__place')
             # print('MARITIME LOC', b)
             for b in b:
                 arr.append(b.location.id)
@@ -2068,7 +2070,7 @@ def ajax_port_report(request):
             # print('ARR',arr)
             for data in arr:
                 l = Location.objects.get(id=data)
-                m = Maritime.objects.filter(datetime__range=[from_date, to_date]).filter(location=l).aggregate(avg=Avg('passenger_count'))['avg']
+                m = Maritime.objects.filter(date__range=[from_date, to_date]).filter(location=l).aggregate(avg=Avg('passenger_count'))['avg']
                 edd = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Explosives Related').count()
                 ndd = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Narcotics Related').count()
                 sar = Incidents.objects.filter(date__range=[from_date, to_date]).filter(location=l).filter(type='Search and Rescue Related').count()
