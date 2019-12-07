@@ -49,6 +49,7 @@ from deployment.tasks import subtract_inventory, assign_TL, task_to_dash_dep
 from deployment.views import team_location_details, request_dog_details, mass_populate_revisited
 from unitmanagement.forms import EmergencyLeaveForm
 from unitmanagement.tasks import check_leave_window, task_to_dash_um
+from planningandacquiring.tasks import task_to_dash_pq
 
 # Create your views here.
 
@@ -1635,6 +1636,8 @@ def login(request):
     if request.method == 'POST':
         task_to_dash_dep()
         task_to_dash_um()
+        task_to_dash_pq()
+
         serial = request.POST['serial_number']
         password = request.POST['password']
         # user_auth = authenticate(request, username=serial, password=password)

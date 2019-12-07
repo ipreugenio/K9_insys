@@ -121,7 +121,7 @@ def assign_TL(team, handler_list_arg = None):
     handler_rank_dataframe.sort_values(by=['Rank'],
                                    ascending=[False], inplace=True) #TODO add another field for User model for "date of duty" then add another sorting process
 
-    print(handler_rank_dataframe)
+    # print handler_rank_dataframe
 
     try:
         team_leader =  handler_rank_dataframe.iloc[0]['Handler']
@@ -232,11 +232,11 @@ def subtract_inventory(user):
 # @periodic_task(run_every=crontab(hour=6, minute=30))
 # @periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
-    print('check_initial_deployment_dates code is running')
+    # print 'check_initial_deployment_dates code is running'
     schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
 
-    print("Schedules")
-    print(schedules)
+    # print "Schedules"
+    # print schedules
 
     today = datetime.today().date()
     team_list = []
@@ -246,16 +246,16 @@ def check_initial_deployment_dates():
         delta = today - item.date_start
         pre_deps = K9_Pre_Deployment_Items.objects.filter(initial_sched=item)
 
-        print("Pre Deps")
-        print(pre_deps)
+        # print "Pre Deps"
+        # print pre_deps
 
         team = item.team
         team_list.append(team.id)
 
         if delta.days >= 0: #TAKE NOTE OF THIS #TODO notification
             for pre_dep in pre_deps:
-                print("PRE DEP STATUS")
-                print(pre_dep.status)
+                # print "PRE DEP STATUS"
+                # print pre_dep.status
                 if pre_dep.status == "Confirmed" and pre_deps.filter(status = "Confirmed").count() >= 2: #Dapat atleast 2 sila nidedeploy
                     pre_dep.status = "Done"
                     pre_dep.save()
@@ -266,7 +266,7 @@ def check_initial_deployment_dates():
                     k9.save()
                     deploy = Team_Dog_Deployed.objects.create(k9=k9, status="Pending", team_assignment=team)
                     deploy.save()
-                    print(deploy)
+                    # print deploy
 
 
                     #TODO dito pa lang ibabawas yung items

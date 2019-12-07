@@ -2431,7 +2431,7 @@ def generate_k9_parents():
 
 def generate_k9_due_retire():
     fake = Faker()
-    k9_c = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).order_by('year_retired')
+    k9_c = K9.objects.filter(training_status='Deployed').exclude(handler=None).exclude(assignment=None)
 
     k9_list = list(k9_c)
 
@@ -2444,6 +2444,78 @@ def generate_k9_due_retire():
         choice.save()
         print("DUE TO RETIRE ", choice)
  
+def generate_sick_breeding():
+    fake = Faker()
+    
+    k9 = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    k9_list = list(k9)
+
+    time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
+
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat', 'Runny Eyes', 'Vomiting', 'Coughing', 'Fever', 'Weight loss', 'Diarrhea']
+
+    vet = User.objects.filter(position="Veterinarian")
+    vet_list=list(vet)
+
+    problem = ['Anemia','Elbow Dysplasia','Lymphoma','Bladder Stones','Diabetes']
+    treatment = ['Acute, supportive care may be necessary and indicate a need for a blood transfusion.','Integrative therapies, such as cold-therapy laser can also help decrease pain and inflammation.','Cyclophosphamide, vincristine, doxorubicin, and prednisone.','Extreme case is treated through surgery.','Monitor diet, feeding regimen, and start your dog on insulin therapy.']
+
+    med = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
+    med_list = list(med)
+
+    for i in range(20):
+        print("Generate Health Concern for Breeding ", i+1)
+        data = random.choice(k9_list)
+
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,12,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        k_desc = random.choice(sick)
+        v = random.choice(vet_list)
+        prob = random.choice(problem)
+        treat = random.choice(treatment)
+        
+        k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+        
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+
+        randomint = random.randint(1, 5)
+
+        f_dur = 0
+        for i in range(randomint):
+            days = random.randint(1, 5)
+            quan = random.randint(1, 10)
+            m = random.choice(med_list)
+            tod = random.choice(time_of_day)
+
+            HealthMedicine.objects.create(health=health,medicine=m,quantity=quan,duration=days,time_of_day=tod)
+            
+            f_dur = f_dur+days
+
+        health.duration = f_dur
+        health.save()
+
+    #K9 LITTER
+    female = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
+    male = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male')
+
+    sire = list(male) 
+    dam = list(female)
+
+    for i in range(20):
+        print("Generate K9 Litter for Breeding ", i+1)
+        born = random.randint(1, 8)
+        died = random.randint(0, born)
+
+        mom = random.choice(dam)
+        dad = random.choice(sire)
+
+        K9_Litter.objects.create(mother=mom, father=dad,litter_no=born,litter_died=died)
+
+
 '''
 TODO
 
