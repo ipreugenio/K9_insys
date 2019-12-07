@@ -258,6 +258,15 @@ def dashboard(request):
     except kdi.ObjectDoesNotExist:
         pass
 
+    cbs = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
+
+    cb_list = []
+    for c in cbs:
+        cb_list.append(c.k9.id)
+
+    due_retire = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).exclude(id__in=cb_list).order_by('year_retired').count()
+
+    cb_conf_count = Call_Back_K9.objects.filter(status='Confirmed').count()
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -292,6 +301,8 @@ def dashboard(request):
         'el':el,
         'k9i':k9i,
         'hi':hi,
+        'due_retire':due_retire,
+        'cb_conf_count':cb_conf_count,
 
         'notif_data':notif_data,
         'count':count,
@@ -1326,9 +1337,7 @@ def vet_dashboard(request):
             ab_k9 = 0
 
         ab_total = ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash
-
-
-    except ObjectDoesNotExist:
+    except:
         ab_k9 = 0
         ab_total = None
 

@@ -99,5 +99,11 @@ def k9_sched():
         k9 = K9.objects.get(id=ks.k9.id)
 
         Notification.objects.create(k9=kss.k9, position='Handler', user=k9.handler,message=str(k9) + 'is due for check-up today.', notif_type='checkup')
-        
+
+def light_duty():
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").order_by('year_retired')
+
+    for data in data:
+        data.training_status = 'Light Duty'
+        data.save()
         

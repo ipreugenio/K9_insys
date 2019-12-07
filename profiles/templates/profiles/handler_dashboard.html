@@ -25,7 +25,7 @@
                           convenient time. </li>
                     </ul>
                   </div>
-                  {% else %}
+                  {% elif cb.status == 'Confirmed'%}
                   <div class="ui info icon message">
                       <i class="exclamation icon"></i>
                       <div class="content">
@@ -34,6 +34,8 @@
                         </div>
                       </div> 
                   </div>
+                  {% else %}
+                  
                   {% endif %}
                   {% endif %}
 

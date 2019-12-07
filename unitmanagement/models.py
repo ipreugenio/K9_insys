@@ -348,10 +348,14 @@ class Call_Back_K9(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
+        ('Returned', 'Returned'),
     )
     date_created =  models.DateField('date_created', auto_now_add=True)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
+    handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
+    date_confirmed = models.DateField('date_confirmed', null=True, blank=True)
+    date_returned = models.DateField('date_returned', null=True, blank=True)
 
 class Temporary_Handler(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)

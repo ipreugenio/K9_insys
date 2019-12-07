@@ -966,7 +966,7 @@ def generate_k9():
 
             k9.training_status = 'Trained'
             k9.training_level = "Finished Training"
-            k9.serialserial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
             k9.trained = "Trained"
             k9.save()
             print("Created Training for " + str(k9))
@@ -993,6 +993,8 @@ def generate_k9():
             k9 = K9.objects.get(id=id)
             k9.training_status = "For-Deployment"
             k9.status = "Working Dog"
+            sn = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.serial_number = sn
             k9.birth_date = k9.birth_date - timedelta(days = 2190)
             k9.save()
             print(str(k9) + " is now For-Deployment")
@@ -1058,6 +1060,8 @@ def generate_k9():
                 elif k9.capability == "EDD":
                     team.EDD_deployed += 1
                 team.save()
+                k9.training_status = 'Deployed'
+                k9.status = 'Working Dog' 
                 k9.assignment = team.team
                 k9.save()
                 print(str(k9) + " is deployed to " + str(team))
@@ -1463,11 +1467,14 @@ def generate_inventory_trail():
 
 def generate_daily_refresher():
     fake = Faker()
- 
-    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    user = User.objects.filter(position="Handler")
+    user = list(user)
+    k9 = K9.objects.exclude(serial_number='Unassigned Serial Number')
     k9_list = list(k9) 
+    
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
     for data in k9_sample:
+        handler = random.choice(user)
         for i in range(2):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
@@ -1518,7 +1525,7 @@ def generate_daily_refresher():
 
             others_time = others_date.time()
 
-            dr = Daily_Refresher.objects.create(k9=choice,handler=choice.handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
+            dr = Daily_Refresher.objects.create(k9=choice,handler=handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
 
             print('DR'+str(i), dr.k9, dr.rating)
     
@@ -1746,7 +1753,6 @@ def generate_health_record():
         health.duration = f_dur
         health.save()
 
-#TODO TEST THIS
 def generate_k9_parents():
     fake = Faker()
 
@@ -2170,9 +2176,10 @@ def generate_k9_parents():
 
         print(data, 'CREATE/UPDATE')
 
+    dam2 = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
     third_gen = []
     # BREED THIRD GEN
-    for data in dam:
+    for data in dam2:
         start_date = datetime(2019,1,1)
         end_date = datetime(2019,10,10)
 
@@ -2422,6 +2429,21 @@ def generate_k9_parents():
 
         print(data, 'CREATE/UPDATE')
 
+def generate_k9_due_retire():
+    fake = Faker()
+    k9_c = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).order_by('year_retired')
+
+    k9_list = list(k9_c)
+
+    for i in range(5):
+        choice = random.choice(k9_list)
+        k9 = K9.objects.filter(id=choice.id).last()
+        
+        choice.birth_date = date.today() - relativedelta(years=9)
+        choice.status = "Due-For-Retirement"
+        choice.save()
+        print("DUE TO RETIRE ", choice)
+ 
 '''
 TODO
 
