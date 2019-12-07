@@ -373,7 +373,7 @@ class Emergency_Leave(models.Model):
 
     def save(self, *args, **kwargs):
         if self.date_of_return !=None and self.date_of_leave != None:
-            days = self.date_of_return- self.date_of_leave
+            days = self.date_of_return-self.date_of_leave
             self.duration = days.days
         super(Emergency_Leave, self).save(*args, **kwargs)
 

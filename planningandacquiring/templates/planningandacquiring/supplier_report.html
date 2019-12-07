@@ -13,6 +13,33 @@
     <br>#56 ML Quezon St. New Lower Bicutan, Taguig City
         <br>Supplier Report
         <br><b>{{from_date}} to {{to_date}}</b></center>
+        <table class="ui small celled six column structured table">
+        <thead class="center aligned">
+            <tr class='center aligned'>
+                <th colspan="5">SUMMARY</th>
+            </tr>
+            <tr>
+                <th>Supplier</th>
+                <th>Trained</th>
+                <th>Failed</th>
+                <th>On-Training</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data1 in grand_arr %}
+            <tr class="right aligned">
+                <td class="left aligned">{{data1.0}}</td>
+                <td>{{data1.1}}</td>
+                <td>{{data1.2}}</td>
+                <td>{{data1.3}}</td>
+                <td>{{data1.4}}</td>
+            </tr>
+            {%endfor%}            
+        </tbody>
+    </table>
+    
+    <div class="ui horizontal divider"></div>
     
     <table class="ui small celled six column structured table">
         <thead class="center aligned">

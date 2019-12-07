@@ -232,8 +232,8 @@ class Team_Assignment(models.Model):
 
 class Dog_Request(models.Model):
     TYPE = (
-        ('Disaster', 'Disaster'),
-        ('Annual Event', 'Annual Event'),
+        # ('Disaster', 'Disaster'),
+        # ('Annual Event', 'Annual Event'),
         ('Big Event', 'Big Event'),
         ('Small Event', 'Small Event'),
     )
@@ -429,7 +429,7 @@ class Team_Dog_Deployed(models.Model):
     k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
-    date_added = models.DateField('date_added', default=timezone.now, null=True, blank=True)
+    date_added = models.DateField('date_added', default=date.today(), null=True, blank=True)
     date_pulled = models.DateField('date_pulled' , null=True, blank=True)
 
     def __str__(self):
@@ -491,6 +491,7 @@ class Incidents(models.Model):
         ('Explosives Related', 'Explosives Related'),
         ('Narcotics Related', 'Narcotics Related'),
         ('Search and Rescue Related', 'Search and Rescue Related'),
+        ('Others', 'Others'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -501,7 +502,7 @@ class Incidents(models.Model):
     remarks = models.TextField('remarks', max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return str(self.type) + " : " + str(date)
+        return str(self.type) + " : " + str(self.date)
 
 class Maritime(models.Model):
     BOAT_TYPE = (
@@ -521,12 +522,12 @@ class Maritime(models.Model):
     passenger_count = models.IntegerField('passenger_count', blank=True, null=True, default = 0)
     
     def save(self, *args, **kwargs):
-        if datetime == None:
-            self.datetime = timezone.now
+        if self.date == None:
+            self.date = date.today()
         super(Maritime, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.datetime)
+        return str(self.date)
 
 class Daily_Refresher(models.Model):
 
@@ -539,7 +540,7 @@ class Daily_Refresher(models.Model):
 
     k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE)
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField('date', auto_now_add = True)
+    date = models.DateField('date', null=True, blank=True)
     rating = models.DecimalField('rating', max_length=200, blank=True, null=True, decimal_places=2, max_digits=10)
     on_leash = models.BooleanField(default=False)
     off_leash = models.BooleanField(default=False)
@@ -548,22 +549,33 @@ class Daily_Refresher(models.Model):
     morning_feed_cups = models.DecimalField('morning_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
     evening_feed_cups = models.DecimalField('evening_feed_cups', blank=True, null=True, decimal_places=2, max_digits=10)
     # plant and find
-    port_plant = models.IntegerField('port_plant', blank=True, null=True)
-    port_find = models.IntegerField('port_find', blank=True, null=True)
+    port_plant = models.IntegerField('port_plant', blank=True, null=True, default=0)
+    port_find = models.IntegerField('port_find', blank=True, null=True,default=0)
     port_time = models.TimeField('port_time', blank=True, null=True)
-    building_plant = models.IntegerField('building_plant',blank=True, null=True)
-    building_find = models.IntegerField('building_find', blank=True, null=True)
+    building_plant = models.IntegerField('building_plant',blank=True, null=True,default=0)
+    building_find = models.IntegerField('building_find', blank=True, null=True,default=0)
     building_time = models.TimeField('building_time', blank=True, null=True)
-    vehicle_plant = models.IntegerField('vehicle_plant', blank=True, null=True)
-    vehicle_find = models.IntegerField('vehicle_find',blank=True, null=True)
+    vehicle_plant = models.IntegerField('vehicle_plant', blank=True, null=True,default=0)
+    vehicle_find = models.IntegerField('vehicle_find',blank=True, null=True,default=0)
     vehicle_time = models.TimeField('vehicle_time', blank=True, null=True)
-    baggage_plant = models.IntegerField('baggage_plant', blank=True, null=True)
-    baggage_find = models.IntegerField('baggage_find', blank=True, null=True)
+    baggage_plant = models.IntegerField('baggage_plant', blank=True, null=True,default=0)
+    baggage_find = models.IntegerField('baggage_find', blank=True, null=True,default=0)
     baggage_time = models.TimeField('baggage_time', blank=True, null=True)
-    others_plant = models.IntegerField('others_plant', blank=True, null=True)
-    others_find = models.IntegerField('others_find', blank=True, null=True)
+    others_plant = models.IntegerField('others_plant', blank=True, null=True,default=0)
+    others_find = models.IntegerField('others_find', blank=True, null=True,default=0)
     others_time = models.TimeField('others_time', blank=True, null=True)
     mar =  models.CharField('mar', choices=MAR, max_length=100, blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+         
+        find = (self.port_find+self.building_find+self.vehicle_find+self.baggage_find+self.others_find)
+        plant = (self.port_plant+self.building_plant+self.vehicle_plant+self.baggage_plant+self.others_plant)
+        self.rating = 100 - ((plant - find) * 5)
+
+        if self.date == None:
+            self.date = date.today()
+        super(Daily_Refresher, self).save(*args, **kwargs)
+
 
 
 class TempDeployment(models.Model):

@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents
 
 import random
 
@@ -275,7 +275,7 @@ def mass_populate():
     assign_commander_random() #Assign commanders to areas
     fix_dog_duplicates() # fix duplicate names for dogs
     create_predeployment_inventory() #Inventory items for pre deployment
-
+    
     return None
 
 # Find handlerss with multiple k9s
@@ -302,6 +302,13 @@ def mass_populate_revisited():
     # create_predeployment_inventory()
     # generate_inventory_trail()
 
+    # generate_daily_refresher()
+    # generate_location_incident()
+  
+    # generate_handler_leave()
+    generate_k9_incident()
+    # generate_health_record()
+    # generate_k9_parents()
 
     return None
 
@@ -1337,16 +1344,18 @@ def daily_refresher_form(request):
 
             mar = request.POST.get('select')
             f.mar = mar
-            #TODO Formula for Rating
+           
             port = (f.port_find / f.port_plant * 20)
             building = (f.building_find /f.building_plant * 20)
             vehicle = (f.vehicle_find /f.vehicle_plant * 20)
             baggage = (f.baggage_find /f.baggage_plant * 20)
             others = (f.others_find /f.others_plant * 20)
-            find = (f.port_find+f.building_find+f.vehicle_find+f.baggage_find+f.others_find)
-            plant = (f.port_plant+f.building_plant+f.vehicle_plant+f.baggage_plant+f.others_plant)
+            
+            # MODEL save__
+            # find = (f.port_find+f.building_find+f.vehicle_find+f.baggage_find+f.others_find)
+            # plant = (f.port_plant+f.building_plant+f.vehicle_plant+f.baggage_plant+f.others_plant)
 
-            f.rating = 100 - ((plant - find) * 5)
+            # f.rating = 100 - ((plant - find) * 5)
 
             #TIME
             #time = (f.port_time + f.building_time + f.vehicle_time + f.baggage_time + f.others_time)

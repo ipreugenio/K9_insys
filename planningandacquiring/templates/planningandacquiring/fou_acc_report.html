@@ -25,11 +25,11 @@
         <tbody>
             {% for data in data%}
             <tr>
-                <td>{{data.handler}}</td>
+                <td>{{data.handler.fullname}}</td>
                 <td>{{data.k9}}</td>
                 <td>{{data.incident}}</td>
                 <td>{{data.description}}</td>
-                <td>{{data.reported_by}}</td>
+                <td>{{data.reported_by.fullname}}</td>
             </tr>
             {%endfor%}
         </tbody>

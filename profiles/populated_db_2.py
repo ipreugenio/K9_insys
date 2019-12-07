@@ -8,11 +8,13 @@ from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, 
 from django.contrib.auth.models import User as AuthUser
 from training.models import Training, Training_Schedule, Training_History
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
-from unitmanagement.models import PhysicalExam
+from deployment.models import Daily_Refresher
+
+from unitmanagement.models import PhysicalExam, Handler_Incident, K9_Incident, Health, HealthMedicine, Handler_On_Leave, Emergency_Leave
 from itertools import groupby
 
 from deployment.tasks import assign_TL
-
+from django.db.models import Q
 import re
 '''
 For more info on faker.Faker, view https://faker.readthedocs.io/en/latest/index.html
@@ -953,6 +955,11 @@ def generate_k9():
 
             training.remarks = remark
             training.stage = "Finished Training"
+            
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+            training.date_finished = f_date
             training.save()
 
             k9.training_status = 'Trained'
@@ -1191,7 +1198,7 @@ def generate_inventory_trail():
     #food = Food.objects.filter(foodtype='Milk')
     for data in food:
         #FOOD RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1204,7 +1211,7 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1218,11 +1225,11 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1234,7 +1241,7 @@ def generate_inventory_trail():
     misc = Miscellaneous.objects.all()
     for data in misc:
         #MISCELLANEOUS RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1247,7 +1254,7 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1261,11 +1268,11 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1277,7 +1284,7 @@ def generate_inventory_trail():
     med = Medicine_Inventory.objects.all()
     for data in med:
         #MEDICINE RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             exp_date = datetime(2023,12,31)
@@ -1291,7 +1298,7 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1305,11 +1312,11 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1322,7 +1329,7 @@ def generate_inventory_trail():
     food = Food.objects.all()
     for data in food:
         #FOOD RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1335,7 +1342,7 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1349,11 +1356,11 @@ def generate_inventory_trail():
             data.save()
 
         #FOOD PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1365,7 +1372,7 @@ def generate_inventory_trail():
     misc = Miscellaneous.objects.all()
     for data in misc:
         #MISCELLANEOUS RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1378,7 +1385,7 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1392,11 +1399,11 @@ def generate_inventory_trail():
             data.save()
 
         #MISCELLANEOUS PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
@@ -1408,7 +1415,7 @@ def generate_inventory_trail():
     med = Medicine_Inventory.objects.all()
     for data in med:
         #MEDICINE RECEIVED TRAIL
-        for i in range(10):
+        for i in range(5):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             exp_date = datetime(2023,12,31)
@@ -1422,7 +1429,7 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE SUBTRACT TRAIL
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -1436,17 +1443,283 @@ def generate_inventory_trail():
             data.save()
 
         #MEDICINE PHYSICAL COUNT
-        for i in range(5):
+        for i in range(3):
             start_date = datetime(2018,1,1)
             end_date = datetime(2018,12,31)
             f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            randomizer = random.randint(100, 800)
+            randomizer = random.randint(100, 500)
             choice = random.choice(admin)
             new_q = randomizer
             print(data,data.quantity,new_q)
             Medicine_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
             data.quantity = new_q
             data.save()
+
+def generate_daily_refresher():
+    fake = Faker()
+ 
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9) 
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
+    for data in k9_sample:
+        for i in range(2):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+            
+            choice = random.choice(k9_list)
+
+            mar = ['MARSEC','MARLEN','MARSAR','MAREP']
+            mar = random.choice(mar)
+
+            port_plant = random.randint(1, 3)
+            port_find = random.randint(0, port_plant)
+            building_plant = random.randint(1, 3)
+            building_find = random.randint(0, building_plant)
+            vehicle_plant = random.randint(1, 3)
+            vehicle_find = random.randint(0, vehicle_plant)
+            baggage_plant = random.randint(1, 3)
+            baggage_find = random.randint(0, baggage_plant)
+            others_plant = random.randint(1, 3)
+            others_find = random.randint(0, others_plant)
+            
+            port_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            port_hour = int(port_date.time().hour)
+            port_date = port_date - timedelta(hours=port_hour)
+
+            port_time = port_date.time()
+
+            building_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            building_hour = int(building_date.time().hour)
+            building_date = building_date - timedelta(hours=building_hour)
+
+            building_time = building_date.time()
+
+            vehicle_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            vehicle_hour = int(vehicle_date.time().hour)
+            vehicle_date = vehicle_date - timedelta(hours=vehicle_hour)
+
+            vehicle_time = vehicle_date.time()
+
+            baggage_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            baggage_hour = int(baggage_date.time().hour)
+            baggage_date = baggage_date - timedelta(hours=baggage_hour)
+
+            baggage_time = baggage_date.time()
+
+            others_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
+            others_hour = int(others_date.time().hour)
+            others_date = others_date - timedelta(hours=others_hour)
+
+            others_time = others_date.time()
+
+            dr = Daily_Refresher.objects.create(k9=choice,handler=choice.handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
+
+            print('DR'+str(i), dr.k9, dr.rating)
+    
+#LOCATION INCIDENT, MARITIME, DOG REQUEST
+def generate_location_incident():
+    fake = Faker()
+    ta = Team_Assignment.objects.exclude(team_leader=None)
+    ta_list = list(ta) 
+    ta_sample = random.sample(ta_list, int(len(ta_list) * .25))
+    user = User.objects.all()
+    user_list = list(user) 
+
+    incident_type = ['Explosives Related', 'Narcotics Related', 'Search and Rescue Related', 'Others']
+
+    explosive = ['Bombing in Mall', 'Bombing in Airport', 'Bombing at Road', 'Terrorist Bombing']
+    narcotics = ['Drug Bust', 'Airport Drug Traffic', 'Drug Trade', 'Drug Use at Mall']
+    search = ['Landslide', 'Typhoon', 'Hurricane', 'Kidnapping', 'Arson', 'Earthquake']
+    others = ['Attack', 'Bodyguard Duty', 'Security Duty']
+    boat = ['Domestice Passenger Vessels', 'Motorbancas', 'Fastcrafts', 'Cruise Ships', 'Tugboat', 'Barge','Tanker']
+    event = ['Big Event', 'Small Event']
+    
+    pre_titles = ['An Evening of ', 'A Night to Celebrate ', 'A Celebration of Life and ', 'The Wonders of ', 'In Observance of ', 'In Recognition of ', 'In Commemoration of ', 'Meetup for ', 'The Future of ', 'The Technology of ', 'A Date with ']
+    post_titles = [' Conference', ' Con', ' Competition', ' Hackathon', ' Fundraiser', ' Charity', ' Party', ' Bash', ' Ball', ' Gala', ' Shindig', 'athon', ' Celebration', ' Affair', ' Ceremony', ' Awards', ' Event of the Year!', ' Jubilee', ' Performance', ' Blast', ' Blowout', ' Rite', ' Show', ' Meetup', ' for Health', ' Workshop', ' Research Event', ' Summit', ' Course', ' Symposium', ' Town Hall Meeting', ' Games', ' Expo', ': The Event']
+
+    loc = []
+    tl = []
+    for ta in ta:
+        if ta.location:
+            loc.append(ta.location)
+        if ta.team_leader:
+            tl.append(ta.team_leader)
+
+    start_date = datetime(2019,1,1)
+    end_date = datetime(2019,12,31)
+
+    for data in ta_sample:
+        for i in range(10):
+            f_date = fake.date_time_between(start_date=start_date, end_date=end_date, tzinfo=None)
+            i_type = random.choice(incident_type)
+            i_loc = random.choice(loc)
+            i_tl = random.choice(tl)
+            if i_type == 'Explosives Related':
+                i_inc = random.choice(explosive) 
+                i_rem = 'Explosive Remarks Here'
+            elif i_type == 'Narcotics Related':
+                i_inc = random.choice(narcotics)
+                i_rem = 'Narcotics Remarks Here'
+            elif i_type == 'Search and Rescue Related':
+                i_inc = random.choice(search)
+                i_rem = 'Search and Rescue Remarks Here'
+            elif i_type == 'Others':
+                i_inc = random.choice(others)
+                i_rem = 'Other Remarks Here'
+            
+            Incidents.objects.create(user=i_tl,date=f_date.date(),incident=i_inc,location=i_loc,type=i_type,remarks=i_rem)
+            
+            m_boat = random.choice(boat)
+            p_count = random.randint(50, 150)
+
+            Maritime.objects.create(location=i_loc, boat_type=m_boat, date=f_date.date(), time=f_date.time(), passenger_count=p_count)
+            # print(f_date,i_type,i_tl,i_loc,i_inc)
+
+            city = generate_city_ph()
+            pre_t = random.choice(pre_titles)
+            post_t = random.choice(post_titles)
+            e = random.choice(event)
+            cellnum = fake.msisdn()[:10]
+            u = random.choice(user_list)
+            email = u.lastname.lower() + "@gmail.com"
+            lat = random.uniform(7.823, 18.579)
+            lng = random.uniform(118.975, 125.563)
+            needed = random.randint(3, 10)
+            deployed = random.randint(1, needed)
+
+            s_date = datetime(2019,1,1)
+            e_date = datetime(2019,6,30)
+
+            ss_date = datetime(2019,7,1)
+            ee_date = datetime(2019,12,10)
+
+            sf_date = fake.date_between(start_date=start_date, end_date=end_date)
+            ef_date = fake.date_between(start_date=start_date, end_date=end_date)
+            
+            s_loc = str(i_loc)
+            place = s_loc.replace('port', '')
+            Dog_Request.objects.create(requester=str(u),event_name=pre_t+post_t,location=place,city=city,sector_type=e,phone_number=cellnum,email_address=email,area=i_loc.area,k9s_needed=needed,k9s_deployed=deployed,status='Done',longtitude=lng,latitude=lat,team_leader=i_tl, start_date=sf_date, end_date=ef_date,remarks='No remarks')
+            
+def generate_handler_incident():
+    fake = Faker()
+    incident = ['Rescued People','Made an Arrest','Poor Performance','Violation']
+    ta = Team_Assignment.objects.exclude(team_leader=None)
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
+    
+    for data in k9_sample:
+        for i in range(5):
+            start_date = datetime(2019,1,1)
+            end_date = datetime(2019,12,31)
+
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+
+            inc = random.choice(incident)
+            ta_list = random.choice(ta)
+            dog = random.choice(k9_sample)
+
+            Handler_Incident.objects.create(handler=dog.handler, k9=dog, incident=inc, date = f_date, description='Description Here', status='Done', reported_by=ta_list.team_leader)
+
+def generate_handler_leave():
+    fake = Faker()
+    admin = User.objects.filter(position='Administrator')
+    admin = list(admin)
+
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
+    
+    for data in k9_sample:
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,11,1)
+
+        el = random.randint(1, 8)
+        rl = random.randint(1, 8)
+
+        sf_date = fake.date_between(start_date=start_date, end_date=end_date)
+        ef_date = sf_date + timedelta(days=rl)
+        dog = data
+        approver = random.choice(admin)
+        
+        # Handler_On_Leave
+        Handler_On_Leave.objects.create(handler=dog.handler,approved_by=approver,k9=dog,description='Sick Leave',reply='Okay',status='Approved',date_from=sf_date,date_to=ef_date)
+
+        ssf_date = fake.date_between(start_date=start_date, end_date=end_date)
+        eef_date = ssf_date + timedelta(days=el)
+
+        # Emergency_Leave
+        Emergency_Leave.objects.create(handler=dog.handler,date_of_leave=ssf_date,date_of_return=eef_date,status='Returned',reason='Family Emergency')
+
+def generate_k9_incident():
+    fake = Faker()
+    inc = ['Stolen','Lost','Sick','Accident']
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
+    
+    lost = ['Collar not properly put on', 'Leashed on a pole', 'Suddenly disappeared']
+    stolen = ['Dognapped', 'Left with a stranger', 'Snatched']
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat']
+    accident = ['Hit by Car', 'Caught in Bomb Explosion', 'Building Fell Down', 'Stab by Unknown Subject','Caught by Gun Fired on Premises']
+    
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+    
+    for data in k9_sample:
+        k_inc = random.choice(inc)
+
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,12,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+
+        if k_inc == 'Stolen':
+            k_desc = random.choice(stolen)
+        elif k_inc == 'Lost':
+            k_desc = random.choice(lost)
+        if k_inc == 'Sick':
+            k_desc = random.choice(sick)
+        elif k_inc == 'Accident':
+            k_desc = random.choice(accident)
+        if k_inc == 'Stolen' or k_inc == 'Lost':
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+        else:
+            k_clinic = random.choice(clinic)
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler,clinic=k_clinic)
+    
+def generate_health_record():
+    fake = Faker()
+    time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
+
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+
+    
+    # # Health
+    # dog
+    # date
+    # problem
+    # treatment
+    # status
+    # veterinary
+    # duration
+    # date_done
+    # incident_id
+    # image
+    # follow_up
+    # follow_up_date
+    # follow_up_done
+
+    # # HealthMedicine
+
+    # health 
+    # medicine
+    # quantity 
+    # time_of_day
+    # duration
+
+def generate_k9_parents():
+    pass
+       
 
 '''
 TODO
