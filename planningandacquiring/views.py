@@ -204,10 +204,14 @@ def budgeting_list(request):
     count = notif_data.filter(viewed=False).count()
     user = user_session(request)
 
-    data = Proposal_Budget.objects.all()
-    if request.method == 'POST':
-        pass
+    pb = Proposal_Budget.objects.all()
+    data = []
+    for pb in pb:
+        ab = Actual_Budget.objects.filter(year_budgeted__year=pb.year_budgeted.year).last()
+        x = [pb,ab]
+        data.append(x)
 
+    print(data)
     context = {
         'notif_data':notif_data,
         'count':count,
@@ -3383,26 +3387,35 @@ def budgeting(request):
                     # milk needed = total_milk_needed , current = current_milk 
                     # needed - current * price
                     milk_quantity = total_milk_needed - current_milk
+                    if milk_quantity < 0:
+                        milk_quantity = 0
                     print('M ITEM',total_milk_needed,current_milk)
                     milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
                     # print('MILK', m_item, milk_quantity, milk_quantity_total)
-                    food_arr.append([m_item,milk_quantity,milk_quantity_total])
+                    if milk_quantity_total > 0:
+                        food_arr.append([m_item,milk_quantity,milk_quantity_total])
 
             if total_puppy_food>0:
                 if p_item:
                     #puppy food needed = total_puppy_food , current = current_puppy_food 
                     puppy_quantity = total_puppy_food - current_puppy_food
+                    if puppy_quantity < 0:
+                        puppy_quantity = 0
                     puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
                     # print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
-                    food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
+                    if puppy_quantity_total > 0:
+                        food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
 
             if total_adult_food > 0:
                 if a_item:
                     #adult food needed = total_adult_food , current = current_adult_food 
                     adult_quantity = total_adult_food - current_adult_food
+                    if adult_quantity < 0:
+                        adult_quantity = 0
                     adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
                     # print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
-                    food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
+                    if adult_quantity_total > 0:
+                        food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
 
             mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 
@@ -3571,7 +3584,7 @@ def budgeting(request):
                 dhcv_quantity = 0
             dhcv_total = round(int(np.ceil(dhcv_quantity)) * dhcv_item.price,2)
             # print(dhcv_item, dhcv_quantity, dhcv_total)
-            if dhcv_item:
+            if dhcv_total>0:
                 vac_arr.append([dhcv_item,dhcv_quantity,dhcv_total])
 
             #DHPPiL4 CALCULATION
@@ -3909,10 +3922,10 @@ def budgeting(request):
             pass
 
     #LAST YEAR BUDGET
-    last_year = next_year - 2
+    this_year = next_year - 1
     try:
-        abb = Actual_Budget.objects.get(year_budgeted__year=last_year)
-    except ObjectDoesNotExist:
+        abb = Actual_Budget.objects.get(year_budgeted__year=this_year)
+    except:
         abb = None
 
 
@@ -3984,7 +3997,7 @@ def load_budget(request):
     for data in all_k9:
         b = Dog_Breed.objects.filter(breed = data.breed)[0]
         if (data.age + 1) >= b.life_span:
-            dead_breed_ny.append(breed.breed)
+            dead_breed_ny.append(data.breed)
 
     kb_index = pd.Index(dead_breed_ny)
 
@@ -4049,26 +4062,35 @@ def load_budget(request):
             # milk needed = total_milk_needed , current = current_milk 
             # needed - current * price
             milk_quantity = total_milk_needed - current_milk
+            if milk_quantity < 0:
+                milk_quantity = 0
             print('M ITEM',total_milk_needed,current_milk)
             milk_quantity_total = int(np.ceil(milk_quantity)) * m_item.price
             # print('MILK', m_item, milk_quantity, milk_quantity_total)
-            food_arr.append([m_item,milk_quantity,milk_quantity_total])
+            if adult_quantity_total > 0:
+                food_arr.append([m_item,milk_quantity,milk_quantity_total])
 
     if total_puppy_food>0:
         if p_item:
             #puppy food needed = total_puppy_food , current = current_puppy_food 
             puppy_quantity = total_puppy_food - current_puppy_food
+            if puppy_quantity < 0:
+                puppy_quantity = 0
             puppy_quantity_total = int(np.ceil(puppy_quantity)) * p_item.price
             # print('PUPPY FOOD', p_item, puppy_quantity, puppy_quantity_total)
-            food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
+            if puppy_quantity_total > 0:
+                food_arr.append([p_item,int(puppy_quantity),puppy_quantity_total])
 
     if total_adult_food > 0:
         if a_item:
             #adult food needed = total_adult_food , current = current_adult_food 
             adult_quantity = total_adult_food - current_adult_food
+            if adult_quantity < 0:
+                adult_quantity = 0
             adult_quantity_total = int(np.ceil(adult_quantity)) * a_item.price
             # print('ADULT FOOD', a_item,adult_quantity, adult_quantity_total)
-            food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
+            if adult_quantity_total > 0:
+                food_arr.append([a_item,int(adult_quantity),adult_quantity_total])
 
     mrt = Medicine_Received_Trail.objects.filter(expiration_date__year=next_year).filter(status='Pending').values('inventory').annotate(sum = Sum('quantity'))
 
@@ -4176,7 +4198,7 @@ def load_budget(request):
         ar_quantity = 0
     ar_total = round(int(np.ceil(ar_quantity)) * ar_item.price,2)
 
-    if ar_item:
+    if ar_total>0:
         vac_arr.append([ar_item,ar_quantity,ar_total])
 
     # print(ar_item, ar_quantity, ar_total)

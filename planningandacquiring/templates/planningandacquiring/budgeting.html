@@ -109,12 +109,12 @@
 
         <table class="ui four column celled table right aligned">
             <thead>
-                <th class="four wide column">Last Year's Budget</th>
+                <th class="four wide column">This Year's Budget</th>
                 <th class="four wide column" style="color: teal">
                     {% if abb != None %}
                         {{abb.grand_total|intcomma}}
                     {%else%}
-                        No saved budget last year
+                        No saved budget for this year
                     {%endif%}
                 </th>
                 <th class="four wide column">Budget Proposal</th>
