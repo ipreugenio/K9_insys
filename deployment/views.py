@@ -19,7 +19,7 @@ import re
 import sys
 from datetime import date
 
-from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave
+from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave, VaccinceRecord
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account, Education
@@ -293,22 +293,37 @@ def check_handlers_with_multiple_k9s():
     return None
 
 def mass_populate_revisited():
-    # generate_user()
-    # create_teams()
-    # generate_k9()
-    # generate_requests()
-    # generate_dogbreed()
+    # GENERAL
+    generate_user()
+    generate_k9()
+    generate_dogbreed()
+    create_predeployment_inventory()
+    generate_k9_parents()
 
-    # create_predeployment_inventory()
-    # generate_inventory_trail()
+    # DEPLOYMENT
+    create_teams()
+    generate_requests()
 
-    # generate_daily_refresher()
-    # generate_location_incident()
-  
-    # generate_handler_leave()
+    # UNIT MANAGEMENT
+    generate_daily_refresher()
+    generate_location_incident()
+    generate_handler_leave()
     generate_k9_incident()
-    # generate_health_record()
-    # generate_k9_parents()
+    generate_health_record()
+    generate_inventory_trail()
+
+    count = K9.objects.filter(source='Breeding').count()
+    k9 = K9.objects.filter(source='Breeding')
+
+    l = list(k9)
+    vr = VaccinceRecord.objects.filter(k9__in=l)
+
+    print('COUNT',count)
+    print('K9',k9)
+    print('Vaccine')
+    for vr in vr:
+        print(vr.status)
+
 
     return None
 

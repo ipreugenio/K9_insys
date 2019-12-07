@@ -122,7 +122,11 @@
                     <thead>
                     <tr>
                     <th>Status: {{k9.training_status}}</th>
+                    {% if k9.status == "Sick" or k9.status == "Lost" or k9.status == "Stolen" or k9.status == "Accident"%}
+                    <th style="color:red;">K9 in Incident</th>
+                    {%else%}
                     <th>Type: {{k9.status}}</th>
+                    {%endif%}
                     <th>Capability: {{k9.capability}}</th>
 
                         {% if k9.training_status == "On-Training" %}
@@ -180,6 +184,7 @@
                         {% endif %}
 
                         {% if reveal_items == True %}
+                          {% if pre_deployment_item %}
                             <div class="ui two column grid">
                                 <div class="six wide column">
                                     <input class = "ui green button" type="submit"  value="Confirm Initial Deployment" id = "reveal_predep_checklist">
@@ -189,6 +194,7 @@
                                       <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
                                 </div>
                             </div>
+                            {%endif%}
                         {% elif all_clear == True and reveal_items == True %}
                          <strong>Deployment Date : </strong> <span>{{pre_deployment_item.initial_sched.date_start}} </span> <br>
                         <strong>Port: </strong> <span>{{pre_deployment_item.initial_sched.team.team}}</span>
@@ -211,6 +217,17 @@
               </div>
 
               <div class="six wide column" style="padding: 0%;margin:0%;">
+                  {% if messages %}
+                  {% for message in messages %}
+                      <input class="msg" type='hidden' value="{{message}}">
+                      <div class="ui info message">
+                        <div class="header">
+                          {{message}}
+                        </div>
+                      </div>
+                  {% endfor %}
+                  {% endif %}
+
                     {%if ki %}
                     <div class="ui info message">
                       <ul class="list">
@@ -250,13 +267,6 @@
 
         </div>
       </div>
-
-        {% if messages %}
-        {% for message in messages %}
-            <input class="msg" type='hidden' value="{{message}}">
-        {% endfor %}
-        {% endif %}
-
 
     </div>
 

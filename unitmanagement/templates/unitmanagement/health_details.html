@@ -63,7 +63,8 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if th%}
+    {% if request.session.session_user_position == "Veterinarian" %}
+    {% if th %}
         {% for th in th %}
         <div class="ui raised segment">
                     <h2>Follow-Up</h2>
@@ -93,6 +94,7 @@
             </div>
         </div>
         {% endfor %}
+    {% endif %}
     {% endif %}
     <br>
     

@@ -26,8 +26,8 @@
         <tbody>
             {% for data in data%}
             <tr>
-                <td>{{data.0.date}}</td>
-                <td>{{data.0.dog}}</td>
+                <td class="two wide">{{data.0.date|date:'Y-m-d'}}</td>
+                <td class="two wide">{{data.0.dog}}</td>
                 <td>{{data.0.problem}}</td>
                 <td>{{data.0.treatment}}</td>
                     <td>

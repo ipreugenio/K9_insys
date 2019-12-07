@@ -2345,7 +2345,7 @@ def ajax_health_report(request):
         to_date = request.GET.get('date_to')
         from_date = request.GET.get('date_from')
 
-        arr_val = Health.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('date')
+        arr_val = Health.objects.filter(date__range=[from_date, to_date]).filter(status='Done').order_by('date','dog__name')
         for data in arr_val:
             hm = HealthMedicine.objects.filter(health=data)
             data_arr.append([data,hm])

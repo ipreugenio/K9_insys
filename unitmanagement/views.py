@@ -89,6 +89,10 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('unitmanagement:health_history', id = notif.k9.id)
+    elif notif.notif_type == 'medicine_given':
+        notif.viewed = True
+        notif.save()
+        return redirect('unitmanagement:health_details', id = notif.other_id)
     elif notif.notif_type == 'dog_request':
         notif.viewed = True
         notif.save()
@@ -2017,10 +2021,11 @@ def health_list_handler(request):
         data = K9_Incident.objects.filter(reported_by=user).filter(status='Pending')
         data2 = Health.objects.filter(dog=k9).filter(status='On-Going')
 
-    for da in data2:
-        d =  (da.date_done - date)
-        d = d.days
-        data_arr.append(d)
+    if data2:
+        for da in data2:
+            d =  (da.date_done - date)
+            d = d.days
+            data_arr.append(d)
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -2876,7 +2881,7 @@ def k9_unpartnered_list(request):
     style=''
 
     # data = K9.objects.filter(handler=None) #removed for deployment
-    data = K9.objects.filter(status='Working Dog').filter(handler=None).count()
+    data = K9.objects.filter(status='Working Dog').filter(handler=None)
     # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW

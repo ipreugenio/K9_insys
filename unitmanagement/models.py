@@ -40,7 +40,11 @@ class K9_Incident(models.Model):
     status = models.CharField('status', max_length=200, default="Pending")
     clinic = models.CharField('clinic', max_length=200, null=True, blank=True)
     reported_by = models.CharField('reported_by', max_length=200, null=True, blank=True)
-
+    def save(self, *args, **kwargs):
+        if self.incident == 'Sick' or self.incident == 'Accident':
+            if self.clinic == None:
+                self.clinic = "PCG CLINIC"
+        super(K9_Incident, self).save(*args, **kwargs)
 
 class Image(models.Model):
     incident_id = models.ForeignKey(K9_Incident, on_delete=models.CASCADE, null=True, blank=True)
@@ -74,13 +78,13 @@ class Health(models.Model):
         expired = self.date_done + timedelta(days=7)
         return expired
     #
-    # def save(self, *args, **kwargs):
-    #     if self.date != None:
-    #         self.date_done = self.date + timedelta(days=self.duration)
-    #
-    #     if date.today() == self.date_done:
-    #         self.dog.status = 'Working Dog'
-    #     super(Health, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.date != None:
+            self.date_done = self.date + timedelta(days=self.duration)
+    
+        if date.today() == self.date_done:
+            self.dog.status = 'Working Dog'
+        super(Health, self).save(*args, **kwargs)
 
 
 class HealthMedicine(models.Model):
@@ -518,6 +522,7 @@ def create_handler_incident_notif(sender, instance, **kwargs):
 def create_handler_health_notif(sender, instance, **kwargs):
     if kwargs.get('created', False):
             Notification.objects.create(user = instance.dog.handler,
+                            k9 = instance.dog,
                             position = 'Handler',
                             other_id = instance.id,
                             notif_type = 'medicine_given',

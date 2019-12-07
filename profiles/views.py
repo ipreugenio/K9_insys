@@ -759,8 +759,7 @@ def handler_dashboard(request):
     ki = None
     try:
         k9 = K9.objects.get(handler=user)
-        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(
-        status='Pending').latest('id')
+        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(k9=k9).filter(status='Pending').latest('id')
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     except: pass
@@ -808,11 +807,14 @@ def handler_dashboard(request):
             # print(items_list)
 
             pre_deployment_items = K9_Pre_Deployment_Items.objects.filter(k9=k9).last()
-            initial_sched = pre_deployment_items.initial_sched
+            delta = None
+            if pre_deployment_items:
+                initial_sched = pre_deployment_items.initial_sched
 
-            delta = initial_sched.date_start - today.date()
-            if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
-                reveal_items = True
+                delta = initial_sched.date_start - today.date()
+
+                if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
+                    reveal_items = True
 
 
         # TODO try except for when handler does not yet have a k9
@@ -975,8 +977,6 @@ def handler_dashboard(request):
         'current_port' : current_port,
         'current_request' : current_request,
         'upcoming_deployment' : upcoming_deployment,
-
-        'ki' : ki,
 
         'emergency_leave_form' : emergency_leave_form,
         'emergency_leave_count' : emergency_leave_count

@@ -352,7 +352,7 @@ class K9(models.Model):
             
         elif self.age == 10:
             self.training_status = 'Retired'
-            self.year_retired = self.birth_date + td(days=(10*365))
+            # self.year_retired = self.birth_date + td(days=(10*365))
             self.status = 'Retired'
         else:
             pass
