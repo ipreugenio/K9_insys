@@ -8,6 +8,7 @@ from datetime import timedelta as td
 from datetime import date as d
 import ast
 from decimal import *
+from django.utils import timezone
 # Create your models here.
 
 class K9_Genealogy(models.Model):
@@ -65,7 +66,7 @@ class Training(models.Model):
 class Training_History(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=timezone.now)
 
 class Training_Schedule(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, blank=True, null=True)
@@ -92,7 +93,7 @@ class K9_Adopted_Owner(models.Model):
     birth_date = models.DateField('birth_date')
     email = models.EmailField('email', max_length=200)
     contact_no = models.CharField('contact_no', max_length=200)
-    date_adopted = models.DateField('date_adopted', auto_now_add=True)
+    date_adopted = models.DateField('date_adopted', default=timezone.now)
     date_returned = models.DateField('date_returned', blank=True, null=True)
     reason = models.TextField('remarks', max_length=500, blank=True, null=True)
     file_adopt = models.FileField(upload_to='adoption_papers', blank=True, null=True)

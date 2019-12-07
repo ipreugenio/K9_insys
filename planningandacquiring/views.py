@@ -2303,7 +2303,7 @@ def ajax_k9_breeding_report(request):
             arr_val.append(a)
 
 
-        data_arr = K9_Litter.objects.filter(date__range=[from_date, to_date]).order_by('date')
+        data_arr = K9_Litter.objects.filter(date__range=[from_date, to_date]).order_by('date','mother','father')
                 
         print(arr_val)
 

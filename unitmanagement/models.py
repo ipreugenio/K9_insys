@@ -12,14 +12,14 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
 from planningandacquiring.models import K9
 from django.contrib.auth.models import User as AuthUser
-
+from django.utils import timezone
 # Create your models here.
 
 
 class Handler_K9_History(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
 
     def __str__(self):
         return str(self.handler) + ': ' + str(self.k9.capability)
@@ -35,7 +35,7 @@ class K9_Incident(models.Model):
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, choices=INCIDENT, default="")
     title = models.CharField('title', max_length=100)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
     description = models.TextField('description', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
     clinic = models.CharField('clinic', max_length=200, null=True, blank=True)
@@ -53,7 +53,7 @@ class Image(models.Model):
 
 class Health(models.Model):
     dog = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
     problem = models.TextField('problem', max_length=800, null=True, blank=True)
     treatment = models.TextField('treatment', max_length=800, null=True, blank=True)
     status = models.CharField('status', max_length=200, default="On-Going")
@@ -145,7 +145,7 @@ class PhysicalExam(models.Model):
     eyes = models.CharField('eyes', choices=EXAMSTATUS, max_length=200, default='Normal')
     ears = models.CharField('ears', choices=EXAMSTATUS, max_length=200, default='Normal')
     remarks = models.TextField('remarks', max_length=200, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
     date_next_exam = models.DateField('date_next_exam', null=True, blank=True)
     status = models.CharField('status', max_length=200, default="Pending")
     body_score = models.IntegerField('body_score', choices=BODY_SCORE, default = 3)
@@ -237,7 +237,7 @@ class VaccineUsed(models.Model):
     veterinary = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     image = models.FileField(upload_to='health_image', blank=True, null=True)
     done = models.BooleanField(default=False)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
 
     def __str__(self):
         return str(self.k9) + ':' + str(self.disease) + '-' + str(self.date_vaccinated)
@@ -254,7 +254,7 @@ class Replenishment_Request(models.Model):
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='admin_give')
     date_approved = models.DateField('date_approved', null=True, blank=True)
     date_received = models.DateField('date_received', null=True, blank=True)
-    date_requested = models.DateField('date_requested', auto_now_add=True)
+    date_requested = models.DateField('date_requested', default=timezone.now)
 # Request Equipment Connect to K9_Pre_Deployment Equipments
 class Miscellaneous_Request(models.Model):
     request = models.ForeignKey(Replenishment_Request, on_delete=models.CASCADE, null=True, blank=True,related_name='misc_replenishment')
@@ -286,7 +286,7 @@ class Handler_On_Leave(models.Model):
     approved_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='admin')
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', max_length=100, default="On-Leave")
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
     description = models.TextField('description', max_length=200, null=True, blank=True)
     reply = models.TextField('description', max_length=200, null=True, blank=True)
     status = models.CharField('status', max_length=200, default="Pending")
@@ -315,7 +315,7 @@ class Handler_Incident(models.Model):
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='handler_incident')
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     incident = models.CharField('incident', choices=INCIDENT,max_length=100, null=True, blank=True)
-    date = models.DateField('date', auto_now_add=True)
+    date = models.DateField('date', default=timezone.now)
     description = models.TextField('description', max_length=200)
     status = models.CharField('status', max_length=200, default="Pending")
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='leader')
@@ -337,7 +337,7 @@ class Request_Transfer(models.Model):
     )
 
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    date_created =  models.DateField('date_created', auto_now_add=True)
+    date_created =  models.DateField('date_created', default=timezone.now)
     date_of_transfer = models.DateField('date_created', null=True, blank=True)
     location_from = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_from', null=True, blank=True)
     location_to = models.ForeignKey('deployment.Team_Assignment', on_delete=models.CASCADE, related_name='location_to', null=True, blank=True)
@@ -350,7 +350,7 @@ class Call_Back_K9(models.Model):
         ('Confirmed', 'Confirmed'),
         ('Returned', 'Returned'),
     )
-    date_created =  models.DateField('date_created', auto_now_add=True)
+    date_created =  models.DateField('date_created', default=timezone.now)
     k9 = models.ForeignKey(K9, on_delete=models.CASCADE, null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', choices=STATUS,max_length=100, default='Pending')
@@ -424,7 +424,7 @@ class Notification(models.Model):
     position = models.CharField('position', max_length=100, choices=POSITION, default="Administrator")
     message = models.CharField(max_length=200)
     viewed = models.BooleanField(default=False)
-    datetime = models.DateTimeField(auto_now_add=True)
+    datetime = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         super(Notification, self).save(*args, **kwargs)

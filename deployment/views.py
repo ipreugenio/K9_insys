@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption
 
 import random
 
@@ -310,9 +310,11 @@ def mass_populate_revisited():
     # generate_k9_incident()
     # generate_health_record()
     # generate_inventory_trail()
+    # generate_handler_incident()
+    generate_adoption()
 
     # generate_k9_due_retire()
-    generate_sick_breeding()
+    # generate_sick_breeding()
 
     #TEST
     # count = K9.objects.filter(source='Breeding').count()

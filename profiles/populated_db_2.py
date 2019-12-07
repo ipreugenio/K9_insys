@@ -6,7 +6,7 @@ from planningandacquiring.models import K9, K9_Supplier, Dog_Breed, K9_Mated, K9
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
     K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
-from training.models import Training, Training_Schedule, Training_History
+from training.models import Training, Training_Schedule, Training_History, K9_Adopted_Owner
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
 from deployment.models import Daily_Refresher
 
@@ -1618,9 +1618,10 @@ def generate_handler_incident():
     incident = ['Rescued People','Made an Arrest','Poor Performance','Violation']
     ta = Team_Assignment.objects.exclude(team_leader=None)
     k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
-    
+  
     for data in k9_sample:
         for i in range(5):
             start_date = datetime(2019,1,1)
@@ -1671,6 +1672,9 @@ def generate_k9_incident():
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
     
+    handler = User.objects.filter(position="Handler")
+    handler = list(handler)
+
     lost = ['Collar not properly put on', 'Leashed on a pole', 'Suddenly disappeared']
     stolen = ['Dognapped', 'Left with a stranger', 'Snatched']
 
@@ -1697,7 +1701,7 @@ def generate_k9_incident():
         elif k_inc == 'Accident':
             k_desc = random.choice(accident)
         if k_inc == 'Stolen' or k_inc == 'Lost':
-            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=handler)
         else:
             k_clinic = random.choice(clinic)
             K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler,clinic=k_clinic)
@@ -2516,6 +2520,62 @@ def generate_sick_breeding():
         K9_Litter.objects.create(mother=mom, father=dad,litter_no=born,litter_died=died)
 
 
+def generate_adoption():
+    
+    # 20 Adopted 
+    fake = Faker()
+    k9_list = K9.objects.all()
+    k9_list = list(k9_list)
+    sex_list = ['Male', 'Female']
+
+    start_date = datetime(2019,1,1)
+    end_date = datetime(2019,12,10)
+
+    # 10 returned
+    for i in range(10):
+        sex = random.choice(sex_list)
+        name = 'temp_name'
+        if sex == 'Female':
+            name = fake.first_name_female()
+        else:
+            name = fake.first_name_male()
+        middle_name = fake.last_name()
+        last_name = fake.last_name()
+        email = name+last_name+"@gmail.com"
+        birth_date = fake.date_between(start_date='-25y', end_date='now')
+        address = fake.address()
+        contact_no = "+63" + fake.msisdn()[:10]
+        reason = fake.paragraph(nb_sentences=1, variable_nb_sentences=True, ext_word_list=None)
+        k9 = random.choice(k9_list)
+        date_adopted = fake.date_between(start_date='-1y', end_date='now')
+        date_returned = fake.date_between(start_date=date_adopted, end_date='now')
+
+        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted,date_returned=date_returned,reason=reason)
+
+        print("Generate Returned" + str(i), k9)
+
+    for i in range(20):
+        sex = random.choice(sex_list)
+        name = 'temp_name'
+        if sex == 'Female':
+            name = fake.first_name_female()
+        else:
+            name = fake.first_name_male()
+        middle_name = fake.last_name()
+        last_name = fake.last_name()
+        email = name+last_name+"@gmail.com"
+        birth_date = fake.date_between(start_date='-25y', end_date='now')
+        address = fake.address()
+        contact_no = "+63" + fake.msisdn()[:10]
+        k9 = random.choice(k9_list)
+        date_adopted = fake.date_between(start_date='-1y', end_date='now')
+       
+
+        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
+
+        print("Generate Adopted" + str(i), k9)
+        
+  
 '''
 TODO
 
