@@ -157,52 +157,53 @@ def unitmanagement_notifs():
             h.status = 'Done'
             h.dog.status = 'Working Dog'
 
-    # TODO
-    # Handler on leave end_date is today
-    hi = Handler_Incident.objects.filter(status='Approved')
+    # Possibly Deprecated Code
+    # # TODO
+    # # Handler on leave end_date is today
+    # hi = Handler_Incident.objects.filter(status='Approved')
+    #
+    # for hi in hi:
+    #     if hi.date_to == date.today():
+    #         hi.status = 'Done'
+    #         hi.save()
+    #         # get handler and k9
+    #         h = User.objects.get(id=hi.handler.id)
+    #         k9 = K9.objects.get(id=hi.k9.id)
+    #         h.status = 'Working'
+    #         h.save()
+    #
+    #         if h.retain_last_handler == True:
+    #             k9.partnered = True
+    #             k9.handler = h
+    #             h.partnered = True
+    #
+    #             k9.save()
+    #             h.save()
 
-    for hi in hi:
-        if hi.date_to == date.today():
-            hi.status = 'Done'
-            hi.save()
-            # get handler and k9
-            h = User.objects.get(id=hi.handler.id)
-            k9 = K9.objects.get(id=hi.k9.id)
-            h.status = 'Working'
-            h.save()
-
-            if h.retain_last_handler == True:
-                k9.partnered = True
-                k9.handler = h
-                h.partnered = True
-
-                k9.save()
-                h.save()
-
-            try:
-                # where dog is deployed
-                td = Team_Dog_Deployed.objects.filter(k9=k9).latest()
-
-                try:
-                    # where location is updated
-                    ta = Team_Assignment.objects.get(id=td.team_assignment.id)
-
-                    # create new team dog
-                    Team_Dog_Deployed.objects.create(k9=k9, handler=h, team_assignment=ta,
-                                                     date_added=date.today())
-
-                    if k9.capability == 'EDD':
-                        ta.EDD_deployed = ta.EDD_deployed + 1
-                    elif k9.capability == 'NDD':
-                        ta.NDD_deployed = ta.NDD_deployed + 1
-                    elif k9.capability == 'SAR':
-                        ta.SAR_deployed = ta.SAR_deployed + 1
-
-                    ta.save()
-                except Team_Assignment.DoesNotExist:
-                    pass
-            except Team_Dog_Deployed.DoesNotExist:
-                pass
+            # try:
+            #     # where dog is deployed
+            #     td = Team_Dog_Deployed.objects.filter(k9=k9).last()
+            #
+            #     try:
+            #         # where location is updated
+            #         ta = Team_Assignment.objects.get(id=td.team_assignment.id)
+            #
+            #         # create new team dog
+            #         Team_Dog_Deployed.objects.create(k9=k9, handler=h, team_assignment=ta,
+            #                                          date_added=date.today())
+            #
+            #         if k9.capability == 'EDD':
+            #             ta.EDD_deployed = ta.EDD_deployed + 1
+            #         elif k9.capability == 'NDD':
+            #             ta.NDD_deployed = ta.NDD_deployed + 1
+            #         elif k9.capability == 'SAR':
+            #             ta.SAR_deployed = ta.SAR_deployed + 1
+            #
+            #         ta.save()
+            #     except Team_Assignment.DoesNotExist:
+            #         pass
+            # except Team_Dog_Deployed.DoesNotExist:
+            #     pass
 
             # TODO DEPLOYMENT NOTIFS
 
@@ -246,9 +247,19 @@ def tri_monthly_checkup():
 
     k9s = K9.objects.all()
     for k9 in k9s:
-        k9_phex = PhysicalExam.objects.filter(k9 = k9).latest('id')
-        delta = datetime.today().date() - k9_phex.date
-        if k9_phex.cleared == True and delta.days >= 90:  # 3 months
+        k9_phex = None
+        delta = 0
+        try:
+            k9_phex = PhysicalExam.objects.filter(dog = k9).last()
+            delta = datetime.today().date() - k9_phex.date
+        except:
+            pass
+
+        cleared = False
+        if k9_phex:
+            cleared = k9_phex.cleared
+
+        if cleared == True and delta.days >= 90:  # 3 months
             phex = K9_Schedule.objects.create(date_start = k9_phex.date + relativedelta(months=3), status = "Tri Monthly Checkup")
 
             Notification.objects.create(position='Handler', user=k9.handler, notif_type='handler_phex_scheduled',
@@ -265,7 +276,7 @@ def check_leave_window(is_emergency = False, handler = None):
     if is_emergency == True:
         leaves = Emergency_Leave.objects.filter(handler = handler).filter(status = "Ongoing")
     else:
-        leaves = Handler_On_Leave.objects.filter(status="Approved").filter(incident='On-Leave').filter(date_from__gte = today - timedelta(days=1))
+        leaves = Handler_On_Leave.objects.filter(status="Approved").filter(incident='On-Leave').filter(Q(date_from__lte = today - timedelta(days=1)), Q(date_to__gte = today + timedelta(days=1)))
 
     for leave in leaves:
         handler = leave.handler
@@ -313,12 +324,14 @@ def check_leave_window(is_emergency = False, handler = None):
         Team_Dog_Deployed.objects.create(team_assignment=handler_tdd.team_assignment, handler=handler, k9=k9,
                                          date_added=datetime.today().date(), status="Pending")
 
-        leave.status = "Done"
+        # leave.status = "Done"
+        leave.is_actioned = True
+        leave.save()
         if is_emergency == False:
             handler.status = "On-Leave"
             handler.save()
 
-
+    return None
 #@periodic_task(run_every=crontab(hour=12, minute=30))
 # def check_returning_from_leave():
 #     today = datetime.today().date()
@@ -417,27 +430,7 @@ def check_transfer():
 #
 #     return None
 
-#@periodic_task(run_every=crontab(hour=12, minute=30))
-# def check_transfers():
-#
-#     today = datetime.today().date()
-#     transfers = Request_Transfer.objects.filter(date_of_transfer__lte = today).filter(status = "Approved")
-#     for transfer in transfers:
-#         transfer.status = "Done"
-#         transfer.save()
-#
-#         k9 = K9.objects.filter(handler = transfer.handler).last()
-#         k9.assignment = transfer.location_to.team
-#         k9.save()
-#
-#         Team_Dog_Deployed.objects.create(k9=k9, handler=k9.handler, team_assignment=transfer.location_to,
-#                                          date_added=today, status = "Pending")
-#
-#         team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=k9).filter(team_assignment=transfer.location_from).latest('id')
-#         team_dog_deployed.date_pulled = today
-#         team_dog_deployed.save()
-#
-#     return None
+
 
 #@periodic_task(run_every=crontab(hour=12, minute=30))
 def check_lapsed_emergency_leaves():
@@ -485,8 +478,11 @@ def notif_on_recommended_phex_date():
         if adjusted_date <= datetime.today().date():
             phex_preset.append((item.k9, adjusted_date))
 
-    if len(phex_preset):
-        Notification.objects.create(position='Veterinarian', user=None, notif_type='recommended_phex_sched',
+    if len(phex_preset) > 0:
+        if Notification.objects.filter(position='Veterinarian', user=None, notif_type='recommended_phex_sched',
+                                message='You have ' + str(len(phex_preset)) + " K9s that will be deployed a week from now, schedule them for physical exam as soon as possible."
+                                       ).filter(datetime = datetime.today()).count() <= 0:
+            Notification.objects.create(position='Veterinarian', user=None, notif_type='recommended_phex_sched',
                                 message='You have ' + str(len(phex_preset)) + " K9s that will be deployed a week from now, schedule them for physical exam as soon as possible.")
 
     return None
@@ -501,6 +497,7 @@ def task_to_dash_um():
 
     # Check if there are ongoing leaves (both emergency and non-emergenc) Handlers become "On-leave" then k9s are assigned to TL temporarily
     check_leave_window()
+    check_leave_window(is_emergency=True)
 
     # Check if a transfer should be taking place
     check_transfer()

@@ -293,6 +293,7 @@ class Handler_On_Leave(models.Model):
     date_from = models.DateField('date_from', null=True, blank=True)
     date_to = models.DateField('date_to', null=True, blank=True)
     duration = models.IntegerField('duration', null=True, blank=True)
+    is_actioned = models.BooleanField('is_actioned', null=True, blank=True, default=False)
 
     def save(self, *args, **kwargs):
         days = self.date_to - self.date_from
@@ -372,6 +373,7 @@ class Emergency_Leave(models.Model):
     duration = models.IntegerField('duration', null=True, blank=True, default=0)
     status = models.CharField('status', choices=STATUS, max_length=100, default='Ongoing')
     reason = models.TextField('reason', max_length=200)
+    is_actioned = models.BooleanField('is_actioned', null=True, blank=True, default=False)
 
     def save(self, *args, **kwargs):
         if self.date_of_return !=None and self.date_of_leave != None:

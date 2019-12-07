@@ -44,11 +44,11 @@ from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,C
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
-from deployment.tasks import subtract_inventory, assign_TL
+from deployment.tasks import subtract_inventory, assign_TL, task_to_dash_dep
 
 from deployment.views import team_location_details, request_dog_details, mass_populate_revisited
 from unitmanagement.forms import EmergencyLeaveForm
-from unitmanagement.tasks import check_leave_window
+from unitmanagement.tasks import check_leave_window, task_to_dash_um
 
 # Create your views here.
 
@@ -325,7 +325,7 @@ def team_leader_dashboard(request):
 
     ki = None
     try:
-        k9 = K9.objects.get(handler = user)
+        k9 = K9.objects.filter(handler = user).last()
         ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(
         status='Pending').latest('id')
     except:pass
@@ -333,17 +333,17 @@ def team_leader_dashboard(request):
     
     ta = None
     try:
-        ta = Team_Assignment.objects.get(team_leader=user)
+        ta = Team_Assignment.objects.filter(team_leader=user).last()
     except: pass
 
     try:
         incident_count = Incidents.objects.filter(location=ta.location).count()
         tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(
-            date_pulled=None)  # only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
+            date_pulled=None).filter(handler__in = working_handlers)  # only currently deployed k9s | NOTE : tasks pull out k9s not confirmed within 5 days
         tdd_count = tdd.count()
 
         # NOTE: System checks every nth hours if handler arrival is confirmed, escalate to admin if not confirm (tasks.py)
-        for_arrival = tdd.filter(status="Pending").filter(handler__in = working_handlers)
+        for_arrival = tdd.filter(status="Pending")
     except: pass
 
 
@@ -451,7 +451,7 @@ def team_leader_dashboard(request):
             # NOTE: if this came from leave, transfer or init_dep:
             for handler in handlers_arrived:
                 try:
-                    deploy = Team_Dog_Deployed.objects.get(handler = handler).filter(status = "Pending").last()
+                    deploy = Team_Dog_Deployed.objects.ge(handler = handler).filter(status = "Pending").last()
                     deploy.status = "Deployed"
                     deploy.save()
 
@@ -544,11 +544,11 @@ def team_leader_dashboard(request):
 
     cb = None
     try:
-        cb = Call_Back_K9.objects.get(k9__handler=user)
+        cb = Call_Back_K9.objects.filter(k9__handler=user).last()
     except ObjectDoesNotExist:
         pass
 
-    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+    drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.today().date())
 
     if drf.exists():
         dr = 1
@@ -605,7 +605,7 @@ def check_pre_deployment_items(user):
     items_list = [False]
 
     all_clear = True
-    k9 = K9.objects.get(handler = user)
+    k9 = K9.objects.filter(handler = user).last()
 
     items_list = []
 
@@ -760,6 +760,7 @@ def handler_dashboard(request):
     try:
         k9 = K9.objects.get(handler=user)
         ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(k9=k9).filter(status='Pending').latest('id')
+
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     except: pass
@@ -822,11 +823,11 @@ def handler_dashboard(request):
         # TODO try except when k9 has finished training
 
         try:
-            training = Training.objects.get(k9=k9, training=k9.capability)
+            training = Training.objects.filter(k9=k9, training=k9.capability).last()
             if training.stage != "Finished Training":
                 # print("TRAINING STAGE")
                 # print(training.stage)
-                training_sched = Training_Schedule.objects.filter(stage=training.stage).get(k9=k9)
+                training_sched = Training_Schedule.objects.filter(stage=training.stage).filter(k9=k9).last()
 
                 # print("Training Sched")
                 # print(training_sched.date_start)
@@ -839,7 +840,7 @@ def handler_dashboard(request):
         except:
             pass
 
-        drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.now())
+        drf = Daily_Refresher.objects.filter(handler=user).filter(date=datetime.today().date())
 
         if drf.exists():
             dr = 1
@@ -938,7 +939,7 @@ def handler_dashboard(request):
 
     cb = None
     try:
-        cb = Call_Back_K9.objects.get(k9__handler=user)
+        cb = Call_Back_K9.objects.filter(k9__handler=user).last()
     except ObjectDoesNotExist:
         pass
 
@@ -1002,7 +1003,7 @@ def vet_dashboard(request):
     k9_exclude_list = [] #Does not need to be
     for k9 in k9_list:
         try:
-            checkup = PhysicalExam.objects.filter(dog=k9).latest('id')  # TODO Also check if validity is worth 3 months
+            checkup = PhysicalExam.objects.filter(dog=k9).last()  # TODO Also check if validity is worth 3 months
             delta = datetime.today().date() - checkup.date
             if checkup.cleared == True and delta.days <= 90: #3 months
                 k9_exclude_list.append(k9)
@@ -1315,7 +1316,7 @@ def vet_dashboard(request):
 
     ab = None
     try:
-        ab = Actual_Budget.objects.get(year_budgeted__year=datetime.today().year)
+        ab = Actual_Budget.objects.filter(year_budgeted__year=datetime.today().year).last()
 
         aq = K9.objects.filter(date_created__year=datetime.today().year).count()
 
@@ -1449,8 +1450,8 @@ def operations_dashboard(request):
             location.latitude = lat
 
             serial = request.session['session_serial']
-            account = Account.objects.get(serial_number=serial)
-            user_in_session = User.objects.get(id=account.UserID.id)
+            account = Account.objects.filter(serial_number=serial).last()
+            user_in_session = User.objects.filter(id=account.UserID.id).last()
 
 
             if location.sector_type != "Disaster":
@@ -1529,10 +1530,10 @@ def profile(request):
     serial = request.session['session_serial']
     # print(serial)
 
-    account = Account.objects.get(serial_number=serial)
-    user = User.objects.get(id = account.UserID.id)
-    p_info = Personal_Info.objects.get(UserID=user)
-    e_info = Education.objects.get(UserID=user)
+    account = Account.objects.filter(serial_number=serial).last()
+    user = User.objects.filter(id = account.UserID.id).last()
+    p_info = Personal_Info.objects.filter(UserID=user).last()
+    e_info = Education.objects.filter(UserID=user).last()
 
     # print(account.UserID.position)
 
@@ -1550,7 +1551,7 @@ def profile(request):
                     if uform.status == 'No Longer Employed':
                         uform.partnered = False
                         try:
-                            k9 = K9.objects.get(handler=uform)
+                            k9 = K9.objects.filter(handler=uform).last()
                             k9.handler = None
                             k9.save()
                         except:
@@ -1598,7 +1599,7 @@ def register(request):
 def home(request):
     id = request.user.id
 
-    user = User.objects.get(id =id)
+    user = User.objects.filter(id =id).last()
 
     request.session["session_serial"] = request.user.username
     request.session["session_user_position"] = user.position
@@ -1621,7 +1622,10 @@ def logout(request):
     return redirect('profiles:login')
 
 def login(request):
+
     if request.method == 'POST':
+        task_to_dash_dep()
+        task_to_dash_um()
         serial = request.POST['serial_number']
         password = request.POST['password']
         # user_auth = authenticate(request, username=serial, password=password)
@@ -1629,8 +1633,8 @@ def login(request):
 
         # auth_login(request, user_auth)
         request.session["session_serial"] = serial
-        account = Account.objects.get(serial_number = serial)
-        user = User.objects.get(id = account.UserID.id)
+        account = Account.objects.filter(serial_number = serial).last()
+        user = User.objects.filter(id = account.UserID.id).last()
 
         request.session["session_user_position"] = user.position
         request.session["session_id"] = user.id
@@ -1704,7 +1708,7 @@ def add_personal_info(request):
         if form.is_valid():
             personal_info = form.save(commit=False)
             UserID = request.session["session_userid"]
-            user_s = User.objects.get(id=UserID)
+            user_s = User.objects.filter(id=UserID).last()
             personal_info.UserID = user_s
             personal_info.save()
             '''style = "ui green message"
@@ -1716,7 +1720,7 @@ def add_personal_info(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user_s = User.objects.get(id=request.session["session_userid"])
+    user_s = User.objects.filter(id=request.session["session_userid"]).last()
     user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1740,7 +1744,7 @@ def add_education(request):
         if form.is_valid():
             personal_info = form.save(commit=False)
             UserID = request.session["session_userid"]
-            user_s = User.objects.get(id=UserID)
+            user_s = User.objects.filter(id=UserID).last()
             personal_info.UserID = user_s
             personal_info.save()
             '''style = "ui green message"
@@ -1752,7 +1756,7 @@ def add_education(request):
             style = "ui red message"
             messages.warning(request, 'Invalid input data!')
 
-    user_s = User.objects.get(id=request.session["session_userid"])
+    user_s = User.objects.filter(id=request.session["session_userid"]).last()
     user_name = str(user_s)
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1775,7 +1779,7 @@ def add_user_account(request):
     style = ""
 
     UserID = request.session["session_userid"]
-    data = User.objects.get(id=UserID)
+    data = User.objects.filter(id=UserID).last()
 
     if request.method == 'POST':
         if form.is_valid():
@@ -1834,7 +1838,7 @@ def user_listview(request):
         status = request.POST.get('status_input')
         handler_id = request.POST.get('id_input')
 
-        u = User.objects.get(id=handler_id)
+        u = User.objects.filter(id=handler_id).last()
         u.retire_quit_died = date
         u.partnered = False
         u.assigned = False
@@ -1845,7 +1849,7 @@ def user_listview(request):
         u.save()
 
         try:
-            k = K9.objects.get(handler=u)
+            k = K9.objects.filter(handler=u).last()
             k.handler = None
             k.save()
         except:
@@ -1867,10 +1871,10 @@ def user_listview(request):
 
 #Detailview format
 def user_detailview(request, id):
-    user_s = User.objects.get(id = id)
-    personal_info = Personal_Info.objects.get(UserID = id)
-    education = Education.objects.get(UserID=id)
-    account = Account.objects.get(UserID=id)
+    user_s = User.objects.filter(id = id).last()
+    personal_info = Personal_Info.objects.filter(UserID = id).last()
+    education = Education.objects.filter(UserID=id).last()
+    account = Account.objects.filter(UserID=id).last()
 
     #NOTIF SHOW
     notif_data = notif(request)
@@ -1911,7 +1915,7 @@ def load_event(request):
 
     dog_request = None
     try:
-        dog_request = Dog_Request.objects.get(id = id)
+        dog_request = Dog_Request.objects.filter(id = id).last()
     except: pass
 
     context = {
@@ -1926,7 +1930,7 @@ def load_event_handler(request):
     # print(id)
     sched = None
     try:
-        sched = K9_Schedule.objects.get(id = id)
+        sched = K9_Schedule.objects.filter(id = id).last()
     except: pass
     context = {
       'sched' : sched
