@@ -84,8 +84,8 @@ class MyDictionary(dict):
 
 def notif(request):
     serial = request.session['session_serial']
-    account = Account.objects.get(serial_number=serial)
-    user_in_session = User.objects.get(id=account.UserID.id)
+    account = Account.objects.filter(serial_number=serial).last()
+    user_in_session = User.objects.filter(id=account.UserID.id).last()
 
     if user_in_session.position == 'Veterinarian':
         notif = Notification.objects.filter(position='Veterinarian').order_by('-datetime')
@@ -99,12 +99,12 @@ def notif(request):
 
 def user_session(request):
     serial = request.session['session_serial']
-    account = Account.objects.get(serial_number=serial)
-    user_in_session = User.objects.get(id=account.UserID.id)
+    account = Account.objects.filter(serial_number=serial).last()
+    user_in_session = User.objects.filter(id=account.UserID.id).last()
     return user_in_session
 
 def index(request):
-    d = Daily_Refresher.objects.get(id=4)
+    d = Daily_Refresher.objects.filter(id=4).last()
     # CAUTION : Only run this once
     #Only uncomment this if you are populating db
     context = {
@@ -1102,11 +1102,11 @@ def request_dog_details(request, id):
     return render(request, 'deployment/request_dog_details.html', context)
 
 def remove_dog_request(request, id):
-    pull_k9 = Team_Dog_Deployed.objects.get(id=id)
-    k9 = K9.objects.get(id=pull_k9.k9.id)
-    dog_request = Dog_Request.objects.get(id=pull_k9.team_requested.id)
+    pull_k9 = Team_Dog_Deployed.objects.filter(id=id).last()
+    k9 = K9.objects.filter(id=pull_k9.k9.id).last()
+    dog_request = Dog_Request.objects.filter(id=pull_k9.team_requested.id).last()
 
-    sched = K9_Schedule.objects.get(Q(k9 = k9) & Q(dog_request = dog_request))
+    sched = K9_Schedule.objects.filter(Q(k9 = k9) & Q(dog_request = dog_request)).last()
     sched.delete()
 
     #change Team_Dog_Deployed model
@@ -1155,7 +1155,7 @@ def view_schedule(request, id):
 
     date_now = datetime.date.today()
 
-    k9 = K9.objects.get(id = id)
+    k9 = K9.objects.filter(id = id).last()
 
 
     #NOTIF SHOW
@@ -1177,7 +1177,7 @@ def deployment_area_details(request):
 
     data = None
     try:
-        data = Team_Assignment.objects.get(team_leader=user)
+        data = Team_Assignment.objects.filter(team_leader=user).last()
     except:
          pass
 
@@ -1190,7 +1190,7 @@ def deployment_area_details(request):
 
     mn = []
     for td in tdd:
-        pi = Personal_Info.objects.get(UserID=td.handler)
+        pi = Personal_Info.objects.filter(UserID=td.handler).last()
         mn.append(pi.mobile_number)
 
     data_list = zip(tdd, mn)
@@ -1225,10 +1225,10 @@ def add_incident(request):
     # print("USER SERIAL")
     # print(user_serial)
 
-    user = Account.objects.get(serial_number=user_serial)
-    current_user = User.objects.get(id=user.UserID.id)
+    user = Account.objects.filter(serial_number=user_serial).last()
+    current_user = User.objects.filter(id=user.UserID.id).last()
 
-    ta = Team_Assignment.objects.get(team_leader=current_user)
+    ta = Team_Assignment.objects.filter(team_leader=current_user).last()
 
 
     form.initial['date'] = date.today()
@@ -1286,7 +1286,7 @@ def choose_date(request):
 
 def fou_details(request):
     user = user_session(request)
-    data = Team_Assignment.objects.get(team_leader=user)
+    data = Team_Assignment.objects.filter(team_leader=user).last()
 
     tdd = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
 
@@ -1315,7 +1315,7 @@ def daily_refresher_form(request):
     user = user_session(request)
     k9 = None
     try:
-        k9 = K9.objects.get(handler=user)
+        k9 = K9.objects.filter(handler=user).last()
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     form = DailyRefresherForm(request.POST or None)
@@ -1378,7 +1378,7 @@ def daily_refresher_form(request):
 
 #TODO: this
 def incident_detail(request, id):
-    incident = Incidents.objects.get(id = id)
+    incident = Incidents.objects.filter(id = id).last()
     title = "Incident Detail View"
 
 
@@ -1438,7 +1438,7 @@ def choose_location(request):
         location_incident_count_list.append(incident_count)
         maritime_count = Maritime.objects.filter(location=location).count()
         location_maritime_count_list.append(maritime_count)
-        team = Team_Assignment.objects.get(location = location)
+        team = Team_Assignment.objects.filter(location = location).last()
         location_list.append(location)
         team_list.append(team)
 
@@ -1467,7 +1467,7 @@ def load_units(request):
     selected_list = []
 
     location_id = request.GET.get('location')
-    location = Location.objects.get(id = location_id)
+    location = Location.objects.filter(id = location_id).last()
 
     # filter personal_info where city != Team_Assignment.city
     handlers = Personal_Info.objects.exclude(city=location.city)
@@ -1478,7 +1478,7 @@ def load_units(request):
 
     capability_blacklist = []
 
-    team = Team_Assignment.objects.get(location=location)
+    team = Team_Assignment.objects.filter(location=location).last()
 
     sar_count_select = 0
     ndd_count_select = 0
@@ -1562,10 +1562,10 @@ def load_units_selected(request): #Note : Maybe we can use a db solution for thi
 
     try:
         location_id = request.GET.get('location')
-        location = Location.objects.get(id=location_id)
+        location = Location.objects.filter(id=location_id).last()
 
         for item in fullstring.values():
-            k9 = K9.objects.get(id=item)
+            k9 = K9.objects.filter(id=item).last()
             k9_list.append(k9)
             k9_list_id.append(k9.id)
 
@@ -1583,7 +1583,7 @@ def load_units_selected(request): #Note : Maybe we can use a db solution for thi
 
     except:
         for item in fullstring.values():
-            k9 = K9.objects.get(id=item)
+            k9 = K9.objects.filter(id=item).last()
             k9_list.append(k9)
             k9_list_id.append(k9.id)
 
@@ -1800,7 +1800,7 @@ def schedule_units(request):
         location_incident_list_count.append(maritimes.count())
         location_maritime_list_count.append(incidents.count())
 
-        team = Team_Assignment.objects.get(location=location)
+        team = Team_Assignment.objects.filter(location=location).last()
         location_list.append(location)
         team_list.append(team)
 
@@ -2073,10 +2073,10 @@ def transfer_request(request, k9_id, team_assignment_id, location_id):
     #TODO check if date of transfer has conflict
     #TODO if unit is transferring, prompt commander/operations if he wants to replace units assigned to a request
 
-    k9 = K9.objects.get(id = k9_id)
-    team = Team_Assignment.objects.get(id = team_assignment_id) #Current Team
-    location = Location.objects.get(id = location_id)  #Location to transfer to (user input)
-    team_to_transfer = Team_Assignment.objects.get(location = location) #Team to transfer to
+    k9 = K9.objects.filter(id = k9_id).last()
+    team = Team_Assignment.objects.filter(id = team_assignment_id).last() #Current Team
+    location = Location.objects.filter(id = location_id).last()  #Location to transfer to (user input)
+    team_to_transfer = Team_Assignment.objects.filter(location = location).last() #Team to transfer to
 
     can_transfer = 0
 

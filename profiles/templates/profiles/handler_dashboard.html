@@ -102,9 +102,9 @@
                                 <div class="extra content">
                                     <strong>
                                         {% if current_port is not None %}
-                                            <a href="{% url 'deployment:team_location_details' current_port.id %}">CURRENT ASSIGNMENT</a>
+                                            <a href="{% url 'deployment:team_location_details' current_port.id %}">CURRENT ASSIGNMENT (PORT)</a>
                                         {% elif current_request is not None %}
-                                            <a href="{% url 'deployment:request_dog_details' current_request.id %}">CURRENT ASSIGNMENT</a>
+                                            <a href="{% url 'deployment:request_dog_details' current_request.id %}">CURRENT ASSIGNMENT (REQUEST)</a>
                                         {% else %}
                                             <a href="#">CURRENT ASSIGNMENT</a>
                                         {% endif %}

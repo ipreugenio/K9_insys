@@ -301,11 +301,11 @@ def check_initial_dep_arrival():
     for item in deployed:
         k9 = item.k9
 
-        pre_dep = K9_Pre_Deployment_Items.objects.get(k9=k9)
+        pre_dep = K9_Pre_Deployment_Items.objects.filter(k9=k9).last()
         initial_sched = pre_dep.initial_sched
         delta = initial_sched.date_start - datetime.today().date()
 
-        if delta.days > 5: #TODO Escalate first to admin rather than straight up MIA agad
+        if delta.days > 5:
             item.date_pulled = datetime.today().date()
             k9.training_status = "MIA"
             k9.save()
@@ -326,7 +326,7 @@ def check_initial_dep_arrival():
 def update_request_info(dog_request):
 
     try:
-        request = Dog_Request.objects.get(id = dog_request.id)
+        request = Dog_Request.objects.filter(id = dog_request.id).last()
         deployed = Team_Dog_Deployed.objects.filter(team_requested = request).count()
         request.k9s_deployed = deployed
         request.save()
@@ -345,30 +345,45 @@ def update_request_info(dog_request):
 # @periodic_task(run_every=timedelta(seconds=30))
 def deploy_dog_request():
     # When Schedule is today, change training status to deployed
-    scheds = K9_Schedule.objects.filter(date_start=date.today()).filter(status = "Request").exclude(dog_request = None)
+    scheds = K9_Schedule.objects.filter(date_start__lte=date.today()).filter(status = "Request").exclude(dog_request = None)
 
     for sched in scheds: #per k9
         if sched.dog_request.status == "Approved":
             # sched.k9.training_status = 'Deployed'
             # sched.k9.save()
+            dr = sched.dog_request
+            dr.status = "Ongoing"
+            dr.save()
 
             # temporarily pull out from port
-            recent_port_deploy = Team_Dog_Deployed.objects.filter(team_requested=sched.dog_request).filter(date_pulled=None).latest('date_added')
+            recent_port_deploy = Team_Dog_Deployed.objects.exclude(team_assignment = None).filter(date_pulled=None).latest('date_added')
             recent_port_deploy.date_pulled = datetime.today().date()
+
+            assign_TL(recent_port_deploy.team_assignment)
+
             recent_port_deploy.save()
 
+            # Create new Team Dog Deployed
             if Team_Dog_Deployed.objects.filter(k9 = sched.k9, team_requested = sched.dog_request, status="Pending").count() == 0:
                 deploy = Team_Dog_Deployed.objects.create(k9 = sched.k9, team_requested = sched.dog_request, status="Pending")
+
+            # Turn everyone in schedule into a handler
             handler = sched.k9.handler
             handler.position = "Handler"
             handler.save()
+
+            # Update request info assigns a new handler based on who is currently assigned
             update_request_info(sched.dog_request)
             tl = sched.dog_request.team_leader
 
+            # TL position is assigned to handler that is set in update_request_info
             try:
-                handler_to_tl = User.objects.get(id = tl.id)
+                handler_to_tl = User.objects.filter(id = tl.id).last()
                 handler_to_tl.position = "Team Leader"
                 handler_to_tl.save()
+
+                Notification.objects.create(position='Team Leader', user=handler_to_tl, notif_type='TL_handler_into_TL',
+                                            message='You are the Team Leader for this request.')
             except: pass
 
 
@@ -380,11 +395,11 @@ def deploy_dog_request():
 # @periodic_task(run_every=timedelta(seconds=30))
 def pull_dog_request():
 
-    requests = Dog_Request.objects.filter(end_date__gt = date.today()).filter(status = "Approved")
+    requests = Dog_Request.objects.filter(end_date__lt = date.today()).filter(status = "Approved")
 
     for request in requests:
         try:
-            deployed = Team_Dog_Deployed.objects.filter(date_pulled = None).get(team_requested = request)
+            deployed = Team_Dog_Deployed.objects.filter(date_pulled = None).filter(team_requested = request).last()
             deployed.date_pulled = date.today()
             deployed.save()
 
@@ -397,6 +412,7 @@ def pull_dog_request():
 
             #TODO Create Team_Dog_Deployed for last port assignment
             recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).latest('date_pulled')
+            assign_TL(recent_port.team_assignment)
 
             if Team_Dog_Deployed.objects.filter(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending").count() == 0:
                 new_deploy = Team_Dog_Deployed.objects.create(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending")
@@ -423,10 +439,12 @@ def check_arrival_to_request(dog_request):
 #Every nth hour, check if arrival is confirmed by checking if Team_Dog_deployed status is still pending after 5 days after recent request date pull
 def check_arrival_to_ports_via_request(team_assignment):
 
-    deployed = Team_Dog_Deployed.objects.filter(team_assignment=team_assignment)
-    recent_request_deployment = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_request=None).filter(date_pulled = None).latest('date_pulled')
+    # TODO deployed queryset has no k9 attribute
+    deployed = Team_Dog_Deployed.objects.filter(team_assignment=team_assignment).exclude(date_pulled = None)
+
     today = datetime.today().date()
     for item in deployed:
+        recent_request_deployment = Team_Dog_Deployed.objects.filter(k9=item.k9).exclude(team_requested=None).filter(date_pulled=None).last()
         delta = today - recent_request_deployment.date
         if item.status == "Pending" and delta.days > 5:
             deployed.date_pulled = date.today()
@@ -465,7 +483,7 @@ def notify_if_port_has_only_one_unit():
 
     for team in teams:
         if Notification.objects.filter(position='Administrator', user=None, notif_type='admin_port_has_one_unit',
-                                    message=str(team) + " has only one unit deployed, consider deploying more units as soon as possible.", datetime = datetime.now()).count == 0:
+                                    message=str(team) + " has only one unit deployed, consider deploying more units as soon as possible.", datetime__date = datetime.today().date()).count == 0:
             Notification.objects.create(position='Administrator', user=None, notif_type='admin_port_has_one_unit',
                                     message=str(team) + " has only one unit deployed, consider deploying more units as soon as possible.")
 
