@@ -34,7 +34,7 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, \
     PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, \
-    Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request, Temporary_Handler, Emergency_Leave
+    Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request, Temporary_Handler, Emergency_Leave, Call_Back_Handler
 
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
@@ -43,7 +43,7 @@ from training.models import K9_Handler, Training_History,Training_Schedule, Trai
 from training.forms import assign_handler_form
 
 from deployment.tasks import update_port_info
-from deployment.templatetags.index import current_team
+# from deployment.templatetags.index import current_team
 
 # Create your views here.
 
@@ -222,7 +222,10 @@ def redirect_notif(request, id):
         notif.viewed = True
         notif.save()
         return redirect('profiles:team_leader_dashboard')
-
+    elif notif.notif_type == 'handler_k9_death':
+        notif.viewed = True
+        notif.save()
+        return redirect('profiles:handler_dashboard')
 
 
 def index(request):
@@ -1812,11 +1815,22 @@ def k9_incident_list(request):
         handler.partnered = False
 
         handler.save()
+
+        tdd = Team_Dog_Deployed.objects.filter(k9 = k9).filter(date_pulled = None).last()
+        if tdd:
+            tdd.date_pulled =  datetime.today().date()
+            tdd.save()
+            current_port = current_team(k9)
+            update_port_info([current_port.id])
+        Call_Back_Handler.objects.create(handler = handler)
+        Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
+                                    message='Your K9 is now deceased. You are required to report back to main base.')
+
         ki.status = 'Done'
         ki.save()
         k9.handler = None
         k9.save()
-        messages.success(request,  str(k9) +' Died...')
+        messages.success(request,  str(k9) +' is now Deceased...')
 
     elif request.method=='POST' and 'recovered' in request.POST:
         i = request.POST['id_val']
@@ -1957,7 +1971,7 @@ def k9_retreived(request, id):
     messages.success(request, 'K9 retrieval has been confirmed and data has been updated!')
     return redirect('unitmanagement:k9_incident_list')
 
-def k9_accident(request, id=None):
+def k9_accident(request, id=None): #Line 1967
     accident = request.GET.get('accident')
     data = K9_Incident.objects.get(id=id)
     data.status = 'Done'
@@ -1980,6 +1994,17 @@ def k9_accident(request, id=None):
 
         k9.handler = None
         handler.save()
+
+        tdd = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).last()
+        if tdd:
+            tdd.date_pulled = datetime.today().date()
+            tdd.save()
+            current_port = current_team(k9)
+            update_port_info([current_port.id])
+        Call_Back_Handler.objects.create(handler=handler)
+        Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
+                                    message='Your K9 is now deceased. You are required to report back to main base.')
+
         k9.save()
 
     if request.method == 'POST':
@@ -1998,9 +2023,17 @@ def k9_accident(request, id=None):
 
         h = User.objects.get(id=k9.handler.id)
         h.partnered = False
-
-
         k9.handler= None
+
+        tdd = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).last()
+        if tdd:
+            tdd.date_pulled = datetime.today().date()
+            tdd.save()
+            current_port = current_team(k9)
+            update_port_info([current_port.id])
+        Call_Back_Handler.objects.create(handler=h)
+        Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
+                                    message='Your K9 is now deceased. You are required to report back to main base.')
 
         k9.save()
         h.save()
@@ -2044,9 +2077,9 @@ def handler_incident_form(request):
     form = HandlerIncidentForm(request.POST or None)
     style='ui green message'
     try:
-        data = Team_Assignment.objects.get(team_leader=user)
+        data = Team_Assignment.objects.filter(team_leader=user).last()
 
-        team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed')
+        team = Team_Dog_Deployed.objects.filter(team_assignment=data).filter(status='Deployed').exclude(date_pulled = None)
         handler = []
         for team in team:
             handler.append(team.handler.id)
@@ -2064,6 +2097,9 @@ def handler_incident_form(request):
             f.k9 = b
             # handler = None
 
+            k9_td = team.filter(k9 = b)
+
+
             handler = User.objects.get(id = b.handler.id)
 
             if f.incident == 'Died':
@@ -2072,26 +2108,39 @@ def handler_incident_form(request):
                 handler.assigned = False
                 b.handler = None
 
-                if b.capability == "SAR":
-                    data.SAR_deployed -= 1
-                if b.capability == "NDD":
-                    data.NDD_deployed -= 1
-                else:
-                    data.EDD_deployed -= 1
+                # if b.capability == "SAR":
+                #     data.SAR_deployed -= 1
+                # if b.capability == "NDD":
+                #     data.NDD_deployed -= 1
+                # else:
+                #     data.EDD_deployed -= 1
+                #
+                # data.total_dogs_deployed -= 1
+                # data.save()
 
-                data.total_dogs_deployed -= 1
-                data.save()
+                k9_td.date_pulled = datetime.today().date()
+                k9_td.save()
+
+                Temporary_Handler.objects.create(k9=b, original=handler, temp=data.team_leader,
+                                                 date_given=datetime.today().date())
             elif f.incident == 'MIA':
-                handler.status = 'MIA'
-                handler.partnered = False
-                handler.assigned = False
-                b.handler = None
+                # handler.status = 'MIA'
+                # handler.partnered = False
+                # handler.assigned = False
+                # b.handler = None
+                b.training_status = "MIA"
+                k9_td.date_pulled = datetime.today().date()
+                k9_td.save()
+
+                Temporary_Handler.objects.create(k9=b, original=handler, temp=data.team_leader,
+                                                 date_given=datetime.today().date())
                 # if MIA, kasama ba ang aso?
 
             handler.save()
             b.save()
             f.save()
 
+            update_port_info([data.id])
 
             style = "ui green message"
             messages.success(request, 'Incident has been successfully Reported!')
@@ -2281,11 +2330,23 @@ def reassign_assets(request, id):
             #Handler Update
             h = User.objects.get(id= f.handler.id)
             h.partnered = True
+            h.assigned = True
             h.save()
 
             #K9 Update
             k = K9.objects.get(id=f.k9.id)
             k.handler=h
+
+            try:
+                temp_handler = Temporary_Handler.objects.filter(k9 = k).last()
+                if temp_handler:
+                    if temp_handler.date_returned == None:
+                        temp_handler.date_returned = datetime.today().date()
+                        temp_handler.save()
+                        Temporary_Handler.objects.create(k9=k, original=h, temp=temp_handler.temp,
+                                                         date_given=datetime.today().date())
+            except: pass
+
             k.save()
 
             Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
@@ -2876,7 +2937,7 @@ def k9_unpartnered_list(request):
     style=''
 
     # data = K9.objects.filter(handler=None) #removed for deployment
-    data = K9.objects.filter(status='Working Dog').filter(handler=None).count()
+    data = K9.objects.filter(status='Working Dog').filter(handler=None)
     # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW
@@ -4135,7 +4196,7 @@ def load_item_misc(request):
 
 def current_team(K9):
 
-    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment=None).latest('id')
+    team_dog_deployed = Team_Dog_Deployed.objects.filter(k9=K9).exclude(team_assignment=None).last()
     team_assignment = None
 
     print("TEAM DOG DEPLOYED")
@@ -4201,7 +4262,7 @@ def k9_mia_list(request):
     k9_list = []
 
     for km in k9_mia:
-        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).exclude(date_pulled=None).latest('date_pulled')
+        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).filter(date_pulled=None).latest('date_pulled')
 
         loc = None
         if tdd.team_assignment != None:
@@ -4233,10 +4294,20 @@ def k9_mia_change(request,id):
 
     k9 = K9.objects.get(id=id)
     if status == 'missing':
-        k9.status = 'Missing'
-        k9.training_status = 'Missing'
+        temp_handler = Temporary_Handler.objects.filter(k9 = k9).last()
+        if temp_handler:
+            if temp_handler.date_returned == None:
+                # temp_handler.date_returned = datetime.today().date()
+                # temp_handler.save()
+                pass
+            else:
+                k9.status = 'Missing'
+                k9.training_status = 'Missing'
+        k9.handler = None
         handler = k9.handler
-        handler.status = "Missing"
+        handler.status = "MIA"
+        handler.partnered = False
+        handler.assigned = False
         handler.save()
         k9.save()
 
@@ -4254,7 +4325,7 @@ def k9_mia_change(request,id):
         Notification.objects.create(position='Handler', user=k9.handler, notif_type='handler_mia_to_port',
                                     message="Your have been deployed back to your most recent port.")
 
-        team = current_team(k9, None)
+        team = current_team(k9)
         Notification.objects.create(position='Team Leader', user=team.team_leader, notif_type='TL_mia_to_port',
                                     message="Your team member(" + str(k9.handler) + "), has been deployed back to your port.")
 
@@ -4314,44 +4385,44 @@ def replenishment_form(request):
     return render (request, 'unitmanagement/replenishment_form.html', context)
 
 
-def k9_accident(request, id=None):
-    accident = request.GET.get('accident')
-    data = K9_Incident.objects.get(id=id)
-    data.status = 'Done'
-    data.save()
-
-    k9 = K9.objects.get(id=data.k9.id)
-
-    if accident == 'recovered':
-        k9.status = 'Working Dog'
-        messages.success(request, 'K9 has recovered!')
-        k9.save()
-    elif accident == 'Died':
-        k9.status = 'Dead'
-        k9.training_status = 'Dead'
-        messages.success(request, 'K9 is deceased..')
-        k9.save()
-
-    if request.method == 'POST':
-        data2 = K9_Incident.objects.get(id=id)
-        data2.status = 'Done'
-        data2.save()
-
-        dc = request.POST['death_cert']
-        dd = request.POST['date_died']
-
-        k9 = K9.objects.get(id=data.k9.id)
-        k9.status = 'Dead'
-        k9.training_status = 'Dead'
-        k9.death_cert = dc
-        k9.death_date = dd
-
-        h = User.objects.get(id=k9.handler.id)
-        h.partnered = False
-        h.save()
-
-        k9.handler = None
-        k9.save()
-
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
+# def k9_accident(request, id=None): #Line 4362
+#     accident = request.GET.get('accident')
+#     data = K9_Incident.objects.get(id=id)
+#     data.status = 'Done'
+#     data.save()
+#
+#     k9 = K9.objects.get(id=data.k9.id)
+#
+#     if accident == 'recovered':
+#         k9.status = 'Working Dog'
+#         messages.success(request, 'K9 has recovered!')
+#         k9.save()
+#     elif accident == 'Died':
+#         k9.status = 'Dead'
+#         k9.training_status = 'Dead'
+#         messages.success(request, 'K9 is now deceased..')
+#         k9.save()
+#
+#     if request.method == 'POST':
+#         data2 = K9_Incident.objects.get(id=id)
+#         data2.status = 'Done'
+#         data2.save()
+#
+#         dc = request.POST['death_cert']
+#         dd = request.POST['date_died']
+#
+#         k9 = K9.objects.get(id=data.k9.id)
+#         k9.status = 'Dead'
+#         k9.training_status = 'Dead'
+#         k9.death_cert = dc
+#         k9.death_date = dd
+#
+#         h = User.objects.get(id=k9.handler.id)
+#         h.partnered = False
+#         h.save()
+#
+#         k9.handler = None
+#         k9.save()
+#
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+#

@@ -263,6 +263,9 @@ def check_initial_deployment_dates():
 
                     k9.training_status = "Deployed"
                     k9.assignment = str(team)
+                    handler = k9.handler
+                    handler.assigned = True
+                    handler.save()
                     k9.save()
                     deploy = Team_Dog_Deployed.objects.create(k9=k9, status="Pending", team_assignment=team)
                     deploy.save()

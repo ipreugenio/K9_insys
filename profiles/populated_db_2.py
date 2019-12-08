@@ -1053,6 +1053,10 @@ def generate_k9():
                     team.EDD_deployed += 1
                 team.save()
                 k9.assignment = team.team
+                k9.training_status = "Deployed"
+                handler = k9.handler
+                handler.assigned = True
+                handler.save()
                 k9.save()
                 print(str(k9) + " is deployed to " + str(team))
 

@@ -40,7 +40,8 @@ from deployment.forms import GeoForm, GeoSearch, RequestForm, MaritimeForm
 from profiles.forms import add_User_form, add_personal_form, add_education_form, add_user_account_form, CheckArrivalForm
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
-    K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler, Handler_On_Leave, Handler_Incident, K9_Incident
+    K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler, \
+    Handler_On_Leave, Handler_Incident, K9_Incident, Call_Back_Handler
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -335,6 +336,8 @@ def team_leader_dashboard(request):
     try:
         ta = Team_Assignment.objects.filter(team_leader=user).last()
     except: pass
+
+    dog_request = None
 
     try:
         incident_count = Incidents.objects.filter(location=ta.location).count()
@@ -940,6 +943,12 @@ def handler_dashboard(request):
     except ObjectDoesNotExist:
         pass
 
+    cb_handler = None
+    try:
+        cb_handler = Call_Back_Handler.objects.filter(handler = user).filter(status = "Pending").last()
+    except:
+        pass
+
     emergency_leave_count = Emergency_Leave.objects.filter(handler = user).filter(status = "Ongoing").count()
 
     # print("Show Start")
@@ -976,10 +985,9 @@ def handler_dashboard(request):
         'current_request' : current_request,
         'upcoming_deployment' : upcoming_deployment,
 
-        'ki' : ki,
-
         'emergency_leave_form' : emergency_leave_form,
-        'emergency_leave_count' : emergency_leave_count
+        'emergency_leave_count' : emergency_leave_count,
+        'cb_handler' : cb_handler
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 
