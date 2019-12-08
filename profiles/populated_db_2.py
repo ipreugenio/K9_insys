@@ -893,8 +893,13 @@ def generate_k9():
         training_k9_list.append(k9)
 
     training_k9_sample = random.sample(training_k9_list, int(len(training_k9_list) * .80))
+    last_stage_k9_sample = random.sample(training_k9_sample, int(len(training_k9_sample) * .10))
 
     for k9 in training_k9_sample:
+        exclude_k9 = False
+        if k9 in last_stage_k9_sample:
+            exclude_k9 = True
+
         #create training history
         fake_date = fake.date_between(start_date='-5y', end_date='today')
         Training_History.objects.create(k9=k9,handler=k9.handler,date=fake_date)
@@ -908,7 +913,7 @@ def generate_k9():
 
             remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
 
-            train_sched = Training_Schedule.objects.get(k9 = k9) #Because we have 1 instance of this per k9 instance
+            train_sched = Training_Schedule.objects.filter(k9 = k9).last() #Because we have 1 instance of this per k9 instance at the start
             train_sched.date_start = training_start_alpha
             train_sched.date_end = training_start_alpha + timedelta(days=20)
 
@@ -938,9 +943,10 @@ def generate_k9():
                 elif idx == 8:
                     stage = "Stage 3.3"
 
-                sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-                train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
-                                                                date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
+                if exclude_k9 == False and idx != 8:
+                    sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                    train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+                                                                    date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
                 # train_sched.save()
 
             training.stage1_1 = grade_list[0]
@@ -953,22 +959,26 @@ def generate_k9():
 
             training.stage3_1 = grade_list[6]
             training.stage3_2 = grade_list[7]
-            training.stage3_3 = grade_list[8]
+
+            start_date = datetime(2019, 1, 1)
+            end_date = datetime(2019, 12, 31)
+            f_date = fake.date_between(start_date=start_date, end_date=end_date)
+
+            if exclude_k9 == False:
+                training.stage3_3 = grade_list[8]
+                training.stage = "Finished Training"
+                training.date_finished = f_date
+
+                k9.training_status = 'Trained'
+                k9.training_level = "Finished Training"
+                k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+                k9.trained = "Trained"
+                k9.save()
 
             training.remarks = remark
-            training.stage = "Finished Training"
-            
-            start_date = datetime(2019,1,1)
-            end_date = datetime(2019,12,31)
-            f_date = fake.date_between(start_date=start_date, end_date=end_date)
-            training.date_finished = f_date
             training.save()
 
-            k9.training_status = 'Trained'
-            k9.training_level = "Finished Training"
-            k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
-            k9.trained = "Trained"
-            k9.save()
+
             print("Created Training for " + str(k9))
         except:
             pass
@@ -2578,8 +2588,30 @@ def generate_adoption():
         K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
 
         print("Generate Adopted" + str(i), k9)
-        
-  
+
+def fix_dog_duplicates():
+
+    k9s = K9.objects.all()
+
+    k9_list = []
+    for k9 in k9s:
+        k9_list.append(k9.name)
+
+    # Get unique names
+    k9_list = list(set(k9_list))
+
+    for item in k9_list:
+        k9s = K9.objects.filter(name = item)
+        ctr = 1
+        if k9s.count() > 1:
+            for k9 in k9s:
+                k9.name = k9.name + " " + str(ctr)
+                k9.save()
+                print(str(k9.name))
+                ctr += 1
+
+    return None
+
 '''
 TODO
 
@@ -2588,7 +2620,6 @@ Create Parents (Use For-Breeding K9s)
 Create Litter
 Create K9_mated
 Create Health (Specially for K9s that have reach deployment/breeding decision)
-
 
 VaccineUsed Record for Procured K9s (Date of vaccination lang kailangan + Name of Diseases)4 diseases
 Remove handlers on For-Breeding K9s, then status is unpartnered

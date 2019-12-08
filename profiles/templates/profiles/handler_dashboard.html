@@ -39,6 +39,34 @@
                   {% endif %}
                   {% endif %}
 
+                <!--{% if cb_handler %}-->
+                 <!--{%if cb_handler.status == 'Pending' %}-->
+                <!--<div class="ui info message">-->
+
+                    <!--<div class="header">-->
+                      <!--<i></i>-->
+                        <!--YOU HAVE BEEN CALLED BACK TO BASE!-->
+                        <!--<a href="{% url 'unitmanagement:confirm_going_back_handler' cb_handler.id %}" class="ui orange small button">Confirm</a>-->
+                    <!--</div>-->
+                    <!--<ul class="list">-->
+                      <!--<li>Please confirm that-->
+                          <!--you have received the message and will return at your most earliest-->
+                          <!--convenient time. </li>-->
+                    <!--</ul>-->
+                  <!--</div>-->
+                  <!--{% elif cb.status == 'Confirmed'%}-->
+                  <!--<div class="ui info icon message">-->
+                      <!--<i class="exclamation icon"></i>-->
+                      <!--<div class="content">-->
+                        <!--<div class="header">-->
+                            <!--Admin is awaiting your arrival back to base.-->
+                        <!--</div>-->
+                      <!--</div>-->
+                  <!--</div>-->
+                  <!--{% else %}-->
+                  <!--{% endif %}-->
+                <!--{% endif %}-->
+
                 {% if k9 %}
 
                     <div class="ui three column grid">

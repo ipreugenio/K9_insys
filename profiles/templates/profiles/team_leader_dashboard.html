@@ -66,13 +66,21 @@
               </div>
               <div class="column">
                   <div class="ui raised segment">
-                      <strong>Team</strong>
-
+                      {% if ta %}
+                      <strong>Current Team (Port)</strong>
                       <a href="{% url 'deployment:team_location_details' ta.id %}"><p> {{ta.team}}</p></a>
+
+                      {% elif dog_req %}
+                      <strong>Current Team (Request)</strong>
+                      <a href="{% url 'deployment:request_dog_details' dr.id %}"><p> {{dr}}</p></a>
+                      {% endif %}
+
                     </div>
                 </div>
           </div>
          </div>
+
+            {% if ta %}
             <div class="eight wide column">
               <div class="ui raised segment">
                 <div class="ui two statistics">
@@ -81,7 +89,7 @@
                       {{ta.total_dogs_deployed}}
                     </div>
                     <div class="label">
-                      K9 Assigned in Area
+                      K9s Assigned in Area
                     </div>
                   </div>
                   <div class="purple statistic">
@@ -96,6 +104,11 @@
                   <canvas id="myChart2" height="110" ></canvas>
               </div>
             </div>
+            {% elif dog_req %}
+
+            {% endif %}
+
+            {% if ta %}
             <div class="eight wide column">
               <div class="ui raised segment">
                   <div class="ui horizontal statistics">
@@ -111,6 +124,9 @@
                   <canvas id="myChart" height="110" ></canvas>
               </div>
             </div>
+            {% elif dog_req %}
+
+            {% endif %}
 
             <div class="sixteen wide column">
                 <div class="ui raised segment">
@@ -191,9 +207,17 @@
                       <div id = "calendar" style="margin-top:0%;"></div>
                   </div>
 
-                  {% if k9 %}
+
+
+                    {% if ta %}
                   <h4>Port</h4>
                   <p>{{ta.location}}</p>
+                    {% elif dog_req  %}
+                    <h4>Request</h4>
+                  <p>{{dog_req.location}}</p>
+                    {% endif %}
+
+                    {% if k9 %}
                  <strong>K9 : {{k9}}</strong>
 
             <div class="ui styled fluid accordion">

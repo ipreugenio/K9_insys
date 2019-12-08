@@ -117,4 +117,5 @@ urlpatterns = [
 
     path('replenishment_confirm/ajax_load_replenishment', views.load_replenishment, name='load_replenishment'),
 
+    # path('returning_handlers_list', views.returning_handlers_list, name ='returning_handlers_list'),
 ];

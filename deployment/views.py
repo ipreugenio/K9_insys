@@ -294,27 +294,29 @@ def check_handlers_with_multiple_k9s():
 
 def mass_populate_revisited():
     # GENERAL & DEPLOYMENT
-    # generate_user()
-    # create_teams()
-    # generate_k9()
-    # generate_dogbreed()
-    # create_predeployment_inventory()
-    # generate_k9_parents()
+    generate_user()
+    create_teams()
+    generate_k9()
+    generate_dogbreed()
+    create_predeployment_inventory()
+    generate_k9_parents()
 
-    # generate_requests()
+    generate_requests()
 
     # UNIT MANAGEMENT
-    # generate_location_incident()
-    # generate_handler_leave()
-    # generate_daily_refresher()
-    # generate_k9_incident()
-    # generate_health_record()
-    # generate_inventory_trail()
-    # generate_handler_incident()
+    generate_location_incident()
+    generate_handler_leave()
+    generate_daily_refresher()
+    generate_k9_incident()
+    generate_health_record()
+    generate_inventory_trail()
+    generate_handler_incident()
     generate_adoption()
 
-    # generate_k9_due_retire()
-    # generate_sick_breeding()
+    generate_k9_due_retire()
+    generate_sick_breeding()
+
+    fix_dog_duplicates()
 
     #TEST
     # count = K9.objects.filter(source='Breeding').count()
@@ -821,7 +823,7 @@ def request_dog_details(request, id):
 
     # get instance of user using personal_info.id
     # id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave")
+    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave").exclude(status = 'No Longer Employed').exclude(status = 'Retired').exclude('Died').exclude('MIA')
 
     user_deploy = []  # append the user itself
     for u in user:
@@ -830,7 +832,7 @@ def request_dog_details(request, id):
     # print("Viable User Ids")
     # print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
-    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed')
+    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed').filter(status = 'Working Dog')
         # .filter(assignment='None')
 
     # print("can_deploy_by_handler")
