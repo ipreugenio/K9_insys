@@ -116,5 +116,7 @@ urlpatterns = [
     path('k9_accident_death_handler', views.k9_accident_death_handler, name ='k9_accident_death_handler'),
 
     path('replenishment_confirm/ajax_load_replenishment', views.load_replenishment, name='load_replenishment'),
+    
+    path('mia_fou/<int:id>', views.mia_fou, name ='mia_fou'),
 
 ];

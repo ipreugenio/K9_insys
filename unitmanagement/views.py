@@ -1565,7 +1565,7 @@ def trained_list(request):
     #finished training data
     ts =[]
     for d in data:
-        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.3')
+        a = Training_Schedule.objects.filter(k9=d).get(stage='Stage 3.2')
         ts.append(a.date_end.date())
      
         
@@ -2410,7 +2410,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
 
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).exclude(id__in=cb_list).order_by('year_retired')
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
 
     cb_conf = Call_Back_K9.objects.filter(status='Confirmed')
     cb_pend = Call_Back_K9.objects.filter(status='Pending')
@@ -3917,7 +3917,7 @@ def load_k9_data(request):
     try:
         k9_id = request.GET.get('id')
         k9 = K9.objects.get(id=k9_id)
-        remarks = Training_Schedule.objects.filter(k9=k9).exclude(stage = "Stage 0")
+        remarks = Training_Schedule.objects.filter(k9=k9)
         h_count = Health.objects.filter(dog=k9).count()
         health = Health.objects.filter(dog=k9)
         train = Training.objects.filter(k9=k9).get(training=k9.capability)
@@ -4382,6 +4382,24 @@ def k9_mia_change(request,id):
     messages.success(request, 'You have updated K9 unit status.')
     return redirect('unitmanagement:k9_mia_list')
 
+def mia_fou(request,id):
+    cb = Call_Back_K9.objects.filter(id=id).last()
+    k9  = K9.objects.filter(id=cb.k9.id).last()
+    handler = User.objects.filter(id=cb.handler.id).last()
+
+    handler.status = "MIA"
+    handler.assigned = False
+    k9.status = "Missing"
+    k9.training_status = "Missing"
+    k9.assignment = "None"
+    
+    k9.save()
+    handler.save()
+    cb.delete()
+    style = "ui red message"
+    messages.success(request, 'Feild Unit status is now Missing.')
+    return redirect ('unitmanagement:due_retired_list')
+    
 # #unitmanagement views.py
 # #CHANGE REPLENISHMENT FORM
 # def replenishment_form(request):

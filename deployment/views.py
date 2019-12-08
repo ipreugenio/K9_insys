@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption, create_supplier, generate_grading
 
 import random
 
@@ -294,13 +294,16 @@ def check_handlers_with_multiple_k9s():
 
 def mass_populate_revisited():
     # GENERAL & DEPLOYMENT
+    # create_supplier()
+    # generate_dogbreed()
+    
     # generate_user()
     # create_teams()
     # generate_k9()
-    # generate_dogbreed()
-    # create_predeployment_inventory()
-    # generate_k9_parents()
 
+    # create_predeployment_inventory()
+    # generate_inventory_trail()
+    # generate_k9_parents()
     # generate_requests()
 
     # UNIT MANAGEMENT
@@ -309,14 +312,17 @@ def mass_populate_revisited():
     # generate_daily_refresher()
     # generate_k9_incident()
     # generate_health_record()
-    # generate_inventory_trail()
     # generate_handler_incident()
-    generate_adoption()
+    # generate_adoption()
+    # generate_grading()
 
-    # generate_k9_due_retire()
+    generate_k9_due_retire()
     # generate_sick_breeding()
 
-    #TEST
+    #TEST   
+    k9 = K9.objects.filter(status='Due-For-Retirement')
+    for k9 in k9:
+        print(k9.training_status)
     # count = K9.objects.filter(source='Breeding').count()
     # k9 = K9.objects.filter(source='Breeding')
 

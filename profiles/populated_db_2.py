@@ -391,6 +391,14 @@ def create_predeployment_inventory():
     print("Generated inventory items")
     return None
 
+# START CREATE SUPPLIERS
+def create_supplier():
+    fake = Faker()
+    for x in range(12):
+        contact = "+63" + fake.msisdn()[:10]
+        sup = K9_Supplier.objects.create(name=fake.name(), organization=fake.company(), address=fake.address(),contact_no=contact)
+        print('K9 SUPPLIER - ', sup)
+
 def create_teams():
     fake = Faker()
     CITY = (
@@ -791,15 +799,7 @@ def generate_k9():
         ("100", "100"),
     )
 
-    # START CREATE SUPPLIERS
     suppliers = K9_Supplier.objects.all()
-    if suppliers.count() == 0:
-        for x in range(0, 12):
-            contact = "+63" + fake.msisdn()[:10]
-            supplier = K9_Supplier.objects.create(name=fake.name(), organization=fake.company(), address=fake.address(),
-                                                  contact_no=contact)
-            supplier.save()
-        suppliers = K9_Supplier.objects.all()
     # END CREATE SUPPLIERS
 
     # START CREATE PROCURED K9S
@@ -912,9 +912,16 @@ def generate_k9():
             train_sched.date_start = training_start_alpha
             train_sched.date_end = training_start_alpha + timedelta(days=20)
 
+            stage_o =Training_Schedule.objects.filter(stage='Stage 0').last()
+            stage_o.date_start = training_start_alpha + timedelta(days=20 * 3 + 1)
+            stage_o.date_end = training_start_alpha + timedelta(days=20 * idx + 2)
+            stage_o.remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            stage_o.save()
+            
+
             grade_list = []
             stage = "Stage 0"
-            for idx in range(9):
+            for idx in range(8):
                 randomizer = random.randint(0, 5)
                 grade = GRADE[randomizer][0]
                 grade_list.append(grade)
@@ -935,9 +942,7 @@ def generate_k9():
                     stage = "Stage 3.1"
                 elif idx == 7:
                     stage = "Stage 3.2"
-                elif idx == 8:
-                    stage = "Stage 3.3"
-
+               
                 sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
                 train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
                                                                 date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
@@ -966,7 +971,6 @@ def generate_k9():
 
             k9.training_status = 'Trained'
             k9.training_level = "Finished Training"
-            k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
             k9.trained = "Trained"
             k9.save()
             print("Created Training for " + str(k9))
@@ -1875,8 +1879,6 @@ def generate_k9_parents():
         ts = Training_Schedule.objects.filter(k9=k9).last()
         dur_train = random.randint(20,40)
         t_date = s_date + timedelta(days=dur_train) 
-
-        ts.stage = 'Stage 1.1'
         ts.date_start = s_date
         ts.date_end = t_date
         ts.remarks = remark
@@ -1921,12 +1923,8 @@ def generate_k9_parents():
             if i == 6:
                 # Stage 3.2
                 Training_Schedule.objects.create(k9=k9,stage='Stage 3.2',date_start=ss_date,date_end=t_date,remarks=remarks)
-            if i == 7:
-                # Stage 3.3
-                Training_Schedule.objects.create(k9=k9,stage='Stage 3.3',date_start=ss_date,date_end=t_date,remarks=remarks)
 
-
-        final_date = Training_Schedule.objects.filter(k9=k9).filter(stage='Stage 3.3').last()
+        final_date = Training_Schedule.objects.filter(k9=k9).filter(stage='Stage 3.2').last()
         train.date_finished = final_date.date_end 
         train.save()
 
@@ -2439,7 +2437,7 @@ def generate_k9_parents():
 
 def generate_k9_due_retire():
     fake = Faker()
-    k9_c = K9.objects.filter(training_status='Deployed').exclude(handler=None).exclude(assignment=None)
+    k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment=None)
 
     k9_list = list(k9_c)
 
@@ -2525,18 +2523,67 @@ def generate_sick_breeding():
 
 
 def generate_adoption():
-    
-    # 20 Adopted 
     fake = Faker()
-    k9_list = K9.objects.all()
-    k9_list = list(k9_list)
+    
     sex_list = ['Male', 'Female']
+    color_list = ['Black','Yellow','Chocolate','Dark Golden','Light Golden','Cream','Golden','Brindle','Silver Brindle','Gold Brindle','Salt and Pepper','Gray Brindle','Blue and Gray','Tan','Black-Tipped Fawn','Mahogany','White','Black and White','White and Tan']
+    skill_list = ['EDD', 'NDD', 'SAR']
 
-    start_date = datetime(2019,1,1)
-    end_date = datetime(2019,12,10)
+    breed_list = Dog_Breed.objects.all().values_list('breed', flat=True).distinct()
+    breed_list = list(breed_list)
 
-    # 10 returned
-    for i in range(10):
+    supplier_list = K9_Supplier.objects.all().values_list('id', flat=True).distinct()
+    supplier_list = list(supplier_list)
+    supplier_id = random.choice(supplier_list)
+    supplier = K9_Supplier.objects.filter(id=supplier_id).last()
+
+    #CREATE K9 FAILED
+    for i in range(30):
+        #Create offspring
+        start_date = datetime(2018,1,1)
+        end_date = datetime(2019,2,20)
+    
+        b_date = fake.date_between(start_date='-2y', end_date='-1y')
+        color = random.choice(color_list)
+        sex = random.choice(sex_list)
+        name = 'temp name'
+
+        if sex == 'Male':
+            name = fake.first_name_male()
+        elif sex == 'Female':
+            name = fake.first_name_female()
+
+        weight = random.randint(30, 50)
+        height = random.randint(60, 80)
+        cap = random.choice(skill_list)
+        breed = random.choice(breed_list)
+        
+        k9 = K9.objects.create(name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',training_level='Stage 1.1',capability=cap,trained='Failed',weight=weight,height=height,supplier=supplier)
+        k9.training_status = 'For-Adoption'
+        k9.save()
+        
+        dur = random.randint(40,100)
+        date_start = fake.date_between(start_date=start_date, end_date=end_date)
+        date_end = fake.date_between(start_date=date_start, end_date=(date_start+timedelta(days=dur)))
+        
+    
+        tr = Training.objects.filter(k9=k9,training=cap).last()
+        ts = Training_Schedule.objects.filter(k9=k9).last()
+
+        ts.stage = 'Stage 1.1'
+        ts.date_start = date_start
+        ts.date_end = date_end
+        ts.remarks = 'Poor Performance'
+
+        tr.stage = 'Stage 1.1 Failed'
+        tr.date_finished = date_end
+
+        tr.save()
+        ts.save()
+    
+    k9_adopt = K9.objects.filter(training_status = 'For-Adoption')
+    
+    for i, k9 in enumerate(k9_adopt):
         sex = random.choice(sex_list)
         name = 'temp_name'
         if sex == 'Female':
@@ -2546,40 +2593,193 @@ def generate_adoption():
         middle_name = fake.last_name()
         last_name = fake.last_name()
         email = name+last_name+"@gmail.com"
-        birth_date = fake.date_between(start_date='-25y', end_date='now')
+        birth_date = fake.date_between(start_date='-30y', end_date='-25y')
         address = fake.address()
         contact_no = "+63" + fake.msisdn()[:10]
-        reason = fake.paragraph(nb_sentences=1, variable_nb_sentences=True, ext_word_list=None)
-        k9 = random.choice(k9_list)
         date_adopted = fake.date_between(start_date='-1y', end_date='now')
         date_returned = fake.date_between(start_date=date_adopted, end_date='now')
-
-        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted,date_returned=date_returned,reason=reason)
-
-        print("Generate Returned" + str(i), k9)
-
-    for i in range(20):
-        sex = random.choice(sex_list)
-        name = 'temp_name'
-        if sex == 'Female':
-            name = fake.first_name_female()
-        else:
-            name = fake.first_name_male()
-        middle_name = fake.last_name()
-        last_name = fake.last_name()
-        email = name+last_name+"@gmail.com"
-        birth_date = fake.date_between(start_date='-25y', end_date='now')
-        address = fake.address()
-        contact_no = "+63" + fake.msisdn()[:10]
-        k9 = random.choice(k9_list)
-        date_adopted = fake.date_between(start_date='-1y', end_date='now')
-       
-
-        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
-
-        print("Generate Adopted" + str(i), k9)
+        reason = fake.paragraph(nb_sentences=1, variable_nb_sentences=True, ext_word_list=None)
+        # 20 Adopted 
+        if i < 20:
+            K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
+            k9.training_status = 'Adopted'
+            k9.status = 'Adopted'
+            k9.save()
+            print("Generate Adopted" + str(i), k9)      
         
-  
+        # 10 Returned 
+        if i > 20:
+            K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted,date_returned=date_returned,reason=reason)
+            print("Generate Returned" + str(i), k9)
+
+def generate_grading():
+    fake = Faker()
+    
+    sex_list = ['Male', 'Female']
+    color_list = ['Black','Yellow','Chocolate','Dark Golden','Light Golden','Cream','Golden','Brindle','Silver Brindle','Gold Brindle','Salt and Pepper','Gray Brindle','Blue and Gray','Tan','Black-Tipped Fawn','Mahogany','White','Black and White','White and Tan']
+    skill_list = ['EDD', 'NDD', 'SAR']
+
+    handler_list = User.objects.filter(position='Handler').filter(partnered=False).filter(assigned=False)
+    handler = list(handler_list)
+
+    breed_list = Dog_Breed.objects.all().values_list('breed', flat=True).distinct()
+    breed_list = list(breed_list)
+
+    supplier_list = K9_Supplier.objects.all().values_list('id', flat=True).distinct()
+    supplier_list = list(supplier_list)
+    supplier_id = random.choice(supplier_list)
+    supplier = K9_Supplier.objects.filter(id=supplier_id).last()
+
+    grade_list = ['75','80','85','90','95','100']
+    #CREATE K9 FAILED
+    for i in range(11):
+        print(i)
+        #Create offspring
+        start_date = datetime(2018,1,1)
+        end_date = datetime(2019,2,20)
+    
+        b_date = fake.date_between(start_date='-2y', end_date='-1y')
+        color = random.choice(color_list)
+        sex = random.choice(sex_list)
+        name = 'temp name'
+
+        if sex == 'Male':
+            name = fake.first_name_male()
+        elif sex == 'Female':
+            name = fake.first_name_female()
+
+        weight = random.randint(30, 50)
+        height = random.randint(60, 80)
+        cap = random.choice(skill_list)
+        breed = random.choice(breed_list)
+        
+        #K9 on stage 3.1
+        if i < 5:
+            han_c = random.choice(handler)
+            k9 = K9.objects.create(handler=han_c,name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',capability=cap,weight=weight,height=height,supplier=supplier)
+            k9.training_status = 'On-Training'
+            k9.training_level = 'Stage 2.3'
+            k9.save()    
+            han_c.partnered = True
+            han_c.save()
+
+            train = Training.objects.filter(k9=k9).filter(training=k9.capability).last()
+            train.stage = 'Stage 2.3'
+            train.stage1_1 = random.choice(grade_list)
+            train.stage1_2 = random.choice(grade_list)
+            train.stage1_3 = random.choice(grade_list)
+            train.stage2_1 = random.choice(grade_list)
+            train.stage2_2 = random.choice(grade_list)
+            train.stage2_3 = random.choice(grade_list)
+            train.save()
+            
+            ts = Training_Schedule.objects.filter(k9=k9).last()
+
+            dur_train = random.randint(20,40)
+            ts.date_start = fake.date_between(start_date=b_date, end_date=b_date+timedelta(days=300))
+            ts.date_end = fake.date_between(start_date=ts.date_start, end_date=ts.date_start+timedelta(days=dur_train))
+            ts.remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            ts.save()
+
+            t_date = ts.date_end
+            
+            print(k9,' - Stage 3.1 For Grading')
+            #CREATE TRAINING SCHED
+            for i in range(6):
+                dur_train = random.randint(20,40)
+                ss_date = t_date
+                t_date = t_date + timedelta(days=dur_train)
+                remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                
+                if i == 0:
+                    # Stage 1.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 1:
+                    # Stage 1.3
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 2:
+                    # Stage 2.1
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 3:
+                    # Stage 2.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 4:
+                    # Stage 2.3
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 5:
+                    # Stage 3.1
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+
+        #K9 on stage 3.3
+        if i > 5:
+            han_c = random.choice(handler)
+            k9 = K9.objects.create(handler=han_c,name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',capability=cap,weight=weight,height=height,supplier=supplier)
+            k9.training_status = 'On-Training'
+            k9.training_level = 'Stage 3.2'
+            k9.save()    
+            han_c.partnered = True
+            han_c.save()
+
+            train = Training.objects.filter(k9=k9).filter(training=k9.capability).last()
+            train.stage = 'Stage 3.2'
+            train.stage1_1 = random.choice(grade_list)
+            train.stage1_2 = random.choice(grade_list)
+            train.stage1_3 = random.choice(grade_list)
+            train.stage2_1 = random.choice(grade_list)
+            train.stage2_2 = random.choice(grade_list)
+            train.stage2_3 = random.choice(grade_list)
+            train.stage3_1 = random.choice(grade_list)
+            train.stage3_2 = random.choice(grade_list)
+            train.save()
+            ts = Training_Schedule.objects.filter(k9=k9).last()
+
+            dur_train = random.randint(20,40)
+            ts.date_start = fake.date_between(start_date=b_date, end_date=b_date+timedelta(days=300))
+            ts.date_end = fake.date_between(start_date=ts.date_start, end_date=ts.date_start+timedelta(days=dur_train))
+            ts.remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            ts.save()
+
+            t_date = ts.date_end
+            
+            #CREATE TRAINING SCHED
+            print(k9,' - Stage 3.3 For Grading')
+            for i in range(8):
+                dur_train = random.randint(20,40)
+                ss_date = t_date
+                t_date = t_date + timedelta(days=dur_train)
+                remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+                
+                if i == 0:
+                    # Stage 1.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 1:
+                    # Stage 1.3
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 2:
+                    # Stage 2.1
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 1.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 3:
+                    # Stage 2.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 4:
+                    # Stage 2.3
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 5:
+                    # Stage 3.1
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 2.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 6:
+                    # Stage 3.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 3.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+                if i == 7:
+                    # Stage 3.2
+                    Training_Schedule.objects.create(k9=k9,stage='Stage 3.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+
+    
+def generate_item_request():
+    pass
+
+
+
 '''
 TODO
 
