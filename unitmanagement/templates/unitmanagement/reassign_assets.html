@@ -82,22 +82,24 @@
 <script>
 
     $('#tabledata').DataTable({
-    "order": [[ 2, "desc" ]]
+    "order": [[ 3, "desc" ]]
     });
 
     $("input[name='handler']").change(function () {
-    var url = 'ajax_load_handler';  // get the url of the `load_handler` view
-    var handlerId = $("input[name='handler']:checked"). val(); // get the selected handler ID from the HTML input
 
-    $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-handler/)
-        data: {
-        'handler': handlerId       // add the handler id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_handler` view function
-        $("#id_handler_data").html(data);  // replace the contents of the #id_handler_data input with the data that came from the server
-        }
-    });
+        var url = 'ajax_load_handler';  // get the url of the `load_handler` view
+        var handlerId = $("input[name='handler']:checked"). val(); // get the selected handler ID from the HTML input
+
+        $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-handler/)
+            data: {
+            'handler': handlerId       // add the handler id to the GET parameters
+            },
+            success: function (data) {   // `data` is the return of the `load_handler` view function
+            $("#id_handler_data").html(data);  // replace the contents of the #id_handler_data input with the data that came from the server
+            }
+        });
+    
 
     });
 

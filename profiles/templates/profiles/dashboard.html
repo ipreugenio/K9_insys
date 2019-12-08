@@ -131,6 +131,24 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="column">
+                            <div class="ui raised center aligned segment">
+                                <div style="margin-left: 25%;">
+                                    <span style="color: red;">Retire Due</span> |
+                                    <span style="color: orange;">Returning</span>
+                                </div>
+                                <div class="ui small statistic">
+                                    <div class="value">
+                                        <i class="yellow hourglass end icon"></i>
+                                        <i class="red icon">{{due_retire}}</i>
+                                        <i class="orange icon">{{cb_conf_count}}</i>
+                                    </div>
+                                    <div class="label">
+                                            <a href="{% url 'unitmanagement:due_retired_list'%}">RETIREMENT</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="column">
                             <div class="ui raised center aligned segment">
                                     <div class="ui small statistic">
@@ -140,7 +158,7 @@
                                     </div>
                                     <div class="label">
 
-                                            <a href="{% url 'unitmanagement:replenishment_confirm' %}">ITEM REPLENISHMENT REQUESTS</a>
+                                            <a href="{% url 'unitmanagement:replenishment_confirm' %}">PENDING ITEM REPLENISHMENT REQUESTS</a>
 
                                     </div>
                                 </div>

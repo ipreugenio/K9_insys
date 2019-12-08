@@ -1,6 +1,8 @@
 {% extends "profiles/sidebar_reports.html" %} {% block content %}
 {% load humanize %}
 {% load um_tags %}
+{% load static %}
+{% load staticfiles %}
 <div>
 
 {% if ab %}
@@ -11,7 +13,7 @@
   <div class="ui bottom attached active tab segment" data-tab="first" >
       <div id="printableArea1">
         <center>
-                <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+                <br><img src="{% static 'images/k9_logo.png' %}" width="150">
                 <br>Philippine Coast Guard
                 <br>Maritime Security Command
                     <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
@@ -369,7 +371,7 @@
     <div id="printableArea1">
 
     <center>
-            <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+            <br><img src="{% static 'images/k9_logo.png' %}" width="150">
             <br>Philippine Coast Guard
             <br>Maritime Security Command
                 <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>
@@ -736,7 +738,7 @@
 
 <div id = 'printableArea3'>
 <center>
-        <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Philippine_Coast_Guard_%28PCG%29.svg/220px-Philippine_Coast_Guard_%28PCG%29.svg.png" width="100">
+        <br><img src="{% static 'images/k9_logo.png' %}" width="150">
         <br>Philippine Coast Guard
         <br>Maritime Security Command
             <br><b>HEADQUARTERS COAST GUARD K9 FORCE</b>

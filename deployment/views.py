@@ -19,7 +19,7 @@ import re
 import sys
 from datetime import date
 
-from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave
+from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave, VaccinceRecord
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account, Education
@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption
 
 import random
 
@@ -293,22 +293,42 @@ def check_handlers_with_multiple_k9s():
     return None
 
 def mass_populate_revisited():
+    # GENERAL & DEPLOYMENT
     # generate_user()
     # create_teams()
     # generate_k9()
-    # generate_requests()
     # generate_dogbreed()
-
     # create_predeployment_inventory()
-    # generate_inventory_trail()
-
-    # generate_daily_refresher()
-    # generate_location_incident()
-  
-    # generate_handler_leave()
-    generate_k9_incident()
-    # generate_health_record()
     # generate_k9_parents()
+
+    # generate_requests()
+
+    # UNIT MANAGEMENT
+    # generate_location_incident()
+    # generate_handler_leave()
+    # generate_daily_refresher()
+    # generate_k9_incident()
+    # generate_health_record()
+    # generate_inventory_trail()
+    # generate_handler_incident()
+    generate_adoption()
+
+    # generate_k9_due_retire()
+    # generate_sick_breeding()
+
+    #TEST
+    # count = K9.objects.filter(source='Breeding').count()
+    # k9 = K9.objects.filter(source='Breeding')
+
+    # l = list(k9)
+    # vr = VaccinceRecord.objects.filter(k9__in=l)
+
+    # print('COUNT',count)
+    # print('K9',k9)
+    # print('Vaccine')
+    # for vr in vr:
+    #     print(vr.status)
+
 
     return None
 

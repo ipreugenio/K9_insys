@@ -2,17 +2,18 @@ from faker import Faker
 import random
 from datetime import timedelta, datetime, date
 from profiles.models import User, Account, Personal_Info, Education
-from planningandacquiring.models import K9, K9_Supplier, Dog_Breed
+from planningandacquiring.models import K9, K9_Supplier, Dog_Breed, K9_Mated, K9_Parent, K9_Litter
 from deployment.models import Area, Location, Dog_Request, Incidents, Maritime, Team_Assignment, K9_Pre_Deployment_Items, \
     K9_Schedule, Team_Dog_Deployed
 from django.contrib.auth.models import User as AuthUser
-from training.models import Training, Training_Schedule, Training_History
+from training.models import Training, Training_Schedule, Training_History, K9_Adopted_Owner
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine, Food_Received_Trail, Food_Subtracted_Trail, Food_Inventory_Count, Medicine_Received_Trail, Medicine_Subtracted_Trail, Medicine_Inventory_Count, Miscellaneous_Received_Trail, Miscellaneous_Subtracted_Trail, Miscellaneous_Inventory_Count
 from deployment.models import Daily_Refresher
 
-from unitmanagement.models import PhysicalExam, Handler_Incident, K9_Incident, Health, HealthMedicine, Handler_On_Leave, Emergency_Leave
+from unitmanagement.models import PhysicalExam, Handler_Incident, K9_Incident, Health, HealthMedicine, Handler_On_Leave, Emergency_Leave, Handler_K9_History, VaccinceRecord, VaccineUsed
 from itertools import groupby
 
+from dateutil.relativedelta import *
 from deployment.tasks import assign_TL
 from django.db.models import Q
 import re
@@ -881,6 +882,7 @@ def generate_k9():
 
         user.partnered = True
         user.save()
+        Handler_K9_History.objects.create(handler=user,k9=k9)
         print("Assigned Handler " + str(user) + " to " + str(k9))
     # END ASSIGN HANDLER
 
@@ -991,6 +993,8 @@ def generate_k9():
             k9 = K9.objects.get(id=id)
             k9.training_status = "For-Deployment"
             k9.status = "Working Dog"
+            sn = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.serial_number = sn
             k9.birth_date = k9.birth_date - timedelta(days = 2190)
             k9.save()
             print(str(k9) + " is now For-Deployment")
@@ -998,6 +1002,7 @@ def generate_k9():
             pass
 
     for id in for_breeding_k9_sample:
+        #For BREEDING age is now 6yrs old
         try:
             k9 = K9.objects.get(id=id)
             k9.training_status = "For-Breeding"
@@ -1005,6 +1010,9 @@ def generate_k9():
             handler = k9.handler
             k9.handler = None
             handler.partnered = False
+            k9.birth_date = fake.date_between(start_date="-6y", end_date="-6y")
+            sn = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+            k9.serial_number = sn
             k9.save()
             print(str(k9) + " is now For-Breeding")
         except:
@@ -1052,6 +1060,8 @@ def generate_k9():
                 elif k9.capability == "EDD":
                     team.EDD_deployed += 1
                 team.save()
+                k9.training_status = 'Deployed'
+                k9.status = 'Working Dog' 
                 k9.assignment = team.team
                 k9.training_status = "Deployed"
                 handler = k9.handler
@@ -1461,11 +1471,14 @@ def generate_inventory_trail():
 
 def generate_daily_refresher():
     fake = Faker()
- 
-    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    user = User.objects.filter(position="Handler")
+    user = list(user)
+    k9 = K9.objects.exclude(serial_number='Unassigned Serial Number')
     k9_list = list(k9) 
+    
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
     for data in k9_sample:
+        handler = random.choice(user)
         for i in range(2):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
@@ -1516,7 +1529,7 @@ def generate_daily_refresher():
 
             others_time = others_date.time()
 
-            dr = Daily_Refresher.objects.create(k9=choice,handler=choice.handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
+            dr = Daily_Refresher.objects.create(k9=choice,handler=handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
 
             print('DR'+str(i), dr.k9, dr.rating)
     
@@ -1609,9 +1622,10 @@ def generate_handler_incident():
     incident = ['Rescued People','Made an Arrest','Poor Performance','Violation']
     ta = Team_Assignment.objects.exclude(team_leader=None)
     k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
-    
+  
     for data in k9_sample:
         for i in range(5):
             start_date = datetime(2019,1,1)
@@ -1662,9 +1676,14 @@ def generate_k9_incident():
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
     
+    handler = User.objects.filter(position="Handler")
+    handler = list(handler)
+
     lost = ['Collar not properly put on', 'Leashed on a pole', 'Suddenly disappeared']
     stolen = ['Dognapped', 'Left with a stranger', 'Snatched']
-    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat']
+
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat', 'Runny Eyes', 'Vomiting', 'Coughing', 'Fever', 'Weight loss', 'Diarrhea']
+    
     accident = ['Hit by Car', 'Caught in Bomb Explosion', 'Building Fell Down', 'Stab by Unknown Subject','Caught by Gun Fired on Premises']
     
     clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
@@ -1686,45 +1705,881 @@ def generate_k9_incident():
         elif k_inc == 'Accident':
             k_desc = random.choice(accident)
         if k_inc == 'Stolen' or k_inc == 'Lost':
-            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+            K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=handler)
         else:
             k_clinic = random.choice(clinic)
             K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler,clinic=k_clinic)
     
-def generate_health_record():
+def generate_health_record():    
     fake = Faker()
     time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
 
     clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
 
-    
-    # # Health
-    # dog
-    # date
-    # problem
-    # treatment
-    # status
-    # veterinary
-    # duration
-    # date_done
-    # incident_id
-    # image
-    # follow_up
-    # follow_up_date
-    # follow_up_done
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat', 'Runny Eyes', 'Vomiting', 'Coughing', 'Fever', 'Weight loss', 'Diarrhea']
 
-    # # HealthMedicine
+    k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
+    k9_list = list(k9)
+    k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
 
-    # health 
-    # medicine
-    # quantity 
-    # time_of_day
-    # duration
+    vet = User.objects.filter(position="Veterinarian")
+    vet_list=list(vet)
+
+    problem = ['Anemia','Elbow Dysplasia','Lymphoma','Bladder Stones','Diabetes']
+    treatment = ['Acute, supportive care may be necessary and indicate a need for a blood transfusion.','Integrative therapies, such as cold-therapy laser can also help decrease pain and inflammation.','Cyclophosphamide, vincristine, doxorubicin, and prednisone.','Extreme case is treated through surgery.','Monitor diet, feeding regimen, and start your dog on insulin therapy.']
+
+    med = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
+    med_list = list(med)
+
+    for data in k9_sample:
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,12,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        k_desc = random.choice(sick)
+        v = random.choice(vet_list)
+        prob = random.choice(problem)
+        treat = random.choice(treatment)
+        
+        k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+        
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+
+        randomint = random.randint(1, 5)
+
+        f_dur = 0
+        for i in range(randomint):
+            days = random.randint(1, 5)
+            quan = random.randint(1, 10)
+            m = random.choice(med_list)
+            tod = random.choice(time_of_day)
+
+            HealthMedicine.objects.create(health=health,medicine=m,quantity=quan,duration=days,time_of_day=tod)
+            
+            f_dur = f_dur+days
+
+        health.duration = f_dur
+        health.save()
 
 def generate_k9_parents():
-    pass
+    fake = Faker()
+
+    color_list = ['Black','Yellow','Chocolate','Dark Golden','Light Golden','Cream','Golden','Brindle','Silver Brindle','Gold Brindle','Salt and Pepper','Gray Brindle','Blue and Gray','Tan','Black-Tipped Fawn','Mahogany','White','Black and White','White and Tan']
+
+    dam = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
+
+    sex_list = ['Male', 'Female']
+
+    grade_list = ['75','80','85','90','95','100']
+    vet = User.objects.filter(position="Veterinarian")
+    vet_list=list(vet)
+
+    ar = Medicine_Inventory.objects.filter(medicine__immunization='Anti-Rabies')
+    bbb = Medicine_Inventory.objects.filter(medicine__immunization='Bordetella Bronchiseptica Bacterin')
+    dw = Medicine_Inventory.objects.filter(medicine__immunization='Deworming')
+    dhp = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL+CV')
+    dh4 = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4')
+    hw = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm')
+    tf = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea')
+    
+    print(dam.count())
+    
+    #BREED K9
+    second_gen = []
+    for data in dam:
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,10,20)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        try:
+            sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability)
+            sire_list = list(sire)
+
+            parent = K9_Parent.objects.filter(offspring=data)
+          
+            f_sire = []
+            for par in parent:
+                f_sire.append(par.father.id)
+
+            n_sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability).exclude(serial_number='Unassigned Serial Number').exclude(id__in=f_sire)
+          
+        
+            sire_pick = random.choice(n_sire)
+
+            if sire_pick:
+                bol = True
+                print('PICK', sire_pick)
+            else:
+                bol = False
+
+        except:
+            bol = False
+
+        if bol == True:
+            # print('SIRE',sire_pick)
+            m_date = f_date - relativedelta(years=4)
+            b_date = m_date + timedelta(days=63)
+
+            born = random.randint(1, 3)
+            died = random.randint(0, born)
+
+            K9_Mated.objects.create(mother=data,father=sire_pick,status='Pregnancy Done',date_mated=m_date)
+
+            K9_Litter.objects.create(mother=data, father=sire_pick,litter_no=born,litter_died=died)
+            
+            dif = born - died
+            for i in range(dif):
+                #Create offspring
+                color = random.choice(color_list)
+                sex = random.choice(sex_list)
+                name = 'temp name'
+
+                if sex == 'Male':
+                    name = fake.first_name_male()
+                elif sex == 'Female':
+                    name = fake.first_name_female()
+
+                weight = random.randint(30, 50)
+                height = random.randint(60, 80)
+                
+                data.last_date_mated = m_date
+                sire_pick.last_date_mated = m_date
+
+                data.save()
+                sire_pick.save()
+
+                k9 = K9.objects.create(name=name,breed=data.breed,sex=sex,color=color,birth_date=b_date,source='Breeding',status='Working Dog', training_status='For-Breeding',training_level='Finished Training', capability=data.capability,trained='Trained',weight=weight,height=height)
+
+                sn = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+                k9.serial_number = sn
+                k9.save()
+
+                K9_Parent.objects.create(mother=data,father=sire_pick,offspring=k9)
+
+                second_gen.append(k9)
+
+    print('For-Breeding CHANGE')
+    print('SEC COUNT', len(second_gen))
+
+    # CREATE/UPDATE SECOND GEN TRAINING, VACCINE, STATUS
+    for data in second_gen:
+        s_date = data.birth_date + relativedelta(years=2) #CHANGE
+        k9 = data
+        cap = data.capability
+        handler = User.objects.filter(position="Handler")
+        remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        
+        Training_History.objects.create(k9=k9,handler=random.choice(handler),date=s_date)
+        
+        #FIRST TRAINING STAGE
+        ts = Training_Schedule.objects.filter(k9=k9).last()
+        dur_train = random.randint(20,40)
+        t_date = s_date + timedelta(days=dur_train) 
+
+        ts.stage = 'Stage 1.1'
+        ts.date_start = s_date
+        ts.date_end = t_date
+        ts.remarks = remark
+        ts.save()
+
+        train = Training.objects.filter(k9=k9).filter(training=cap).last()
+        train.stage = 'Finished Training'
+        train.stage1_1 = random.choice(grade_list)
+        train.stage1_2 = random.choice(grade_list)
+        train.stage1_3 = random.choice(grade_list)
+        train.stage2_1 = random.choice(grade_list)
+        train.stage2_2 = random.choice(grade_list)
+        train.stage2_3 = random.choice(grade_list)
+        train.stage3_1 = random.choice(grade_list)
+        train.stage3_2 = random.choice(grade_list)
+        train.stage3_3 = random.choice(grade_list)
+
+        for i in range(8):
+            dur_train = random.randint(20,40)
+            ss_date = t_date
+            t_date = t_date + timedelta(days=dur_train)
+            remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+            
+            if i == 0:
+                # Stage 1.2
+                Training_Schedule.objects.create(k9=k9,stage='Stage 1.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 1:
+                # Stage 1.3
+                Training_Schedule.objects.create(k9=k9,stage='Stage 1.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 2:
+                # Stage 2.1
+                Training_Schedule.objects.create(k9=k9,stage='Stage 2.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 3:
+                # Stage 2.2
+                Training_Schedule.objects.create(k9=k9,stage='Stage 2.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 4:
+                # Stage 2.3
+                Training_Schedule.objects.create(k9=k9,stage='Stage 2.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 5:
+                # Stage 3.1
+                Training_Schedule.objects.create(k9=k9,stage='Stage 3.1',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 6:
+                # Stage 3.2
+                Training_Schedule.objects.create(k9=k9,stage='Stage 3.2',date_start=ss_date,date_end=t_date,remarks=remarks)
+            if i == 7:
+                # Stage 3.3
+                Training_Schedule.objects.create(k9=k9,stage='Stage 3.3',date_start=ss_date,date_end=t_date,remarks=remarks)
+
+
+        final_date = Training_Schedule.objects.filter(k9=k9).filter(stage='Stage 3.3').last()
+        train.date_finished = final_date.date_end 
+        train.save()
+
+        #VACCINE RECORD # get dont create
+        vr = VaccinceRecord.objects.filter(k9=k9).last()
+        vr.deworming_1 = True
+        vr.deworming_2 = True
+        vr.deworming_3 = True
+        vr.deworming_4 = True
+        vr.dhppil_cv_1 = True
+        vr.dhppil_cv_2 = True
+        vr.dhppil_cv_3 = True
+        vr.heartworm_1 = True
+        vr.heartworm_2 = True
+        vr.heartworm_3 = True
+        vr.heartworm_4 = True
+        vr.heartworm_5 = True
+        vr.heartworm_6 = True
+        vr.heartworm_7 = True
+        vr.heartworm_8 = True
+        vr.anti_rabies = True
+        vr.bordetella_1 = True
+        vr.bordetella_2 = True
+        vr.dhppil4_1 = True
+        vr.dhppil4_2 = True
+        vr.tick_flea_1 = True
+        vr.tick_flea_2 = True
+        vr.tick_flea_3 = True
+        vr.tick_flea_4 = True
+        vr.tick_flea_5 = True
+        vr.tick_flea_6 = True
+        vr.tick_flea_7 = True
+        vr.status = 'Done'
+        vr.save()
+
+        # VaccineUsed
+        start_date = data.birth_date #CHANGE K9 BDATE
+        end_date = ts.date_start
+
+        a = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='1').last()
+        a.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        a.vaccine = random.choice(dw)
+        a.veterinary = random.choice(vet_list)
+        a.image = 'health_image/vac_stamp.jpg'
+        a.done = True  
+        a.save()
+
+        b = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='2').last()
+        b.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        b.vaccine = random.choice(dw)
+        b.veterinary = random.choice(vet_list)
+        b.image = 'health_image/vac_stamp.jpg'
+        b.done = True  
+        b.save()
+
+        c = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='3').last()
+        c.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        c.vaccine = random.choice(dw)
+        c.veterinary = random.choice(vet_list)
+        c.image = 'health_image/vac_stamp.jpg'
+        c.done = True  
+        c.save()
+
+        d = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='4').last()
+        d.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        d.vaccine = random.choice(dhp)
+        d.veterinary = random.choice(vet_list)
+        d.image = 'health_image/vac_stamp.jpg'
+        d.done = True  
+        d.save()
+
+        e = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='5').last()
+        e.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        e.vaccine = random.choice(hw)
+        e.veterinary = random.choice(vet_list)
+        e.image = 'health_image/vac_stamp.jpg'
+        e.done = True  
+        e.save()
+
+        f = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='6').last()
+        f.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        f.vaccine = random.choice(bbb)
+        f.veterinary = random.choice(vet_list)
+        f.image = 'health_image/vac_stamp.jpg'
+        f.done = True  
+        f.save()
+
+        g = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='7').last()
+        g.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        g.vaccine = random.choice(tf)
+        g.veterinary = random.choice(vet_list)
+        g.image = 'health_image/vac_stamp.jpg'
+        g.done = True  
+        g.save()
+
+        h = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='8').last()
+        h.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        h.vaccine = random.choice(dh4)
+        h.veterinary = random.choice(vet_list)
+        h.image = 'health_image/vac_stamp.jpg'
+        h.done = True  
+        h.save()
+
+        i = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='9').last()
+        i.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        i.vaccine = random.choice(dw)
+        i.veterinary = random.choice(vet_list)
+        i.image = 'health_image/vac_stamp.jpg'
+        i.done = True  
+        i.save()
+
+        j = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='10').last()
+        j.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        j.vaccine = random.choice(hw)
+        j.veterinary = random.choice(vet_list)
+        j.image = 'health_image/vac_stamp.jpg'
+        j.done = True  
+        j.save()
+
+        k = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='11').last()
+        k.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        k.vaccine = random.choice(bbb)
+        k.veterinary = random.choice(vet_list)
+        k.image = 'health_image/vac_stamp.jpg'
+        k.done = True  
+        k.save()
+
+        l = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='12').last()
+        l.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        l.vaccine = random.choice(ar)
+        l.veterinary = random.choice(vet_list)
+        l.image = 'health_image/vac_stamp.jpg'
+        l.done = True  
+        l.save()
+
+        m = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='13').last()
+        m.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        m.vaccine = random.choice(tf)
+        m.veterinary = random.choice(vet_list)
+        m.image = 'health_image/vac_stamp.jpg'
+        m.done = True  
+        m.save()
+        
+        n = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='14').last()
+        n.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        n.vaccine = random.choice(dhp)
+        n.veterinary = random.choice(vet_list)
+        n.image = 'health_image/vac_stamp.jpg'
+        n.done = True  
+        n.save()
+
+        o = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='15').last()
+        o.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        o.vaccine = random.choice(hw)
+        o.veterinary = random.choice(vet_list)
+        o.image = 'health_image/vac_stamp.jpg'
+        o.done = True  
+        o.save()
+
+        p = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='16').last()
+        p.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        p.vaccine = random.choice(dh4)
+        p.veterinary = random.choice(vet_list)
+        p.image = 'health_image/vac_stamp.jpg'
+        p.done = True  
+        p.save()
+
+        q = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='17').last()
+        q.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        q.vaccine = random.choice(tf)
+        q.veterinary = random.choice(vet_list)
+        q.image = 'health_image/vac_stamp.jpg'
+        q.done = True  
+        q.save()
+
+        r = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='18').last()
+        r.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        r.vaccine = random.choice(dh4)
+        r.veterinary = random.choice(vet_list)
+        r.image = 'health_image/vac_stamp.jpg'
+        r.done = True  
+        r.save()
+
+        s = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='19').last()
+        s.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        s.vaccine = random.choice(hw)
+        s.veterinary = random.choice(vet_list)
+        s.image = 'health_image/vac_stamp.jpg'
+        s.done = True  
+        s.save()
+
+        t = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='20').last()
+        t.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        t.vaccine = random.choice(tf)
+        t.veterinary = random.choice(vet_list)
+        t.image = 'health_image/vac_stamp.jpg'
+        t.done = True  
+        t.save()
+
+        u = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='21').last()
+        u.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        u.vaccine = random.choice(hw)
+        u.veterinary = random.choice(vet_list)
+        u.image = 'health_image/vac_stamp.jpg'
+        u.done = True  
+        u.save()
+
+        v = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='22').last()
+        v.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        v.vaccine = random.choice(tf)
+        v.veterinary = random.choice(vet_list)
+        v.image = 'health_image/vac_stamp.jpg'
+        v.done = True  
+        v.save()
+
+        w = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='23').last()
+        w.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        w.vaccine = random.choice(hw)
+        w.veterinary = random.choice(vet_list)
+        w.image = 'health_image/vac_stamp.jpg'
+        w.done = True  
+        w.save()
+
+        x = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='24').last()
+        x.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        x.vaccine = random.choice(tf)
+        x.veterinary = random.choice(vet_list)
+        x.image = 'health_image/vac_stamp.jpg'
+        x.done = True  
+        x.save()
+
+        y = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='25').last()
+        y.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        y.vaccine = random.choice(hw)
+        y.veterinary = random.choice(vet_list)
+        y.image = 'health_image/vac_stamp.jpg'
+        y.done = True  
+        y.save()
+
+        z = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='26').last()
+        z.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        z.vaccine = random.choice(tf)
+        z.veterinary = random.choice(vet_list)
+        z.image = 'health_image/vac_stamp.jpg'
+        z.done = True  
+        z.save()
+
+        zz = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='27').last()
+        zz.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        zz.vaccine = random.choice(hw)
+        zz.veterinary = random.choice(vet_list)
+        zz.image = 'health_image/vac_stamp.jpg'
+        zz.done = True  
+        zz.save()
+
+        print(data, 'CREATE/UPDATE')
+
+    dam2 = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
+    third_gen = []
+    # BREED THIRD GEN
+    for data in dam2:
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,10,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        
+        if data.sex == 'Female':
+            try:
+                sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability)
+                sire_list = list(sire)
+                
+                parent = K9_Parent.objects.filter(offspring=data)
+            
+                f_sire = []
+                for par in parent:
+                    f_sire.append(par.father.id)
+
+                n_sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability).exclude(serial_number='Unassigned Serial Number').exclude(id__in=f_sire)
+            
+                sire_pick = random.choice(n_sire)
+
+                if sire_pick:
+                    bol = True
+                    print('PICK', sire_pick)
+                else:
+                    bol = False
+            except:
+                bol = False
+
+            if bol == True:
+                m_date = f_date
+                b_date = m_date + timedelta(days=63)
+
+                born = random.randint(1, 3)
+                died = random.randint(0, born)
+
+                K9_Mated.objects.create(mother=data,father=sire_pick,status='Pregnancy Done',date_mated=m_date)
+
+                K9_Litter.objects.create(mother=data, father=sire_pick,litter_no=born,litter_died=died)
+                
+                dif = born - died
+                for i in range(dif):
+                    #Create offspring
+                    color = random.choice(color_list)
+                    sex = random.choice(sex_list)
+                    name = 'temp name'
+
+                    if sex == 'Male':
+                        name = fake.first_name_male()
+                    elif sex == 'Female':
+                        name = fake.first_name_female()
+
+                    weight = random.randint(30, 50)
+                    height = random.randint(60, 80)
+
+                     
+                    data.last_date_mated = m_date
+                    sire_pick.last_date_mated = m_date
+
+                    data.save()
+                    sire_pick.save()
+                    
+                    k9 = K9.objects.create(name=name,breed=data.breed,sex=sex,color=color,birth_date=b_date,source='Breeding',weight=weight,height=height)
+
+                    sn = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+                    k9.serial_number = sn
+                    k9.save()
+                    
+                    K9_Parent.objects.create(mother=data,father=sire_pick,offspring=k9)
+
+                    third_gen.append(k9)
+            
+
+    print(third_gen)
+    
+    print('On Training','Puppy')
+    print('THIRD COUNT', len(third_gen))
+    # CREATE/UPDATE SECOND GEN TRAINING, VACCINE, STATUS, 1 yr old or less than 
+    for data in third_gen:
+        s_date = data.birth_date
+        k9 = data
+       
+        #VACCINE RECORD 
+        vr = VaccinceRecord.objects.filter(k9=k9).last()
+        vr.deworming_1 = True
+        vr.deworming_2 = True
+        vr.deworming_3 = True
+        vr.deworming_4 = True
+
+        vr.dhppil_cv_1 = True
+        vr.dhppil_cv_2 = True
+        vr.dhppil_cv_3 = True
+
+        vr.heartworm_1 = True
+        vr.heartworm_2 = True
+        vr.heartworm_3 = True
+      
+        vr.anti_rabies = True
+        vr.bordetella_1 = True
+        vr.bordetella_2 = True 
+        vr.dhppil4_1 = True
+        vr.dhppil4_2 = False # LAST
+
+        vr.tick_flea_1 = True
+        vr.tick_flea_2 = True
+        vr.tick_flea_3 = True
+        vr.save()
+
+        # VaccineUsed
+        start_date = data.birth_date + timedelta(days=14)
+        end_date = start_date + timedelta(days=133)
+
+        a = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='1').last()
+        a.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        a.vaccine = random.choice(dw)
+        a.veterinary = random.choice(vet_list)
+        a.image = 'health_image/vac_stamp.jpg'
+        a.done = True  
+        a.save()
+
+        b = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='2').last()
+        b.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        b.vaccine = random.choice(dw)
+        b.veterinary = random.choice(vet_list)
+        b.image = 'health_image/vac_stamp.jpg'
+        b.done = True  
+        b.save()
+
+        c = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='3').last()
+        c.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        c.vaccine = random.choice(dw)
+        c.veterinary = random.choice(vet_list)
+        c.image = 'health_image/vac_stamp.jpg'
+        c.done = True  
+        c.save()
+
+        d = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='4').last()
+        d.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        d.vaccine = random.choice(dhp)
+        d.veterinary = random.choice(vet_list)
+        d.image = 'health_image/vac_stamp.jpg'
+        d.done = True  
+        d.save()
+
+        e = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='5').last()
+        e.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        e.vaccine = random.choice(hw)
+        e.veterinary = random.choice(vet_list)
+        e.image = 'health_image/vac_stamp.jpg'
+        e.done = True  
+        e.save()
+
+        f = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='6').last()
+        f.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        f.vaccine = random.choice(bbb)
+        f.veterinary = random.choice(vet_list)
+        f.image = 'health_image/vac_stamp.jpg'
+        f.done = True  
+        f.save()
+
+        g = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='7').last()
+        g.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        g.vaccine = random.choice(tf)
+        g.veterinary = random.choice(vet_list)
+        g.image = 'health_image/vac_stamp.jpg'
+        g.done = True  
+        g.save()
+
+        h = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='8').last()
+        h.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        h.vaccine = random.choice(dh4)
+        h.veterinary = random.choice(vet_list)
+        h.image = 'health_image/vac_stamp.jpg'
+        h.done = True  
+        h.save()
+
+        i = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='9').last()
+        i.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        i.vaccine = random.choice(dw)
+        i.veterinary = random.choice(vet_list)
+        i.image = 'health_image/vac_stamp.jpg'
+        i.done = True  
+        i.save()
+
+        j = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='10').last()
+        j.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        j.vaccine = random.choice(hw)
+        j.veterinary = random.choice(vet_list)
+        j.image = 'health_image/vac_stamp.jpg'
+        j.done = True  
+        j.save()
+
+        k = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='11').last()
+        k.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        k.vaccine = random.choice(bbb)
+        k.veterinary = random.choice(vet_list)
+        k.image = 'health_image/vac_stamp.jpg'
+        k.done = True  
+        k.save()
+
+        l = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='12').last()
+        l.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        l.vaccine = random.choice(ar)
+        l.veterinary = random.choice(vet_list)
+        l.image = 'health_image/vac_stamp.jpg'
+        l.done = True  
+        l.save()
+
+        m = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='13').last()
+        m.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        m.vaccine = random.choice(tf)
+        m.veterinary = random.choice(vet_list)
+        m.image = 'health_image/vac_stamp.jpg'
+        m.done = True  
+        m.save()
+        
+        n = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='14').last()
+        n.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        n.vaccine = random.choice(dhp)
+        n.veterinary = random.choice(vet_list)
+        n.image = 'health_image/vac_stamp.jpg'
+        n.done = True  
+        n.save()
+
+        o = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='15').last()
+        o.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        o.vaccine = random.choice(hw)
+        o.veterinary = random.choice(vet_list)
+        o.image = 'health_image/vac_stamp.jpg'
+        o.done = True  
+        o.save()
+
+        p = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='16').last()
+        p.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        p.vaccine = random.choice(dh4)
+        p.veterinary = random.choice(vet_list)
+        p.image = 'health_image/vac_stamp.jpg'
+        p.done = True  
+        p.save()
+
+        q = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='17').last()
+        q.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
+        q.vaccine = random.choice(tf)
+        q.veterinary = random.choice(vet_list)
+        q.image = 'health_image/vac_stamp.jpg'
+        q.done = True  
+        q.save()
+
+        print(data, 'CREATE/UPDATE')
+
+def generate_k9_due_retire():
+    fake = Faker()
+    k9_c = K9.objects.filter(training_status='Deployed').exclude(handler=None).exclude(assignment=None)
+
+    k9_list = list(k9_c)
+
+    for i in range(5):
+        choice = random.choice(k9_list)
+        k9 = K9.objects.filter(id=choice.id).last()
+        
+        choice.birth_date = date.today() - relativedelta(years=9)
+        choice.status = "Due-For-Retirement"
+        choice.save()
+        print("DUE TO RETIRE ", choice)
+ 
+def generate_sick_breeding():
+    fake = Faker()
+    
+    k9 = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
+    k9_list = list(k9)
+
+    time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
+
+    clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
+
+    sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat', 'Runny Eyes', 'Vomiting', 'Coughing', 'Fever', 'Weight loss', 'Diarrhea']
+
+    vet = User.objects.filter(position="Veterinarian")
+    vet_list=list(vet)
+
+    problem = ['Anemia','Elbow Dysplasia','Lymphoma','Bladder Stones','Diabetes']
+    treatment = ['Acute, supportive care may be necessary and indicate a need for a blood transfusion.','Integrative therapies, such as cold-therapy laser can also help decrease pain and inflammation.','Cyclophosphamide, vincristine, doxorubicin, and prednisone.','Extreme case is treated through surgery.','Monitor diet, feeding regimen, and start your dog on insulin therapy.']
+
+    med = Medicine_Inventory.objects.exclude(medicine__med_type='Vaccine')
+    med_list = list(med)
+
+    for i in range(20):
+        print("Generate Health Concern for Breeding ", i+1)
+        data = random.choice(k9_list)
+
+        start_date = datetime(2019,1,1)
+        end_date = datetime(2019,12,10)
+
+        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        k_desc = random.choice(sick)
+        v = random.choice(vet_list)
+        prob = random.choice(problem)
+        treat = random.choice(treatment)
+        
+        k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
+        
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+
+        randomint = random.randint(1, 5)
+
+        f_dur = 0
+        for i in range(randomint):
+            days = random.randint(1, 5)
+            quan = random.randint(1, 10)
+            m = random.choice(med_list)
+            tod = random.choice(time_of_day)
+
+            HealthMedicine.objects.create(health=health,medicine=m,quantity=quan,duration=days,time_of_day=tod)
+            
+            f_dur = f_dur+days
+
+        health.duration = f_dur
+        health.save()
+
+    #K9 LITTER
+    female = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
+    male = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male')
+
+    sire = list(male) 
+    dam = list(female)
+
+    for i in range(20):
+        print("Generate K9 Litter for Breeding ", i+1)
+        born = random.randint(1, 8)
+        died = random.randint(0, born)
+
+        mom = random.choice(dam)
+        dad = random.choice(sire)
+
+        K9_Litter.objects.create(mother=mom, father=dad,litter_no=born,litter_died=died)
+
+
+def generate_adoption():
+    
+    # 20 Adopted 
+    fake = Faker()
+    k9_list = K9.objects.all()
+    k9_list = list(k9_list)
+    sex_list = ['Male', 'Female']
+
+    start_date = datetime(2019,1,1)
+    end_date = datetime(2019,12,10)
+
+    # 10 returned
+    for i in range(10):
+        sex = random.choice(sex_list)
+        name = 'temp_name'
+        if sex == 'Female':
+            name = fake.first_name_female()
+        else:
+            name = fake.first_name_male()
+        middle_name = fake.last_name()
+        last_name = fake.last_name()
+        email = name+last_name+"@gmail.com"
+        birth_date = fake.date_between(start_date='-25y', end_date='now')
+        address = fake.address()
+        contact_no = "+63" + fake.msisdn()[:10]
+        reason = fake.paragraph(nb_sentences=1, variable_nb_sentences=True, ext_word_list=None)
+        k9 = random.choice(k9_list)
+        date_adopted = fake.date_between(start_date='-1y', end_date='now')
+        date_returned = fake.date_between(start_date=date_adopted, end_date='now')
+
+        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted,date_returned=date_returned,reason=reason)
+
+        print("Generate Returned" + str(i), k9)
+
+    for i in range(20):
+        sex = random.choice(sex_list)
+        name = 'temp_name'
+        if sex == 'Female':
+            name = fake.first_name_female()
+        else:
+            name = fake.first_name_male()
+        middle_name = fake.last_name()
+        last_name = fake.last_name()
+        email = name+last_name+"@gmail.com"
+        birth_date = fake.date_between(start_date='-25y', end_date='now')
+        address = fake.address()
+        contact_no = "+63" + fake.msisdn()[:10]
+        k9 = random.choice(k9_list)
+        date_adopted = fake.date_between(start_date='-1y', end_date='now')
        
 
+        K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
+
+        print("Generate Adopted" + str(i), k9)
+        
+  
 '''
 TODO
 
@@ -1733,8 +2588,7 @@ Create Parents (Use For-Breeding K9s)
 Create Litter
 Create K9_mated
 Create Health (Specially for K9s that have reach deployment/breeding decision)
-Create Daily Refreshers
-Create Budgeting Stuff
+
 
 VaccineUsed Record for Procured K9s (Date of vaccination lang kailangan + Name of Diseases)4 diseases
 Remove handlers on For-Breeding K9s, then status is unpartnered

@@ -34,7 +34,7 @@
                 </div>
                 <div class="field">
                     <label>Port</label>
-                    <textarea name="" id="" cols="30" rows="4">{{ta}}</textarea readonly>
+                    <textarea name="" id="" cols="30" rows="4" readonly>{{ta}}</textarea>
                 </div>
             
                 <div class="ui basic segment">
@@ -49,13 +49,19 @@
                                  <th>Quantity</th>
                              </thead>
                              <tbody>
-                                 {% for food in food%}
-                                 <tr>
-                                     <td>{{food.food}}</td>
-                                     <td>{{food.unit}}</td>
-                                     <td>{{food.quantity}}</td>
-                                 </tr>
-                                 {%endfor%}
+                                {% if food %}
+                                    {% for food in food%}
+                                    <tr>
+                                        <td>{{food.food}}</td>
+                                        <td>{{food.unit}}</td>
+                                        <td>{{food.quantity}}</td>
+                                    </tr>
+                                    {%endfor%}
+                                {% else %}
+                                    <tr class="center aligned">
+                                        <td colspan='3'>No Item Request</td>
+                                    </tr>
+                                {% endif %}
                              </tbody>
                             </table>
                         </div>
@@ -68,13 +74,19 @@
                                 <th>Quantity</th>
                             </thead>
                             <tbody>
-                                {% for med in med%}
-                                <tr>
-                                    <td>{{med.medicine}}</td>
-                                    <td>{{med.unit}}</td>
-                                    <td>{{med.quantity}}</td>
-                                </tr>
-                                {%endfor%}
+                                {%if med%}
+                                    {% for med in med%}
+                                    <tr>
+                                        <td>{{med.medicine}}</td>
+                                        <td>{{med.unit}}</td>
+                                        <td>{{med.quantity}}</td>
+                                    </tr>
+                                    {%endfor%}
+                                {% else %}
+                                    <tr class="center aligned">
+                                        <td colspan='3'>No Item Request</td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                             </table>
                         </div>
@@ -87,6 +99,7 @@
                                 <th>Quantity</th>
                             </thead>
                             <tbody>
+                                {% if misc %}
                                 {% for misc in misc%}
                                 <tr>
                                     <td>{{misc.miscellaneous}}</td>
@@ -94,6 +107,11 @@
                                     <td>{{misc.quantity}}</td>
                                 </tr>
                                 {%endfor%}
+                                {% else %}
+                                    <tr class="center aligned">
+                                        <td colspan='3'>No Item Request</td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                             </table>
                         </div>
@@ -102,7 +120,7 @@
                 </div>
                 {% if rr.status == 'Pending'%}
                 <center>
-                    <button  type="submit" class="ui orange button">Send Items</button>
+                    <button  type="submit" class="ui green button">Send</button>
                 </center>
                 {% endif%}
             </form>            
@@ -110,11 +128,6 @@
 
 
 <script type="text/javascript">
-        
-    $(document).ready(function() {
-        $('.menu .item').tab();
-
-    });
-    
+    $('.menu .item').tab();
 </script>
  {% endblock %}

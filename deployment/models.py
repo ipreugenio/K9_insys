@@ -429,7 +429,7 @@ class Team_Dog_Deployed(models.Model):
     k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)
     handler = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField('status', max_length=100, null=True, blank=True, default='Deployed')
-    date_added = models.DateField('date_added', default=date.today(), null=True, blank=True)
+    date_added = models.DateField('date_added', default=timezone.now, null=True, blank=True)
     date_pulled = models.DateField('date_pulled' , null=True, blank=True)
 
     def __str__(self):

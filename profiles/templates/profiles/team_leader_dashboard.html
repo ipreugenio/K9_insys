@@ -150,23 +150,7 @@
                   </ul>
                 </div>
                 {%endif%}
-
-                <div class="ui black floating message">
-                    <p>Calendar</p>
-                  </div>
-
-                  <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
-                      <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
-                      <div class="ui buttons">
-                        <button class="ui button"  id = "prev" >Previous Year</button>
-                        <div class="or"></div>
-                        <button class="ui button"  id = "next" >Next Year</button>
-                      </div>
-
-                      <div id = "calendar" style="margin-top:0%;"></div>
-                  </div>
-
-                  {%if cb %}
+                 {%if cb %}
                   {%if cb.status == 'Pending' %}
                   <div class="ui info message">
 
@@ -192,6 +176,20 @@
                     </div>
                     {% endif %}
                     {% endif %}
+                <div class="ui black floating message">
+                    <p>Calendar</p>
+                  </div>
+
+                  <div class="ui right aligned basic segment" style="padding: 0%;margin:0%;">
+                      <div class="ui green tiny button" id = 'add_event_btn'>Add Event</div>
+                      <div class="ui buttons">
+                        <button class="ui button"  id = "prev" >Previous Year</button>
+                        <div class="or"></div>
+                        <button class="ui button"  id = "next" >Next Year</button>
+                      </div>
+
+                      <div id = "calendar" style="margin-top:0%;"></div>
+                  </div>
 
                   {% if k9 %}
                   <h4>Port</h4>

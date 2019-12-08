@@ -50,6 +50,7 @@ from deployment.tasks import subtract_inventory, assign_TL, task_to_dash_dep
 from deployment.views import team_location_details, request_dog_details, mass_populate_revisited
 from unitmanagement.forms import EmergencyLeaveForm
 from unitmanagement.tasks import check_leave_window, task_to_dash_um
+from planningandacquiring.tasks import task_to_dash_pq
 
 # Create your views here.
 
@@ -259,6 +260,15 @@ def dashboard(request):
     except kdi.ObjectDoesNotExist:
         pass
 
+    cbs = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
+
+    cb_list = []
+    for c in cbs:
+        cb_list.append(c.k9.id)
+
+    due_retire = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead")).exclude(id__in=cb_list).order_by('year_retired').count()
+
+    cb_conf_count = Call_Back_K9.objects.filter(status='Confirmed').count()
     #NOTIF SHOW
     notif_data = notif(request)
     count = notif_data.filter(viewed=False).count()
@@ -293,6 +303,8 @@ def dashboard(request):
         'el':el,
         'k9i':k9i,
         'hi':hi,
+        'due_retire':due_retire,
+        'cb_conf_count':cb_conf_count,
 
         'notif_data':notif_data,
         'count':count,
@@ -761,9 +773,9 @@ def handler_dashboard(request):
     k9 = None
     ki = None
     try:
-        k9 = K9.objects.filter(handler=user).last()
-        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(
-        status='Pending').latest('id')
+        k9 = K9.objects.get(handler=user)
+        ki = K9_Incident.objects.filter(Q(incident='Stolen') | Q(incident='Accident') | Q(incident='Lost')).filter(k9=k9).filter(status='Pending').latest('id')
+
     except MultipleObjectsReturned:
         k9 = K9.objects.filter(handler=user).last()
     except: pass
@@ -811,11 +823,14 @@ def handler_dashboard(request):
             # print(items_list)
 
             pre_deployment_items = K9_Pre_Deployment_Items.objects.filter(k9=k9).last()
-            initial_sched = pre_deployment_items.initial_sched
+            delta = None
+            if pre_deployment_items:
+                initial_sched = pre_deployment_items.initial_sched
 
-            delta = initial_sched.date_start - today.date()
-            if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
-                reveal_items = True
+                delta = initial_sched.date_start - today.date()
+
+                if delta.days <= 7 and k9.training_status == "For-Deployment" and pre_deployment_items.status == "Pending": #1 week before deployment
+                    reveal_items = True
 
 
         # TODO try except for when handler does not yet have a k9
@@ -1333,9 +1348,7 @@ def vet_dashboard(request):
             ab_k9 = 0
 
         ab_total = ab.others_total + ab.kennel_total + ab.vet_supply_total + ab.medicine_total + ab.vac_prev_total + ab.food_milk_total + ab.petty_cash
-
-
-    except ObjectDoesNotExist:
+    except:
         ab_k9 = 0
         ab_total = None
 
@@ -1633,6 +1646,8 @@ def login(request):
     if request.method == 'POST':
         task_to_dash_dep()
         task_to_dash_um()
+        task_to_dash_pq()
+
         serial = request.POST['serial_number']
         password = request.POST['password']
         # user_auth = authenticate(request, username=serial, password=password)

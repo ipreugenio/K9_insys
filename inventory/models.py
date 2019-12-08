@@ -1,6 +1,7 @@
 from django.db import models
-
+from datetime import datetime, date, timedelta
 from profiles.models import User
+from django.utils import timezone
 # from unitmanagement.models import Notification
 # Create your models here.
 
@@ -67,7 +68,7 @@ class Medicine_Inventory_Count(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_counted = models.DateField('date_counted', auto_now_add=True)
+    date_counted = models.DateField('date_counted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def difference(self):
@@ -83,7 +84,7 @@ class Medicine_Received_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_received = models.DateField('date_received', auto_now_add=True)
+    date_received = models.DateField('date_received', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
     expiration_date = models.DateField('expiration_date', null=True, blank=True)
     status = models.CharField(max_length=100, default='Pending')
@@ -102,7 +103,7 @@ class Medicine_Subtracted_Trail(models.Model):
     price = models.DecimalField('price', max_digits=50, decimal_places=2, default=0, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    date_subtracted = models.DateField('date_subtracted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
@@ -153,7 +154,7 @@ class Food_Inventory_Count(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_counted = models.DateField('date_counted', auto_now_add=True)
+    date_counted = models.DateField('date_counted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def difference(self):
@@ -168,7 +169,7 @@ class Food_Received_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_received = models.DateField('date_received', auto_now_add=True)
+    date_received = models.DateField('date_received', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def difference(self):
@@ -183,7 +184,7 @@ class Food_Subtracted_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    date_subtracted = models.DateField('date_subtracted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):
@@ -231,7 +232,7 @@ class Miscellaneous_Inventory_Count(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_counted = models.DateField('date_counted', auto_now_add=True)
+    date_counted = models.DateField('date_counted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def difference(self):
@@ -246,7 +247,7 @@ class Miscellaneous_Received_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_received = models.DateField('date_received', auto_now_add=True)
+    date_received = models.DateField('date_received', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def difference(self):
@@ -261,7 +262,7 @@ class Miscellaneous_Subtracted_Trail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     old_quantity = models.IntegerField('old_quantity', default=0)
     quantity = models.IntegerField('quantity', default=0)
-    date_subtracted = models.DateField('date_subtracted', auto_now_add=True)
+    date_subtracted = models.DateField('date_subtracted', default=timezone.now)
     time = models.TimeField('time', auto_now_add=True, blank=True)
 
     def __str__(self):

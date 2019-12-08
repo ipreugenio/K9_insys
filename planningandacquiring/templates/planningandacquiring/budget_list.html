@@ -17,20 +17,24 @@
         <table id="tabledata" class="ui four column celled table center aligned">
         <thead>
             <tr>
-                <th>Date Created</th>
+                <th>Date Created (Proposal)</th>
                 <th>Year Budgeted</th>
-                <th>Budget</th>
+                <th>Budget (Proposed/Actual)</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for data in data%}
             <tr>
-                <td>{{data.date_created}}</td>
-                <td>{{data.year_budgeted|date:"Y"}}</td>
-                <td>{{data.grand_total|intcomma}}</td>
+                <td>{{data.0.date_created}}</td>
+                <td>{{data.0.year_budgeted|date:"Y"}}</td>
+                {%if data.1%}
+                <td>{{data.1.grand_total|intcomma}}</td>
+                {%else%}
+                 <td>{{data.0.grand_total|intcomma}}</td>
+                {%endif%}
                 <td>
-                    <a href="{% url 'planningandacquiring:budgeting_detail' data.id %}" class="ui basic tiny blue button">Select</a>
+                    <a href="{% url 'planningandacquiring:budgeting_detail' data.0.id %}" class="ui basic tiny blue button">Select</a>
                 </td>
             </tr>
             {% endfor %}

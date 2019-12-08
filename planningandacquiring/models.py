@@ -348,11 +348,14 @@ class K9(models.Model):
 
         #TODO TRANSFER TO CELERY
         if self.age == 9:
-            self.status = 'Due-For-Retirement'
+            if self.status == 'Working Dog' or self.status == 'Material Dog' or self.status == 'Sick' or self.status =='Accident':
+                self.status = 'Due-For-Retirement'
+                if self.training_status != 'Working Dog':
+                    self.training_status = 'Light Duty'
             
         elif self.age == 10:
             self.training_status = 'Retired'
-            self.year_retired = self.birth_date + td(days=(10*365))
+            # self.year_retired = self.birth_date + td(days=(10*365))
             self.status = 'Retired'
         else:
             pass

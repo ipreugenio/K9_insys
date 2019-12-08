@@ -487,6 +487,12 @@ def notif_on_recommended_phex_date():
 
     return None
 
+def light_duty():
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(training_status='For-Adoption').exclude(training_status='Adopted').exclude(training_status='Light Duty').exclude(training_status='Retired').exclude(training_status='Dead').exclude(status="Missing").order_by('year_retired')
+
+    for data in data:
+        data.training_status = 'Light Duty'
+        data.save()
 
 def task_to_dash_um():
     # Create checkup schedules
@@ -505,5 +511,6 @@ def task_to_dash_um():
     # MIA units that are on emergency leave for more than 3 days
     check_lapsed_emergency_leaves()
 
-
+    light_duty()
+    
     return None
