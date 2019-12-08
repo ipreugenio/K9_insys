@@ -34,7 +34,7 @@ from unitmanagement.forms import PhysicalExamForm, HealthForm, HealthMedicineFor
 
 from unitmanagement.models import HealthMedicine, Health, VaccinceRecord,VaccineUsed, Notification, Image, VaccinceRecord, Transaction_Health, \
     PhysicalExam, Health, K9_Incident, Handler_On_Leave, Handler_K9_History,Medicine_Request, Food_Request, Miscellaneous_Request, \
-    Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request, Temporary_Handler, Emergency_Leave, Call_Back_Handler
+    Request_Transfer,Call_Back_K9, Handler_Incident, Replenishment_Request, Temporary_Handler, Emergency_Leave
 
 from deployment.models import K9_Schedule, Dog_Request, Team_Dog_Deployed, Team_Assignment, Incidents, Daily_Refresher, Area, Location, TempCheckup, K9_Pre_Deployment_Items
 
@@ -1817,6 +1817,7 @@ def k9_incident_list(request):
 
         handler = User.objects.get(id=k9.handler.id)
         handler.partnered = False
+        handler.assigned = False
 
         handler.save()
 
@@ -1826,7 +1827,7 @@ def k9_incident_list(request):
             tdd.save()
             current_port = current_team(k9)
             update_port_info([current_port.id])
-        Call_Back_Handler.objects.create(handler = handler)
+        # Call_Back_Handler.objects.create(handler = handler)
         Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
                                     message='Your K9 is now deceased. You are required to report back to main base.')
 
@@ -1995,6 +1996,7 @@ def k9_accident(request, id=None): #Line 1967
 
         handler = User.objects.get(id=k9.handler.id)
         handler.partnered = False
+        handler.assigned = False
 
         k9.handler = None
         handler.save()
@@ -2005,7 +2007,7 @@ def k9_accident(request, id=None): #Line 1967
             tdd.save()
             current_port = current_team(k9)
             update_port_info([current_port.id])
-        Call_Back_Handler.objects.create(handler=handler)
+        # Call_Back_Handler.objects.create(handler=handler)
         Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
                                     message='Your K9 is now deceased. You are required to report back to main base.')
 
@@ -2027,6 +2029,7 @@ def k9_accident(request, id=None): #Line 1967
 
         h = User.objects.get(id=k9.handler.id)
         h.partnered = False
+        h.assigned = False
         k9.handler= None
 
         tdd = Team_Dog_Deployed.objects.filter(k9=k9).filter(date_pulled=None).last()
@@ -2035,7 +2038,7 @@ def k9_accident(request, id=None): #Line 1967
             tdd.save()
             current_port = current_team(k9)
             update_port_info([current_port.id])
-        Call_Back_Handler.objects.create(handler=h)
+        # Call_Back_Handler.objects.create(handler=h)
         Notification.objects.create(position='Handler', user=handler, notif_type='handler_k9_death',
                                     message='Your K9 is now deceased. You are required to report back to main base.')
 
@@ -2437,6 +2440,17 @@ def due_retired_list(request):
     }
     return render (request, 'unitmanagement/due_retired_list.html', context)
 
+# def returning_handlers_list(request):
+#
+#     cb_h_pending = Call_Back_Handler.objects.filter(status = "Pending")
+#     cb_h_confirmed = Call_Back_Handler.objects.filter(status="Confirmed")
+#
+#     context = {
+#         'cb_h_pending' : cb_h_pending,
+#         'cb_h_confirmed' : cb_h_confirmed
+#     }
+#     return render(request, 'unitmanagement/returning_handlers_list.html', context)
+
 def due_retired_call(request, id):
     k9 = K9.objects.get(id=id)
     cb = Call_Back_K9.objects.create(k9=k9, handler=k9.handler)
@@ -2495,6 +2509,12 @@ def confirm_going_back(request,id):
     cb.status='Confirmed'
     cb.save()
     return redirect ('profiles:handler_dashboard')
+
+def confirm_going_back_handler(id):
+    cb = Call_Back_Handler.objects.get(id=id)
+    cb.status = 'Confirmed'
+    cb.save()
+    return redirect('profiles:handler_dashboard')
 
 def confirm_item_request(request,id):
     rr = Replenishment_Request.objects.get(id=id)

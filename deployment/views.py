@@ -316,8 +316,10 @@ def mass_populate_revisited():
     # generate_adoption()
     # generate_grading()
 
-    generate_k9_due_retire()
+    # generate_k9_due_retire()
     # generate_sick_breeding()
+
+    # fix_dog_duplicates()
 
     #TEST   
     k9 = K9.objects.filter(status='Due-For-Retirement')
@@ -827,7 +829,7 @@ def request_dog_details(request, id):
 
     # get instance of user using personal_info.id
     # id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave")
+    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave").exclude(status = 'No Longer Employed').exclude(status = 'Retired').exclude('Died').exclude('MIA')
 
     user_deploy = []  # append the user itself
     for u in user:
@@ -836,7 +838,7 @@ def request_dog_details(request, id):
     # print("Viable User Ids")
     # print(user_deploy)
     # #filter K9 where handler = person_info and k9 assignment = None
-    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed')
+    can_deploy = K9.objects.filter(handler__id__in=user_deploy).filter(training_status='Deployed').filter(status = 'Working Dog')
         # .filter(assignment='None')
 
     # print("can_deploy_by_handler")

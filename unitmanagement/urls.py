@@ -119,4 +119,5 @@ urlpatterns = [
     
     path('mia_fou/<int:id>', views.mia_fou, name ='mia_fou'),
 
+    # path('returning_handlers_list', views.returning_handlers_list, name ='returning_handlers_list'),
 ];

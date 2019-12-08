@@ -41,7 +41,7 @@ from profiles.forms import add_User_form, add_personal_form, add_education_form,
 from planningandacquiring.models import K9, K9_Mated, Actual_Budget
 from unitmanagement.models import Notification, Request_Transfer, PhysicalExam,Call_Back_K9, VaccinceRecord, \
     K9_Incident, VaccineUsed, Replenishment_Request, Transaction_Health, Emergency_Leave, Temporary_Handler, \
-    Handler_On_Leave, Handler_Incident, K9_Incident, Call_Back_Handler
+    Handler_On_Leave, Handler_Incident, K9_Incident
 from training.models import Training_Schedule, Training
 from inventory.models import Miscellaneous, Food, Medicine_Inventory, Medicine
 
@@ -372,14 +372,22 @@ def team_leader_dashboard(request):
     reveal_for_arrival_request = False
     td_dr = None
     dr = None
+    dog_req = None
     try: #NOTE: TL won't see this anyway unless he's not a TL within date range of Dog_Request
-        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).last()
+        dr = Dog_Request.objects.filter(team_leader = user).exclude(start_date__lt=datetime.today().date()).exclude(end_date__gt=datetime.today().date()).last()
+        dog_req = dr
         td_dr = Team_Dog_Deployed.objects.exclude(team_requested = None).filter(team_requested = dr).filter(status = "Pending").filter(handler__in = working_handlers)
 
         #TODO add filter to td_dr for requests that start today. Celery na bahala sa pag pull out if hindi na confirm
         #TODO if td_dr is today, reveal for_arrival_request
         #TODO change Team_Dog_Deployed.status to "Deployed" if nag confirm si TL
     except: pass
+
+    current_assignment = None
+    if dog_req == None:
+        current_assignment = ta
+    else:
+        current_assignment = dog_req
 
     if for_arrival:
         reveal_arrival = True
@@ -607,7 +615,9 @@ def team_leader_dashboard(request):
         'upcoming_request' : dr,
         'check_arrival_emrgncy_leave' : check_arrival_emrgncy_leave,
         'maritime_form' : maritime_form,
-        'temporary_care_k9s' : temporary_care_k9s
+        'temporary_care_k9s' : temporary_care_k9s,
+        'current_assignment' : current_assignment,
+        'dog_req' : dog_req
 
     }
     return render (request, 'profiles/team_leader_dashboard.html', context)
@@ -760,6 +770,7 @@ def handler_dashboard(request):
     geosearch = GeoSearch(request.POST or None)
 
     emergency_leave_form = EmergencyLeaveForm(request.POST or None)
+
 
     dr = 0
     k9 = None
@@ -958,11 +969,11 @@ def handler_dashboard(request):
     except ObjectDoesNotExist:
         pass
 
-    cb_handler = None
-    try:
-        cb_handler = Call_Back_Handler.objects.filter(handler = user).filter(status = "Pending").last()
-    except:
-        pass
+    # cb_handler = None
+    # try:
+    #     cb_handler = Call_Back_Handler.objects.filter(handler = user).filter(status = "Pending").last()
+    # except:
+    #     pass
 
     emergency_leave_count = Emergency_Leave.objects.filter(handler = user).filter(status = "Ongoing").count()
 
@@ -1002,7 +1013,7 @@ def handler_dashboard(request):
 
         'emergency_leave_form' : emergency_leave_form,
         'emergency_leave_count' : emergency_leave_count,
-        'cb_handler' : cb_handler
+        # 'cb_handler' : cb_handler
     }
     return render (request, 'profiles/handler_dashboard.html', context)
 

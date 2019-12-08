@@ -1005,7 +1005,7 @@ def assign_k9_select(request, id):
         'form': form,
         'style': style,
         'notif_data':notif_data,
-        'type_text':type_text,
+        # 'type_text':type_text,
         'count':count,
         'user':user,
         'k9':k9,
