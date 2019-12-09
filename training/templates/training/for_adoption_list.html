@@ -74,12 +74,13 @@
 <div class="ui large modal" id = 'id_data'></div>
 
 <script type="text/javascript">
+    $(function() {
+        $('#tabledata1').DataTable();
+        $('#tabledata2').DataTable();
+        $('.menu .item').tab();
+        
+    });
 
-  
-    $('#tabledata1').DataTable();
-    $('#tabledata2').DataTable();
-    $('.menu .item').tab();
-  
     $( ".returned_btn" ).bind('click', function() {
         var url = 'adoption-list/ajax_load_adoption';  
         var id = $(this).attr('id')

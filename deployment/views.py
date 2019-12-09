@@ -19,7 +19,7 @@ import re
 import sys
 from datetime import date
 
-from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave, VaccinceRecord
+from unitmanagement.models import Notification, Request_Transfer, Handler_On_Leave, VaccinceRecord,Call_Back_K9
 from training.models import K9_Handler
 from planningandacquiring.models import K9
 from profiles.models import Personal_Info, User, Account, Education
@@ -62,7 +62,7 @@ from profiles.populate_db import generate_user, generate_k9, generate_event, gen
     , create_predeployment_inventory, generate_k9_posttraining_decision, generate_k9_deployment
 
 #GENERATE DB 2
-from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption, create_supplier, generate_grading
+from profiles.populated_db_2 import create_predeployment_inventory, generate_user, create_teams, generate_k9, generate_requests, generate_dogbreed, generate_inventory_trail,generate_daily_refresher, generate_location_incident, generate_handler_incident, generate_handler_leave, generate_k9_incident, generate_health_record, generate_k9_parents, generate_k9_due_retire, generate_sick_breeding,generate_adoption, create_supplier, generate_grading, generate_item_request
 
 import random
 
@@ -303,6 +303,7 @@ def mass_populate_revisited():
 
     # create_predeployment_inventory()
     # generate_inventory_trail()
+
     # generate_k9_parents()
     # generate_requests()
 
@@ -313,18 +314,46 @@ def mass_populate_revisited():
     # generate_k9_incident()
     # generate_health_record()
     # generate_handler_incident()
-    # generate_adoption()
-    # generate_grading()
-
-    # generate_k9_due_retire()
-    # generate_sick_breeding()
 
     # fix_dog_duplicates()
 
+    # generate_sick_breeding()
+    generate_k9_due_retire()
+    # generate_adoption()
+
+
+    # # #FIX THIS
+    # generate_grading()
+
+    # k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment=None)
+    
+    # k9_c = K9.objects.filter(Q(training_status='For-Breeding') |
+    # Q(training_status='Breeding'))
+
+    cb = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
+
+    cb_list = []
+    for c in cb:
+        cb_list.append(c.k9.id)
+
+    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
+
+    print(data)
+
+    
+    # k9_c = K9.objects.filter(status='Due-For-Retirement')
+
+    # for k9 in k9_c:
+    #     print(k9.handler.id, k9.training_status)
+
     #TEST   
-    k9 = K9.objects.filter(status='Due-For-Retirement')
-    for k9 in k9:
-        print(k9.training_status)
+    # print(User.objects.filter(position='Handler').filter(partnered=False).count())
+    # print(date.today() + timedelta(days=63))
+
+
+    # k9 = K9.objects.filter(status='Due-For-Retirement')
+    # for k9 in k9:
+    #     print(k9.training_status)
     # count = K9.objects.filter(source='Breeding').count()
     # k9 = K9.objects.filter(source='Breeding')
 

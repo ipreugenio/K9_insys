@@ -16,7 +16,13 @@
 
 </div>
 
-<div class="ui segment">
+<div class="ui top attached tabular menu">
+    <a class="active item" data-tab="first">Unarrived on Duty</a>
+    <a class="item" data-tab="second">K9 MIA</a>
+    <a class="item" data-tab="third">Handler MIA</a>
+</div>
+
+<div class="ui bottom attached active tab segment" data-tab="first">
     <table id="tabledata1" class="ui celled table">
         <thead>
             <tr>
@@ -43,11 +49,56 @@
         </tbody>
     </table>
 </div>
-
+<div class="ui bottom attached tab segment" data-tab="second">
+    <table id="tabledata2" class="ui celled table">
+        <thead>
+            <tr>
+                <th>K9</th>
+                <th>Breed</th>
+                <th>Capability</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in k9_mia_perma %}
+            <tr>
+               <td><a href="{% url 'planningandacquiring:K9_detail' data.id %}">{{data}}</a></td>
+               <td>{{data.breed}}</td>
+               <td>{{data.capability}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="ui bottom attached tab segment" data-tab="third">
+    <table id="tabledata3" class="ui celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Rank</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in user_mia_perma %}
+            <tr>
+               <td><a  href="{% url 'profiles:user_detail' data.id %}">{{data}}</a></td>
+               <td>{{data.position}}</td>
+               <td>{{data.rank}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 <script type="text/javascript">
 
     $('#tabledata1').DataTable({
             "order": [[ 0, "desc" ],[ 1, "asc" ],[ 2, "asc" ],[ 3, "asc" ]]
+    });
+    $('#tabledata2').DataTable({
+            "order": [[ 0, "asc" ],[ 1, "asc" ],[ 2, "asc" ]]
+    });
+    $('#tabledata3').DataTable({
+            "order": [[ 0, "asc" ],[ 1, "asc" ],[ 2, "asc" ]]
     });
     $('.menu .item').tab();
 

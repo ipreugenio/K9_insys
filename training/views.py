@@ -1082,6 +1082,7 @@ def training_records(request):
 
 def training_update_form(request, id):
     data = K9.objects.get(id=id)  # get k9
+    handler = User.objects.get(id=data.handler.id)  
     training = Training.objects.filter(k9=data).get(training=data.capability)  #get training record
     form = TrainingUpdateForm(request.POST or None, instance=training)
     handlerID = K9_Handler.objects.filter(k9=data)
@@ -1100,7 +1101,12 @@ def training_update_form(request, id):
                 if stage1_1 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
                     training.stage = "Stage 0 - Failed"
                     training.save()
 
@@ -1130,7 +1136,12 @@ def training_update_form(request, id):
                 if stage1_2 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.1 - Failed"
                     training.save()
@@ -1158,7 +1169,12 @@ def training_update_form(request, id):
                 if stage1_3 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.2 - Failed"
                     training.save()
@@ -1186,7 +1202,12 @@ def training_update_form(request, id):
                 if stage2_1 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 1.3 - Failed"
                     training.save()
@@ -1213,7 +1234,12 @@ def training_update_form(request, id):
                 if stage2_2 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.1 - Failed"
                     training.save()
@@ -1240,7 +1266,12 @@ def training_update_form(request, id):
                 if stage2_3 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.2 - Failed"
                     training.save()
@@ -1266,7 +1297,12 @@ def training_update_form(request, id):
                 if stage3_1 == '0':
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 2.3 - Failed"
                     training.save()
@@ -1293,7 +1329,12 @@ def training_update_form(request, id):
                 if stage3_2 == "0":
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 3.1 - Failed"
                     training.save()
@@ -1320,7 +1361,12 @@ def training_update_form(request, id):
                 if stage3_3 == "0":
                     data.training_status = "For-Adoption"
                     data.trained = "Failed"
+                    data.handler = None
                     data.save()
+
+                    handler.partnered = False
+                    handler.save()
+
 
                     training.stage = "Stage 3.2 - Failed"
                     training.save()

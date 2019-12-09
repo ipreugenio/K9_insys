@@ -448,13 +448,16 @@ def check_arrival_to_ports_via_request(team_assignment):
     today = datetime.today().date()
     for item in deployed:
         recent_request_deployment = Team_Dog_Deployed.objects.filter(k9=item.k9).exclude(team_requested=None).filter(date_pulled=None).last()
-        delta = today - recent_request_deployment.date
-        if item.status == "Pending" and delta.days > 5:
-            deployed.date_pulled = date.today()
-            deployed.save()
-            k9 = item.k9
-            k9.training_status = "MIA"
-            k9.save()
+        try:
+            delta = today - recent_request_deployment.date
+            if item.status == "Pending" and delta.days > 5:
+                deployed.date_pulled = date.today()
+                deployed.save()
+                k9 = item.k9
+                k9.training_status = "MIA"
+                k9.save()
+        except:
+            pass
         #creation of TDD is through pull_dog_request()
 
     update_port_info([team_assignment.id])

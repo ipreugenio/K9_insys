@@ -140,4 +140,4 @@ def task_to_dash_pq():
     update_in_heat()
     k9_confirm_pregancy()
     in_heat_notifs()
-    k9_sched()
+    # k9_sched()
