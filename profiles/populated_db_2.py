@@ -298,16 +298,16 @@ def create_predeployment_inventory():
 
     randomizer = random.randint(100, 250)
     food = Food.objects.create(food="Pedigree Sack", foodtype="Adult Dog Food", unit="Sack - 20kg", quantity=randomizer,price=1500)
-    
+
     randomizer = random.randint(100, 250)
     Food.objects.create(food="Pedigree Puppy", foodtype="Puppy Dog Food", unit="kilograms", quantity=randomizer,price=120)
-    
+
     randomizer = random.randint(100, 250)
     Food.objects.create(food="Pedigree", foodtype="Adult Dog Food", unit="kilograms", quantity=randomizer,price=120)
-    
+
     randomizer = random.randint(100, 250)
     Food.objects.create(food="Pedigree Puppy Sack", foodtype="Puppy Dog Food", unit="Sack - 20kg", quantity=randomizer,price=1500)
-    
+
     Food.objects.create(food="Cosi Milk", foodtype="Milk", unit="Box - 1L", quantity=randomizer,price=130)
 
     randomizer = random.randint(50, 150)
@@ -315,13 +315,13 @@ def create_predeployment_inventory():
 
     randomizer = random.randint(50, 150)
     Medicine.objects.create(medicine="Broncure", med_type="Bottle", uom="mL", price=220, dose=90)
-    
+
     randomizer = random.randint(50, 150)
     Medicine.objects.create(medicine="Refamol", med_type="Capsule", uom="mg", price=32.05,dose=50)
-    
+
     randomizer = random.randint(50, 150)
     Medicine.objects.create(medicine="Parvo Aid", med_type="Tablet", uom="mg", price=25.66, dose=25)
-    
+
     randomizer = random.randint(50, 150)
     Medicine.objects.create(medicine="Papi Doxy", med_type="Bottle", uom="mL", price=173, dose=80)
 
@@ -369,22 +369,22 @@ def create_predeployment_inventory():
     #VET SUPPLY
     randomizer = random.randint(100, 1000)
     Miscellaneous.objects.create(miscellaneous='Adhesive Bandage',uom='pack', misc_type='Vet Supply', price=randomizer)
-    
+
     randomizer = random.randint(100, 1000)
     Miscellaneous.objects.create(miscellaneous='Face Mask',uom='pack', misc_type='Vet Supply', price=randomizer)
-    
+
     randomizer = random.randint(500, 800)
     Miscellaneous.objects.create(miscellaneous='Cotton Gauze Dressing',uom='pack', misc_type='Vet Supply',price=randomizer)
-    
+
     randomizer = random.randint(300, 600)
     Miscellaneous.objects.create(miscellaneous='Medical Gloves',uom='box', misc_type='Vet Supply', price=randomizer)
-    
+
     randomizer = random.randint(800, 1200)
     Miscellaneous.objects.create(miscellaneous='Surgical Suture',uom='box', misc_type='Vet Supply', price=randomizer)
 
     randomizer = random.randint(300, 800)
     Miscellaneous.objects.create(miscellaneous='Injection Syringe',uom='pc', misc_type='Vet Supply', price=randomizer)
-    
+
     randomizer = random.randint(500, 1200)
     Miscellaneous.objects.create(miscellaneous='EDTA K2 K3 Blood Tube',uom='tube', misc_type='Vet Supply',price=randomizer)
 
@@ -403,38 +403,38 @@ def create_teams():
     fake = Faker()
     CITY = (
         ('Alaminos', 'Alaminos'),
-        ('Angeles', 'Angeles'),
+        # ('Angeles', 'Angeles'),
         ('Antipolo', 'Antipolo'),
         ('Bacolod', 'Bacolod'),
         ('Bacoor', 'Bacoor'),
-        ('Bago', 'Bago'),
+        # ('Bago', 'Bago'),
         ('Baguio', 'Baguio'),
-        ('Bais', 'Bais'),
-        ('Balanga', 'Balanga'),
+        # ('Bais', 'Bais'),
+        # ('Balanga', 'Balanga'),
         ('Batac', 'Batac'),
         ('Batangas', 'Batangas'),
-        ('Bayawan', 'Bayawan'),
-        ('Baybay', 'Baybay'),
-        ('Bayugan', 'Bayugan'),
+        # ('Bayawan', 'Bayawan'),
+        # ('Baybay', 'Baybay'),
+        # ('Bayugan', 'Bayugan'),
         ('Biñan', 'Biñan'),
         ('Bislig', 'Bislig'),
-        ('Bogo', 'Bogo'),
-        ('Borongan', 'Borongan'),
+        # ('Bogo', 'Bogo'),
+        # ('Borongan', 'Borongan'),
         ('Butuan', 'Butuan'),
-        ('Cabadbaran', 'Cabadbaran'),
+        # ('Cabadbaran', 'Cabadbaran'),
         ('Cabanatuan', 'Cabanatuan'),
         ('Cabuyao', 'Cabuyao'),
-        ('Cadiz', 'Cadiz'),
+        # ('Cadiz', 'Cadiz'),
         ('Cagayan de Oro', 'Cagayan de Oro'),
         ('Calamba', 'Calamba'),
         ('Calapan', 'Calapan'),
-        ('Calbayog', 'Calbayog'),
+        # ('Calbayog', 'Calbayog'),
         ('Caloocan', 'Caloocan'),
         ('Candon', 'Candon'),
         ('Canlaon', 'Canlaon'),
         ('Carcar', 'Carcar'),
         ('Catbalogan', 'Catbalogan'),
-        ('Cauayan', 'Cauayan'),
+        # ('Cauayan', 'Cauayan'),
         ('Cavite', 'Cavite'),
         ('Cebu', 'Cebu'),
         ('Cotabato', 'Cotabato'),
@@ -443,57 +443,56 @@ def create_teams():
         ('Dapitan', 'Dapitan'),
         ('Dasmariñas', 'Dasmariñas'),
         ('Davao', 'Davao'),
-        ('Digos', 'Digos'),
+        # ('Digos', 'Digos'),
         ('Dipolog', 'Dipolog'),
         ('Dumaguete', 'Dumaguete'),
-        ('El Salvador', 'El Salvador'),
-        ('Escalante', 'Escalante'),
-        ('Gapan', 'Gapan'),
+        # ('El Salvador', 'El Salvador'),
+        # ('Escalante', 'Escalante'),
+        # ('Gapan', 'Gapan'),
         ('General Santos', 'General Santos'),
         ('General Trias', 'General Trias'),
-        ('Gingoog', 'Gingoog'),
-        ('Guihulngan', 'Guihulngan'),
+        # ('Gingoog', 'Gingoog'),
+        # ('Guihulngan', 'Guihulngan'),
         ('Himamaylan', 'Himamaylan'),
-        ('Ilagan', 'Ilagan'),
         ('Iligan', 'Iligan'),
         ('Iloilo', 'Iloilo'),
         ('Imus', 'Imus'),
-        ('Iriga', 'Iriga'),
+        # ('Iriga', 'Iriga'),
         ('Isabela', 'Isabela'),
-        ('Kabankalan', 'Kabankalan'),
+        # ('Kabankalan', 'Kabankalan'),
         ('Kidapawan', 'Kidapawan'),
         ('Koronadal', 'Koronadal'),
         ('La Carlota', 'La Carlota'),
-        ('Lamitan', 'Lamitan'),
+        # ('Lamitan', 'Lamitan'),
         ('Laoag', 'Laoag'),
-        ('Lapu‑Lapu', 'Lapu‑Lapu'),
+        # ('Lapu‑Lapu', 'Lapu‑Lapu'),
         ('Las Piñas', 'Las Piñas'),
         ('Legazpi', 'Legazpi'),
-        ('Ligao', 'Ligao'),
+        # ('Ligao', 'Ligao'),
         ('Lipa', 'Lipa'),
         ('Lucena', 'Lucena'),
-        ('Maasin', 'Maasin'),
-        ('Mabalacat', 'Mabalacat'),
+        # ('Maasin', 'Maasin'),
+        # ('Mabalacat', 'Mabalacat'),
         ('Makati', 'Makati'),
         ('Malabon', 'Malabon'),
-        ('Malaybalay', 'Malaybalay'),
+        # ('Malaybalay', 'Malaybalay'),
         ('Malolos', 'Malolos'),
         ('Mandaluyong', 'Mandaluyong'),
-        ('Mandaue', 'Mandaue'),
+        # ('Mandaue', 'Mandaue'),
         ('Manila', 'Manila'),
         ('Marawi', 'Marawi'),
         ('Marikina', 'Marikina'),
         ('Masbate', 'Masbate'),
-        ('Mati', 'Mati'),
-        ('Meycauayan', 'Meycauayan'),
+        # ('Mati', 'Mati'),
+        # ('Meycauayan', 'Meycauayan'),
         ('Muñoz', 'Muñoz'),
         ('Muntinlupa', 'Muntinlupa'),
-        ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
-        ('Naga - Cebu', 'Naga - Cebu'),
+        # ('Naga - Camarines Sur', 'Naga - Camarines Sur'),
+        # ('Naga - Cebu', 'Naga - Cebu'),
         ('Navotas', 'Navotas'),
         ('Olongapo', 'Olongapo'),
-        ('Ormoc', 'Ormoc'),
-        ('Oroquieta', 'Oroquieta'),
+        # ('Ormoc', 'Ormoc'),
+        # ('Oroquieta', 'Oroquieta'),
         ('Ozamiz', 'Ozamiz'),
         ('Pagadian', 'Pagadian'),
         ('Palayan', 'Palayan'),
@@ -501,41 +500,41 @@ def create_teams():
         ('Parañaque', 'Parañaque'),
         ('Pasay', 'Pasay'),
         ('Pasig', 'Pasig'),
-        ('Passi', 'Passi'),
+        # ('Passi', 'Passi'),
         ('Puerto Princesa', 'Puerto Princesa'),
         ('Quezon', 'Quezon'),
         ('Roxas', 'Roxas'),
-        ('Sagay', 'Sagay'),
-        ('Samal', 'Samal'),
-        ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
-        ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
-        ('San Fernando - La Union', 'San Fernando - La Union'),
-        ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
+        # ('Sagay', 'Sagay'),
+        # ('Samal', 'Samal'),
+        # ('San Carlos - Negros Occidental', 'San Carlos - Negros Occidental'),
+        # ('San Carlos - Pangasinan', 'San Carlos - Pangasinan'),
+        # ('San Fernando - La Union', 'San Fernando - La Union'),
+        # ('San Fernando - Pampanga', 'San Fernando - Pampanga'),
         ('San Jose', 'San Jose'),
-        ('San Jose del Monte', 'San Jose del Monte'),
+        # ('San Jose del Monte', 'San Jose del Monte'),
         ('San Juan', 'San Juan'),
         ('San Pablo', 'San Pablo'),
         ('San Pedro', 'San Pedro'),
         ('Santa Rosa', 'Santa Rosa'),
         ('Santiago', 'Santiago'),
-        ('Silay', 'Silay'),
+        # ('Silay', 'Silay'),
         ('Sipalay', 'Sipalay'),
         ('Sorsogon', 'Sorsogon'),
         ('Surigao', 'Surigao'),
         ('Tabaco', 'Tabaco'),
-        ('Tabuk', 'Tabuk'),
+        # ('Tabuk', 'Tabuk'),
         ('Tacloban', 'Tacloban'),
-        ('Tacurong', 'Tacurong'),
+        # ('Tacurong', 'Tacurong'),
         ('Tagaytay', 'Tagaytay'),
-        ('Tagbilaran', 'Tagbilaran'),
+        # ('Tagbilaran', 'Tagbilaran'),
         ('Taguig', 'Taguig'),
         ('Tagum', 'Tagum'),
         ('Talisay - Cebu', 'Talisay - Cebu'),
-        ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
+        # ('Talisay - Negros Occidental', 'Talisay - Negros Occidental'),
         ('Tanauan', 'Tanauan'),
-        ('Tandag', 'Tandag'),
-        ('Tangub', 'Tangub'),
-        ('Tanjay', 'Tanjay'),
+        # ('Tandag', 'Tandag'),
+        # ('Tangub', 'Tangub'),
+        # ('Tanjay', 'Tanjay'),
         ('Tarlac', 'Tarlac'),
         ('Tayabas', 'Tayabas'),
         ('Toledo', 'Toledo'),
@@ -832,13 +831,13 @@ def generate_k9():
             #TODO
             #CREATE VACCINE YEARLY RECORD HERE
             vr = VaccinceRecord.objects.filter(k9=k9).last()
-            
+
             VaccineUsed.objects.create(k9=k9,disease='DHPPiL4',date_vaccinated=fake.date_between(start_date="-2y", end_date="now"),done=True)
-                        
+
             VaccineUsed.objects.create(k9=k9,disease='Anti-Rabies',date_vaccinated=fake.date_between(start_date="-2y", end_date="-2y"),done=True)
-            
+
             VaccineUsed.objects.create(k9=k9,disease='Deworming',date_vaccinated=fake.date_between(start_date="-2y", end_date="-2y"),done=True)
-            
+
             VaccineUsed.objects.create(k9=k9,disease='Bordetella',date_vaccinated=fake.date_between(start_date="-2y", end_date="-2y"),done=True)
 
             try:
@@ -908,7 +907,7 @@ def generate_k9():
     training_k9_sample = random.sample(training_k9_list, int(len(training_k9_list) * .80))
 
     for k9 in training_k9_sample:
-        #create training history
+        # #create training history
         fake_date = fake.date_between(start_date='-5y', end_date='today')
         Training_History.objects.create(k9=k9,handler=k9.handler,date=fake_date)
 
@@ -916,10 +915,77 @@ def generate_k9():
 
         training_start_alpha = datetime.combine(birthdate, datetime.min.time())
         training_start_alpha = training_start_alpha + timedelta(days=365)
-      
-        training = Training.objects.filter(k9 = k9).filter(training = k9.capability).last()
-        
-        remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        try:
+            training = Training.objects.filter(k9 = k9).get(training = k9.capability)
+
+            remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        except:
+            pass
+        #
+        #     train_sched = Training_Schedule.objects.filter(k9 = k9).last() #Because we have 1 instance of this per k9 instance at the start
+        #     train_sched.date_start = training_start_alpha
+        #     train_sched.date_end = training_start_alpha + timedelta(days=20)
+        #
+        #     grade_list = []
+        #     stage = "Stage 0"
+        #     for idx in range(9):
+        #         randomizer = random.randint(0, 5)
+        #         grade = GRADE[randomizer][0]
+        #         grade_list.append(grade)
+        #
+        #         if idx == 0:
+        #             stage = "Stage 1.1"
+        #         elif idx == 1:
+        #             stage = "Stage 1.2"
+        #         elif idx == 2:
+        #             stage = "Stage 1.3"
+        #         elif idx == 3:
+        #             stage = "Stage 2.1"
+        #         elif idx == 4:
+        #             stage = "Stage 2.2"
+        #         elif idx == 5:
+        #             stage = "Stage 2.3"
+        #         elif idx == 6:
+        #             stage = "Stage 3.1"
+        #         elif idx == 7:
+        #             stage = "Stage 3.2"
+        #         elif idx == 8:
+        #             stage = "Stage 3.3"
+        #
+        #         # if exclude_k9 == False and idx != 8:
+        #         sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
+        #         train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=20 * idx + 1),
+        #                                                             date_end = training_start_alpha + timedelta(days=20 * idx + 2), stage = stage, remarks = sched_remark)
+        #         # train_sched.save()
+        #
+        #     training.stage1_1 = grade_list[0]
+        #     training.stage1_2 = grade_list[1]
+        #     training.stage1_3 = grade_list[2]
+        #
+        #     training.stage2_1 = grade_list[3]
+        #     training.stage2_2 = grade_list[4]
+        #     training.stage2_3 = grade_list[5]
+        #
+        #     training.stage3_1 = grade_list[6]
+        #     training.stage3_2 = grade_list[7]
+        #     training.stage3_3 = grade_list[8]
+        #
+        #     start_date = datetime(2019, 1, 1)
+        #     end_date = datetime(2019, 12, 31)
+        #     f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        #
+        #     # if exclude_k9 == False:
+        #
+        #     training.stage = "Finished Training"
+        #     training.date_finished = f_date
+        #
+        #     k9.training_status = 'Trained'
+        #     k9.training_level = "Finished Training"
+        #     k9.serial_number = 'SN-' + str(k9.id) + '-' + str(datetime.now().year)
+        #     k9.trained = "Trained"
+        #     k9.save()
+        #     # else:
+        #     #     training.stage = "Stage 3.2"
 
         train_sched = Training_Schedule.objects.filter(k9=k9).filter(stage='Stage 0').last() #Because we have 1 instance of this per k9 instance
         train_sched.date_start = training_start_alpha
@@ -927,7 +993,7 @@ def generate_k9():
 
         train_sched.remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
         train_sched.save()
-        
+
         grade_list = ['75','80','85','90','95','100']
         training.stage1_1 = random.choice(grade_list)
         training.stage1_2 = random.choice(grade_list)
@@ -972,7 +1038,7 @@ def generate_k9():
             sched_remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
             train_sched = Training_Schedule.objects.create(k9 = k9, date_start = training_start_alpha + timedelta(days=dur),date_end = training_start_alpha + timedelta(days=dur), stage = stage, remarks = sched_remark)
             # train_sched.save()
-        
+
         # start_date = datetime(2019,1,1)
         # end_date = datetime(2019,12,31)
         # f_date = fake.date_between(start_date=start_date, end_date=end_date)
@@ -986,7 +1052,7 @@ def generate_k9():
         k9.trained = "Trained"
         k9.save()
         print("Created Training for " + str(k9))
-     
+
     # END CREATE TRAINING
 
     # START BREEDING_or_DEPLOYMENT
@@ -1077,7 +1143,7 @@ def generate_k9():
                     team.EDD_deployed += 1
                 team.save()
                 k9.training_status = 'Deployed'
-                k9.status = 'Working Dog' 
+                k9.status = 'Working Dog'
                 k9.assignment = team.team
                 k9.training_status = "Deployed"
                 handler = k9.handler
@@ -1119,7 +1185,7 @@ def generate_requests():
     for area in Area.objects.all():
         area_list.append(area)
 
-    for x in range(0, 150):
+    for x in range(0, 80):
         requester = fake.company()
         cell = "+63" + fake.msisdn()[:10]
 
@@ -1176,7 +1242,7 @@ def generate_requests():
 
 def generate_maritime():
     fake = Faker()
-    for x in range(0, 500):
+    for x in range(0, 100):
         BOAT_TYPE = (
             ('Domestice Passenger Vessels', 'Domestice Passenger Vessels'),
             ('Motorbancas', 'Motorbancas'),
@@ -1208,7 +1274,7 @@ def generate_maritime():
         passenger_count = random.randint(20, 100)
 
         maritime = Maritime.objects.create(location = location, boat_type = boat_type, date = date, time = time, passenger_count = passenger_count)
-
+        print(str(x) + " out of 100 maritime generated")
     return None
 
 
@@ -1219,7 +1285,7 @@ def generate_inventory_trail():
     fake = Faker()
     admin = User.objects.filter(position='Administrator')
     admin = list(admin) #food received & count by admin
-    
+
     vet = User.objects.filter(position='Veterinarian')
     vet = list(vet)
     # DATE OF THIS YEAR - 2019
@@ -1266,7 +1332,7 @@ def generate_inventory_trail():
             Food_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
             data.quantity = new_q
             data.save()
-            
+
     # MISC
     misc = Miscellaneous.objects.all()
     for data in misc:
@@ -1397,7 +1463,7 @@ def generate_inventory_trail():
             Food_Inventory_Count.objects.create(inventory=data, user=choice, old_quantity=data.quantity, quantity=new_q,date_counted=f_date)
             data.quantity = new_q
             data.save()
-            
+
     # MISC
     misc = Miscellaneous.objects.all()
     for data in misc:
@@ -1490,15 +1556,15 @@ def generate_daily_refresher():
     user = User.objects.filter(position="Handler")
     user = list(user)
     k9 = K9.objects.exclude(serial_number='Unassigned Serial Number')
-    k9_list = list(k9) 
-    
+    k9_list = list(k9)
+
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
     for data in k9_sample:
         handler = random.choice(user)
         for i in range(2):
             start_date = datetime(2019,1,1)
             end_date = datetime(2019,12,31)
-            
+
             choice = random.choice(k9_list)
 
             mar = ['MARSEC','MARLEN','MARSAR','MAREP']
@@ -1514,7 +1580,7 @@ def generate_daily_refresher():
             baggage_find = random.randint(0, baggage_plant)
             others_plant = random.randint(1, 3)
             others_find = random.randint(0, others_plant)
-            
+
             port_date = fake.date_time_between(start_date=start_date, end_date="now", tzinfo=None)
             port_hour = int(port_date.time().hour)
             port_date = port_date - timedelta(hours=port_hour)
@@ -1548,15 +1614,15 @@ def generate_daily_refresher():
             dr = Daily_Refresher.objects.create(k9=choice,handler=handler,date=port_date,morning_feed_cups=2,evening_feed_cups=2,on_leash=True,off_leash=True,obstacle_course=True,panelling=True, mar = mar, port_plant=port_plant, port_find=port_find, port_time=port_time, building_plant=building_plant,  building_find=building_find, building_time=building_time, vehicle_plant=vehicle_plant,  vehicle_find=vehicle_find, vehicle_time=vehicle_time, baggage_plant=baggage_plant,  baggage_find=baggage_find, baggage_time=baggage_time, others_plant=others_plant, others_find=others_find, others_time=others_time)
 
             print('DR'+str(i), dr.k9, dr.rating)
-    
+
 #LOCATION INCIDENT, MARITIME, DOG REQUEST
 def generate_location_incident():
     fake = Faker()
     ta = Team_Assignment.objects.exclude(team_leader=None)
-    ta_list = list(ta) 
+    ta_list = list(ta)
     ta_sample = random.sample(ta_list, int(len(ta_list) * .25))
     user = User.objects.all()
-    user_list = list(user) 
+    user_list = list(user)
 
     incident_type = ['Explosives Related', 'Narcotics Related', 'Search and Rescue Related', 'Others']
 
@@ -1566,7 +1632,7 @@ def generate_location_incident():
     others = ['Attack', 'Bodyguard Duty', 'Security Duty']
     boat = ['Domestice Passenger Vessels', 'Motorbancas', 'Fastcrafts', 'Cruise Ships', 'Tugboat', 'Barge','Tanker']
     event = ['Big Event', 'Small Event']
-    
+
     pre_titles = ['An Evening of ', 'A Night to Celebrate ', 'A Celebration of Life and ', 'The Wonders of ', 'In Observance of ', 'In Recognition of ', 'In Commemoration of ', 'Meetup for ', 'The Future of ', 'The Technology of ', 'A Date with ']
     post_titles = [' Conference', ' Con', ' Competition', ' Hackathon', ' Fundraiser', ' Charity', ' Party', ' Bash', ' Ball', ' Gala', ' Shindig', 'athon', ' Celebration', ' Affair', ' Ceremony', ' Awards', ' Event of the Year!', ' Jubilee', ' Performance', ' Blast', ' Blowout', ' Rite', ' Show', ' Meetup', ' for Health', ' Workshop', ' Research Event', ' Summit', ' Course', ' Symposium', ' Town Hall Meeting', ' Games', ' Expo', ': The Event']
 
@@ -1588,7 +1654,7 @@ def generate_location_incident():
             i_loc = random.choice(loc)
             i_tl = random.choice(tl)
             if i_type == 'Explosives Related':
-                i_inc = random.choice(explosive) 
+                i_inc = random.choice(explosive)
                 i_rem = 'Explosive Remarks Here'
             elif i_type == 'Narcotics Related':
                 i_inc = random.choice(narcotics)
@@ -1599,9 +1665,9 @@ def generate_location_incident():
             elif i_type == 'Others':
                 i_inc = random.choice(others)
                 i_rem = 'Other Remarks Here'
-            
+
             Incidents.objects.create(user=i_tl,date=f_date.date(),incident=i_inc,location=i_loc,type=i_type,remarks=i_rem)
-            
+
             m_boat = random.choice(boat)
             p_count = random.randint(50, 150)
 
@@ -1628,20 +1694,20 @@ def generate_location_incident():
 
             sf_date = fake.date_between(start_date=start_date, end_date=end_date)
             ef_date = fake.date_between(start_date=start_date, end_date=end_date)
-            
+
             s_loc = str(i_loc)
             place = s_loc.replace('port', '')
             Dog_Request.objects.create(requester=str(u),event_name=pre_t+post_t,location=place,city=city,sector_type=e,phone_number=cellnum,email_address=email,area=i_loc.area,k9s_needed=needed,k9s_deployed=deployed,status='Done',longtitude=lng,latitude=lat,team_leader=i_tl, start_date=sf_date, end_date=ef_date,remarks='No remarks')
-            
+
 def generate_handler_incident():
     fake = Faker()
     incident = ['Rescued People','Made an Arrest','Poor Performance','Violation']
     ta = Team_Assignment.objects.exclude(team_leader=None)
     k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
-    
+
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
-  
+
     for data in k9_sample:
         for i in range(5):
             start_date = datetime(2019,1,1)
@@ -1663,7 +1729,7 @@ def generate_handler_leave():
     k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .10))
-    
+
     for data in k9_sample:
         start_date = datetime(2019,1,1)
         end_date = datetime(2019,11,1)
@@ -1675,7 +1741,7 @@ def generate_handler_leave():
         ef_date = sf_date + timedelta(days=rl)
         dog = data
         approver = random.choice(admin)
-        
+
         # Handler_On_Leave
         Handler_On_Leave.objects.create(handler=dog.handler,approved_by=approver,k9=dog,description='Sick Leave',reply='Okay',status='Approved',date_from=sf_date,date_to=ef_date)
 
@@ -1691,7 +1757,7 @@ def generate_k9_incident():
     k9 = K9.objects.exclude(assignment='None').exclude(handler=None).exclude(serial_number='Unassigned Serial Number')
     k9_list = list(k9)
     k9_sample = random.sample(k9_list, int(len(k9_list) * .15))
-    
+
     handler = User.objects.filter(position="Handler")
     handler = list(handler)
 
@@ -1699,11 +1765,11 @@ def generate_k9_incident():
     stolen = ['Dognapped', 'Left with a stranger', 'Snatched']
 
     sick = ['Rashes', 'Red Spots', 'Breathing Heavy', 'Depressed/Low Energy', 'Would not Eat', 'Runny Eyes', 'Vomiting', 'Coughing', 'Fever', 'Weight loss', 'Diarrhea']
-    
+
     accident = ['Hit by Car', 'Caught in Bomb Explosion', 'Building Fell Down', 'Stab by Unknown Subject','Caught by Gun Fired on Premises']
-    
+
     clinic = ['Companion Animal Veterinary Clinic','BSF Animal Clinic','Makati Dog & Cat Hospital','Ada Animal Clinics','Animal House','UP Veterinary Teaching Hospital, Diliman Station','Pendragon Veterinary Clinic','Vets in Practice Animal Hospital','The Pet Project Vet Clinic','Pet Society Veterinary Clinic']
-    
+
     for data in k9_sample:
         k_inc = random.choice(inc)
 
@@ -1725,8 +1791,8 @@ def generate_k9_incident():
         else:
             k_clinic = random.choice(clinic)
             K9_Incident.objects.create(k9=data,incident=k_inc,title=str(data)+str(' is ')+k_inc,date=f_date,description=k_desc,status='Done',reported_by=data.handler,clinic=k_clinic)
-    
-def generate_health_record():    
+
+def generate_health_record():
     fake = Faker()
     time_of_day = ['Morning','Afternoon','Night','Morning/Afternoon','Morning/Night','Afternoon/Night','Morning/Afternoon/Night']
 
@@ -1751,15 +1817,16 @@ def generate_health_record():
         start_date = datetime(2019,1,1)
         end_date = datetime(2019,12,10)
 
-        f_date = fake.date_between(start_date=start_date, end_date=end_date)
+        f_date = fake.date_between_dates(date_start=start_date, date_end=end_date)
         k_desc = random.choice(sick)
         v = random.choice(vet_list)
         prob = random.choice(problem)
         treat = random.choice(treatment)
-        
+        days = random.randint(1, 5)
+
         k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
-        
-        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident, duration = days)
 
         randomint = random.randint(1, 5)
 
@@ -1771,7 +1838,7 @@ def generate_health_record():
             tod = random.choice(time_of_day)
 
             HealthMedicine.objects.create(health=health,medicine=m,quantity=quan,duration=days,time_of_day=tod)
-            
+
             f_dur = f_dur+days
 
         health.duration = f_dur
@@ -1797,9 +1864,9 @@ def generate_k9_parents():
     dh4 = Medicine_Inventory.objects.filter(medicine__immunization='DHPPiL4')
     hw = Medicine_Inventory.objects.filter(medicine__immunization='Heartworm')
     tf = Medicine_Inventory.objects.filter(medicine__immunization='Tick and Flea')
-    
+
     print(dam.count())
-    
+
     #BREED K9
     second_gen = []
     for data in dam:
@@ -1812,14 +1879,14 @@ def generate_k9_parents():
             sire_list = list(sire)
 
             parent = K9_Parent.objects.filter(offspring=data)
-          
+
             f_sire = []
             for par in parent:
                 f_sire.append(par.father.id)
 
             n_sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability).exclude(serial_number='Unassigned Serial Number').exclude(id__in=f_sire)
-          
-        
+
+
             sire_pick = random.choice(n_sire)
 
             if sire_pick:
@@ -1842,7 +1909,7 @@ def generate_k9_parents():
             K9_Mated.objects.create(mother=data,father=sire_pick,status='Pregnancy Done',date_mated=m_date)
 
             K9_Litter.objects.create(mother=data, father=sire_pick,litter_no=born,litter_died=died)
-            
+
             dif = born - died
             for i in range(dif):
                 #Create offspring
@@ -1857,7 +1924,7 @@ def generate_k9_parents():
 
                 weight = random.randint(30, 50)
                 height = random.randint(60, 80)
-                
+
                 data.last_date_mated = m_date
                 sire_pick.last_date_mated = m_date
 
@@ -1884,13 +1951,13 @@ def generate_k9_parents():
         cap = data.capability
         handler = User.objects.filter(position="Handler")
         remark = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-        
+
         Training_History.objects.create(k9=k9,handler=random.choice(handler),date=s_date)
-        
+
         #FIRST TRAINING STAGE
         ts = Training_Schedule.objects.filter(k9=k9).last()
         dur_train = random.randint(20,40)
-        t_date = s_date + timedelta(days=dur_train) 
+        t_date = s_date + timedelta(days=dur_train)
         ts.date_start = s_date
         ts.date_end = t_date
         ts.remarks = remark
@@ -1913,7 +1980,7 @@ def generate_k9_parents():
             ss_date = t_date
             t_date = t_date + timedelta(days=dur_train)
             remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-            
+
             if i == 0:
                 # Stage 1.2
                 Training_Schedule.objects.create(k9=k9,stage='Stage 1.2',date_start=ss_date,date_end=t_date,remarks=remarks)
@@ -1937,7 +2004,7 @@ def generate_k9_parents():
                 Training_Schedule.objects.create(k9=k9,stage='Stage 3.2',date_start=ss_date,date_end=t_date,remarks=remarks)
 
         final_date = Training_Schedule.objects.filter(k9=k9).filter(stage='Stage 3.2').last()
-        train.date_finished = final_date.date_end 
+        train.date_finished = final_date.date_end
         train.save()
 
         #VACCINE RECORD # get dont create
@@ -1981,7 +2048,7 @@ def generate_k9_parents():
         a.vaccine = random.choice(dw)
         a.veterinary = random.choice(vet_list)
         a.image = 'health_image/vac_stamp.jpg'
-        a.done = True  
+        a.done = True
         a.save()
 
         b = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='2').last()
@@ -1989,7 +2056,7 @@ def generate_k9_parents():
         b.vaccine = random.choice(dw)
         b.veterinary = random.choice(vet_list)
         b.image = 'health_image/vac_stamp.jpg'
-        b.done = True  
+        b.done = True
         b.save()
 
         c = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='3').last()
@@ -1997,7 +2064,7 @@ def generate_k9_parents():
         c.vaccine = random.choice(dw)
         c.veterinary = random.choice(vet_list)
         c.image = 'health_image/vac_stamp.jpg'
-        c.done = True  
+        c.done = True
         c.save()
 
         d = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='4').last()
@@ -2005,7 +2072,7 @@ def generate_k9_parents():
         d.vaccine = random.choice(dhp)
         d.veterinary = random.choice(vet_list)
         d.image = 'health_image/vac_stamp.jpg'
-        d.done = True  
+        d.done = True
         d.save()
 
         e = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='5').last()
@@ -2013,7 +2080,7 @@ def generate_k9_parents():
         e.vaccine = random.choice(hw)
         e.veterinary = random.choice(vet_list)
         e.image = 'health_image/vac_stamp.jpg'
-        e.done = True  
+        e.done = True
         e.save()
 
         f = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='6').last()
@@ -2021,7 +2088,7 @@ def generate_k9_parents():
         f.vaccine = random.choice(bbb)
         f.veterinary = random.choice(vet_list)
         f.image = 'health_image/vac_stamp.jpg'
-        f.done = True  
+        f.done = True
         f.save()
 
         g = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='7').last()
@@ -2029,7 +2096,7 @@ def generate_k9_parents():
         g.vaccine = random.choice(tf)
         g.veterinary = random.choice(vet_list)
         g.image = 'health_image/vac_stamp.jpg'
-        g.done = True  
+        g.done = True
         g.save()
 
         h = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='8').last()
@@ -2037,7 +2104,7 @@ def generate_k9_parents():
         h.vaccine = random.choice(dh4)
         h.veterinary = random.choice(vet_list)
         h.image = 'health_image/vac_stamp.jpg'
-        h.done = True  
+        h.done = True
         h.save()
 
         i = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='9').last()
@@ -2045,7 +2112,7 @@ def generate_k9_parents():
         i.vaccine = random.choice(dw)
         i.veterinary = random.choice(vet_list)
         i.image = 'health_image/vac_stamp.jpg'
-        i.done = True  
+        i.done = True
         i.save()
 
         j = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='10').last()
@@ -2053,7 +2120,7 @@ def generate_k9_parents():
         j.vaccine = random.choice(hw)
         j.veterinary = random.choice(vet_list)
         j.image = 'health_image/vac_stamp.jpg'
-        j.done = True  
+        j.done = True
         j.save()
 
         k = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='11').last()
@@ -2061,7 +2128,7 @@ def generate_k9_parents():
         k.vaccine = random.choice(bbb)
         k.veterinary = random.choice(vet_list)
         k.image = 'health_image/vac_stamp.jpg'
-        k.done = True  
+        k.done = True
         k.save()
 
         l = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='12').last()
@@ -2069,7 +2136,7 @@ def generate_k9_parents():
         l.vaccine = random.choice(ar)
         l.veterinary = random.choice(vet_list)
         l.image = 'health_image/vac_stamp.jpg'
-        l.done = True  
+        l.done = True
         l.save()
 
         m = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='13').last()
@@ -2077,15 +2144,15 @@ def generate_k9_parents():
         m.vaccine = random.choice(tf)
         m.veterinary = random.choice(vet_list)
         m.image = 'health_image/vac_stamp.jpg'
-        m.done = True  
+        m.done = True
         m.save()
-        
+
         n = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='14').last()
         n.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
         n.vaccine = random.choice(dhp)
         n.veterinary = random.choice(vet_list)
         n.image = 'health_image/vac_stamp.jpg'
-        n.done = True  
+        n.done = True
         n.save()
 
         o = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='15').last()
@@ -2093,7 +2160,7 @@ def generate_k9_parents():
         o.vaccine = random.choice(hw)
         o.veterinary = random.choice(vet_list)
         o.image = 'health_image/vac_stamp.jpg'
-        o.done = True  
+        o.done = True
         o.save()
 
         p = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='16').last()
@@ -2101,7 +2168,7 @@ def generate_k9_parents():
         p.vaccine = random.choice(dh4)
         p.veterinary = random.choice(vet_list)
         p.image = 'health_image/vac_stamp.jpg'
-        p.done = True  
+        p.done = True
         p.save()
 
         q = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='17').last()
@@ -2109,7 +2176,7 @@ def generate_k9_parents():
         q.vaccine = random.choice(tf)
         q.veterinary = random.choice(vet_list)
         q.image = 'health_image/vac_stamp.jpg'
-        q.done = True  
+        q.done = True
         q.save()
 
         r = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='18').last()
@@ -2117,7 +2184,7 @@ def generate_k9_parents():
         r.vaccine = random.choice(dh4)
         r.veterinary = random.choice(vet_list)
         r.image = 'health_image/vac_stamp.jpg'
-        r.done = True  
+        r.done = True
         r.save()
 
         s = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='19').last()
@@ -2125,7 +2192,7 @@ def generate_k9_parents():
         s.vaccine = random.choice(hw)
         s.veterinary = random.choice(vet_list)
         s.image = 'health_image/vac_stamp.jpg'
-        s.done = True  
+        s.done = True
         s.save()
 
         t = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='20').last()
@@ -2133,7 +2200,7 @@ def generate_k9_parents():
         t.vaccine = random.choice(tf)
         t.veterinary = random.choice(vet_list)
         t.image = 'health_image/vac_stamp.jpg'
-        t.done = True  
+        t.done = True
         t.save()
 
         u = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='21').last()
@@ -2141,7 +2208,7 @@ def generate_k9_parents():
         u.vaccine = random.choice(hw)
         u.veterinary = random.choice(vet_list)
         u.image = 'health_image/vac_stamp.jpg'
-        u.done = True  
+        u.done = True
         u.save()
 
         v = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='22').last()
@@ -2149,7 +2216,7 @@ def generate_k9_parents():
         v.vaccine = random.choice(tf)
         v.veterinary = random.choice(vet_list)
         v.image = 'health_image/vac_stamp.jpg'
-        v.done = True  
+        v.done = True
         v.save()
 
         w = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='23').last()
@@ -2157,7 +2224,7 @@ def generate_k9_parents():
         w.vaccine = random.choice(hw)
         w.veterinary = random.choice(vet_list)
         w.image = 'health_image/vac_stamp.jpg'
-        w.done = True  
+        w.done = True
         w.save()
 
         x = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='24').last()
@@ -2165,7 +2232,7 @@ def generate_k9_parents():
         x.vaccine = random.choice(tf)
         x.veterinary = random.choice(vet_list)
         x.image = 'health_image/vac_stamp.jpg'
-        x.done = True  
+        x.done = True
         x.save()
 
         y = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='25').last()
@@ -2173,7 +2240,7 @@ def generate_k9_parents():
         y.vaccine = random.choice(hw)
         y.veterinary = random.choice(vet_list)
         y.image = 'health_image/vac_stamp.jpg'
-        y.done = True  
+        y.done = True
         y.save()
 
         z = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='26').last()
@@ -2181,7 +2248,7 @@ def generate_k9_parents():
         z.vaccine = random.choice(tf)
         z.veterinary = random.choice(vet_list)
         z.image = 'health_image/vac_stamp.jpg'
-        z.done = True  
+        z.done = True
         z.save()
 
         zz = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='27').last()
@@ -2189,7 +2256,7 @@ def generate_k9_parents():
         zz.vaccine = random.choice(hw)
         zz.veterinary = random.choice(vet_list)
         zz.image = 'health_image/vac_stamp.jpg'
-        zz.done = True  
+        zz.done = True
         zz.save()
 
         print(data, 'CREATE/UPDATE')
@@ -2202,20 +2269,20 @@ def generate_k9_parents():
         end_date = datetime(2019,10,10)
 
         f_date = fake.date_between(start_date=start_date, end_date=end_date)
-        
+
         if data.sex == 'Female':
             try:
                 sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability)
                 sire_list = list(sire)
-                
+
                 parent = K9_Parent.objects.filter(offspring=data)
-            
+
                 f_sire = []
                 for par in parent:
                     f_sire.append(par.father.id)
 
                 n_sire = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male').filter(breed=data.breed).filter(capability=data.capability).exclude(serial_number='Unassigned Serial Number').exclude(id__in=f_sire)
-            
+
                 sire_pick = random.choice(n_sire)
 
                 if sire_pick:
@@ -2236,7 +2303,7 @@ def generate_k9_parents():
                 K9_Mated.objects.create(mother=data,father=sire_pick,status='Pregnancy Done',date_mated=m_date)
 
                 K9_Litter.objects.create(mother=data, father=sire_pick,litter_no=born,litter_died=died)
-                
+
                 dif = born - died
                 for i in range(dif):
                     #Create offspring
@@ -2252,31 +2319,31 @@ def generate_k9_parents():
                     weight = random.randint(30, 50)
                     height = random.randint(60, 80)
 
-                     
+
                     data.last_date_mated = m_date
                     sire_pick.last_date_mated = m_date
 
                     data.save()
                     sire_pick.save()
-                    
+
                     k9 = K9.objects.create(name=name,breed=data.breed,sex=sex,color=color,birth_date=b_date,source='Breeding',weight=weight,height=height)
                     k9.save()
-                    
+
                     K9_Parent.objects.create(mother=data,father=sire_pick,offspring=k9)
 
                     third_gen.append(k9)
-            
+
 
     print(third_gen)
-    
+
     print('On Training','Puppy')
     print('THIRD COUNT', len(third_gen))
-    # CREATE/UPDATE SECOND GEN TRAINING, VACCINE, STATUS, 1 yr old or less than 
+    # CREATE/UPDATE SECOND GEN TRAINING, VACCINE, STATUS, 1 yr old or less than
     for data in third_gen:
         s_date = data.birth_date
         k9 = data
-       
-        #VACCINE RECORD 
+
+        #VACCINE RECORD
         vr = VaccinceRecord.objects.filter(k9=k9).last()
         vr.deworming_1 = True
         vr.deworming_2 = True
@@ -2290,10 +2357,10 @@ def generate_k9_parents():
         vr.heartworm_1 = True
         vr.heartworm_2 = True
         vr.heartworm_3 = True
-      
+
         vr.anti_rabies = True
         vr.bordetella_1 = True
-        vr.bordetella_2 = True 
+        vr.bordetella_2 = True
         vr.dhppil4_1 = True
         vr.dhppil4_2 = False # LAST
 
@@ -2311,7 +2378,7 @@ def generate_k9_parents():
         a.vaccine = random.choice(dw)
         a.veterinary = random.choice(vet_list)
         a.image = 'health_image/vac_stamp.jpg'
-        a.done = True  
+        a.done = True
         a.save()
 
         b = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='2').last()
@@ -2319,7 +2386,7 @@ def generate_k9_parents():
         b.vaccine = random.choice(dw)
         b.veterinary = random.choice(vet_list)
         b.image = 'health_image/vac_stamp.jpg'
-        b.done = True  
+        b.done = True
         b.save()
 
         c = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='3').last()
@@ -2327,7 +2394,7 @@ def generate_k9_parents():
         c.vaccine = random.choice(dw)
         c.veterinary = random.choice(vet_list)
         c.image = 'health_image/vac_stamp.jpg'
-        c.done = True  
+        c.done = True
         c.save()
 
         d = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='4').last()
@@ -2335,7 +2402,7 @@ def generate_k9_parents():
         d.vaccine = random.choice(dhp)
         d.veterinary = random.choice(vet_list)
         d.image = 'health_image/vac_stamp.jpg'
-        d.done = True  
+        d.done = True
         d.save()
 
         e = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='5').last()
@@ -2343,7 +2410,7 @@ def generate_k9_parents():
         e.vaccine = random.choice(hw)
         e.veterinary = random.choice(vet_list)
         e.image = 'health_image/vac_stamp.jpg'
-        e.done = True  
+        e.done = True
         e.save()
 
         f = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='6').last()
@@ -2351,7 +2418,7 @@ def generate_k9_parents():
         f.vaccine = random.choice(bbb)
         f.veterinary = random.choice(vet_list)
         f.image = 'health_image/vac_stamp.jpg'
-        f.done = True  
+        f.done = True
         f.save()
 
         g = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='7').last()
@@ -2359,7 +2426,7 @@ def generate_k9_parents():
         g.vaccine = random.choice(tf)
         g.veterinary = random.choice(vet_list)
         g.image = 'health_image/vac_stamp.jpg'
-        g.done = True  
+        g.done = True
         g.save()
 
         h = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='8').last()
@@ -2367,7 +2434,7 @@ def generate_k9_parents():
         h.vaccine = random.choice(dh4)
         h.veterinary = random.choice(vet_list)
         h.image = 'health_image/vac_stamp.jpg'
-        h.done = True  
+        h.done = True
         h.save()
 
         i = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='9').last()
@@ -2375,7 +2442,7 @@ def generate_k9_parents():
         i.vaccine = random.choice(dw)
         i.veterinary = random.choice(vet_list)
         i.image = 'health_image/vac_stamp.jpg'
-        i.done = True  
+        i.done = True
         i.save()
 
         j = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='10').last()
@@ -2383,7 +2450,7 @@ def generate_k9_parents():
         j.vaccine = random.choice(hw)
         j.veterinary = random.choice(vet_list)
         j.image = 'health_image/vac_stamp.jpg'
-        j.done = True  
+        j.done = True
         j.save()
 
         k = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='11').last()
@@ -2391,7 +2458,7 @@ def generate_k9_parents():
         k.vaccine = random.choice(bbb)
         k.veterinary = random.choice(vet_list)
         k.image = 'health_image/vac_stamp.jpg'
-        k.done = True  
+        k.done = True
         k.save()
 
         l = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='12').last()
@@ -2399,7 +2466,7 @@ def generate_k9_parents():
         l.vaccine = random.choice(ar)
         l.veterinary = random.choice(vet_list)
         l.image = 'health_image/vac_stamp.jpg'
-        l.done = True  
+        l.done = True
         l.save()
 
         m = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='13').last()
@@ -2407,15 +2474,15 @@ def generate_k9_parents():
         m.vaccine = random.choice(tf)
         m.veterinary = random.choice(vet_list)
         m.image = 'health_image/vac_stamp.jpg'
-        m.done = True  
+        m.done = True
         m.save()
-        
+
         n = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='14').last()
         n.date_vaccinated = fake.date_between(start_date=start_date, end_date=end_date)
         n.vaccine = random.choice(dhp)
         n.veterinary = random.choice(vet_list)
         n.image = 'health_image/vac_stamp.jpg'
-        n.done = True  
+        n.done = True
         n.save()
 
         o = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='15').last()
@@ -2423,7 +2490,7 @@ def generate_k9_parents():
         o.vaccine = random.choice(hw)
         o.veterinary = random.choice(vet_list)
         o.image = 'health_image/vac_stamp.jpg'
-        o.done = True  
+        o.done = True
         o.save()
 
         p = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='16').last()
@@ -2431,7 +2498,7 @@ def generate_k9_parents():
         p.vaccine = random.choice(dh4)
         p.veterinary = random.choice(vet_list)
         p.image = 'health_image/vac_stamp.jpg'
-        p.done = True  
+        p.done = True
         p.save()
 
         q = VaccineUsed.objects.filter(vaccine_record=vr).filter(order='17').last()
@@ -2439,7 +2506,7 @@ def generate_k9_parents():
         q.vaccine = random.choice(tf)
         q.veterinary = random.choice(vet_list)
         q.image = 'health_image/vac_stamp.jpg'
-        q.done = True  
+        q.done = True
         q.save()
 
         print(data, 'CREATE/UPDATE')
@@ -2457,10 +2524,10 @@ def generate_k9_due_retire():
         k9.status = "Due-For-Retirement"
         k9.save()
         print("DUE TO RETIRE ", k9, k9.handler.id, k9.training_status, k9.status)
- 
+
 def generate_sick_breeding():
     fake = Faker()
-    
+
     k9 = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding'))
     k9_list = list(k9)
 
@@ -2491,10 +2558,11 @@ def generate_sick_breeding():
         v = random.choice(vet_list)
         prob = random.choice(problem)
         treat = random.choice(treatment)
-        
+        days = random.randint(1, 5)
+
         k9_incident = K9_Incident.objects.create(k9=data,incident='Sick',title=str(data)+str(' is Sick'),date=f_date,description=k_desc,status='Done',reported_by=data.handler)
-        
-        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident)
+
+        health = Health.objects.create(status='Done',image='prescription_image/prescription.jpg',date_done=f_date,dog=data,problem=prob,treatment=treat,veterinary=v,incident_id=k9_incident, duration = days)
 
         randomint = random.randint(1, 5)
 
@@ -2506,7 +2574,7 @@ def generate_sick_breeding():
             tod = random.choice(time_of_day)
 
             HealthMedicine.objects.create(health=health,medicine=m,quantity=quan,duration=days,time_of_day=tod)
-            
+
             f_dur = f_dur+days
 
         health.duration = f_dur
@@ -2516,7 +2584,7 @@ def generate_sick_breeding():
     female = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Female')
     male = K9.objects.filter(Q(training_status='For-Breeding') | Q(training_status='Breeding')).filter(sex='Male')
 
-    sire = list(male) 
+    sire = list(male)
     dam = list(female)
 
     for i in range(20):
@@ -2532,7 +2600,7 @@ def generate_sick_breeding():
 
 def generate_adoption():
     fake = Faker()
-    
+
     sex_list = ['Male', 'Female']
     color_list = ['Black','Yellow','Chocolate','Dark Golden','Light Golden','Cream','Golden','Brindle','Silver Brindle','Gold Brindle','Salt and Pepper','Gray Brindle','Blue and Gray','Tan','Black-Tipped Fawn','Mahogany','White','Black and White','White and Tan']
     skill_list = ['EDD', 'NDD', 'SAR']
@@ -2550,7 +2618,7 @@ def generate_adoption():
         #Create offspring
         start_date = datetime(2018,1,1)
         end_date = datetime(2019,2,20)
-    
+
         b_date = fake.date_between(start_date='-2y', end_date='-1y')
         color = random.choice(color_list)
         sex = random.choice(sex_list)
@@ -2565,16 +2633,16 @@ def generate_adoption():
         height = random.randint(60, 80)
         cap = random.choice(skill_list)
         breed = random.choice(breed_list)
-        
+
         k9 = K9.objects.create(name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',training_level='Stage 1.1',capability=cap,trained='Failed',weight=weight,height=height,supplier=supplier)
         k9.training_status = 'For-Adoption'
         k9.save()
-        
+
         dur = random.randint(40,100)
         date_start = fake.date_between(start_date=start_date, end_date=end_date)
         date_end = fake.date_between(start_date=date_start, end_date=(date_start+timedelta(days=dur)))
-        
-    
+
+
         tr = Training.objects.filter(k9=k9,training=cap).last()
         ts = Training_Schedule.objects.filter(k9=k9).last()
 
@@ -2588,9 +2656,9 @@ def generate_adoption():
 
         tr.save()
         ts.save()
-    
+
     k9_adopt = K9.objects.filter(training_status = 'For-Adoption')
-    
+
     for i, k9 in enumerate(k9_adopt):
         sex = random.choice(sex_list)
         name = 'temp_name'
@@ -2607,22 +2675,22 @@ def generate_adoption():
         date_adopted = fake.date_between(start_date='-1y', end_date='now')
         date_returned = fake.date_between(start_date=date_adopted, end_date='now')
         reason = fake.paragraph(nb_sentences=1, variable_nb_sentences=True, ext_word_list=None)
-        # 20 Adopted 
+        # 20 Adopted
         if i < 20:
             K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted)
             k9.training_status = 'Adopted'
             k9.status = 'Adopted'
             k9.save()
-            print("Generate Adopted" + str(i), k9)      
-        
-        # 10 Returned 
+            print("Generate Adopted" + str(i), k9)
+
+        # 10 Returned
         if i > 20:
             K9_Adopted_Owner.objects.create(k9=k9,first_name=name,middle_name=middle_name,last_name=last_name,address=address,sex=sex,birth_date=birth_date,email=email,contact_no=contact_no,date_adopted=date_adopted,date_returned=date_returned,reason=reason)
             print("Generate Returned" + str(i), k9)
 
 def generate_grading():
     fake = Faker()
-    
+
     sex_list = ['Male', 'Female']
     color_list = ['Black','Yellow','Chocolate','Dark Golden','Light Golden','Cream','Golden','Brindle','Silver Brindle','Gold Brindle','Salt and Pepper','Gray Brindle','Blue and Gray','Tan','Black-Tipped Fawn','Mahogany','White','Black and White','White and Tan']
     skill_list = ['EDD', 'NDD', 'SAR']
@@ -2643,7 +2711,7 @@ def generate_grading():
         #Create offspring
         start_date = datetime(2018,1,1)
         end_date = datetime(2019,2,20)
-    
+
         b_date = fake.date_between(start_date='-2y', end_date='-1y')
         color = random.choice(color_list)
         sex = random.choice(sex_list)
@@ -2658,13 +2726,13 @@ def generate_grading():
         height = random.randint(60, 80)
         cap = random.choice(skill_list)
         breed = random.choice(breed_list)
-        
+
         #K9 on stage 3.1
         han_c = random.choice(handler)
         k9 = K9.objects.create(handler=han_c,name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',capability=cap,weight=weight,height=height,supplier=supplier)
         k9.training_status = 'On-Training'
         k9.training_level = 'Stage 2.3'
-        k9.save()    
+        k9.save()
         han_c.partnered = True
         han_c.save()
 
@@ -2677,7 +2745,7 @@ def generate_grading():
         train.stage2_2 = random.choice(grade_list)
         train.stage2_3 = random.choice(grade_list)
         train.save()
-        
+
         ts = Training_Schedule.objects.filter(k9=k9).last()
 
         dur_train = random.randint(20,40)
@@ -2687,7 +2755,7 @@ def generate_grading():
         ts.save()
 
         t_date = ts.date_end
-        
+
         print(k9,' - Stage 3.1 For Grading')
         #CREATE TRAINING SCHED
         for i in range(6):
@@ -2695,7 +2763,7 @@ def generate_grading():
             ss_date = t_date
             t_date = t_date + timedelta(days=dur_train)
             remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-            
+
             if i == 0:
                 # Stage 1.2
                 Training_Schedule.objects.create(k9=k9,stage='Stage 1.1',date_start=ss_date,date_end=t_date,remarks=remarks)
@@ -2723,7 +2791,7 @@ def generate_grading():
         #Create offspring
         start_date = datetime(2018,1,1)
         end_date = datetime(2019,2,20)
-    
+
         b_date = fake.date_between(start_date='-2y', end_date='-1y')
         color = random.choice(color_list)
         sex = random.choice(sex_list)
@@ -2738,12 +2806,12 @@ def generate_grading():
         height = random.randint(60, 80)
         cap = random.choice(skill_list)
         breed = random.choice(breed_list)
-    
+
         han_c = random.choice(handler)
         k9 = K9.objects.create(handler=han_c,name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',capability=cap,weight=weight,height=height,supplier=supplier)
         k9.training_status = 'On-Training'
         k9.training_level = 'Stage 3.2'
-        k9.save()    
+        k9.save()
         han_c.partnered = True
         han_c.save()
 
@@ -2767,7 +2835,7 @@ def generate_grading():
         ts.save()
 
         t_date = ts.date_end
-        
+
         #CREATE TRAINING SCHED
         print(k9,' - Stage 3.3 For Grading')
         for i in range(8):
@@ -2775,7 +2843,7 @@ def generate_grading():
             ss_date = t_date
             t_date = t_date + timedelta(days=dur_train)
             remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-            
+
             if i == 0:
                 # Stage 1.2
                 Training_Schedule.objects.create(k9=k9,stage='Stage 1.1',date_start=ss_date,date_end=t_date,remarks=remarks)
@@ -2807,7 +2875,7 @@ def generate_grading():
         #Create offspring
         start_date = datetime(2018,1,1)
         end_date = datetime(2019,2,20)
-    
+
         b_date = fake.date_between(start_date='-2y', end_date='-1y')
         color = random.choice(color_list)
         sex = random.choice(sex_list)
@@ -2827,7 +2895,7 @@ def generate_grading():
         k9 = K9.objects.create(handler=han_c,name=name,breed=breed,sex=sex,color=color,birth_date=b_date, source='Procurement',status='Material Dog',capability=cap,weight=weight,height=height,supplier=supplier)
         k9.training_status = 'On-Training'
         k9.training_level = 'Stage 3.2'
-        k9.save()    
+        k9.save()
         han_c.partnered = True
         han_c.save()
 
@@ -2840,7 +2908,7 @@ def generate_grading():
         train.stage2_2 = random.choice(grade_list)
         train.stage2_3 = random.choice(grade_list)
         train.stage3_1 = random.choice(grade_list)
-       
+
         train.save()
         ts = Training_Schedule.objects.filter(k9=k9).last()
 
@@ -2851,7 +2919,7 @@ def generate_grading():
         ts.save()
 
         t_date = ts.date_end
-        
+
         #CREATE TRAINING SCHED
         print(k9,' - Stage 3.3 For Training')
         for i in range(7):
@@ -2859,7 +2927,7 @@ def generate_grading():
             ss_date = t_date
             t_date = t_date + timedelta(days=dur_train)
             remarks = fake.paragraph(nb_sentences=2, variable_nb_sentences=True, ext_word_list=None)
-            
+
             if i == 0:
                 # Stage 1.2
                 Training_Schedule.objects.create(k9=k9,stage='Stage 1.1',date_start=ss_date,date_end=t_date,remarks=remarks)
@@ -2907,7 +2975,7 @@ def fix_dog_duplicates():
 
     return None
 
-#TODO item request from team leader (approved and insufficient) 
+#TODO item request from team leader (approved and insufficient)
 def generate_item_request():
     pass
 

@@ -3335,7 +3335,8 @@ class TeamLeaderView(APIView):
     def get(self, request, format=None):
         user = user_session(request)
         ta = Team_Assignment.objects.get(team_leader=user)
-        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
+        dog_req = Dog_Request.objects.filter(team_leader = user).filter(Q(start_date__lte = datetime.today().date()), Q(end_date__gte = datetime.today().date())).last()
+        # tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').filter(date_pulled = None)
 
         # Incident
         er = Incidents.objects.filter(location = ta.location).filter(type='Explosives Related').count()
@@ -3360,8 +3361,12 @@ class TeamLeaderView(APIView):
         supply_items = [s_edd, s_ndd, s_sar]
 
         # Perfromance
+        if ta:
+            tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed').filter(date_pulled = None)
+        elif dog_req:
+            tdd = Team_Dog_Deployed.objects.filter(team_requested = dog_req)
+        else: tdd = None
 
-        tdd = Team_Dog_Deployed.objects.filter(team_assignment=ta).filter(status='Deployed')
 
         k9_id = []
 
