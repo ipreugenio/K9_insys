@@ -2446,7 +2446,7 @@ def generate_k9_parents():
 
 def generate_k9_due_retire():
     fake = Faker()
-    k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing"))
+    k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment="None").exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing"))
 
     k9_list = list(k9_c)
 

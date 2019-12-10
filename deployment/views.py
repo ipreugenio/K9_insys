@@ -315,57 +315,59 @@ def mass_populate_revisited():
     # generate_health_record()
     # generate_handler_incident()
 
-    # fix_dog_duplicates()
 
     # generate_sick_breeding()
-    generate_k9_due_retire()
+    # generate_k9_due_retire()
     # generate_adoption()
 
-
-    # # #FIX THIS
     # generate_grading()
 
-    # k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment=None)
+    # fix_dog_duplicates()
+
+    #PRINT
+    '''
+    1 Admin 
+    1 Team Leader
+    1 Vet
+    1 Trainer
+    3 Handler with k9
+
+    '''
+
+    #TEST HERE
+    #DUE FOR RETIREMENT
+    k9_c = K9.objects.filter(status="Due-For-Retirement").filter(status='Working Dog')
+    for k9_c in k9_c:
+        print('Due for Retirement - ', k9_c, k9_c.handler, k9_c.handler.id)
+
+    handler = User.objects.filter(position="Handler").filter(assigned=True)
+
+    for i in range(3):
+        choice =  random.choice(handler)
+        k9 = K9.objects.get(handler=choice)
+        print('Handler with K9 - ',choice.id, choice, k9)
+
+    tl = Team_Assignment.objects.all()
+
+    leader =  random.choice(tl)
+    print('Leader - ', leader.id ,leader)
+
+    admin = User.objects.filter(position="Administrator")
+    admin =  random.choice(admin)
+    print('Admin - ',admin.id ,admin)
     
-    # k9_c = K9.objects.filter(Q(training_status='For-Breeding') |
-    # Q(training_status='Breeding'))
 
-    cb = Call_Back_K9.objects.filter(Q(status='Pending') | Q(status='Confirmed'))
+    vet = User.objects.filter(position="Veterinarian")
+    vet =  random.choice(vet)
+    print('Vet - ',vet.id ,vet)
 
-    cb_list = []
-    for c in cb:
-        cb_list.append(c.k9.id)
-
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
-
-    print(data)
-
-    
-    # k9_c = K9.objects.filter(status='Due-For-Retirement')
-
-    # for k9 in k9_c:
-    #     print(k9.handler.id, k9.training_status)
-
-    #TEST   
-    # print(User.objects.filter(position='Handler').filter(partnered=False).count())
-    # print(date.today() + timedelta(days=63))
+    trainer = User.objects.filter(position="Trainer")
+    trainer =  random.choice(trainer)
+    print('Vet - ',trainer.id ,trainer)
 
 
-    # k9 = K9.objects.filter(status='Due-For-Retirement')
-    # for k9 in k9:
-    #     print(k9.training_status)
-    # count = K9.objects.filter(source='Breeding').count()
-    # k9 = K9.objects.filter(source='Breeding')
-
-    # l = list(k9)
-    # vr = VaccinceRecord.objects.filter(k9__in=l)
-
-    # print('COUNT',count)
-    # print('K9',k9)
-    # print('Vaccine')
-    # for vr in vr:
-    #     print(vr.status)
-
+    print("Date confirm pregnancy: ", date.today() + timedelta(days=22))
+    print("Date add litter: ", date.today()  + timedelta(days=63))
 
     return None
 
