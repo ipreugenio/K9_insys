@@ -298,28 +298,32 @@ def check_handlers_with_multiple_k9s():
 
 def mass_populate_revisited():
     # GENERAL & DEPLOYMENT
-    # create_supplier()
-    # generate_dogbreed()
+    create_supplier()
+    generate_dogbreed()
 
-    # generate_user()
-    # create_teams()
-    # generate_maritime()
-    # generate_k9()
+    generate_user()
+    create_teams()
+    generate_maritime()
+    generate_k9()
 
-    # create_predeployment_inventory()
-    # generate_inventory_trail()
+    create_predeployment_inventory()
+    generate_inventory_trail()
 
-    # generate_k9_parents()
-    # generate_requests()
+    generate_k9_parents()
+    generate_requests()
 
+    generate_sick_breeding()
+    generate_adoption()
+    generate_health_record()
+    generate_grading()
+    generate_k9_incident()
+    generate_handler_leave()
+    generate_handler_incident()
+    generate_location_incident()
+    generate_daily_refresher()
 
-    # generate_sick_breeding()
-    # generate_k9_due_retire()
-    # generate_adoption()
-
-    # generate_grading()
-
-    # fix_dog_duplicates()
+    fix_dog_duplicates()
+    generate_k9_due_retire()
 
     #PRINT
     '''
@@ -332,11 +336,8 @@ def mass_populate_revisited():
     '''
 
     #TEST HERE
-    #DUE FOR RETIREMENT
-    k9_c = K9.objects.filter(status="Due-For-Retirement").filter(status='Working Dog')
-    for k9_c in k9_c:
-        print('Due for Retirement - ', k9_c, k9_c.handler, k9_c.handler.id)
-
+    
+   
     #Handler with k9
     handler = User.objects.filter(position="Handler").filter(assigned=True).filter(partnered=True)
 
@@ -349,7 +350,7 @@ def mass_populate_revisited():
     #Team Leader
     tl = Team_Assignment.objects.all()
     leader =  random.choice(tl)
-    print('Leader - ', leader.id ,leader)
+    print('Leader - ', leader.team_leader.id ,leader)
 
     #Admin
     admin = User.objects.filter(position="Administrator")
@@ -366,7 +367,7 @@ def mass_populate_revisited():
     trainer =  random.choice(trainer)
     print('Vet - ',trainer.id ,trainer)
 
-    #K9 to be mated dates of notif show
+    #K9 to be mated dates of notif show 
     print("Date confirm pregnancy: ", date.today() + timedelta(days=22))
     print("Date add litter: ", date.today()  + timedelta(days=63))
 

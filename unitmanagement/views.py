@@ -2405,7 +2405,7 @@ def due_retired_list(request):
     for c in cb:
         cb_list.append(c.k9.id)
 
-    data = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired')
+    data = K9.objects.filter(training_status="Deployed").filter(status='Due-For-Retirement').exclude(handler=None).exclude(assignment="None").exclude(id__in=cb_list).order_by('year_retired')
 
     cb_conf = Call_Back_K9.objects.filter(status='Confirmed')
     cb_pend = Call_Back_K9.objects.filter(status='Pending')
@@ -2480,19 +2480,17 @@ def confirm_arrive(request,id):
     cb = Call_Back_K9.objects.filter(id=id).last()
     
     #k9
-    k9 = K9.objects.filter(id=cb.k9.id).last()
+    k9 = K9.objects.get(id=cb.k9.id)
     k9.training_status = 'Light Duty'
-    # k9.status = 'Working Dog'
     k9.assignment = None
-    
-    # k9.handler = None
-
-    #handler
-    # handler = User.objects.get(id=k9.handler.id)
-    # handler.partnered = False
-    # handler.assigned = False
-
     k9.save()
+
+    if tdd:
+        tdd.date_pulled =  datetime.today().date()
+        tdd.save()
+        current_port = current_team(k9)
+        update_port_info([current_port.id])
+
     # handler.save()
 
     messages.success(request, 'You have confirmed the arrival of ' + str(cb.k9.handler) + ' and ' +str(cb.k9) + ' back to base.')
