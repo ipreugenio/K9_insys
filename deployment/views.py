@@ -337,32 +337,36 @@ def mass_populate_revisited():
     for k9_c in k9_c:
         print('Due for Retirement - ', k9_c, k9_c.handler, k9_c.handler.id)
 
-    handler = User.objects.filter(position="Handler").filter(assigned=True)
+    #Handler with k9
+    handler = User.objects.filter(position="Handler").filter(assigned=True).filter(partnered=True)
 
     for i in range(3):
         choice =  random.choice(handler)
         k9 = K9.objects.get(handler=choice)
         print('Handler with K9 - ',choice.id, choice, k9)
 
-    tl = Team_Assignment.objects.all()
 
+    #Team Leader
+    tl = Team_Assignment.objects.all()
     leader =  random.choice(tl)
     print('Leader - ', leader.id ,leader)
 
+    #Admin
     admin = User.objects.filter(position="Administrator")
     admin =  random.choice(admin)
     print('Admin - ',admin.id ,admin)
     
-
+    #Veterinarian
     vet = User.objects.filter(position="Veterinarian")
     vet =  random.choice(vet)
     print('Vet - ',vet.id ,vet)
 
+    #Trainer
     trainer = User.objects.filter(position="Trainer")
     trainer =  random.choice(trainer)
     print('Vet - ',trainer.id ,trainer)
 
-
+    #K9 to be mated dates of notif show
     print("Date confirm pregnancy: ", date.today() + timedelta(days=22))
     print("Date add litter: ", date.today()  + timedelta(days=63))
 
