@@ -2512,19 +2512,23 @@ def generate_k9_parents():
         print(data, 'CREATE/UPDATE')
 
 def generate_k9_due_retire():
-    fake = Faker()
-    k9_c = K9.objects.filter(training_status='Deployed').filter(status='Working Dog').exclude(handler=None).exclude(assignment="None").exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing"))
+    k9_c = K9.objects.filter(training_status="Deployed").filter(status='Working Dog').exclude(handler=None).exclude(assignment="None")
+    
+    print('CAN RETIRE: ', k9_c.count())
 
     k9_list = list(k9_c)
 
     for i in range(5):
-        choice = random.choice(k9_list)
-        k9 = K9.objects.get(id=choice.id)
+        k9_choice = random.choice(k9_list)
+        k9 = K9.objects.get(id=k9_choice.id)
+
         k9.birth_date = date.today() - relativedelta(years=9)
         k9.status = "Due-For-Retirement"
         k9.save()
+        
         print("DUE TO RETIRE ", k9, k9.handler.id, k9.training_status, k9.status)
 
+    return None
 def generate_sick_breeding():
     fake = Faker()
 

@@ -266,7 +266,7 @@ def dashboard(request):
     for c in cbs:
         cb_list.append(c.k9.id)
 
-    due_retire = K9.objects.filter(status='Due-For-Retirement').exclude(assignment=None).exclude(Q(training_status="For-Adoption") | Q(training_status="Adopted") | Q(training_status="Light Duty") | Q(training_status="Retired") | Q(training_status="Dead") | Q(training_status="Missing")).exclude(id__in=cb_list).order_by('year_retired').count()
+    due_retire =  K9.objects.filter(training_status="Deployed").filter(status='Due-For-Retirement').exclude(handler=None).exclude(assignment="None").count()
 
     cb_conf_count = Call_Back_K9.objects.filter(status='Confirmed').count()
     #NOTIF SHOW

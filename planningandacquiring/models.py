@@ -348,20 +348,6 @@ class K9(models.Model):
             else:
                 self.reproductive_stage = 'Anestrus'
 
-        #TODO TRANSFER TO CELERY
-        if self.age == 9:
-            if self.status == 'Working Dog' or self.status == 'Material Dog' or self.status == 'Sick' or self.status =='Accident':
-                self.status = 'Due-For-Retirement'
-                if self.assignment == 'None':
-                    self.training_status = 'Light Duty'
-            
-        elif self.age == 10:
-            self.training_status = 'Retired'
-            # self.year_retired = self.birth_date + td(days=(10*365))
-            self.status = 'Retired'
-        else:
-            pass
-
         if self.sex == 'Male':
             self.in_heat_months = 0
             self.last_proestrus_date = None
@@ -370,11 +356,6 @@ class K9(models.Model):
             self.next_estrus_date = None
             self.metestrus_date = None
             self.anestrus_date = None
-
-        # Serial Numbers and Microchips are given after training
-        # lead_zero = str(self.id).zfill(5)
-        # serial_number = '#%s' % (lead_zero)
-        # self.serial_number = str(serial_number)
 
         self.age_month = (self.age * 12) + self.month_remainder()
         super(K9, self).save(*args, **kwargs)
