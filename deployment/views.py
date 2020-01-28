@@ -817,8 +817,8 @@ def request_dog_list(request):
         print("NOT A COMMANDER")
 
     data1 = data.filter(status='Pending').exclude(start_date__lte = datetime.date.today())
-    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed')).exclude(end_date = datetime.date.today())
-    data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed'))
+    data2 = data.filter(status='Approved').exclude(k9s_deployed__gte = F('k9s_needed')).exclude(start_date__lte = datetime.date.today())
+    data3 = data.filter(status='Approved').filter(k9s_deployed__gte = F('k9s_needed')).exclude(start_date__lte = datetime.date.today())
 
     # latest_date = Dog_Request.objects.latest('end_date')
     # latest_date = latest_date.end_date
@@ -861,7 +861,7 @@ def request_dog_details(request, id):
 
     # get instance of user using personal_info.id
     # id of user is the fk.id of person_info
-    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave").exclude(status = 'No Longer Employed').exclude(status = 'Retired').exclude('Died').exclude('MIA')
+    user = User.objects.filter(id__in=handler_can_deploy).exclude(position = "Team Leader").exclude(status = "Emergency Leave").exclude(status = "On-Leave").exclude(status = 'No Longer Employed').exclude(status = 'Retired').exclude(status ='Died').exclude(status ='MIA')
 
     user_deploy = []  # append the user itself
     for u in user:
@@ -1037,7 +1037,7 @@ def request_dog_details(request, id):
     #TODO Find a way to somehow put all within AOR on top first for Small Events, otherwise create a seperate dataframe
     can_deploy_dataframe = df(data=df_data)
     can_deploy_dataframe.sort_values(by=["Distance", "Maritime", "Incident"],
-                                   ascending=[True, True, True])
+                                   ascending=[True, True, True], inplace=True)
 
     if data2.sector_type == "Small Event":
         for k9 in can_deploy_outside_AOR:
@@ -1090,7 +1090,7 @@ def request_dog_details(request, id):
 
         can_deploy_outside_AOR_dataframe = df(data=df_data)
         can_deploy_outside_AOR_dataframe.sort_values(by=["Distance", "Maritime", "Incident"],
-                                         ascending=[True, True, True])
+                                         ascending=[True, True, True], inplace=True)
 
         can_deploy_dataframe = pd.concat([can_deploy_dataframe, can_deploy_outside_AOR_dataframe])#Puts within AOR on top first
         can_deploy_dataframe.reset_index(drop=True, inplace=True)
@@ -1124,7 +1124,7 @@ def request_dog_details(request, id):
 
             Notification.objects.create(position='Handler', user=dog.handler, notif_type='handler_request_scheduled',
                                         message="Your have an upcoming K9 request on " + str(
-                                            data2.date_start) + ". Be there!")
+                                            data2.start_date) + ". Be there!")
 
             #
             # if checked_dogs.capability == 'EDD':
@@ -1169,37 +1169,38 @@ def request_dog_details(request, id):
     return render(request, 'deployment/request_dog_details.html', context)
 
 def remove_dog_request(request, id):
-    pull_k9 = Team_Dog_Deployed.objects.filter(id=id).last()
-    k9 = K9.objects.filter(id=pull_k9.k9.id).last()
-    dog_request = Dog_Request.objects.filter(id=pull_k9.team_requested.id).last()
+    # pull_k9 = Team_Dog_Deployed.objects.filter(id=id).last()
+    k9 = K9.objects.filter(id=id).last()
+    dog_request = Dog_Request.objects.filter(id=id).last()
 
-    sched = K9_Schedule.objects.filter(Q(k9 = k9) & Q(dog_request = dog_request)).last()
+    sched = K9_Schedule.objects.filter(Q(k9 = k9), Q(dog_request = dog_request))
     sched.delete()
 
     #change Team_Dog_Deployed model
-    pull_k9.status = 'Pulled-Out'
-    pull_k9.date_pulled = datetime.date.today()
-    pull_k9.save()
+    # pull_k9.status = 'Pulled-Out'
+    # pull_k9.date_pulled = datetime.date.today()
+    # pull_k9.save()
 
     #change K9 model
-    k9.assignment = 'None'
-    k9.save()
+    # k9.assignment = 'None'
+    # k9.save()
     #TODO Only put None if K9 is currently deployed on said request
 
     #change Dog_Request model
-    if pull_k9.k9.capability == 'EDD':
+    if k9.capability == 'EDD':
         dog_request.EDD_deployed  = dog_request.EDD_deployed - 1
-    elif pull_k9.k9.capability == 'NDD':
+    elif k9.capability == 'NDD':
         dog_request.NDD_deployed = dog_request.NDD_deployed - 1
-    elif pull_k9.k9.capability == 'SAR':
+    elif k9.capability == 'SAR':
         dog_request.SAR_deployed = dog_request.SAR_deployed - 1
     else:
         pass
+    dog_request.k9s_deployed = dog_request.k9s_deployed - 1
     dog_request.save()
 
-    messages.success(request, 'Dogs has been successfully Pulled!')
+    messages.success(request, 'Dogs has been successfully un-scheduled')
 
-    return redirect('deployment:request_dog_details', id=pull_k9.team_requested.id)
+    return redirect('deployment:request_dog_details', id=dog_request.id)
 
 # def deployment_report(request):
 #     assignment = Team_Assignment.objects.all()

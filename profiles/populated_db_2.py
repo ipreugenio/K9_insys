@@ -1193,9 +1193,11 @@ def generate_requests():
 
         event_type = "?"
         k9s_required = 0
+        status = "Pending"
         if randomizer == 0:
             event_type = "Big Event"
             k9s_required = random.randint(5, 10)
+            status = "Approved"
 
         else:
             event_type = "Small Event"
@@ -1230,7 +1232,7 @@ def generate_requests():
         request = Dog_Request.objects.create(requester=requester, location=location, city=city, sector_type=event_type,
                                              phone_number=cell, email_address=email, event_name=event_name,
                                              remarks=remarks, area=area, k9s_needed=k9s_required, start_date=start_date,
-                                             end_date=end_date, latitude=lat, longtitude=lng)
+                                             end_date=end_date, latitude=lat, longtitude=lng, status = status)
         request.save()
         print("Event: " + event_name + ". " + str(x) + "/150 events")
 

@@ -460,6 +460,7 @@ class K9_Schedule(models.Model):
         ('Initial Deployment', 'Initial Deployment'),
         ('Checkup', 'Checkup'),
         ('Request', 'Request'),
+        ('Arrival', 'Arrival')
     )
 
     k9 = models.ForeignKey('planningandacquiring.K9', on_delete=models.CASCADE, null=True, blank=True)

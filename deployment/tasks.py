@@ -234,7 +234,7 @@ def subtract_inventory(user):
 # @periodic_task(run_every=timedelta(seconds=25))
 def check_initial_deployment_dates():
     # print 'check_initial_deployment_dates code is running'
-    schedules = K9_Schedule.objects.filter(status = 'Initial Deployment')
+    schedules = K9_Schedule.objects.filter(status = 'Initial Deployment').filter(date_start__lte = date.today()).exclude(team = None)
 
     # print "Schedules"
     # print schedules
@@ -251,13 +251,11 @@ def check_initial_deployment_dates():
         # print pre_deps
 
         team = item.team
-        team_list.append(team.id)
-
         if delta.days >= 0: #TAKE NOTE OF THIS #TODO notification
             for pre_dep in pre_deps:
                 # print "PRE DEP STATUS"
                 # print pre_dep.status
-                if pre_dep.status == "Confirmed" and pre_deps.filter(status = "Confirmed").count() >= 2: #Dapat atleast 2 sila nidedeploy
+                if pre_dep.status == "Confirmed" and pre_deps.filter(status = "Confirmed").count() + team.total_dogs_deployed >= 2: #Dapat atleast 2 sila nidedeploy
                     pre_dep.status = "Done"
                     pre_dep.save()
                     k9 = pre_dep.k9
@@ -272,10 +270,11 @@ def check_initial_deployment_dates():
                     deploy.save()
                     # print deploy
 
+                    team_list.append(team.id)
 
                     #TODO dito pa lang ibabawas yung items
 
-                elif pre_dep.status == "Pending" or (pre_dep.status == "Pending" and pre_deps.filter(status = "Confirmed").count() < 2):
+                elif pre_dep.status == "Pending" or (pre_dep.status == "Pending" and pre_deps.filter(status = "Confirmed").count() < 2 + team.total_dogs_deployed < 2):
                     pre_dep.status = "Cancelled"
                     pre_dep.save()
 
@@ -318,10 +317,35 @@ def check_initial_dep_arrival():
         if item.team_assignment:
             team_list.append(item.team_assignment.id)
 
-    update_port_info(team_list)
+    if deployed:
+        update_port_info(team_list)
 
     return None
 
+
+# Arrival from leaves, transfers and reassignments
+def check_port_dep_arrival():
+
+    port_arrival_sched = K9_Schedule.objects.filter(status = "Arrival").filter(date_start__lte=datetime.today().date())
+
+    team_list = []
+    for sched in port_arrival_sched:
+        tdd = Team_Dog_Deployed.objects.filter(k9=sched.k9).exclude(team_assignment=None).filter(
+            date_pulled=None).last()
+        delta = sched.date_start - datetime.today().date()
+        k9 = sched.k9
+        if delta.days > 5:
+            tdd.date_pulled = datetime.today().date()
+            k9.training_status = "MIA"
+            k9.save()
+            tdd.save()
+
+        if tdd.team_assignment:
+            team_list.append(tdd.team_assignment.id)
+
+    update_port_info(team_list)
+
+    return None
 
 # @periodic_task(run_every=timedelta(seconds=10))
 # def test():
@@ -361,7 +385,7 @@ def deploy_dog_request():
             dr.save()
 
             # temporarily pull out from port
-            recent_port_deploy = Team_Dog_Deployed.objects.exclude(team_assignment = None).filter(date_pulled=None).latest('date_added')
+            recent_port_deploy = Team_Dog_Deployed.objects.filter(k9 = sched.k9).exclude(team_assignment = None).filter(date_pulled=None).last()
             recent_port_deploy.date_pulled = datetime.today().date()
 
             assign_TL(recent_port_deploy.team_assignment)
@@ -416,7 +440,7 @@ def pull_dog_request():
             handler.save()
 
             #TODO Create Team_Dog_Deployed for last port assignment
-            recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).latest('date_pulled')
+            recent_port = Team_Dog_Deployed.objects.filter(k9=deployed.k9).exclude(team_assignment=None).exclude(date_pulled = None).last()
             assign_TL(recent_port.team_assignment)
 
             if Team_Dog_Deployed.objects.filter(k9 = deployed.k9, team_assignment = recent_port.team_assignment, status="Pending").count() == 0:
@@ -432,8 +456,8 @@ def check_arrival_to_request(dog_request):
 
     for item in deployed:
         if item.status == "Pending" and dog_request.start_date >= date.today():
-            deployed.date_pulled = date.today()
-            deployed.save()
+            item.date_pulled = date.today()
+            item.save()
             k9 = item.k9
             k9.training_status = "MIA"
             k9.save()
@@ -453,8 +477,8 @@ def check_arrival_to_ports_via_request(team_assignment):
         try:
             delta = today - recent_request_deployment.date
             if item.status == "Pending" and delta.days > 5:
-                deployed.date_pulled = date.today()
-                deployed.save()
+                item.date_pulled = date.today()
+                item.save()
                 k9 = item.k9
                 k9.training_status = "MIA"
                 k9.save()
@@ -470,20 +494,20 @@ def check_arrival_to_ports_via_request(team_assignment):
 # @periodic_task(run_every=timedelta(seconds=30))
 def check_arrivals():
 
-    team_assignments = Team_Assignment.objects.all()
+    # team_assignments = Team_Assignment.objects.all()
     # dog_requests = Dog_Request.objects.exclude(start_date__gt = date.today()) #TODO filter for currently ongoing dog requests
     dog_requests = Dog_Request.objects.filter(Q(start_date__lte = datetime.today().date()), Q(end_date__gte = datetime.today().date()))
 
-    team_list = []
-    for team_assignment in team_assignments:
-        check_arrival_to_ports_via_request(team_assignment)
-        team_list.append(team_assignment.id)
+    # team_list = []
+    # for team_assignment in team_assignments:
+    #     check_arrival_to_ports_via_request(team_assignment)
+    #     team_list.append(team_assignment.id)
 
     for dog_request in dog_requests:
         check_arrival_to_request(dog_request)
         update_request_info(dog_request)
 
-    update_port_info(team_list)
+    # update_port_info(team_list)
 
     return None
 
@@ -528,5 +552,8 @@ def task_to_dash_dep():
 
     # Notify admin to schedule initial deployment if ports only has one unit
     notify_if_port_has_only_one_unit()
+
+    # Confirm arivals from transfers, regular leaves and reassignments
+    check_port_dep_arrival()
 
     return None

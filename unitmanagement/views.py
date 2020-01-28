@@ -2323,6 +2323,22 @@ def reassign_assets(request, id):
             k = K9.objects.get(id=f.k9.id)
             k.handler=h
 
+            if k.training_status == "Deployed":
+                try:
+                    recent_tdd = Team_Dog_Deployed.objects.filter(k9 = k).exclude(team_assignment = None).last()
+                    if recent_tdd:
+                        Team_Dog_Deployed.objects.create(team_assignment = recent_tdd.team_assignment, k9 = k, handler = h, status = "Pending")
+                        K9_Schedule.objects.create(team=recent_tdd.team_assignment, k9=k, status="Arrival",
+                                                            date_start=datetime.today().date())
+
+                        Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given',
+                                                    message=str(k) + ' has been assigned to you. Please go to ' + str(recent_tdd.team_assignment) + " to confirm arrival.")
+                except: pass
+            else:
+                Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given',
+                                            message=str(k) + ' has been assigned to you.')
+
+
             try:
                 temp_handler = Temporary_Handler.objects.filter(k9 = k).last()
                 if temp_handler:
@@ -2334,8 +2350,6 @@ def reassign_assets(request, id):
             except: pass
 
             k.save()
-
-            Notification.objects.create(position='Handler', user=k.handler, notif_type='k9_given', message= str(k) + ' has been assigned to you.')
 
             messages.success(request, str(k9) + ' has been assigned to ' + str(h))
             return redirect('unitmanagement:k9_unpartnered_list')
@@ -2492,11 +2506,11 @@ def confirm_going_back(request,id):
     cb.save()
     return redirect ('profiles:handler_dashboard')
 
-def confirm_going_back_handler(id):
-    cb = Call_Back_Handler.objects.get(id=id)
-    cb.status = 'Confirmed'
-    cb.save()
-    return redirect('profiles:handler_dashboard')
+# def confirm_going_back_handler(id):
+#     cb = Call_Back_Handler.objects.get(id=id)
+#     cb.status = 'Confirmed'
+#     cb.save()
+#     return redirect('profiles:handler_dashboard')
 
 def confirm_item_request(request,id):
     rr = Replenishment_Request.objects.get(id=id)
@@ -2988,7 +3002,7 @@ def k9_unpartnered_list(request):
     style=''
 
     # data = K9.objects.filter(handler=None) #removed for deployment
-    data = K9.objects.filter(status='Working Dog').filter(handler=None)
+    data = K9.objects.filter(status='Working Dog').exclude(training_status = "For-Breeding").exclude(training_status = "Breeding").filter(handler=None)
     # data_on_leave = K9.objects.filter(training_status='Handler_on_Leave').filter(handler=None)
 
     #NOTIF SHOW
@@ -4321,16 +4335,17 @@ def k9_mia_list(request):
     user_mia_perma = User.objects.filter(status = "MIA")
 
     for km in k9_mia:
-        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).filter(date_pulled=None).latest('date_pulled')
+        tdd = Team_Dog_Deployed.objects.filter(k9=km).filter(status='Pending').exclude(date_added=None).exclude(date_pulled=None).last()
 
-        loc = None
-        if tdd.team_assignment != None:
-            loc = tdd.team_assignment
-        else:
-            loc = tdd.team_requested
+        if tdd:
+            loc = None
+            if tdd.team_assignment != None:
+                loc = tdd.team_assignment
+            else:
+                loc = tdd.team_requested
 
-        a = [km,loc,tdd]
-        k9_list.append(a)
+            a = [km,loc,tdd]
+            k9_list.append(a)
 
     print(k9_mia)
     print(k9_list)
@@ -4376,7 +4391,7 @@ def k9_mia_change(request,id):
         k9.status = 'Working Dog'
         k9.training_status = 'Deployed'
         k9.save()
-        deployed = Team_Dog_Deployed.objects.filter(k9 = k9).exclude(date_pulled=None).filter(status="Pending").exclude(
+        deployed = Team_Dog_Deployed.objects.filter(k9 = k9).filter(status="Pending").exclude(
             team_assignment=None).last()
         deployed.status = "Deployed"
         deployed.save()

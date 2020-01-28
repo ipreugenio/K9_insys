@@ -154,7 +154,7 @@ def dashboard(request):
     #Counts
     c_count = K9.objects.filter(training_status='Classified').count()
     item_req_count = Replenishment_Request.objects.filter(status='Pending').count()
-    up_count = K9.objects.filter(status='Working Dog').filter(handler=None).count()
+    up_count = K9.objects.filter(status='Working Dog').filter(handler=None).exclude(training_status = "For-Breeding").exclude(training_status = "Breeding").count()
     tq_count = Request_Transfer.objects.filter(status='Pending').count()
 
     pre_dep_items = K9_Pre_Deployment_Items.objects.filter(Q(status = "Pending") | Q(status = "Confirmed") | Q(status = "Done"))

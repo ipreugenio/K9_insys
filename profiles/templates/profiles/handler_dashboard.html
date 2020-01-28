@@ -153,7 +153,7 @@
                     <tr>
                     <th>Status: {{k9.training_status}}</th>
                     {% if k9.status == "Sick" or k9.status == "Lost" or k9.status == "Stolen" or k9.status == "Accident"%}
-                    <th style="color:red;">K9 in Incident</th>
+                    <th style="color:red;">K9 in Incident ({{k9.status}})</th>
                     {%else%}
                     <th>Type: {{k9.status}}</th>
                     {%endif%}

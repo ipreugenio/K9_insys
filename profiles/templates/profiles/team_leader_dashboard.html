@@ -72,7 +72,7 @@
 
                       {% elif dog_req %}
                       <strong>Current Team (Request)</strong>
-                      <a href="{% url 'deployment:request_dog_details' dr.id %}"><p> {{dr}}</p></a>
+                      <a href="{% url 'deployment:request_dog_details' dog_req.id %}"><p> {{dog_req}}</p></a>
                       {% endif %}
 
                     </div>
@@ -251,14 +251,18 @@
 
                   </table>
 
+                    {% if ta %}
                     <input class = "ui blue button" type="submit"  value="Record Maritime" id = "maritime_btn">
+                    {% elif dog_req %}
+                    <input class = "ui disabled blue button" type="submit"  value="Record Maritime">
+                    {% endif %}
 
                   {% if reveal_arrival == True %}
                   <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival">
-                  {% endif %}
 
-                  {% if reveal_arrival_dr == True %}
-                  <input class = "ui green button" type="submit"  value="Confirm Arrival to Port" id = "reveal_confirm_arrival_dr">
+                  {% elif reveal_arrival_dr == True %}
+                  <input class = "ui green button" type="submit"  value="Confirm Arrival to Request" id = "reveal_confirm_arrival_dr">
+                   {% else %}
                   {% endif %}
 
                    {% if check_arrival_emrgncy_leave is not None %}

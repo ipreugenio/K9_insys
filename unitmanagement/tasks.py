@@ -321,8 +321,10 @@ def check_leave_window(is_emergency = False, handler = None):
         handler_tdd = tdd.filter(handler = handler).filter(status = "Deployed").last()
         handler_tdd.date_pulled = datetime.today().date()
         handler_tdd.save()
-        Team_Dog_Deployed.objects.create(team_assignment=handler_tdd.team_assignment, handler=handler, k9=k9,
+        new_tdd = Team_Dog_Deployed.objects.create(team_assignment=handler_tdd.team_assignment, handler=handler, k9=k9,
                                          date_added=datetime.today().date(), status="Pending")
+        K9_Schedule.objects.create(team=new_tdd.team_assignment, k9=k9, status="Arrival",
+                                   date_start=datetime.today().date())
 
         # leave.status = "Done"
         leave.is_actioned = True
@@ -375,7 +377,9 @@ def check_transfer():
         k9 = K9.objects.filter(handler = handler).last()
         k9.assignment = str(transfer.location_to)
 
-        Team_Dog_Deployed.objects.create(team_assignment = transfer.location_to, handler = handler, k9 = k9, date_added = datetime.today().date(), status = "Pending")
+        new_tdd = Team_Dog_Deployed.objects.create(team_assignment = transfer.location_to, handler = handler, k9 = k9, date_added = datetime.today().date(), status = "Pending")
+        K9_Schedule.objects.create(team=new_tdd.team_assignment, k9=k9, status="Arrival",
+                                   date_start=datetime.today().date())
 
         k9.save()
         transfer.status = "Done"
